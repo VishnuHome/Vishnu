@@ -1,0 +1,104 @@
+Vishnu-Ladevorgang
+1. alle Jobs, -SubJobs und Snapshots werden in JobPackages eingelesen.
+
+
+App.cs:
+	SingleInstanceApplication._businessLogic = new LogicalTaskTree.LogicalTaskTree(new TreeParameters("Tree 1", null), new ProductionJobProvider());
+		public LogicalTaskTree(TreeParameters treeParams, IJobProvider jobProvider)
+		  this._rootJobList = new JobList(treeParams, jobProvider);
+				private JobList(string logicalName, LogicalNode mother, JobList rootJoblist, TreeParameters treeParams, IJobProvider jobProvider,
+	          List<string> parsedJobs, Dictionary<string, JobList> subJobs)
+	          : base(logicalName, mother, rootJoblist, treeParams)
+					this._job = this._jobProvider.GetJob(ref logicalName);
+	        	public virtual Job GetJob(ref string name)
+	        		public abstract class JobProviderBase : IJobProvider
+	        			public virtual Job GetJob(ref string name
+	        				ProductionJobProvider.TryLoadJobPackage
+	        					
+	        					private string loadJob(Job mother, string jobXML, string logicalJobName, XElement xSubJob, bool isControlled, bool startCollapsed,
+											if (!String.IsNullOrEmpty(jobXML)) // bei MainJob oder extern definiertem SubJob XML laden
+	            				{
+				                xmlLogicalJobName = loadJobXMLFile(jobXML, isRootJob, isSnapshot, ref xmlDoc, ref isDefaultSnapshot);
+				              }
+	            				JobPackage jobPackage = new JobPackage(jobXML, logicalJobName);
+	            				
+	   									ggf. Rekursion bei SubJobs: 
+	   									loadJob(jobPackage.Job, physicalPath, subJob.Element("LogicalName").Value, subJob,
+	                      jobPackage.Job.IsControlled, startSubJobCollapsed, null, null, false, false, out depth);
+	                      
+	                    ggf. Rekursion bei Snapshots:
+	                    loadJob(jobPackage.Job, physicalSnapshotPath, logicalSnapshotName, snapshot,
+	                      false, startSnapshotCollapsed, trigger, logicalTriggerName, false, true, out depth);
+	
+	        this.parse();
+	          this.syntaxTree = new LogicalParser().Parse(this.LogicalExpression);
+	          this.buildParallelTree(this, this.syntaxTree);
+	            private void buildParallelTree(NodeList mother, SyntaxTree template)
+	
+							ggf. bei Snapshots:
+	              newChild = new Snapshot(child.NodeName, this, this, this.TreeParams, this._jobProvider, this._parsedJobs);
+									internal Snapshot(string logicalName, LogicalNode mother, JobList rootJoblist, TreeParameters treeParams, IJobProvider jobProvider, List<string> parsedJobs)
+	          							: base(logicalName, mother, rootJoblist, treeParams)
+	          			  this.RefreshSnapshot(mother, true);
+	          			  	this.parse(mother, isConstructor);
+     
+	LogicalTaskTreeViewModel logicalTaskTreeViewModel = new LogicalTaskTreeViewModel(SingleInstanceApplication._businessLogic, this._mainWindow, SingleInstanceApplication._appSettings.StartTreeOrientation, SingleInstanceApplication._appSettings.FlatNodeListFilter);
+		this.MainLogicalNodeView = new ReadOnlyCollection<JobListViewModel>(
+		          new JobListViewModel[]
+		          {
+		              new JobListViewModel(this, null, this._root, false, this._uIMain)
+		          });
+		this.MainLogicalNodeView[0].SetChildOrientation(startTreeOrientation);
+		this.MainLogicalNodeView[0].ExpandTree(this.MainLogicalNodeView[0], false);
+
+
+
+Prosa:
+	Das Ganze beginnt mit der Instanziierung der BusinessLogic in App.cs.
+	  Dort wird die Root-JobList durch LogicalTaskTree instanziiert.
+			Diese Root-JobList holt sich ihren Job über den JobProvider.
+				Der JobProvider lädt bei diesem Aufruf alle Jobs und Unter-Jobs rekursiv
+				in Jobs in JobPackages. Dieser Vorgang lädt zwar rekursiv, aber nur die JobPackages aus XMLs.
+				Weitere JobLists werden dabei nicht instanziiert.
+				Es wird bei Snapshots allerdings schon ein zugehöriger FileWatcherTrigger auf die XML des
+				remote-Snapshots instanziiert (aber noch nicht gestartet).
+			Zurück in der Root-JobList.
+			Die Root-JobList holt sich jetzt den zur LogicalExpression aufgebauten SyntaxTree vom LogicalParser.
+			Dann hangelt sich die Root-Joblist über buildParallelTree an dem SyntaxTree entlang und baut
+			den LogicalTaskTree auf.
+			Hierbei werden rekursiv alle JobLists und enthaltene Elemente instanziiert.
+			Snapshots werden von der Root-JobList selbst nicht rekursiv behandelt; das macht der Konstruktor
+			eines neu instanziierten Snapshots selbst.
+				Im Snapshot-Konstruktor: Aufruf von RefreshSnapshot, dort Aufruf von Parse.
+				  Parse lädt das zugehörige XML-File und ruft buildTreeFromRemoteJob.
+				  	buildTreeFromRemoteJob ist für den Snapsot das, was buildParallelTree für die Root-JobList is.
+				  	Hier werden rekursiv alle Snapshot-Unterelemente (als SnapshotDummies) instanziiert.
+				  	Beim ersten Aufruf werden die Snapshot-Elemente noch nicht mit den Laufzeit-Werten des
+				  	remote-Trees gefüllt, da der gesamte Vishnu-Tree zu diesem Zeitpunkt noch nicht gestartet ist.
+				  	
+	Zurück in App.cs.
+	Jetzt wird LogicalTaskTreeViewModel instanziiert. Der Konstruktor von LogicalTaskTreeViewModel bekommt
+	dabei die gerade erzeugte Instanz der BusinessLogic (Root-JobList) übergeben.
+		LogicalTaskTreeViewModel instanziiert JobListViewModel und übergibt dabei die Root-JobList aus
+		der BusinessLogic.
+			JoblistViewModel(über LogicalNodeViewModel) übernimmt die Root-JobList als seinen BusinessLogic-Knoten
+			und baut rekursiv über LoadChildren für alle Unterknoten der Root-Joblist die ViewModels.
+			Jedes einzelne ViewModel hängt sich dabei in die Events Des zugehörigen BusinessLogic-Knoten ein.
+	
+	Run des Trees (Benutzerinteraktion oder Parametereinstellung).
+		Hierbei werden alle Knoten und auch alle Trigger gestartet.	Unter anderem auch eventuell vorher (s.o.)
+		instanziierte FileWatcherTrigger auf Snapshots.
+		Sofern solche mit dem Zusatzparameter 'InitialFire' eingerichtet wurden (ist der Default), springen
+		sie direkt in die Routine DoRun des Snapshots, welche ihrerseits RefreshSnapshot aufruft.
+			Wie oben ruft RefreshSnapshot, Parse, Parse lädt das XML und ruft dann buildTreeFromRemoteJob.
+				Dort werden jetzt allerdings die Laufzeitwerte des remote-Trees übernommen.
+			Danach springt Parse die Routine OnSnapshotRefreshed an, welche über das Event SnapshotRefreshed
+			die Methode SnapshotViewModel_SnapshotRefreshed im zugehörigen ViewModel aufruft.
+				SnapshotViewModel_SnapshotRefreshed ruft dann leanTreeRefresh.
+			  	leanTreeRefresh ruft refreshTreeView. 
+			  		refreshTreeView geht rekursiv durch den ViewModelTree, aktualisiert auf jedem Knoten
+			  		den BusinessLogic-Knoten und raised die UI-Events.
+			  		Falls es im Verlauf von refreshTreeView und/oder leanTreeRefresh zu einer Diskrepanz
+			  		zwischen altem und neuen Tree kommen sollte, wird mit false abgebrochen und in Folge
+			  		im übergeordneten SnapshotViewModel_SnapshotRefreshed ein Aufruf von
+			  		fullTreeRefresh angeschlossen.

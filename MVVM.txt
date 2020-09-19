@@ -1,0 +1,67 @@
+
+													Applications
+						App (Type a), App (Type b), App (Type c), ...
+																|erzeugt
+									+-------------+-------------+-----------------+
+									|							:							|									|
+					 				|		.......Resourcen				|									|
+					 				|		:					|							|									|
+									v		:		DataTemplates				v									v
+							MainWindow			^		^			MainViewModel--kennt-->Model
+									|						| 	|				^		|erzeugt
+									|						|		|				|		+-----------------+
+							Content-				|		|				|		v									v
+							Property--kennt-+---)-------+	Sub-ViewModel		Sub-Model
+									|								|						^			|						^
+								Views--kennt------+-----------+			+-kennt-----+
+								 ...						 ...						...								...
+
+
+-----------------------------------------------------------------------------------------------------------
+			Event
+View -------> ViewModel <--> Model
+	+<-------------+
+	
+Richtlinien:
+1.	Eine View instanziiert nichts außer ggf. implizit andere Views (ansonsten wären mehrere 
+		Views auf einen Business-case kaum machbar);
+2.	Views können direkt bidirektional mit ViewModels kommunizieren, ohne das die ViewModels
+		ihre Models kontaktieren und ohne das die ViewModels ihre Views kennen;
+3.	ViewModels können Views instanziieren, sie tun das aber nur indirekt, indem sie einem
+		schon existierenden und an eine View gebundenen ViewModel eine Neues ViewModel als
+		veröffentlichte Property bzw. Listenelement hinzufügen; über ein in einer übergeordneten
+		Resource definiertes DataTemplate für den Typ des neu erzeugten ViewModels hat die UI dann 
+		die Möglichkeit, dem neuen ViewModel eine passende neue View zu rendern - vorausgesetzt,
+		das neue ViewModel ist direkt oder indirekt (Liste) an eine Content-Property gebunden,
+		in der es angezeigt werden soll.
+4.	Models sind der Kern einer Anwendung und ViewModels 'nur' Sekudärattribute, eine Anwendung
+		kann auch ohne jedes ViewModel auskommen (gilt zumindest bei nicht-Dialog-Anwendungen)
+		aber jedes ViewModel benötigt ein Model;
+5.	Apps instanziieren das Main-Model, das Main-ViewModel und die Main-View;
+6.	Apps sind reine Starter (Loader) und sollen danach keine weitergehende Funktion übernehmen;
+		zum Startzeitpunkt einer App ist noch nicht bekannt, wieviele Models, ViewModels und Views
+		zur Laufzeit noch entstehen werden, weshalb eine App auch nicht für das Starten von Models,
+		ViewModels und Views zuständig sein darf - mit Ausnahme des Main-Models
+		(übernimmt den Application-Thread), des Main-ViewModels (übernimmt das (Main-)Model) und der
+		Main-View (startet den Dispatcher-Thread und rendert das Main-ViewModel mit Hilfe von
+		Resourcen aus App und/oder MainWindow);
+		Da z.B. in verteilten Anwendungen abhängig vom zu ladenden Inhalt einer Liste in einem 
+		ViewModel neue ViewModels mit neuen Models instanziert werden können, ja sogar ganze
+		Slave-Apps gestartet werden können, sollte das von dem zuständigen ViewModel aus erfolgen;
+		es wäre zwar auch denkbar, Models und ViewModels nur über Models zu starten, ist aber in
+		einer Dialoganwendung nicht sehr praktikabel und bildet auch nicht die Tatsache ab, dass
+		die neuen Instanzen ja nur deshalb neu entstehen können, weil sie durch externe Einflüsse
+		(View->ViewModel) iniziiert werden.
+7.	ViewModels erhalten bei der Instanziierung ihren DataContext und erzeugen diesen nicht
+		selbst. Erzeugen diese nun ihrerseits neue Sub-ViewModels, so holen sie sich zuerst aus
+		ihrem Model eine Instanz des für das Sub-ViewModel passenden DataContextes und geben
+		diese dann dem Konstruktor des Sub-ViewModels mit.
+   
+"Die Ansichtsklassen wissen nicht, dass die Modellklassen existieren,
+während dem ViewModel und dem Modell die Ansicht nicht bekannt ist.
+Das Modell weiß nichts darüber, dass das ViewModel und die Ansicht existieren."
+
+1. Create Model
+2. Create ViewModel(Model)
+-----------------------------------------------------------------------------------------------------------
+

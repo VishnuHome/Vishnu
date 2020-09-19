@@ -1,0 +1,260 @@
+﻿<UserControl x:Class="Vishnu.WPF_UI.LogicalTaskTreeControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ctrl="clr-namespace:CustomProgressBar;assembly=CustomProgressBar"
+             xmlns:vm="clr-namespace:Vishnu.ViewModel;assembly=ViewModel"
+             xmlns:convert="clr-namespace:Vishnu.WPF_UI.ValueConverter"
+             xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+             mc:Ignorable="d" 
+             x:Name="LogicalTaskTreeControl1">
+             <!--DataContext="{Binding [LogicalTaskTreeViewModel], Source={StaticResource Locator}}"-->
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Assets/LogicalTaskTreeControlResourceDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <convert:NullableBoolToBrush x:Key="nullableBoolToBrush" />
+            <convert:VisualNodeWorkerStateToText x:Key="workersStateToText" />
+            <convert:VisualNodeStateToBitmapImage x:Key="visualNodeStateToBitmapImage" />
+            <x:Code>
+                <![CDATA[
+                                    private void ItemBorder_MouseDown(object sender, MouseButtonEventArgs e)
+                                    {
+                                        Console.WriteLine("border1_MouseDown");
+                                        e.Handled = true; // Console.WriteLine("border1_MouseDown: setting e.Handled to true.");
+                                    }
+                                ]]>
+            </x:Code>
+            <HierarchicalDataTemplate 
+                        DataType="{x:Type vm:JobListViewModel}" 
+                        ItemsSource="{Binding Children}"
+                    >
+                <Border Name="ItemBorder" Padding="5" Background="Transparent" CornerRadius="6" MouseDown="ItemBorder_MouseDown">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Name}" Padding="5" />
+                        <Grid Grid.Row="0" Grid.Column="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <ctrl:CustomProgressBar Grid.Column="0" Name="cpBar" Value="{Binding Path=SingleNodesFinished}" Height="22" Width="60" Padding="5"/>
+                            <StackPanel Margin="4,7,4,7">
+                                <Button Grid.Column="0" Name="btnRunOrBreakLogicalTaskTree" Visibility="Hidden"
+                                        Command="{Binding RunOrBreakLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}"
+                                        FontSize="8">
+                                    <Button.Content>
+                                        <Binding Path="ButtonRunBreakText" />
+                                    </Button.Content>
+                                </Button>
+                            </StackPanel>
+                            <Ellipse Grid.Column="1" Width="5" Height="5" Margin="3" Fill="{Binding Logical, Converter={StaticResource nullableBoolToBrush}}" />
+                        </Grid>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Id}" Padding="5" />
+                        <TextBlock Grid.Row="0" Grid.Column="3" FontSize="8">
+                            <TextBlock.Text>
+                                <Binding Path="WorkersState" Converter="{StaticResource workersStateToText}" />
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <Image Grid.Row="0" Grid.Column="4" Height="14" Width="14">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource visualNodeStateToBitmapImage, diag:PresentationTraceSources.TraceLevel=High}">
+                                    <Binding Path="VisualState" />
+                                    <Binding Source="{StaticResource BitmapImageDictionary}" />
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </Grid>
+                </Border>
+                <DataTemplate.Triggers>
+                    <Trigger Property="UIElement.IsMouseOver" Value="True">
+                        <Setter
+                                                    TargetName="btnRunOrBreakLogicalTaskTree"
+                                                    Property="Visibility"                     
+                                                    Value="visible" />
+                    </Trigger>
+                </DataTemplate.Triggers>
+            </HierarchicalDataTemplate>
+
+            <HierarchicalDataTemplate 
+                        DataType="{x:Type vm:NodeListViewModel}" 
+                        ItemsSource="{Binding Children}"
+                        >
+                <Border Name="ItemBorder" Padding="5" Background="Transparent" CornerRadius="6" MouseDown="ItemBorder_MouseDown">
+                    <StackPanel Orientation="Horizontal">
+                        <!-- TextBlock Text="{Binding Id}" Padding="5" / -->
+                        <TextBlock Text="{Binding Name}" Padding="5" />
+                        <!-- Label Content="{Binding SingleNodes}" Padding="5" / -->
+                        <!--Label Content="{Binding SingleNodesFinished}" Padding="5" / -->
+                        <ctrl:CustomProgressBar Value="{Binding Path=SingleNodesFinished}" Height="22" Width="60" Padding="5"/>
+                        <Ellipse Width="7" Height="7" Margin="3" Fill="{Binding Logical, Converter={StaticResource nullableBoolToBrush}}" />
+                        <Grid Height="14">
+                            <Image>
+                                <Image.Source>
+                                    <MultiBinding Converter="{StaticResource visualNodeStateToBitmapImage, diag:PresentationTraceSources.TraceLevel=High}">
+                                        <Binding Path="VisualState" />
+                                        <Binding Source="{StaticResource BitmapImageDictionary}" />
+                                    </MultiBinding>
+                                </Image.Source>
+                            </Image>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </HierarchicalDataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:SingleNodeViewModel}">
+                <Border Name="ItemBorder" Background="Transparent" MouseDown="ItemBorder_MouseDown">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Name}" Padding="5" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" FontSize="8">
+                            <TextBlock.Text>
+                                <Binding Path="WorkersState" Converter="{StaticResource workersStateToText}" />
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <Image Grid.Row="0" Grid.Column="2" Height="14" Width="14">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource visualNodeStateToBitmapImage, diag:PresentationTraceSources.TraceLevel=High}">
+                                    <Binding Path="VisualState" />
+                                    <Binding Source="{StaticResource BitmapImageDictionary}" />
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <ctrl:CustomProgressBar Grid.Column="0" Name="cpBar" Value="{Binding Path=SingleNodesFinished}" Height="22" Width="60" Padding="5"/>
+                            <StackPanel Margin="4,7,4,7">
+                                <Button Grid.Column="0" Name="btnRunOrBreakLogicalTaskTree" Visibility="Hidden"
+                                    Command="{Binding RunOrBreakLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}"
+                                    FontSize="8">
+                                    <Button.Content>
+                                        <Binding Path="ButtonRunBreakText" />
+                                    </Button.Content>
+                                </Button>
+                            </StackPanel>
+                            <Ellipse Grid.Column="1" Width="5" Height="5" Margin="3" Fill="{Binding Logical, Converter={StaticResource nullableBoolToBrush}}" />
+                        </Grid>
+                    </Grid>
+                </Border>
+                <DataTemplate.Triggers>
+                    <Trigger Property="UIElement.IsMouseOver" Value="True">
+                        <Setter
+                                                    TargetName="btnRunOrBreakLogicalTaskTree"
+                                                    Property="Visibility"                     
+                                                    Value="visible" />
+                    </Trigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TreeView x:Name="TreeView1" ItemsSource="{Binding MainLogicalNodeView}" Grid.Row="0">
+            <TreeView.ItemContainerStyle>
+                <!-- 
+                    Dieser Style bindet ein TreeViewItem an ein TreeViewItemViewModel. 
+                -->
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TreeViewItem">
+                                <Grid Margin="2" HorizontalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <!-- Die obere Zeile enthält den kompletten Inhalt des TreeViewItems incl. möglicher Kinder. -->
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Expander Name="Exp" Template="{StaticResource ExpanderStyleHeaderCentered}" Grid.Row="0" Grid.Column="0"
+                                                      ExpandDirection="Down"
+                                                      IsExpanded="{TemplateBinding TreeViewItem.IsExpanded}">
+                                        <Expander.Header>
+                                            <!-- Der 'ContentPresenter' zeigt den Inhalt des TreeViewItems an. -->
+                                            <ContentPresenter Name="Exp_Header"                  
+                                                            ContentSource="Header"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center" />
+                                        </Expander.Header>
+                                        <!-- 'ItemsPresenter' zeigt die Kinder des TreeViewItems an. -->
+                                        <ItemsPresenter Grid.Row="1" />
+                                    </Expander>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="TreeViewItem.HasItems" Value="False">
+                                        <Setter Property="Tag" TargetName="Exp" Value="NoChilds" />
+                                    </Trigger>
+                                    <!--<Trigger Property="UIElement.IsMouseOver" Value="True">
+                                        <Setter
+                                                    TargetName="Exp"
+                                                    Property="Opacity"                     
+                                                    Value="0.5" />
+                                    </Trigger>-->
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+
+                    <!-- Setzt die Default-Darstellung im ItemsPanel so, dass die Kinder
+                        in einem StackPanel horizontal nebeneinander angezeigt werden. -->
+                    <Setter Property="ItemsPanel">
+                        <Setter.Value>
+                            <ItemsPanelTemplate>
+                                <StackPanel 
+                                    HorizontalAlignment="Left" 
+                                    IsItemsHost="True" 
+                                    Orientation="Horizontal"  />
+                            </ItemsPanelTemplate>
+                        </Setter.Value>
+                    </Setter>
+
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                    <Setter Property="FontWeight" Value="Normal" />
+                    
+                    <!-- Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="FontWeight" Value="Bold" />
+                        </Trigger>
+                    </Style.Triggers -->
+                </Style>
+            </TreeView.ItemContainerStyle>
+
+        </TreeView>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Name="btnRunLogicalTaskTree" Command="{Binding RunLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">Run</Button>
+            <Button Grid.Column="1" Name="btnBreakLogicalTaskTree" Command="{Binding BreakLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">Break</Button>
+        </Grid>
+    </Grid>
+</UserControl>

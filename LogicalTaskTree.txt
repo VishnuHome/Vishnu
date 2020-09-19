@@ -1,0 +1,200 @@
+Projekt: Logical Task Tree
+Erste Überlegungen in 07/2012, Projektstart am 17.10.2012
+Erster Stand mit Vishnu Version 1.0.0.0 am 04.03.2013
+Stand: 28.05.2016 Erik Nagel
+
+Ideen:
+	- Entwicklung einer allgemeingültigen Software zur Abarbeitung durch logische Ausdrücke formulierter Jobs
+		mit Tasks auf beliebigen Prozessen.
+		Je nach Sachlage sollen diese Jobs/Tasks auch parallelisiert werden.
+	
+	-	Ein Job ist eine Entity (z.B. Directory), welche mindestens eine RootJoblist enthält
+		Jede Joblist enthält:
+		- einen eindeutigen Namen (ID)
+		- eine optionale Liste von Job-Bezeichnern, die für die dort aufgeführten (Unter-)Jobs (Jobs, deren
+		  Bezeichner im logischen Ausdruck vorkommen) eine Reihenfolge definiert; die spätere Implementierung
+		  des (Haupt-)Jobs beantwortet dann Anfragen aus den (später entstehenden) Logic-Trees, ob ein Unter-Job
+		  schon gestartet werden kann; außerdem verwaltet der Haupt-Job die Return-Objekte der Unter-Jobs, so dass
+		  der Haupt-Job auf Anforderung Return-Objekte von abgeschlossenen Unter-Jobs herausgeben kann, die
+		  dann einem noch zu startenden Unter-Job als Startparameter mitgegeben werden können.
+		- ein Flag: BreakWithResult (bei true werden, sobald der Ausdruck ein eindeutiges Ergebnis hat,
+		                             noch arbeitende Elemente abgebrochen)
+		- einen logischen Ausdruck, dessen Variablen wiederum
+				- Jobs
+				- Joblists
+				-	oder JobDefinitions referenzieren
+		- und/oder Definitionen von Einzeljobs (JobDefinition)
+		- und/oder Inplace-Definitionen von Unter-Joblists
+		
+	(-	Ein Job ist eine Entity (z.B. Directory), welche mindestens eine RootJoblist enthält
+		Jede Joblist enthält:
+		- einen eindeutigen Namen (ID)
+		- einen Typ: Set (Parallelverarbeitung) oder
+		             Sequence (sequenzielle Verarbeitung von links nach rechts, oben nach unten)
+		- ein Flag: BreakWithResult (bei true werden, sobald der Ausdruck ein eindeutiges Ergebnis hat,
+		                             noch arbeitende Elemente abgebrochen)
+		- einen logischen Ausdruck, dessen Variablen wiederum
+				- Jobs
+				- Joblists
+				-	oder JobDefinitions referenzieren
+		- und/oder Definitionen von Einzeljobs (JobDefinition)
+		- und/oder Inplace-Definitionen von Unter-Joblists)
+		
+	-	Logische Bedingungen werden auf Verarbeitung von Listen mit Schwellenwerten reduziert.
+
+Stoffsammlung
+	nach Parsen der Joblists optional decompilierte Joblists wegschreiben.
+	ggf. auch direkt decompilierte Eingaben verarbeiten
+	über Tagged-Jobs zur Mitteilung, Aufzeichnung von Zwischenständen (Mail, Log etc.) nachdenken
+	über Paramater-Übergabe zwischen Jobs nachdenken
+	Zeitsteuerung, Timer, Scheduler?
+	Rechte, Staging?
+
+Nomenklatur
+	!		:= logisches NOT
+	|		:= logisches OR
+	&		:= logisches AND
+	><	:= logisches XOR
+	n		:= Anzahl der Elemente einer Gruppe
+	n+	:= Anzahl der erfolgreich zu beendenden Elemente einer Gruppe,
+				 damit das Gesamtergebnis true wird - 1
+	n-	:= Anzahl der erfolgreich zu beendenden Elemente einer Gruppe,
+				 damit das Gesamtergebnis false wird
+	r		:= Anzahl Ergebnisse (Elemente die ein Ergebnis geliefert haben)
+	r+	:= Anzahl positiver Ergebnisse
+
+Bemerkung
+	Es wäre möglich, auch ohne die zweite Schwelle n- auszukommen, das würde aber
+	die Verarbeitung in einigen Fällen, insbesondere bei XOR, unnötig verkomplizieren;
+	außerdem müsste der Fall NOT über eine zusätzliche Eigenschaft der Node (negierend)
+	abgebildet werden.
+
+Ablauf
+	Bei Überschreiten von Punkt n+, d.h. wenn n+ >= 0 ist und die Anzahl der mit Ergebnis
+	true abgeschlossene Elemente > n+ ist, wird true zurückgegeben, bei gesetzter
+	Abbruch-Option werden noch laufende Elemente des Subtrees abgebrochen;
+	Bei Erreichen von Punkt n- (mit Ergebnis true abgeschlossene Elemente >= n-) wird false
+	zurückgegeben, bei gesetzter Abbruch-Option werden noch laufende Elemente des Subtrees
+	abgebrochen;
+	Bei Erreichen von Punkt n wird geprüft, ob die Anzahl der mit Ergebnis true abgeschlossenen
+	Elemente r+ > n+ und < n- ist, wenn ja, dann wird insgesamt true zurückgegeben.
+
+Beispiele
+	Ein Element
+		a							Sequence oder Set mit n = 1, n+ = n - 1, n- = n + 1
+		!a						Sequence oder Set mit n = 1, n+ = -1, n- = 1
+	
+	Zwei Elemente
+		a | b					Sequence a,b mit n = 2, n+ = 0, n- = n + 1
+									oder Set a,b mit n = 2, n+ = 0, n- = n + 1 und Abbruch-Option
+									                                           bei überschrittenem Schwellenwert
+
+		a & b					Sequence a,b mit n = 2, n+ = n - 1, n- = n + 1 und Check auf Abbruch nach dem
+									ersten Element: n - r + r+ > n+ ? weiter : abbrechen bei Abbruch-Option
+									oder Set a,b mit n = 2, n+ = n - 1, n- = n + 1 und o.g. Check auf Abbruch
+
+		a >< b				Sequence oder Set a,b mit n = 2, n+ = 0, n- = 2
+
+		a => b
+				!a | b		
+						{} | b	s.o.
+	Sub-Node: !a			s.o.
+
+	Drei Elemente		lassen sich über Sub-Nodes natürlich immer auch auf Paare reduzieren, werden
+									hier aber stellvertretend für alle Listen mit mehr als zwei Elementen betrachtet,
+									in denen eine direkte Verarbeitung sinnvoll sein könnte.
+		a | b | c			Sequence a,b,c mit n = 3, n+ = 0, n- = n + 1
+									oder Set a,b,c mit n = 3, n+ = 0, n- = n + 1 und Abbruch-Option bei
+																															 überschrittenem Schwellenwert
+
+		a & b & c			Sequence a,b,c mit n = 3, n+ = n - 1, n- = n + 1 und Check auf Abbruch nach
+									jedem Element: n - r + r+ > n+ ? weiter : abbrechen bei Abbruch-Option
+									oder Set a,b,c mit n = 2, n+ = n - 1, n- = n + 1 und o.g. Check auf Abbruch
+
+		a >< b >< c		Sequence a,b,c mit n = 3, n+ = 0, n- = 2
+									oder Set a,b,c mit n = 3, n+ = 0, n- = 2 und Abbruch-Option
+																													 bei überschrittenem Schwellenwert
+
+Parsen
+		a | b, => c
+				{} | c
+			 !{}
+			 a | b
+
+		(a | b) & c
+				{} & c
+				a | b
+				
+		a & b | a & c
+			 {} | {}
+		a & b   a & b 
+
+Klassen
+	Result	(Ergebnis-Klasse)
+			- Id						- Kopie von Id der zugehörigen Node
+			- Logical				-	true, false	:= das logische Ergebnis der Node
+			- State					- Kopie von State der zugehörigen Node
+			- PhysicalState	-	Kopie von PhysicalState der zugehörigen Node
+			- ReturnObject	-	Exception oder Nutzdaten
+	
+	ResultList := List of Result
+
+	GenericTree	
+		^		- kapselt alle Tree-Eigenschaften
+		|   - bietet AddNode und Traverse
+		|
+		+--	Logical Node
+					^		- Id := eindeutiger Name / eindeutige Kennung der Node
+					|		- Logical	-						:= das logische Ergebnis der Node
+					|		- State		- ready			:= die Verarbeitung kann gestartet werden
+					|							- busy  		:= die Verarbeitung läuft gerade
+					|							-	hasResult	:= die Verarbeitung hat ein Ergebnis (läuft u.U. noch)
+					|							- finished	:= die Verarbeitung ist beendet (hat dann immer ein Ergebnis)
+					|		- PhysicalState
+					|							-	none			:= Default
+					|							-	done			:= durchgelaufen
+					|							-	fault			:= mit Fehler abgebrochen
+					|							- timeout		:= Wartezeit überschritten
+					|							-	userAbort	:= vom Benutzer abgebrochen
+					|		- meldet asynchron Fortschritt (Event)
+					|		- meldet asynchron ein boolesches Ergebnis, wenn eine Verarbeitung endet (Event)
+					|		- liefert Fortschritt auch auf Nachfrage von Parent-Node
+					|		- behandelt Abbruch (abstract)
+					|		- liefert ResultList auf Nachfrage von Parent-Node (virtual)
+					|		(- liefert SubTree auf Nachfrage von Parent-Node (virtual))
+					|		- JobList	:= Referenz auf die übergeordnete, nächste JobList
+					|
+					+--	Single Node
+					|		- besitzt
+					|				|
+					|				+--	WorkerProcess		- beendet sich bei 100% oder Fehler,
+					|														- liefert true oder false als Ergebnis,
+					|														- sollte asynchron Fortschritt an Node melden können,
+					|														- sollte abgebrochen werden können.
+					|				
+					+--	NodeList
+					|		- n+	:= Anzahl der erfolgreich zu beendenden Elemente einer Gruppe,
+					|						 damit das Gesamtergebnis true wird - 1
+					|		- n-	:= Anzahl der erfolgreich zu beendenden Elemente einer Gruppe,
+					|						 damit das Gesamtergebnis false wird
+					|		- meldet asynchron ein boolesches Ergebnis, wenn n+ überschritten
+					|			oder n- erreicht, oder die Gruppe beendet wird
+					|		(intern: n := Gesamt-Anzahl der Elemente, r := Anzahl Ergebnisse,
+					|		         r+ := Anzahl positiver Ergebnisse, t := Anzahl terminierter Elemente)
+					|	  
+					+ Joblist
+							- SequentialNodes	:= Liste der Ids nacheinander abzuarbeitender Nodes	
+								(kann leer sein)
+							- BreakWithResult	:= bei true werden noch laufende Elemente abgebrochen,
+																	 wenn n+ überschritten oder n- erreicht wird
+							- Results					:= Dictionary<Id, Result> aller Nodes, die schon
+								Ergebnisse geliefert haben
+							- liefert auf Anfrage einer Node das ReturnObject einer anderen Node (Key: Id)
+							-	beantwortet die Anfrage einer Node, ob diese gestartet werden kann
+
+Überlegungen zur Verbindung / Überführung eines SyntaxTree (geparster logischer Ausdruck)
+und eines LogicalTaskTree
+	SyntaxTree.STRUCT ist eine Joblist, deren Verknüpfungen atomar, und hierarchisch gleichartig sind.
+	Möglichkeit: SyntaxTree definiert eine Methode Traverse, anhand derer ein paralleler Baum aufgebaut
+	werden kann.
+

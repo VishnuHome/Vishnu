@@ -1,0 +1,296 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" InitialTargets="ValidateAssemblyRoot" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="ValidateAssemblyRoot">
+    <Error Text="'Vishnu_Root' or 'Assemblies' must be set to a valid directory-path through environment or command line." Condition="'$(Vishnu_Root)$(Vishnu_Assemblies)' == ''" />
+    <Error Text="Couldn't find a valid assembly directory." Condition="!Exists('$(Vishnu_Assemblies)') and !Exists('$(Vishnu_Root)/ReadyBin/Assemblies')" />
+  </Target>
+  <PropertyGroup>
+    <AssemblyRoot Condition="'$(Vishnu_Assemblies)'!=''">$(Vishnu_Assemblies)</AssemblyRoot>
+    <PublishUrl>\\any-fileserver\any-share\VishnuViewer\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Unc</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>true</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <InstallUrl>\\any-fileserver\any-share\VishnuViewer\</InstallUrl>
+    <SupportUrl>http://www.neteti.de</SupportUrl>
+    <ErrorReportUrl>http://www.neteti.de</ErrorReportUrl>
+    <ProductName>Vishnu</ProductName>
+    <PublisherName>any-publisher-id</PublisherName>
+    <MinimumRequiredVersion>1.1.0.48</MinimumRequiredVersion>
+    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+    <WebPage>publish.htm</WebPage>
+    <ApplicationRevision>18</ApplicationRevision>
+    <ApplicationVersion>4.9.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <CreateDesktopShortcut>true</CreateDesktopShortcut>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyRoot Condition="'$(Vishnu_Assemblies)'==''">$(Vishnu_Root)/ReadyBin/Assemblies</AssemblyRoot>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D0E1EAC9-794A-474B-8A1B-287AAFEDFB28}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Vishnu</RootNamespace>
+    <AssemblyName>Vishnu</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <!--SupportUrl>http://www.neteti.de</SupportUrl-->
+    <!--ErrorReportUrl>http://www.neteti.de</ErrorReportUrl-->
+    <!--PublisherName>Erik Nagel</PublisherName-->
+    <!--SuiteName>NetEti</SuiteName-->
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Vishnu.XML</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Vishnu_multi.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>3089580D1D0A79BF0C011EA8B5FF0B99A39F6E19</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>Internet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="NetEti.AppEnvReader, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(AssemblyRoot)\NetEti.AppEnvReader.dll</HintPath>
+    </Reference>
+    <Reference Include="NetEti.BasicAppSettings">
+      <HintPath>$(AssemblyRoot)\NetEti.BasicAppSettings.dll</HintPath>
+    </Reference>
+    <Reference Include="NetEti.Global">
+      <HintPath>$(AssemblyRoot)\NetEti.Global.dll</HintPath>
+    </Reference>
+    <Reference Include="NetEti.InfoController">
+      <HintPath>$(AssemblyRoot)\NetEti.InfoController.dll</HintPath>
+    </Reference>
+    <Reference Include="NetEti.Logging">
+      <HintPath>$(AssemblyRoot)\NetEti.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="NetEti.MVVMini">
+      <HintPath>$(AssemblyRoot)\NetEti.MVVMini.dll</HintPath>
+    </Reference>
+    <Reference Include="NetEti.PropertyAccess">
+      <HintPath>$(AssemblyRoot)\NetEti.PropertyAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WpfAnimatedGif">
+      <HintPath>..\..\TimerMessageBox\packages\WpfAnimatedGif.1.4.17\lib\net\WpfAnimatedGif.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\app.manifest" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+    <None Include="Zertifikate\openssl-0.9.8za-x64\bin\Vishnu_Key.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.7.2 %28x86 und x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 4.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="7z32.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="7z64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ClickOnceStarter.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="NewDeployment.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Resource Include="Vishnu_multi.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(Vishnu_Root)\VishnuHome\Install\VishnuPublication\**\*">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <Visible>false</Visible>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LogicalTaskTree\LogicalTaskTree.csproj">
+      <Project>{4ac4b58a-3bb3-418d-a204-917642a6963b}</Project>
+      <Name>LogicalTaskTree</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ViewModel\Vishnu.ViewModel.csproj">
+      <Project>{33e12b9c-4869-42a0-8d8f-086c0871007b}</Project>
+      <Name>Vishnu.ViewModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Vishnu.Interchange\Vishnu.Interchange.csproj">
+      <Project>{96b1ebc8-9460-4061-9a8a-defa18a885ca}</Project>
+      <Name>Vishnu.Interchange</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WPF_UI\Vishnu.WPF_UI.csproj">
+      <Project>{7a5dceff-ebe8-46d0-8b49-704269fdba34}</Project>
+      <Name>Vishnu.WPF_UI</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PublishFile Include="LoadExceptionJob.xml">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="NewDeployment.xml">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="ReadMe!.txt">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>mkdir "$(TargetDir)Plugin"
+del /Q "$(TargetDir)Plugin\*.*"
+mkdir "$(TargetDir)DefaultNodeControls"
+del /Q "$(TargetDir)DefaultNodeControls"\*.*"
+copy /y "$(ProjectDir)..\Plugin\*.*" "$(TargetDir)Plugin\*.*" 
+copy /y "$(ProjectDir)..\DefaultNodeControls\SingleNodeUserControl\bin\$(ConfigurationName)\SingleNodeUserControl.*" "$(TargetDir)DefaultNodeControls\*.*"
+copy /y "$(ProjectDir)..\DefaultNodeControls\NodeListUserControl\bin\$(ConfigurationName)\NodeListUserControl.*" "$(TargetDir)DefaultNodeControls\*.*"
+copy /y "$(ProjectDir)..\DefaultNodeControls\JobListUserControl\bin\$(ConfigurationName)\JobListUserControl.*" "$(TargetDir)DefaultNodeControls\*.*"
+copy /y "$(ProjectDir)..\DefaultNodeControls\JobConnectorUserControl\bin\$(ConfigurationName)\JobConnectorUserControl.*" "$(TargetDir)DefaultNodeControls\*.*"
+copy /y "$(ProjectDir)..\DefaultNodeControls\SnapshotUserControl\bin\$(ConfigurationName)\SnapshotUserControl.*" "$(TargetDir)DefaultNodeControls\*.*"
+copy /y "$(ProjectDir)..\DefaultNodeControls\ConstantNodeUserControl\bin\$(ConfigurationName)\ConstantNodeUserControl.*" "$(TargetDir)DefaultNodeControls\*.*"
+</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

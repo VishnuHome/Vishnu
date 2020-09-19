@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<configuration>
+  <runtime>
+    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+      <probing privatePath="Plugin/"/>
+    </assemblyBinding>
+    <!--gcServer enabled="true" /-->
+  </runtime>
+  <startup>
+    <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.6.1"/>
+  </startup>
+  <appSettings>
+		<add key="VishnuProvider" value="NetEti"/>
+    <add key="RegistryBasePath" value="HKEY_LOCAL_MACHINE\SOFTWARE\Vishnu"/>
+    <add key="AppConfigUser" value="%LOCALAPPDATA%\Vishnu\Vishnu.exe.config.user"/>
+		<add key="WorkingDirectory" value="%TempDirectory%\Vishnu.%MainJobName%"/>
+    <add key="KillWorkingDirectoryAtShutdown" value="false"/>
+    <add key="UserAssemblyDirectory" value="UserAssemblies"/>
+    <add key="DebugInfo" value="DEBUG|INFO|WARN|MILESTONE|ERROR|EXCEPTION"/>
+    <add key="DebugFileRegexFilter" value="(?:_NOPPES_)"/>
+    <add key="StatisticsFileRegexFilter" value="(?:_NOPPES_)"/>
+    <add key="LogicalChangedDelay" value="4"/>
+    <add key="LogicalChangedDelayPower" value="2,7"/>
+		<!-- add key="SleepTime" value="20:00:00-06:00:00" / -->
+    <add key="ClientSettingsProvider.ServiceUri" value=""/>
+  </appSettings>
+  <system.web>
+    <membership defaultProvider="ClientAuthenticationMembershipProvider">
+      <providers>
+        <add name="ClientAuthenticationMembershipProvider" type="System.Web.ClientServices.Providers.ClientFormsAuthenticationMembershipProvider, System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" serviceUri=""/>
+      </providers>
+    </membership>
+    <roleManager defaultProvider="ClientRoleProvider" enabled="true">
+      <providers>
+        <add name="ClientRoleProvider" type="System.Web.ClientServices.Providers.ClientRoleProvider, System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" serviceUri="" cacheTimeout="86400"/>
+      </providers>
+    </roleManager>
+  </system.web>
+</configuration>

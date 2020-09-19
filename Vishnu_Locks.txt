@@ -1,0 +1,140 @@
+Alle suchen "lock (", Unterordner, Suchergebnisse: 1, Gesamte Projektmappe, ""
+  
+  ...\Vishnu\LogicalTaskTree\CheckerShell.cs(373):      lock (this._runProcessLocker)
+  ...
+  ...\Vishnu\LogicalTaskTree\JobList.cs(481):      lock (this.ResultLocker)
+  ...\Vishnu\LogicalTaskTree\JobList.cs(505):      lock (this.ResultLocker) // NEU
+  ...\Vishnu\LogicalTaskTree\JobList.cs(632):      lock (this._lastExecutedWorkersSendersEventsLocker)
+  ...\Vishnu\LogicalTaskTree\JobList.cs(664):      lock (this._lastExecutedWorkersSendersEventsLocker)
+  ...\Vishnu\LogicalTaskTree\JobList.cs(699):      lock (this._lastExecutedWorkersSendersEventsLocker)
+  ...\Vishnu\LogicalTaskTree\JobList.cs(735):      lock (this._lastExecutedWorkersSendersEventsLocker)
+  ...
+  ...\Vishnu\LogicalTaskTree\LoggerShell.cs(44):        lock (this._loggerLocker)
+  ...
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(599):            lock (this.LastLogicalLocker)
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(887):            lock (this._parentViewLocker)
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(1582):            lock (this.LastLogicalLocker)
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(1597):            lock (this.LastLogicalStateLocker)
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(1772):            lock (this._threadStartLocker)
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(1861):            lock (this._runAsyncLocker)
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(1966):            lock (_eventLocker)
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(2085):                lock (this._loggerLocker)
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(2123):            lock (this._validateLastNotNullLogicalLocker)
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(2164):            lock (this._runLocker)
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(2190):                        lock (this.ResultLocker)
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(2211):            } // lock (this._runLocker)
+  ...
+  ...\Vishnu\LogicalTaskTree\NodeConnector.cs(147):                lock (this.ResultLocker)
+  ...
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(43):                lock (this.LastLogicalLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(117):                lock (this.LastStateLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(187):                //lock (this.LastLogicalStateLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(249):                lock (this.LastSingleNodesLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(277):                lock (this.LastSingleNodesFinishedLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(414):                lock (this.ResultLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(558):                lock (this.LastCountResultsLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(733):            lock (this.LastSingleNodesLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(745):            lock (this.ThreadRefreshParentNodeLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(757):            lock (this.LastCountResultsLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(769):            lock (this.LastCountPositiveResultsLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(781):            lock (this.ListLogicalStateLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(793):            lock (this.LastReturnedLogicalLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(805):            lock (this.ThreadRefreshParentNodeLocker)
+  ...
+  ...\Vishnu\LogicalTaskTree\NodeParent.cs(172):            lock (this.LastLogicalStateLocker)
+  ...\Vishnu\LogicalTaskTree\NodeParent.cs(208):            lock (this.SubLastNotNullLogicalLocker)
+  ...\Vishnu\LogicalTaskTree\NodeParent.cs(306):            lock (this.LastLogicalStateLocker)
+  ...\Vishnu\LogicalTaskTree\NodeParent.cs(318):            lock (this.LastSingleNodesFinishedLocker)
+  ...
+  ...\Vishnu\LogicalTaskTree\SingleNode.cs(278):      lock (this.ResultLocker)
+  ...
+  ...\Vishnu\LogicalTaskTree\SnapshotManager.cs(95):          lock (SnapshotManager._saveLocker) // 10.08.2016 Nagel+-
+  ...
+  ...\Vishnu\LogicalTaskTree\TriggerShell.cs(75):        lock (this._startTriggerLocker)
+  ...\Vishnu\LogicalTaskTree\TriggerShell.cs(172):        lock (this._startTriggerLocker)
+  ...\Vishnu\LogicalTaskTree\TriggerShell.cs(363):        lock (this._registerHandlerLocker)
+  ...
+  ...\Vishnu\LogicalTaskTree\WorkerShell.cs(259):      lock (this._workerLocker)
+  ...
+  ...\Vishnu\ViewModel\SnapshotViewModel.cs(145):        lock (this._treeRefreshLocker)
+  ...\Vishnu\ViewModel\SnapshotViewModel.cs(168):      lock (this._treeRefreshLocker)
+
+  Übereinstimmende Zeilen: 47    Übereinstimmende Dateien: 12    Insgesamt durchsuchte Dateien: 118
+
+
+Alle suchen "lock (", Unterordner, Suchergebnisse: 1, Gesamte Projektmappe, ""
+  
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(1966):			lock (LogicalNode._eventLocker)		ok
+  ...
+  ...\Vishnu\LogicalTaskTree\JobList.cs(632):					lock (this._lastExecutedWorkersSendersEventsLocker)		ok
+  ...\Vishnu\LogicalTaskTree\JobList.cs(664):					lock (this._lastExecutedWorkersSendersEventsLocker)		ok
+  ...\Vishnu\LogicalTaskTree\JobList.cs(699):					lock (this._lastExecutedWorkersSendersEventsLocker)		ok
+  ...\Vishnu\LogicalTaskTree\JobList.cs(735):					lock (this._lastExecutedWorkersSendersEventsLocker)		ok
+  ...
+  ...\Vishnu\LogicalTaskTree\LoggerShell.cs(44):				lock (this._loggerLocker)		ok
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(2085):			lock (this._loggerLocker)		ok
+  ...
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(887):			lock (this._parentViewLocker)		ok
+  ...
+  ...\Vishnu\LogicalTaskTree\TriggerShell.cs(363):			lock (this._registerHandlerLocker)		ok
+  ...
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(1861):			lock (this._runAsyncLocker)		ok
+  ...
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(2164):			lock (this._runLocker)		ok
+  ...
+  ...\Vishnu\LogicalTaskTree\CheckerShell.cs(373):			lock (this._runProcessLocker)	OK
+  ...
+  ...\Vishnu\LogicalTaskTree\SnapshotManager.cs(95):		lock (SnapshotManager._saveLocker)		OK
+  ...
+  ...\Vishnu\LogicalTaskTree\TriggerShell.cs(75):			lock (this._startTriggerLocker)		OK
+  ...\Vishnu\LogicalTaskTree\TriggerShell.cs(172):			lock (this._startTriggerLocker)		OK
+  ...
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(1772):			lock (this._threadStartLocker)		OK
+  ...
+  ...\Vishnu\ViewModel\SnapshotViewModel.cs(145):			lock (this._treeRefreshLocker)		OK
+  ...\Vishnu\ViewModel\SnapshotViewModel.cs(168):			lock (this._treeRefreshLocker)		OK
+  ...
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(2123):			lock (this._validateLastNotNullLogicalLocker)		OK
+  ...
+  ...\Vishnu\LogicalTaskTree\WorkerShell.cs(259):			lock (this._workerLocker)		OK
+  ...
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(769):					lock (this.LastCountPositiveResultsLocker)		OK
+  ...
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(558):					lock (this.LastCountResultsLocker)		OK
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(757):					lock (this.LastCountResultsLocker)		OK
+  ...
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(599):			lock (this.LastLogicalLocker)		geändert auf this._nodeLogicalChangedLocker
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(1582):			lock (this.LastLogicalLocker)		ok
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(43):					lock (this.LastLogicalLocker)		ok
+
+--- Diese Konstellation verursacht Deadlocks bei schnellem mehrmaligen Run -------------------------------------
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(1597):			lock (this.LastLogicalStateLocker)	geändert auf this.LastStateLocker
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(187):				//lock (this.LastLogicalStateLocker)	würde DeadLocks verursachen
+  ...\Vishnu\LogicalTaskTree\NodeParent.cs(172):				lock (this.LastLogicalStateLocker)
+  ...\Vishnu\LogicalTaskTree\NodeParent.cs(306):				lock (this.LastLogicalStateLocker)
+----------------------------------------------------------------------------------------------------------------
+
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(793):					lock (this.LastReturnedLogicalLocker)
+  ...
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(277):					lock (this.LastSingleNodesFinishedLocker)
+  ...\Vishnu\LogicalTaskTree\NodeParent.cs(318):				lock (this.LastSingleNodesFinishedLocker)
+  ...
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(249):					lock (this.LastSingleNodesLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(733):					lock (this.LastSingleNodesLocker)
+  ...
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(117):					lock (this.LastStateLocker)
+  ...
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(781):					lock (this.ListLogicalStateLocker)
+  ...
+  ...\Vishnu\LogicalTaskTree\JobList.cs(481):					lock (this.ResultLocker)
+  ...\Vishnu\LogicalTaskTree\JobList.cs(505):					lock (this.ResultLocker)
+  ...\Vishnu\LogicalTaskTree\LogicalNode.cs(2190):			lock (this.ResultLocker)
+  ...\Vishnu\LogicalTaskTree\NodeConnector.cs(147):		lock (this.ResultLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(414):					lock (this.ResultLocker)
+  ...\Vishnu\LogicalTaskTree\SingleNode.cs(278):				lock (this.ResultLocker)
+  ...
+  ...\Vishnu\LogicalTaskTree\NodeParent.cs(208):				lock (this.SubLastNotNullLogicalLocker)		ok
+  ...
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(745):					lock (this.ThreadRefreshParentNodeLocker)
+  ...\Vishnu\LogicalTaskTree\NodeList.cs(805):					lock (this.ThreadRefreshParentNodeLocker)
+  

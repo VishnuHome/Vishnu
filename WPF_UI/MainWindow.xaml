@@ -1,0 +1,88 @@
+﻿<Window x:Class="Vishnu.WPF_UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+        xmlns:local="clr-namespace:Vishnu.WPF_UI"
+        xmlns:vm="clr-namespace:Vishnu.ViewModel;assembly=Vishnu.ViewModel"
+        xmlns:behaviour="clr-namespace:Vishnu.WPF_UI.Behaviours"
+        Title="{Binding WindowTitle}"
+        SizeToContent="WidthAndHeight"
+        MinHeight="120" MinWidth="260"
+        ContentRendered="window_ContentRendered" Closed="Window_Closed" SizeChanged="Window_SizeChanged"
+        Activated="Window_Activated"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Assets/LogicalTaskTreeControlResourceDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Window.Style>
+        <Style TargetType="{x:Type Window}">
+            <Setter Property="Background" Value="{StaticResource WindowBGBrush}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding LogicalTaskTreeVM.IsInSleepTime}" Value="true">
+                    <Setter Property="Background" Value="{StaticResource WindowBGBrushSleepMode}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Style>
+    <Window.CommandBindings>
+        <CommandBinding
+            Command="{x:Static local:MainWindow.SaveWindowAspectsAndCallViewModelLogicCommand}"
+            CanExecute="SaveWindowAspectsAndCallViewModelLogicCommandCanExecute"
+            Executed="SaveWindowAspectsAndCallViewModelLogicCommandExecuted"/>
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Command="{x:Static local:MainWindow.SaveWindowAspectsAndCallViewModelLogicCommand}"
+                    Key="S" Modifiers="Control" />
+        <KeyBinding Command="{Binding Path=InitSizeCommand, diag:PresentationTraceSources.TraceLevel=High}" Key="F3" />
+    </Window.InputBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" HorizontalAlignment="Center" Foreground="AliceBlue"
+                   Text="{Binding LogicalTaskTreeVM.SleepTimeTo}">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding LogicalTaskTreeVM.IsInSleepTime}" Value="true">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+        <TabControl Grid.Row="1" Margin="8" Name="MainTabControl" SelectionChanged="MainTabControl_SelectionChanged">
+            <TabControl.Style >
+                <Style TargetType="{x:Type TabControl}">
+                    <Setter Property="Background" Value="{StaticResource WindowBGBrush}"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding LogicalTaskTreeVM.IsInSleepTime}" Value="true">
+                            <Setter Property="Background" Value="{StaticResource WindowBGBrushSleepMode}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TabControl.Style>
+            <TabItem Header="Logical Task Tree" Name="TreeTab" Loaded="TreeTabLoaded">
+                <Grid>
+                    <local:LogicalTaskTreeControl x:Name="LogicalTaskTreeControl1" Focusable="True" 
+                                              DataContext="{Binding LogicalTaskTreeVM}"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Jobs" Name="JobTabs" Loaded="JobTabLoaded">
+                <local:LogicalTaskJobGroupsControl x:Name="LogicalTaskJobGroupsControl1"/>
+            </TabItem>
+            <!--TabItem Header="Infos">
+                <DockPanel>
+                    <ListBox ItemsSource="{Binding ElementName=LogicalTaskTreeControl1, Path=DataContext.InfoSource,
+                        diag:PresentationTraceSources.TraceLevel=High}" />
+                </DockPanel>
+            </TabItem-->
+        </TabControl>
+    </Grid>
+</Window>

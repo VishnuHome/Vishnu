@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Snapshot>
+  <Timestamp></Timestamp>
+  <Path></Path>
+  <JobDescription Type="JobList" Id="" Name="IS" Path="" LastNotNullLogical="">
+    <LastExceptions>
+      <ApplicationException Message="SnapshotLoadingException!" />
+    </LastExceptions>
+    <LogicalName></LogicalName>
+    <LogicalExpression><![CDATA[IS LoadException]]></LogicalExpression>
+    <BreakWithResult>False</BreakWithResult>
+    <StartCollapsed>False</StartCollapsed>
+    <IsVolatile>False</IsVolatile>
+    <ThreadLocked>False</ThreadLocked>
+    <LogicalNode Type="SingleNode" Id="LoadException" Name="LoadException" Path="" LastNotNullLogical="">
+      <LastExceptions>
+        <ApplicationException Message="SnapshotLoadingException!" />
+      </LastExceptions>
+    </LogicalNode>
+  </JobDescription>
+</Snapshot>

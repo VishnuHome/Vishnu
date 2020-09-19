@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Deployment>
+  <Info>Wenn diese Datei im ClickOnceDataDirectory existiert, muss der Verzeichnisinhalt einmalig nach ApplicationRootPath kopiert werden.</Info>
+</Deployment>
