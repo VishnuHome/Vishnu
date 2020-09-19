@@ -4,7 +4,9 @@ Siehe folgende Quellen:
  - Documentation
  - DemoJobs
  - Tests/TestJobs
- Hier ein Screenshot:
+
+Hier ein Screenshot:
 ![Vishnu-Hilfe Startseite](./FirstView.jpg?raw=true "Vishnu-Hilfe")
+
 Das Vishnu C#-Projekt kann z.B. mit dem Debug-Parameter '-job=..\..\..\..\Documentation\DemoJobs\Simple\CheckAll'
 in Visual Studio debugged werden.
