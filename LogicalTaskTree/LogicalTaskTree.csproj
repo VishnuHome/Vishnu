@@ -51,7 +51,7 @@
     </Reference>
     <Reference Include="NetEti.ExpressionParser, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ExpressionParser\ExpressionParser\bin\Debug\NetEti.ExpressionParser.dll</HintPath>
+      <HintPath>$(AssemblyRoot)\NetEti.ExpressionParser.dll</HintPath>
     </Reference>
     <Reference Include="NetEti.Global">
       <HintPath>$(AssemblyRoot)\NetEti.Global.dll</HintPath>

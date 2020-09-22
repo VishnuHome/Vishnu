@@ -47,7 +47,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CustomProgressBar">
-      <HintPath>..\..\..\CustomProgressBar\CustomProgressBar\bin\Debug\CustomProgressBar.dll</HintPath>
+      <HintPath>$(AssemblyRoot)\CustomProgressBar.dll</HintPath>
     </Reference>
     <Reference Include="NetEti.MVVMini, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

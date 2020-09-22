@@ -51,7 +51,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CustomProgressBar">
-      <HintPath>..\..\CustomProgressBar\CustomProgressBar\bin\Debug\CustomProgressBar.dll</HintPath>
+      <HintPath>$(AssemblyRoot)\CustomProgressBar.dll</HintPath>
     </Reference>
     <Reference Include="NetEti.InfoController, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -84,11 +84,11 @@
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="WpfAnimatedGif">
-      <HintPath>..\..\TimerMessageBox\packages\WpfAnimatedGif.1.4.17\lib\net\WpfAnimatedGif.dll</HintPath>
+      <HintPath>$(AssemblyRoot)\WpfAnimatedGif.dll</HintPath>
     </Reference>
     <Reference Include="ZoomBox, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ZoomBox\ZoomBox\bin\Debug\ZoomBox.dll</HintPath>
+      <HintPath>$(AssemblyRoot)\ZoomBox.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
