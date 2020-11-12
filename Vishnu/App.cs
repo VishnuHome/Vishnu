@@ -358,7 +358,7 @@ namespace Vishnu
             {
                 MessageBox.Show("Fehler bei CopyJobsIfNecessary: " + ex.Message);
                 // throw;
-            }        
+            }
         }
 
         private void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
@@ -402,22 +402,22 @@ namespace Vishnu
         private bool checkCanRun()
         {
             return true; //17.01.2017 Prüfung deaktiviert.
-                         /*
-                         SecureString canUnlock = new SecureString();
-                         canUnlock.AppendChar('D');
-                         canUnlock.AppendChar('M');
-                         canUnlock.AppendChar('e');
-                         canUnlock.AppendChar('u');
-                         canUnlock.AppendChar('b');
-                         canUnlock.AppendChar('r');
-                         canUnlock.AppendChar('u');
-                         canUnlock.AppendChar('c');
-                         canUnlock.AppendChar('g');
-                         canUnlock.AppendChar('s');
+            /*
+            SecureString canUnlock = new SecureString();
+            canUnlock.AppendChar('D');
+            canUnlock.AppendChar('M');
+            canUnlock.AppendChar('e');
+            canUnlock.AppendChar('u');
+            canUnlock.AppendChar('b');
+            canUnlock.AppendChar('r');
+            canUnlock.AppendChar('u');
+            canUnlock.AppendChar('c');
+            canUnlock.AppendChar('g');
+            canUnlock.AppendChar('s');
 
-                         string tmp1 = Marshal.PtrToStringUni(Marshal.SecureStringToBSTR(App._appSettings.XUnlock));
-                         return tmp1 == Marshal.PtrToStringUni(Marshal.SecureStringToBSTR(canUnlock));
-                         */
+            string tmp1 = Marshal.PtrToStringUni(Marshal.SecureStringToBSTR(App._appSettings.XUnlock));
+            return tmp1 == Marshal.PtrToStringUni(Marshal.SecureStringToBSTR(canUnlock));
+            */
         }
 
         private void CopyClickOnceStarter()
@@ -498,19 +498,11 @@ namespace Vishnu
         {
             try
             {
-                if (SingleInstanceApplication._businessLogic != null)
+                try
                 {
-                    try
-                    {
-                        SingleInstanceApplication._businessLogic.Tree.UserBreak();
-                    }
-                    catch { }
-                    try
-                    {
-                        SingleInstanceApplication._businessLogic.Dispose();
-                    }
-                    catch { }
+                    SingleInstanceApplication._businessLogic?.Dispose();
                 }
+                catch { }
                 if (SingleInstanceApplication._appSettings != null)
                 {
                     if (!String.IsNullOrEmpty(SingleInstanceApplication._appSettings.ZipRelativeDummyDirectory)
@@ -528,16 +520,17 @@ namespace Vishnu
                     }
                     catch { }
                 }
-                if (SingleInstanceApplication._logger != null)
+                try
                 {
-                    SingleInstanceApplication._logger.Dispose();
+                    SingleInstanceApplication._logger?.Dispose();
                 }
+                catch { }
                 Statistics.Stop();
-                if (SingleInstanceApplication._statisticsLogger != null)
+                try
                 {
                     SingleInstanceApplication._statisticsLogger.Dispose();
                 }
-
+                catch { }
             }
             finally
             {

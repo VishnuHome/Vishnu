@@ -25,7 +25,7 @@ View -------> ViewModel <--> Model
 Richtlinien:
 1.	Eine View instanziiert nichts außer ggf. implizit andere Views (ansonsten wären mehrere 
 		Views auf einen Business-case kaum machbar);
-2.	Views können direkt bidirektional mit ViewModels kommunizieren, ohne das die ViewModels
+2.	Views können direkt bidirektional mit ViewModels kommunizieren, ohne dass die ViewModels
 		ihre Models kontaktieren und ohne das die ViewModels ihre Views kennen;
 3.	ViewModels können Views instanziieren, sie tun das aber nur indirekt, indem sie einem
 		schon existierenden und an eine View gebundenen ViewModel eine Neues ViewModel als

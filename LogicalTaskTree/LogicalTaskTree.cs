@@ -33,7 +33,7 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
-        /// Hier wird aufgeräumt: ruft für alle User-Elemente, die Disposable sind, Dispose() auf.;
+        /// Hier wird aufgeräumt: ruft für alle User-Elemente, die Disposable sind, Dispose() auf.
         /// </summary>
         /// <param name="disposing">Bei true wurde diese Methode von der öffentlichen Dispose-Methode
         /// aufgerufen; bei false vom internen Destruktor.</param>
@@ -45,6 +45,11 @@ namespace LogicalTaskTree
                 {
                     if (this.Tree != null)
                     {
+                        try
+                        {
+                            this.Tree.UserBreak();
+                        }
+                        catch { }
                         this.Tree.Traverse(new Action<int, LogicalNode>((i, n)
                           =>
                           {
