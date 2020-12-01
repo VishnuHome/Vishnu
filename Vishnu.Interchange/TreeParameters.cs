@@ -20,6 +20,11 @@ namespace Vishnu.Interchange
         public string Name { get; set; }
 
         /// <summary>
+        /// Pfad zum Verzeichnis der Checker.dll.
+        /// </summary>
+        public string CheckerDllDirectory { get; set; }
+
+        /// <summary>
         /// Das Parent-Control.
         /// </summary>
         public DynamicUserControlBase ParentView { get; set; }

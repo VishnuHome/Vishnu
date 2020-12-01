@@ -411,6 +411,7 @@ namespace LogicalTaskTree
                 {
                     try
                     {
+                        treeParameters.CheckerDllDirectory = Path.GetDirectoryName(this._slavePathName);
                         rtn = this.Slave.Run(this._checkerParameters, treeParameters, source);
                     }
                     finally

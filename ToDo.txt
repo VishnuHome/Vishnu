@@ -834,6 +834,10 @@ ERLEDIGT: Schreiben und Laden von Snapshots optimieren und absichern (muss neu)
 	mit ERLEDIGT: Fehler: ShowAll auf User-Server stand auf 5GB Arbeitsspeicher. Nach kurzer Zeit runter auf 66KB
                 Fehler: Viewer nach einiger Zeit reduzierter Tree (falsch) und Memory-Probleme
 ERLEDIGT: Ring Logger - Lösung über parametrisierbares Umbenennen und Löschen überzähliger Logfiles.
+ERLEDIGT: TreeParameters um Property "CheckerDllDirectory" erweitern.
+ERLEDIGT: WebDriver.dll hart in's Bin-Verzeichnis kopieren.
+
+Stand: 01.12.2020 Version 4.9.3.0 ()
 
 -------------------------------------------------------------------------------------------------------------
 
