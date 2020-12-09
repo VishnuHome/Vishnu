@@ -35,7 +35,7 @@
             <DataTemplate DataType="{x:Type vm:NodeListViewModel}">
                 <Border Name="ItemBorder" Padding="5" Background="Transparent" CornerRadius="6" MouseDown="ItemBorder_MouseDown"
                          Visibility="{Binding Visibility}">
-                    <Grid ToolTip="{Binding LastExceptions}">
+                    <Grid ToolTip="{Binding LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>

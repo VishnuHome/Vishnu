@@ -411,6 +411,10 @@ namespace Vishnu.WPF_UI
 
         private void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!(e.OriginalSource is TabControl) || (e.OriginalSource as TabControl).Name != this.MainTabControl.Name)
+            {
+                return; // the event was bubbling from an inner control.
+            }
             if (this.MainTabControl.SelectedIndex == 0)
             {
                 this.SetTreeAspects(false);

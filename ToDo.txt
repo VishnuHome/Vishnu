@@ -836,6 +836,9 @@ ERLEDIGT: Schreiben und Laden von Snapshots optimieren und absichern (muss neu)
 ERLEDIGT: Ring Logger - Lösung über parametrisierbares Umbenennen und Löschen überzähliger Logfiles.
 ERLEDIGT: TreeParameters um Property "CheckerDllDirectory" erweitern.
 ERLEDIGT: WebDriver.dll hart in's Bin-Verzeichnis kopieren.
+ERLEDIGT: BugFix: UserControls mit ListViews mit unhandled SelectionChanged konnten im MainTabControl zum
+          Abbruch von Vishnu führen, da SelectionChanged im Tree nach oben bubbled.
+
 
 Stand: 01.12.2020 Version 4.9.3.0 ()
 

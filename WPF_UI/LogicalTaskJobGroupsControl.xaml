@@ -56,7 +56,7 @@
                                   Grid.Row="0" ExpandDirection="Down" IsExpanded="True">
                             <Expander.Header>
                                 <Grid Name="Head" HorizontalAlignment="Stretch" Margin="2"
-                                      ToolTip="{Binding GroupJobList.LastExceptions}">
+                                      ToolTip="{Binding GroupJobList.LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                         <ColumnDefinition Width="Auto"></ColumnDefinition>
