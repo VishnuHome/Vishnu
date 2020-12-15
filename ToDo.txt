@@ -839,8 +839,10 @@ ERLEDIGT: WebDriver.dll hart in's Bin-Verzeichnis kopieren.
 ERLEDIGT: BugFix: UserControls mit ListViews mit unhandled SelectionChanged konnten im MainTabControl zum
           Abbruch von Vishnu führen, da SelectionChanged im Tree nach oben bubbled.
 ERLEDIGT: Die maximale Öffnungszeit für ToolTips wurde auf 30 Sekunden hochgesetzt.
+ERLEDIGT: BugFix: Direkter UserRun auf getriggerte Knoten führte zum doppelten Start der Knoten., da der
+          zugeordnete Trigger auch sofort wieder auslöste.
 
-Stand: 01.12.2020 Version 4.9.3.0 ()
+Stand: 01.12.2020 Version 4.9.3.1 ()
 
 -------------------------------------------------------------------------------------------------------------
 
@@ -1473,3 +1475,49 @@ NodeConnector bei Exception nicht gelb
         ///   "%Timestamp%" = aktuelles Datum mit aktueller Uhrzeit im Format "dd.MM.yyyy HH.mm.ss",
         ///   "%Logical%" = aktueller logischer Wert des Senders,
         ///   "%Exception%" = Exception.Message, falls %Event% gleich "Exception" ist, ansonsten "".
+
+App.cs
+	// Der Produktions-JobProvider mit extern über XML definierten Jobs:
+  SingleInstanceApplication._businessLogic = new LogicalTaskTree.LogicalTaskTree(new TreeParameters("Tree 1", null), new ProductionJobProvider());
+
+  	public LogicalTaskTree(TreeParameters treeParams, IJobProvider jobProvider)
+    {
+        this._rootJobList = new JobList(treeParams, jobProvider);
+    }
+
+        private JobList(string logicalName, LogicalNode mother, JobList rootJoblist, TreeParameters treeParams, IJobProvider jobProvider,
+          List<string> parsedJobs, Dictionary<string, JobList> subJobs)
+          : base(logicalName, mother, rootJoblist, treeParams)
+        {
+						...
+            this._job = this._jobProvider.GetJob(ref logicalName);
+
+	        		public virtual Job GetJob(ref string name)
+  	      		{
+    	        		if (name == null || !this.LoadedJobPackages.ContainsKey(name))
+      	      		{
+        	        		this.TryLoadJobPackage(ref name); // lädt ggf. auch alle SubJobs
+
+											protected override void TryLoadJobPackage(ref string logicalJobName)
+											{
+											    ...
+          	  						logicalJobName = loadJob(null, jobXml, logicalJobName,
+                      				null, false, null, null, true, false, out depth);
+
+										      		// Lädt einen Job oder SubJob; SubJobs können intern oder extern (eigenes XML-File) angelegt sein.
+        											private string loadJob(Job mother, string jobXML, string logicalJobName, XElement xSubJob, bool startCollapsed,
+                               TriggerShell snapshotTrigger, string snapshotTriggerName, bool isRootJob, bool isSnapshot, out int subJobDepth)
+        											{
+        													macht alles inklusive Rekursionen bei SubJobs und Snapshots
+        													
+						...
+            this.parse();
+
+			        private void parse()
+        			{
+            			this.syntaxTree = new LogicalParser().Parse(this.LogicalExpression);
+            			this.buildParallelTree(this, this.syntaxTree);
+        													
+
+
+

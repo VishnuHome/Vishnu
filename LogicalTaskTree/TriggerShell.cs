@@ -130,11 +130,16 @@ namespace LogicalTaskTree
                         }
                         if (this._slave != null)
                         {
+                            string effectiveTriggerParameters = this.TriggerParameters.ToString();
                             if (!(this.Slave is TreeEventTrigger))
                             {
                                 this._lastDllWriteTime = File.GetLastWriteTime(this._slavePathName);
+                                if (internalTriggerParameters?.ToString() == "UserRun")
+                                {
+                                    effectiveTriggerParameters += "|UserRun";
+                                }
                             }
-                            this.Slave.Start(triggerController, this.TriggerParameters, this.SlaveTriggersIt);
+                            this.Slave.Start(triggerController, effectiveTriggerParameters, this.SlaveTriggersIt);
                             this._isStarted = true;
                             return true;
                         }

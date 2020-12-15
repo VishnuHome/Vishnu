@@ -2033,11 +2033,11 @@ namespace LogicalTaskTree
                 }
                 else
                 {
-                    // InfoController.Say(String.Format($"#TRIGGER# 5 waiting Id/Name: {this.IdInfo}, _starterThread.IsAlive: {this._starterThread.IsAlive.ToString()}, _starterThread.IsValid: {this.IsThreadValid(this._starterThread).ToString()} - {(source == null ? "null" : source.ToString())}"));
                     if (!this.IsThreadValid(this._starterThread))
                     {
                         this.ThreadUpdateLastState(NodeState.Null);
                         this.State = NodeState.Waiting;
+                        InfoController.Say(String.Format($"#TryRun# waiting Id/Name: {this.IdInfo}, _starterThread.IsAlive: {this._starterThread.IsAlive.ToString()}, _starterThread.IsValid: {this.IsThreadValid(this._starterThread).ToString()} - {(source == null ? "null" : source.ToString())}"));
                         this.OnNodeStateChanged();
                     }
                 }
@@ -2051,6 +2051,14 @@ namespace LogicalTaskTree
         /// </summary>
         private void TryRunAsyncWhileIsRunRequired(TreeEvent source)
         {
+            if (source != null)
+            {
+                InfoController.Say(String.Format($"#TryRun# {source.Name} Id/Name: {this.IdInfo}, State: {this.State}, LogicalState: {this.LogicalState}"));
+            }
+            else
+            {
+                InfoController.Say(String.Format($"#TryRun# source==null Id/Name: {this.IdInfo}, State: {this.State}, LogicalState: {this.LogicalState}"));
+            }
             int waitingLoopCounter = 0;
             do
             {
@@ -2120,7 +2128,7 @@ namespace LogicalTaskTree
                     this.AddEnvironment(source);
                 }
                 this.LastRun = DateTime.Now;
-                // InfoController.Say(String.Format($"#TRIGGER# 7 starting Id/Name: {this.IdInfo} this.DoRun({(source == null ? "null" : source.ToString())}  State: {this.State.ToString()}, LogicalState: {this.LogicalState.ToString()}"));
+                InfoController.Say(String.Format($"#TryRun# starting Id/Name: {this.IdInfo} this.DoRun({(source == null ? "null" : source.ToString())})  State: {this.State.ToString()}, LogicalState: {this.LogicalState.ToString()}"));
                 this.DoRun(source);
                 if ((this.LogicalState & NodeLogicalState.Start) > 0)
                 {
@@ -2440,7 +2448,12 @@ namespace LogicalTaskTree
                         TriggerShell triggerShell = (this.Trigger as TriggerShell);
                         if (!triggerShell.HasTreeEventTrigger)
                         {
-                            triggerShell.Start(this, null, this.RunAsyncAsync);
+                            string internalTriggerParameters = null;
+                            if (source.Name == "UserRun" && source.SenderId == this.Id)
+                            {
+                                internalTriggerParameters = "UserRun";
+                            }
+                            triggerShell.Start(this, internalTriggerParameters, this.RunAsyncAsync);
                         }
                     }
                     catch (Exception ex)
