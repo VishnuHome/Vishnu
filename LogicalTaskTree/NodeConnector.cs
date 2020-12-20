@@ -342,6 +342,14 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
+        /// Lädt den Zweig oder Knoten neu.
+        /// </summary>
+        public override void Reload()
+        {
+            this._node.Reload();
+        }
+
+        /// <summary>
         /// Überschrieben, um das Starten von ValueModifiern zu unterbinden.
         /// Stattdessen wird über UserRun zum Originalknoten weitergeleitet.
         /// </summary>

@@ -67,6 +67,13 @@
     <SolidColorBrush x:Key="ToggleButtonArrowCheckedMouseOver.Brush">Cyan</SolidColorBrush>
     <attached:BinaryModificationSwitch x:Key="OrientationModificationSwitch">Unchanged</attached:BinaryModificationSwitch>
 
+    <ContextMenu x:Key="cmMainGrid">
+        <MenuItem Header="Menu item 1" />
+        <MenuItem Header="Menu item 2" />
+        <Separator />
+        <MenuItem Header="Menu item 3" />
+    </ContextMenu>
+    
     <sys:Double x:Key="ToggleButtonArrow.StrokeThickness">2</sys:Double>
     <sys:Double x:Key="ToggleButtonArrowChecked.StrokeThickness">1</sys:Double>
     <DropShadowBitmapEffect x:Key="DropShadowEffect" />

@@ -1372,6 +1372,16 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
+        /// Wird aufgerufen, wenn der Teilbaum neu geladen werden soll.
+        /// </summary>
+        public virtual void Reload()
+        {
+            this.UserBreakedNodePath = this.Path;
+            this.ProcessTreeEvent("Reload", this.Path);
+            InfoController.Say(String.Format($"#RELOAD# Id/Name: {this.IdInfo}"));
+        }
+
+        /// <summary>
         /// Wenn erforderlich, beim Trigger abmelden,
         /// Abbrechen der Task über CancellationToken, Status setzen.
         /// </summary>

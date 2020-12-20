@@ -839,7 +839,7 @@ ERLEDIGT: WebDriver.dll hart in's Bin-Verzeichnis kopieren.
 ERLEDIGT: BugFix: UserControls mit ListViews mit unhandled SelectionChanged konnten im MainTabControl zum
           Abbruch von Vishnu führen, da SelectionChanged im Tree nach oben bubbled.
 ERLEDIGT: Die maximale Öffnungszeit für ToolTips wurde auf 30 Sekunden hochgesetzt.
-ERLEDIGT: BugFix: Direkter UserRun auf getriggerte Knoten führte zum doppelten Start der Knoten., da der
+ERLEDIGT: BugFix: Direkter UserRun auf getriggerte Knoten führte zum doppelten Start der Knoten, da der
           zugeordnete Trigger auch sofort wieder auslöste.
 
 Stand: 01.12.2020 Version 4.9.3.1 ()
