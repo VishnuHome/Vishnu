@@ -47,9 +47,9 @@ namespace Vishnu.Interchange
         /// <summary>
         /// Geht rekursiv durch den Baum und ruft für jeden Knoten die Action auf.
         /// </summary>
-        /// <param name="visitor">Der für jeden Knoten aufzurufende Callback vom Typ Func&lt;int, T, object, object&gt;</param>
+        /// <param name="callback">Der für jeden Knoten aufzurufende Callback vom Typ Func&lt;int, IExpandableNode, object, object&gt;.</param>
         /// <returns>Das oberste UserObjekt für den Tree.</returns>
-        object Traverse(Func<int, IExpandableNode, object, object> visitor);
+        object Traverse(Func<int, IExpandableNode, object, object> callback);
 
     }
 }

@@ -12,6 +12,7 @@ using Vishnu.Interchange;
 using System.Collections.Generic;
 using System.Text;
 using NetEti.ApplicationControl;
+using System.Text.RegularExpressions;
 
 namespace Vishnu.ViewModel
 {
@@ -764,7 +765,23 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// ViewModel des übergeordneten LogicalTaskTree.
         /// </summary>
-        public LogicalTaskTreeViewModel RootLogicalTaskTreeViewModel { get; set; }
+        public OrientedTreeViewModelBase RootLogicalTaskTreeViewModel { get; set; }
+
+        /// <summary>
+        /// Liefert die für den Knoten gültige, oberste Root-JobList.
+        /// </summary>
+        /// <returns>Die für den Knoten gültige, oberste Root-JobList.</returns>
+        public JobListViewModel GetTopRootJobListViewModel()
+        {
+            if (this.RootJobListViewModel.HasParent)
+            {
+                return this.RootJobListViewModel.GetTopRootJobListViewModel();
+            }
+            else
+            {
+                return this.RootJobListViewModel;
+            }
+        }
 
         /// <summary>
         /// Konstruktor
@@ -774,7 +791,7 @@ namespace Vishnu.ViewModel
         /// <param name="myLogicalNode">Der zugeordnete Knoten aus dem LogicalTaskTree.</param>
         /// <param name="lazyLoadChildren">Bei True werden die Kinder erst beim Öffnen des TreeView-Knotens nachgeladen.</param>
         /// <param name="uIMain">Das Root-FrameworkElement zu diesem ViewModel.</param>
-        public LogicalNodeViewModel(LogicalTaskTreeViewModel logicalTaskTreeViewModel, LogicalNodeViewModel parent, LogicalNode myLogicalNode, bool lazyLoadChildren, FrameworkElement uIMain)
+        public LogicalNodeViewModel(OrientedTreeViewModelBase logicalTaskTreeViewModel, LogicalNodeViewModel parent, LogicalNode myLogicalNode, bool lazyLoadChildren, FrameworkElement uIMain)
         {
             this.RootLogicalTaskTreeViewModel = logicalTaskTreeViewModel;
             this.UIMain = uIMain;
@@ -1025,26 +1042,98 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Geht rekursiv durch den Baum und ruft für jeden Knoten die Action auf.
         /// </summary>
-        /// <param name="visitor">Der für jeden Knoten aufzurufende Callback vom Typ Func&lt;int, T, object, object&gt;</param>
+        /// <param name="callback">Der für jeden Knoten aufzurufende Callback vom Typ Func&lt;int, IExpandableNode, object, object&gt;.</param>
         /// <returns>Das oberste UserObjekt für den Tree.</returns>
-        public object Traverse(Func<int, IExpandableNode, object, object> visitor)
+        public object Traverse(Func<int, IExpandableNode, object, object> callback)
         {
-            return this.traverse(0, visitor, null);
+            return this.traverse(0, callback, null);
+        }
+
+        /// <summary>
+        /// Geht rekursiv durch den Baum und ruft für jeden Knoten die Action auf.
+        /// </summary>
+        /// <param name="callback">Der für jeden Knoten aufzurufende Callback vom Typ Func&lt;int, IExpandableNode, object, object&gt;.</param>
+        /// <param name="userObject">Ein User-Object, das rekursiv weitergeleitet und modifiziert wird.</param>
+        /// <returns>Das oberste UserObjekt für den Tree.</returns>
+        public object Traverse(Func<int, IExpandableNode, object, object> callback, object userObject)
+        {
+            return this.traverse(0, callback, userObject);
         }
 
         /// <summary>
         /// Rekursive Hilfsroutine für die öffentliche Routine 'Traverse'.
         /// </summary>
         /// <param name="depth">Die Hierarchie-Ebene.</param>
-        /// <param name="visitor">Der aufrufende Knoten (rekursiv).</param>
-        /// <param name="userParent">Ein User-Object, das rekursiv weitergeleitet und modifiziert wird.</param>
+        /// <param name="callback">Der für jeden Knoten aufzurufende Callback vom Typ Func&lt;int, IExpandableNode, object, object&gt;.</param>
+        /// <param name="userObject">Ein User-Object, das rekursiv weitergeleitet und modifiziert wird.</param>
         /// <returns>Das oberste UserObjekt für den Tree.</returns>
-        protected virtual object traverse(int depth, Func<int, IExpandableNode, object, object> visitor, object userParent)
+        protected virtual object traverse(int depth, Func<int, IExpandableNode, object, object> callback, object userObject)
         {
-            object nextUserParent = visitor(depth, (IExpandableNode)this, userParent);
-            foreach (IExpandableNode child in this.Children)
-                (child as LogicalNodeViewModel).traverse(depth + 1, visitor, nextUserParent);
+            object nextUserParent = callback(depth, (IExpandableNode)this, userObject);
+            if (nextUserParent != null)
+            {
+                foreach (IExpandableNode child in this.Children)
+                    (child as LogicalNodeViewModel).traverse(depth + 1, callback, nextUserParent);
+            }
             return nextUserParent;
+        }
+
+        /// <summary>
+        /// Überschriebene ToString()-Methode.
+        /// </summary>
+        /// <returns>Id des Knoten + ":" + ReturnObject.ToString()</returns>
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine(String.Format($"{this.GetLogicalNode().NodeType}: {this.GetLogicalNode()?.NameId ?? ""}"));
+            stringBuilder.AppendLine(String.Format($"Source: {this.OriginalNodeId ?? ""}"));
+            if (this.Children.Count > 0)
+            {
+                stringBuilder.AppendLine(String.Format($"Children: {this.Children.Count}"));
+            }
+            if (this.IsSnapshotDummy)
+            {
+                stringBuilder.AppendLine(String.Format($"IsSnapshotDummy"));
+            }
+            stringBuilder.AppendLine(String.Format($"Path: {this.Path ?? ""}"));
+            stringBuilder.AppendLine(String.Format($"UserControlPath: {this.UserControlPath??""}"));
+            return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Vergleicht den Inhalt dieses LogicalNodeViewModels nach logischen Gesichtspunkten
+        /// mit dem Inhalt eines übergebenen LogicalNodeViewModels.
+        /// </summary>
+        /// <param name="obj">Das LogicalNodeViewModel zum Vergleich.</param>
+        /// <returns>True, wenn das übergebene Result inhaltlich gleich diesem Result ist.</returns>
+        public override bool Equals(object obj)
+        {
+            if (obj == null || this.GetType() != obj.GetType())
+            {
+                return false;
+            }
+            if (String.IsNullOrEmpty(this.Path) || String.IsNullOrEmpty(this.OriginalNodeId))
+            {
+                return false;
+            }
+            if (Object.ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if (this.ToString() != obj.ToString())
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Erzeugt einen Hashcode für dieses LogicalNodeViewModel.
+        /// </summary>
+        /// <returns>Integer mit Hashwert.</returns>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
 
         #endregion public members
@@ -1229,6 +1318,190 @@ namespace Vishnu.ViewModel
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Lädt den gesamten Tree inklusive JobDescription.xml neu. 
+        /// </summary>
+        protected void ReloadTaskTree()
+        {
+            JobList shadowJobList = this._myLogicalNode.Reload();
+            if (shadowJobList != null)
+            {
+                // Das DummyLogicalTaskTree-ViewModel
+                DummyLogicalTaskTreeViewModel dummyLogicalTaskTreeViewModel = new DummyLogicalTaskTreeViewModel();
+                JobListViewModel shadowJobListViewModel = new JobListViewModel(dummyLogicalTaskTreeViewModel, null, shadowJobList, false, null);
+                if (shadowJobListViewModel != null)
+                {
+                    Dictionary<string, LogicalNodeViewModel> vmFinder = new Dictionary<string, LogicalNodeViewModel>();
+                    shadowJobListViewModel.Traverse(IndexTreeElement, vmFinder);
+
+                    this._treesDiffer = false;
+                    this.GetTopRootJobListViewModel().Traverse(DiffTreeElement, vmFinder);
+
+                    InfoController.Say("#RELOAD# -------------------------------------------------------------------------------------------------------------------------------");
+                    Thread.Sleep(100);
+                    List<string> allTreeInfos = new List<string>();
+                    object result1 = this.GetTopRootJobListViewModel().Traverse(ListTreeElement, allTreeInfos);
+                    string bigMessage = String.Join(System.Environment.NewLine, allTreeInfos);
+                    InfoController.Say("#RELOAD# " + bigMessage);
+                    Thread.Sleep(100);
+                    InfoController.Say("#RELOAD# -------------------------------------------------------------------------------------------------------------------------------");
+                    Thread.Sleep(100);
+                    allTreeInfos.Clear();
+                    object result2 = shadowJobListViewModel.Traverse(ListTreeElement, allTreeInfos);
+                    bigMessage = String.Join(System.Environment.NewLine, allTreeInfos);
+                    InfoController.Say("#RELOAD# " + bigMessage);
+                    Thread.Sleep(100);
+                    InfoController.Say("#RELOAD# -------------------------------------------------------------------------------------------------------------------------------");
+                }
+                /*
+                this.MainLogicalNodeView = new ReadOnlyCollection<JobListViewModel>(
+                  new JobListViewModel[]
+                  {
+                      new JobListViewModel(this, null, this._root, false, this._uIMain)
+                  });
+                this.MainLogicalNodeView[0].SetChildOrientation(startTreeOrientation);
+                this.MainLogicalNodeView[0].ExpandTree(this.MainLogicalNodeView[0], false);
+
+                // Das Main-ViewModel
+                MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(logicalTaskTreeViewModel, this._mainWindow.ForceRecalculateWindowMeasures, SingleInstanceApplication._appSettings.FlatNodeListFilter, SingleInstanceApplication._appSettings.DemoModus ? "-DEMO-" : "");
+
+                // Verbinden von Main-Window mit Main-ViewModel
+                this._mainWindow.DataContext = mainWindowViewModel; //mainViewModel;
+
+                //if (SingleInstanceApplication._appSettings.Autostart)
+                //{
+                //    SingleInstanceApplication._businessLogic.Tree.UserRun();
+                //}
+                */
+
+            }
+        }
+
+        /// <summary>
+        /// Fügt Informationen über die übergebene ExpandableNode in eine als object übergebene Stringlist ein.
+        /// </summary>
+        /// <param name="depth">Nullbasierter Zähler der Rekursionstiefe eines Knotens im LogicalTaskTree.</param>
+        /// <param name="expandableNode">Basisklasse eines ViewModel-Knotens im LogicalTaskTree.</param>
+        /// <param name="userObject">Ein beliebiges durchgeschliffenes UserObject (hier: List&lt;string&gt;).</param>
+        /// <returns>Die bisher gefüllte Stringlist mit Knoteninformationen.</returns>
+        protected object ListTreeElement(int depth, IExpandableNode expandableNode, object userObject)
+        {
+            string deptString = depth > 0 ? new String(' ', depth * 2) : "";
+            List<string> allTreeInfos = (List<string>)userObject;
+            if (expandableNode is JobListViewModel)
+            {
+                JobListViewModel jobListViewModel = expandableNode as JobListViewModel;
+                allTreeInfos.Add(deptString + jobListViewModel.ToString().Replace(Environment.NewLine, ", "));
+            }
+            else
+            {
+                if (expandableNode is SingleNodeViewModel)
+                {
+                    SingleNodeViewModel singleNodeViewModel = expandableNode as SingleNodeViewModel;
+                    allTreeInfos.Add(deptString + singleNodeViewModel.ToString().Replace(Environment.NewLine, ", "));
+                }
+                else
+                {
+                    if (expandableNode is LogicalNodeViewModel)
+                    {
+                        LogicalNodeViewModel logicalNodeViewModel = expandableNode as LogicalNodeViewModel;
+                        allTreeInfos.Add(deptString + logicalNodeViewModel.ToString().Replace(Environment.NewLine, ", "));
+                    }
+                    else
+                    {
+                        allTreeInfos.Add(deptString + "NOTHING " + expandableNode.Path);
+                    }
+                }
+            }
+            return userObject;
+        }
+
+        /// <summary>
+        /// Fügt Informationen über die übergebene ExpandableNode in eine als object übergebene Stringlist ein.
+        /// </summary>
+        /// <param name="depth">Nullbasierter Zähler der Rekursionstiefe eines Knotens im LogicalTaskTree.</param>
+        /// <param name="expandableNode">Basisklasse eines ViewModel-Knotens im LogicalTaskTree.</param>
+        /// <param name="userObject">Ein beliebiges durchgeschliffenes UserObject (hier: Dictionary&lt;string, LogicalNodeViewModel&gt;).</param>
+        /// <returns>Das Dictionary&lt;string, LogicalNodeViewModel&gt; oder null.</returns>
+        protected object DiffTreeElement(int depth, IExpandableNode expandableNode, object userObject)
+        {
+            Dictionary<string, LogicalNodeViewModel> vmFinder = (Dictionary<string, LogicalNodeViewModel>)userObject;
+            if (vmFinder.ContainsKey(expandableNode.Path))
+            {
+                LogicalNodeViewModel shadowTreeVM = vmFinder[expandableNode.Path];
+                if (shadowTreeVM.Equals(expandableNode as LogicalNodeViewModel))
+                {
+                    return userObject; // Weiter im Tree
+                }
+                else
+                {
+                    this.TransferNode(shadowTreeVM, expandableNode as LogicalNodeViewModel);
+                }
+            }
+            else
+            {
+                throw new ApplicationException(String.Format($"Unerwarteter Suchfehler auf {expandableNode.Path}."));
+            }
+            // Dieser auskommentierte ELSE-Zweig sollte überflüssig sein, da sich umbenannte oder ausgetauschte Knoten bei
+            // gleicher Kinderzahl des Parent-Knoten auf jeden Fall schon dort in der LogicalExpression manifestiert haben sollten.
+            //else
+            //{
+            //    string parentPath = System.IO.Path.GetDirectoryName(expandableNode.Path);
+            //    if (vmFinder.ContainsKey(parentPath))
+            //    {
+            //        LogicalNodeViewModel shadowTreeParentVM = vmFinder[parentPath];
+            //        this.TransferNode(shadowTreeParentVM, (expandableNode as LogicalNodeViewModel).Parent);
+            //    }
+            //    else
+            //    {
+            //        throw new ApplicationException(String.Format($"Unerwarteter Suchfehler auf {parentPath}."));
+            //    }
+            //}
+
+            return null; // Bricht die Rekursion für diesen Zweig ab.
+        }
+
+        private void TransferNode(LogicalNodeViewModel shadowTreeVM, LogicalNodeViewModel logicalNodeVM)
+        {
+            LogicalNode shadowNode = shadowTreeVM.GetLogicalNode();
+            LogicalNode logicalNode = logicalNodeVM.GetLogicalNode();
+            if (shadowNode != null && logicalNode != null)
+            {
+                if (!this._treesDiffer)
+                {
+                    this.TransferTreeGlobals(shadowNode.GetTopRootJobList(), logicalNode.GetTopRootJobList());
+                    this._treesDiffer = true;
+                }
+                InfoController.Say(String.Format($"#RELOAD# Transferring Node {shadowTreeVM.Path} from ShadowTree to Tree."));
+
+            }
+        }
+
+        private void TransferTreeGlobals(JobList shadowRootJobList, JobList treeRootJobList)
+        {
+            InfoController.Say(String.Format($"#RELOAD# Transferring Tree Globals from ShadowTree to Tree."));
+        }
+
+        /// <summary>
+        /// Fügt den Path der ExpandableNode als Key und die ExpandableNode als Value in ein als object übergebenes Dictionary ein.
+        /// </summary>
+        /// <param name="depth">Nullbasierter Zähler der Rekursionstiefe eines Knotens im LogicalTaskTree.</param>
+        /// <param name="expandableNode">Basisklasse eines ViewModel-Knotens im LogicalTaskTree.</param>
+        /// <param name="userObject">Ein beliebiges durchgeschliffenes UserObject (hier: Dictionary&lt;string, LogicalNodeViewModel&gt;).</param>
+        /// <returns>Das bisher gefüllte Dictionary mit Path als Key und dem LogicalNodeViewModel als Value.</returns>
+        protected object IndexTreeElement(int depth, IExpandableNode expandableNode, object userObject)
+        {
+            Dictionary<string, LogicalNodeViewModel> vmFinder = (Dictionary<string, LogicalNodeViewModel>)userObject;
+            if (expandableNode is LogicalNodeViewModel)
+            {
+                LogicalNodeViewModel logicalNodeViewModel = expandableNode as LogicalNodeViewModel;
+                // string key = Regex.Replace(logicalNodeViewModel.Path, @"Internal_\d+", "Internal");
+                string key = logicalNodeViewModel.Path;
+                vmFinder.Add(key, logicalNodeViewModel);
+            }
+            return userObject;
         }
 
         /// <summary>
@@ -1458,6 +1731,7 @@ namespace Vishnu.ViewModel
         private string _freeComment;
         private bool _isInSleepTime;
         private string _sleepTimeTo;
+        private bool _treesDiffer;
 
         // True, wenn die Kinder dieses Knotens noch nicht geladen wurden.
         private bool _hasDummyChild

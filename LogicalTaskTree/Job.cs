@@ -61,10 +61,6 @@ namespace LogicalTaskTree
         /// </summary>
         public LoggerShell JobLogger { get; set; }
 
-        /// <summary>
-        /// Liste von internen Triggern für einen jobPackage.Job.
-        /// </summary>
-        public Dictionary<string, Dictionary<string, TriggerShell>> EventTriggers { get; set; }
 
         /// <summary>
         /// Pfad zum dynamisch zu ladenden UserControl für eine JobList.
@@ -298,6 +294,13 @@ namespace LogicalTaskTree
 
         #region internal members
 
+        #region tree globals
+
+        /// <summary>
+        /// Liste von internen Triggern für einen jobPackage.Job.
+        /// </summary>
+        internal Dictionary<string, Dictionary<string, TriggerShell>> EventTriggers { get; set; }
+
         // Hilfsproperty für das Hinzufügen von Workern zum
         // privaten Dictionary _workers.
         // Wird von auße wie ein Dictionary wahrgenommen.
@@ -307,6 +310,8 @@ namespace LogicalTaskTree
         /// Knoten-Id + ":" + TreeEvents-String gebildeten Keys.
         /// </summary>
         internal Workers Workers { get; private set; }
+
+        #endregion tree globals
 
         #endregion internal members
 

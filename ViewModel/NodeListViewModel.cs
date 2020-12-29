@@ -28,7 +28,7 @@ namespace Vishnu.ViewModel
         /// <param name="nodeList">Der zugeordnete Knoten aus dem LogicalTaskTree.</param>
         /// <param name="lazyLoadChildren">Bei True werden die Kinder erst beim Öffnen des TreeView-Knotens nachgeladen.</param>
         /// <param name="uIMain">Das Root-FrameworkElement zu diesem ViewModel.</param>
-        public NodeListViewModel(LogicalTaskTreeViewModel logicalTaskTreeViewModel, LogicalNodeViewModel parent, NodeList nodeList, bool lazyLoadChildren, FrameworkElement uIMain)
+        public NodeListViewModel(OrientedTreeViewModelBase logicalTaskTreeViewModel, LogicalNodeViewModel parent, NodeList nodeList, bool lazyLoadChildren, FrameworkElement uIMain)
           : base(logicalTaskTreeViewModel, parent, nodeList, lazyLoadChildren, uIMain) { }
     }
 }

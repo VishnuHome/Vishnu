@@ -84,6 +84,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DummyLogicalTaskTreeViewModel.cs" />
     <Compile Include="DynamicUserControlViewModelBase.cs" />
     <Compile Include="JobConnectorViewModel.cs" />
     <Compile Include="JobGroupViewModel.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="NodeErrorViewModel.cs" />
     <Compile Include="NodeListViewModel.cs" />
+    <Compile Include="OrientedTreeViewModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SingleNodeViewModel.cs" />
     <Compile Include="SnapshotViewModel.cs" />

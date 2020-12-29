@@ -37,7 +37,7 @@ namespace Vishnu.ViewModel
         /// <param name="parent">Der übergeordnete ViewModel-Knoten.</param>
         /// <param name="singleNode">Der zugeordnete Knoten aus dem LogicalTaskTree.</param>
         /// <param name="uIMain">Das Root-FrameworkElement zu diesem ViewModel.</param>
-        public JobConnectorViewModel(LogicalTaskTreeViewModel logicalTaskTreeViewModel, LogicalNodeViewModel parent, LogicalNode singleNode, FrameworkElement uIMain)
+        public JobConnectorViewModel(OrientedTreeViewModelBase logicalTaskTreeViewModel, LogicalNodeViewModel parent, LogicalNode singleNode, FrameworkElement uIMain)
           : base(logicalTaskTreeViewModel, parent, singleNode, uIMain)
         {
         }

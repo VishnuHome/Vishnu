@@ -92,6 +92,7 @@ namespace LogicalTaskTree
             this.LoadedJobPackages = new Dictionary<string, JobPackage>();
             this._appSettings = GenericSingletonProvider.GetInstance<AppSettings>();
             this.ReachableServers = new Dictionary<string, bool>();
+            LogicalNode.InternalIdBase = 0; // Pro Tree eindeutiger ID-Zusatz für anonyme Knoten.
         }
 
         #endregion public members

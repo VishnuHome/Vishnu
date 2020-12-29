@@ -3,6 +3,9 @@ using LogicalTaskTree;
 using NetEti.MVVMini;
 using System.Windows.Input;
 using Vishnu.Interchange;
+using System;
+using NetEti.ApplicationControl;
+using System.Text;
 
 namespace Vishnu.ViewModel
 {
@@ -113,7 +116,7 @@ namespace Vishnu.ViewModel
         /// <param name="parent">Der übergeordnete ViewModel-Knoten.</param>
         /// <param name="singleNode">Der zugeordnete Knoten aus dem LogicalTaskTree.</param>
         /// <param name="uIMain">Das Root-FrameworkElement zu diesem ViewModel.</param>
-        public SingleNodeViewModel(LogicalTaskTreeViewModel logicalTaskTreeViewModel, LogicalNodeViewModel parent, LogicalNode singleNode, FrameworkElement uIMain)
+        public SingleNodeViewModel(OrientedTreeViewModelBase logicalTaskTreeViewModel, LogicalNodeViewModel parent, LogicalNode singleNode, FrameworkElement uIMain)
           : base(logicalTaskTreeViewModel, parent, singleNode, false, uIMain)
         {
             this._btnRunTaskTreeRelayCommand = new RelayCommand(runTaskTreeExecute, canRunTaskTreeExecute);
@@ -124,6 +127,105 @@ namespace Vishnu.ViewModel
             //this._myLogicalNode.NodeStateChanged += this.treeElementStateChanged;
             //this._myLogicalNode.NodeLogicalStateChanged -= this.TreeElementLogicalStateChanged;
             //this._myLogicalNode.NodeLogicalStateChanged += this.TreeElementLogicalStateChanged;
+        }
+
+        /// <summary>
+        /// Überschriebene ToString()-Methode.
+        /// </summary>
+        /// <returns>Id des Knoten + ":" + ReturnObject.ToString()</returns>
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new StringBuilder(base.ToString());
+            string slavePathName = "";
+            string referencedNodeName = "";
+            string checkerParameters = "";
+            LogicalNode logicalNode = this.GetLogicalNode();
+            if (logicalNode != null)
+            {
+                if ((logicalNode is SingleNode))
+                {
+                    if ((logicalNode as SingleNode).Checker != null)
+                    {
+                        if ((logicalNode as SingleNode).Checker is CheckerShell)
+                        {
+                            slavePathName = ((logicalNode as SingleNode).Checker as CheckerShell).SlavePathName ?? "";
+                            checkerParameters = ((logicalNode as SingleNode).Checker as CheckerShell).CheckerParameters ?? "";
+                            referencedNodeName = ((logicalNode as SingleNode).Checker as CheckerShell).ReferencedNodeName ?? "";
+                        }
+                        else
+                        {
+                            slavePathName = ((logicalNode as SingleNode).Checker as ValueModifier<object>).SlavePathName ?? "";
+                            referencedNodeName = ((logicalNode as SingleNode).Checker as ValueModifier<object>).ReferencedNodeName ?? "";
+                        }
+                    }
+                }
+                else
+                {
+                    if ((logicalNode is NodeConnector))
+                    {
+                        if ((logicalNode as NodeConnector).Checker != null)
+                        {
+                            if ((logicalNode as NodeConnector).Checker is CheckerShell)
+                            {
+                                slavePathName = ((logicalNode as NodeConnector).Checker as CheckerShell).SlavePathName ?? "";
+                                checkerParameters = ((logicalNode as NodeConnector).Checker as CheckerShell).CheckerParameters ?? "";
+                                referencedNodeName = ((logicalNode as NodeConnector).Checker as CheckerShell).ReferencedNodeName ?? "";
+                            }
+                            else
+                            {
+                                slavePathName = ((logicalNode as NodeConnector).Checker as ValueModifier<object>).SlavePathName ?? "";
+                                referencedNodeName = ((logicalNode as NodeConnector).Checker as ValueModifier<object>).ReferencedNodeName ?? "";
+                            }
+                        }
+                    }
+                }
+            }
+            if (!String.IsNullOrEmpty(slavePathName))
+            {
+                stringBuilder.AppendLine(String.Format($"SlavePathName: {slavePathName}"));
+            }
+            if (!String.IsNullOrEmpty(referencedNodeName))
+            {
+                stringBuilder.AppendLine(String.Format($"ReferencedNodeName: {referencedNodeName}"));
+            }
+            if (!String.IsNullOrEmpty(checkerParameters))
+            {
+                stringBuilder.AppendLine(String.Format($"CheckerParameters: {checkerParameters}"));
+            }
+            return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Vergleicht den Inhalt dieses LogicalNodeViewModels nach logischen Gesichtspunkten
+        /// mit dem Inhalt eines übergebenen LogicalNodeViewModels.
+        /// </summary>
+        /// <param name="obj">Das LogicalNodeViewModel zum Vergleich.</param>
+        /// <returns>True, wenn das übergebene Result inhaltlich gleich diesem Result ist.</returns>
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+            /*
+            if (!base.Equals(obj))
+            {
+                return false;
+            }
+            LogicalNode logicalNode = this.GetLogicalNode();
+            LogicalNode objLogicalNode = (obj as LogicalNodeViewModel).GetLogicalNode();
+            if (logicalNode != null && objLogicalNode != null)
+            {
+
+            }
+            return false;
+            */
+        }
+
+        /// <summary>
+        /// Erzeugt einen Hashcode für dieses LogicalNodeViewModel.
+        /// </summary>
+        /// <returns>Integer mit Hashwert.</returns>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
 
         #endregion public members
@@ -234,20 +336,17 @@ namespace Vishnu.ViewModel
 
         private void reloadTaskTreeExecute(object parameter)
         {
-            this._myLogicalNode.ProcessTreeEvent("Reload", null);
             if (!(this._myLogicalNode is NodeConnector))
             {
-                this._myLogicalNode.Reload();
-            }
-            else
-            {
-                (this._myLogicalNode as NodeConnector).Reload();
+                InfoController.Say(String.Format($"#RELOAD# SingleNodeViewModel.reloadTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {this.RootJobListViewModel.Name}"));
+
+                this.ReloadTaskTree();
             }
         }
 
         private bool canReloadTaskTreeExecute()
         {
-            bool canReload = this._myLogicalNode.CanTreeStart;
+            bool canReload = !(this._myLogicalNode is NodeConnector) && this._myLogicalNode.CanTreeStart;
             return canReload;
         }
 

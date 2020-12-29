@@ -3,6 +3,8 @@ using LogicalTaskTree;
 using System.Windows.Input;
 using NetEti.MVVMini;
 using Vishnu.Interchange;
+using System.Text;
+using System;
 
 namespace Vishnu.ViewModel
 {
@@ -114,7 +116,7 @@ namespace Vishnu.ViewModel
         /// <param name="lazyLoadChildren">Bei True werden die Kinder erst beim Öffnen des TreeView-Knotens nachgeladen.</param>
         /// <param name="uIMain">Das Root-FrameworkElement zu diesem ViewModel.</param>
         /// <param name="logicalTaskTreeViewModel">Das dem Root-Knoten übergeordnete ViewModel (nur beim Root-Job ungleich null).</param>
-        public JobListViewModel(LogicalTaskTreeViewModel logicalTaskTreeViewModel, LogicalNodeViewModel parent, JobList jobList, bool lazyLoadChildren, FrameworkElement uIMain)
+        public JobListViewModel(OrientedTreeViewModelBase logicalTaskTreeViewModel, LogicalNodeViewModel parent, JobList jobList, bool lazyLoadChildren, FrameworkElement uIMain)
           : base(logicalTaskTreeViewModel, parent, jobList, lazyLoadChildren, uIMain)
         {
             this._btnRunTaskTreeRelayCommand = new RelayCommand(runTaskTreeExecute, canRunTaskTreeExecute);
@@ -123,6 +125,53 @@ namespace Vishnu.ViewModel
             this._btnSwitchTaskTreeViewRelayCommand = new RelayCommand(switchTaskTreeViewExecute, canSwitchTaskTreeViewExecute);
             this._myLogicalNode.NodeStateChanged -= this.treeElementStateChanged;
             this._myLogicalNode.NodeStateChanged += this.treeElementStateChanged;
+        }
+
+        /// <summary>
+        /// Überschriebene ToString()-Methode.
+        /// </summary>
+        /// <returns>Id des Knoten + ":" + ReturnObject.ToString()</returns>
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new StringBuilder(base.ToString());
+            string logicalExpression = "";
+            LogicalNode logicalNode = this.GetLogicalNode();
+            if (logicalNode != null)
+            {
+                logicalExpression = (logicalNode as JobList).LogicalExpression;
+            }
+            stringBuilder.AppendLine(String.Format($"LogicalExpression: {logicalExpression}"));
+            return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Vergleicht den Inhalt dieses LogicalNodeViewModels nach logischen Gesichtspunkten
+        /// mit dem Inhalt eines übergebenen LogicalNodeViewModels.
+        /// </summary>
+        /// <param name="obj">Das LogicalNodeViewModel zum Vergleich.</param>
+        /// <returns>True, wenn das übergebene Result inhaltlich gleich diesem Result ist.</returns>
+        public override bool Equals(object obj)
+        {
+            if (!base.Equals(obj))
+            {
+                return false;
+            }
+            LogicalNode logicalNode = this.GetLogicalNode();
+            LogicalNode objLogicalNode = (obj as LogicalNodeViewModel).GetLogicalNode();
+            if (logicalNode != null && objLogicalNode != null)
+            {
+                return (logicalNode as JobList).LogicalExpression == (objLogicalNode as JobList).LogicalExpression;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Erzeugt einen Hashcode für dieses LogicalNodeViewModel.
+        /// </summary>
+        /// <returns>Integer mit Hashwert.</returns>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
 
         #endregion public members

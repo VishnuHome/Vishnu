@@ -2,6 +2,7 @@
                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                    xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
                     xmlns:base="clr-namespace:Vishnu.Interchange;assembly=Vishnu.Interchange"
                     xmlns:attached="clr-namespace:Vishnu.WPF_UI.DependencyProperties">
     <LinearGradientBrush x:Key="PlaygroundColorBrush" EndPoint="0.5,1" StartPoint="0.5,0">
@@ -68,7 +69,7 @@
     <attached:BinaryModificationSwitch x:Key="OrientationModificationSwitch">Unchanged</attached:BinaryModificationSwitch>
 
     <ContextMenu x:Key="cmMainGrid">
-        <MenuItem Header="Menu item 1" />
+        <MenuItem Header="Reload tree" Command="{Binding ReloadLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}" />
         <MenuItem Header="Menu item 2" />
         <Separator />
         <MenuItem Header="Menu item 3" />

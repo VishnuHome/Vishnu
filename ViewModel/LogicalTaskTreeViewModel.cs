@@ -22,44 +22,16 @@ namespace Vishnu.ViewModel
     ///
     /// 05.01.2013 Erik Nagel: erstellt
     /// </remarks>
-    public class LogicalTaskTreeViewModel : ObservableObject
+    public class LogicalTaskTreeViewModel : OrientedTreeViewModelBase
     {
         #region public members
 
         #region published members
 
         /// <summary>
-        /// ItemsSource für die TreeView in LogicalTaskTreeControl.
-        /// </summary>
-        public ReadOnlyCollection<JobListViewModel> MainLogicalNodeView { get; private set; }
-
-        /// <summary>
         /// ItemsSource für optionale Zusatz-Infos zum Tree.
         /// </summary>
         public ObservableCollection<string> InfoSource { get; private set; }
-
-        /// <summary>
-        /// Bestimmt die Ausrichtung bei der Darstellung der Elemente im Tree. 
-        /// </summary>
-        public TreeOrientation TreeOrientationState
-        {
-            get
-            {
-                return this._treeOrientationState;
-            }
-            set
-            {
-                if (this._treeOrientationState != value)
-                {
-                    this._treeOrientationState = value;
-                    foreach (LogicalNodeViewModel child in this.MainLogicalNodeView)
-                    {
-                        child.SetChildOrientation(this.TreeOrientationState);
-                    }
-                    this.RaisePropertyChanged("TreeOrientationState");
-                }
-            }
-        }
 
         /// <summary>
         /// Returns true, wenn gerade eine vom User definierte Ruhezeit
@@ -235,12 +207,6 @@ namespace Vishnu.ViewModel
 
         #endregion public members
 
-        #region internal members
-
-        internal List<string> TempIds;
-
-        #endregion internal members
-
         #region private members
 
         private class ViewModelCompare : IEqualityComparer<LogicalNodeViewModel>
@@ -268,7 +234,6 @@ namespace Vishnu.ViewModel
 
         //private int _testAusgabeCount = 0;
         //private int _maxTestAusgabeCount = 1;
-        private TreeOrientation _treeOrientationState;
         private bool _isInSleepTime;
         private string _sleepTimeTo;
 

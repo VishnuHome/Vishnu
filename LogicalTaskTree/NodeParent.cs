@@ -62,6 +62,25 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
+        /// Liefert den Index, an dem das nächste Child eingefügt würde.
+        /// </summary>
+        internal virtual int GetNextChildIndex()
+        {
+            return this.Children.Count;
+        }
+
+        /// <summary>
+        /// Erzeugt eine eindeutige Id.
+        /// </summary>
+        /// <returns>Eindeutige Id</returns>
+        internal string GenerateNextChildId()
+        {
+            // return "Internal_" + (++InternalIdBase).ToString();
+            return "Child_" + this.GetNextChildIndex().ToString();
+        }
+
+
+        /// <summary>
         /// Speichert den Kindknoten und hängt sich in die Events des Kindknoten ein.
         /// </summary>
         internal virtual void HookChildEvents(LogicalNode child)

@@ -264,7 +264,8 @@ namespace LogicalTaskTree
                     // leerer String-Wert wird hier zugelassen
                     this._constantValue = this.Id.Substring(1);
                 }
-                this.Id = LogicalNode.GenerateInternalId();
+                //this.Id = LogicalNode.GenerateInternalId();
+                this.Id = (this.Mother as NodeParent).GenerateNextChildId() + "_" + this.Id;
             }
             this._lastSucceeded = 0;
             this.UserControlPath = null; // Wird nach Instanziierung über die Property gesetzt.

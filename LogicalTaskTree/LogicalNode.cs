@@ -8,6 +8,7 @@ using System.Linq;
 using Vishnu.Interchange;
 using System.Collections.Concurrent;
 using NetEti.MVVMini;
+using LogicalTaskTree.Provider;
 
 namespace LogicalTaskTree
 {
@@ -147,6 +148,11 @@ namespace LogicalTaskTree
         #endregion events
 
         #region IVisnuNode implementation
+
+        /// <summary>
+        /// Pro Tree eindeutiger ID-Zusatz für anonyme Knoten.
+        /// </summary>
+        public static int InternalIdBase;
 
         /// <summary>
         /// Die eindeutige Kennung des Knotens (identisch zur Property Id).
@@ -1374,11 +1380,18 @@ namespace LogicalTaskTree
         /// <summary>
         /// Wird aufgerufen, wenn der Teilbaum neu geladen werden soll.
         /// </summary>
-        public virtual void Reload()
+        public virtual JobList Reload()
         {
-            this.UserBreakedNodePath = this.Path;
             this.ProcessTreeEvent("Reload", this.Path);
-            InfoController.Say(String.Format($"#RELOAD# Id/Name: {this.IdInfo}"));
+            return this.ReloadBranch();
+        }
+
+        private JobList ReloadBranch()
+        {
+            JobList rootJobList = this.GetTopRootJobList();
+            InfoController.Say(String.Format($"#RELOAD# LogicalNode.ReloadBranch Id/Name: {this.IdInfo}, RootJobList: {rootJobList.IdInfo}"));
+            JobList newBranch = new JobList(this.TreeParams, new ProductionJobProvider());
+            return newBranch;
         }
 
         /// <summary>
@@ -1507,15 +1520,6 @@ namespace LogicalTaskTree
             {
                 this.ParentView = parentView;
             }
-        }
-
-        /// <summary>
-        /// Erzeugt eine eindeutige Id.
-        /// </summary>
-        /// <returns>Eindeutige Id</returns>
-        internal static string GenerateInternalId()
-        {
-            return "Internal_" + (++_internalIdBase).ToString();
         }
 
         /// <summary>
@@ -1929,7 +1933,6 @@ namespace LogicalTaskTree
         const int SLEEPMILLISECONDS = 10;
         const int MAXWAITINGLOOPS = 20;
 
-        private static int _internalIdBase = 0;
         private static long _countdownToSleep = COUNTSUNTILSLEEP;
         private static ConcurrentDictionary<Thread, bool> _invalidThreads;
 

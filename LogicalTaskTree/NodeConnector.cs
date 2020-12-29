@@ -275,7 +275,7 @@ namespace LogicalTaskTree
         /// Konstruktor
         /// </summary>
         /// <param name="id">Eindeutige Kennung des Knotens.</param>
-        /// <param name="mother">Id des Parent-Knotens.</param>
+        /// <param name="mother">Der Parent-Knotens.</param>
         /// <param name="rootJoblist">Die zuständige JobList.</param>
         /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
         /// <param name="node">Die LogicalNode, zu der sich dieser NodeConnector verbinden soll.</param>
@@ -283,7 +283,6 @@ namespace LogicalTaskTree
         public NodeConnector(string id, LogicalNode mother, JobList rootJoblist, TreeParameters treeParams, LogicalNode node, NodeCheckerBase valueModifier)
           : base(id, mother, rootJoblist, treeParams)
         {
-            this.Id = LogicalNode.GenerateInternalId();
             if (node != null)
             {
                 this.InitReferencedNode(node);
@@ -344,9 +343,10 @@ namespace LogicalTaskTree
         /// <summary>
         /// Lädt den Zweig oder Knoten neu.
         /// </summary>
-        public override void Reload()
+        public override JobList Reload()
         {
-            this._node.Reload();
+            // keine Weiterleitung 
+            return null;
         }
 
         /// <summary>
@@ -403,6 +403,11 @@ namespace LogicalTaskTree
             {
             }
         }
+
+        //internal string GetReferencedCheckerBaseName()
+        //{
+        //    return this._valueModifier?.CheckerBaseReferenceName;
+        //}
 
         #endregion internal members
 
