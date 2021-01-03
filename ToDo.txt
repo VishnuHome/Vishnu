@@ -1518,6 +1518,159 @@ App.cs
             			this.syntaxTree = new LogicalParser().Parse(this.LogicalExpression);
             			this.buildParallelTree(this, this.syntaxTree);
         													
+----------------------------------------------------------------------------------------------------------------------
+HotPlug
+
+    ///   - Merging von für JobLists und Tree globalen Arrays und Dictionaries:
+		///				Job
+		///		        #region tree globals
+		///		
+		///		        /// <summary>
+		///		        /// Liste von internen Triggern für einen jobPackage.Job.
+		///		        /// </summary>
+		///		        internal Dictionary<string, Dictionary<string, TriggerShell>> EventTriggers { get; set; }
+		///		        										|										|
+		///		        										|										+-> Quelle-Id, z.B SubJob1 oder CheckTreeEvents
+		///		        										|
+		///		        										+-> Events string, z.B. "AnyException|LastNotNullLogicalChanged"
+		///		
+		///		        	EventTriggers werden nach oben in die TopRootJobList propagiert.
+		///		
+		///		        // Hilfsproperty für das Hinzufügen von Workern zum
+		///		        // privaten Dictionary _workers.
+		///		        // Wird von auße wie ein Dictionary wahrgenommen.
+		///		        /// <summary>
+		///		        /// Liste von externen Arbeitsroutinen für einen jobPackage.Job.
+		///		        /// Ist ein Dictionary mit WorkerShell-Arrays zu aus
+		///		        /// Knoten-Id + ":" + TreeEvents-String gebildeten Keys.
+		///		        /// </summary>
+		///		        internal Workers Workers { get; private set; }
+		///		        	private Dictionary<string, Dictionary<string, WorkerShell[]>> _workers { get; set; }
+		///		        											|										|
+		///		        											|										+-> Quelle-Id, z.B. any SQLServer queryingJob
+		///		        											|
+		///		        											+-> einzelnes Event, z.B. "AnyException" oder "LastNotNullLogicalChanged"
+		///		        	
+		///		        	Workers werden nicht nach oben in die TopRootJobList propagiert,
+		///		        	sondern sind für jede JobList spezifisch.
+		///		
+		///		        #endregion tree globals
+		///		
+		///				JobList
+		///		        #region tree globals
+		///		
+		///		        // Der externe Job mit logischem Ausdruck und u.a. Dictionary der Worker.
+		///		        internal Job Job { get; set; }
+		///		
+		///		        /// <summary>
+		///		        /// Dictionary von externen Prüfroutinen für einen jobPackage.Job mit Namen als Key.
+		///		        /// Wird als Lookup für unaufgelöste JobConnector-Referenzen genutzt.
+		///		        /// </summary>
+		///		        internal Dictionary<string, NodeCheckerBase> AllCheckers { get; set; }
+		///		        										|
+		///		        										+-> Checker-Name, z.B. "Datum" (bei NodeConnectoren)
+		///		
+		///		        	AllCheckers werden nach oben in die TopRootJobList propagiert.
+		///		
+		///						nur temporär	/// <summary>
+		///								        	/// Liste von NodeConnectoren, die beim Parsen der Jobs noch nicht aufgelöst
+		///								        	/// werden konnten.
+		///								        	/// </summary>
+		///								        	internal List<NodeConnector> UnsatisfiedNodeConnectors;
+		///		
+		///		        /// <summary>
+		///		        /// Dictionary von externen Prüfroutinen für eine JobList, die nicht in
+		///		        /// der LogicalExpression referenziert werden; Checker, die ausschließlich
+		///		        /// über ValueModifier angesprochen werden.
+		///		        /// </summary>
+		///		        internal Dictionary<string, NodeCheckerBase> TreeExternalCheckers { get; set; }
+		///		        										|
+		///		        										+-> Checker-Id, z.B. "Datum" (NodeName wird zur Id)
+		///		
+		///		        	TreeExternalCheckers werden nicht nach oben in die TopRootJobList propagiert,
+		///		        	sondern sind für jede JobList spezifisch.
+		///		
+		///		        /// <summary>
+		///		        /// Liste von externen SingleNodes für die TopRootJobList, die in keiner
+		///		        /// der LogicalExpressions referenziert werden; Nodes, die ausschließlich
+		///		        /// über NodeConnectoren angesprochen werden.
+		///		        /// </summary>
+		///		        internal List<SingleNode> TreeExternalSingleNodes { get; set; }
+		///		        										|
+		///		        										+-> SingleNode-Id, z.B. "Datum" (NodeName wird zur Id)
+		///		
+		///		        	TreeExternalSingleNodes werden nicht nach oben in die TopRootJobList propagiert,
+		///		        	sondern sind für jede JobList spezifisch.
+		///		
+		///		        /// <summary>
+		///		        /// Cache zur Beschleunigung der Verarbeitung von TreeEvents
+		///		        /// bezogen auf EventTrigger.
+		///		        /// </summary>
+		///		        internal List<string> TriggerRelevantEventCache;
+		///		  											|
+		///		   											+-> einzelnes Event, z.B. "AnyException" oder "LastNotNullLogicalChanged"
+		///		
+		///		        	TriggerRelevantEventCache wird nach oben in die TopRootJobList propagiert.
+		///		        	
+		///		        /// <summary>
+		///		        /// Cache zur Beschleunigung der Verarbeitung von TreeEvents
+		///		        /// bezogen auf Worker.
+		///		        /// </summary>
+		///		        internal List<string> WorkerRelevantEventCache;
+		///		  											|
+		///		   											+-> einzelnes Event, z.B. "AnyException" oder "LastNotNullLogicalChanged"
+		///		
+		///		        	WorkerRelevantEventCache wird nach oben in die TopRootJobList propagiert.
+		///		
+		///		        /// <summary>
+		///		        /// Cache zur Beschleunigung der Verarbeitung von TreeEvents
+		///		        /// bezogen auf Logger.
+		///		        /// </summary>
+		///		        internal List<string> LoggerRelevantEventCache;
+		///		  											|
+		///		   											+-> einzelnes Event, z.B. "AnyException" oder "LastNotNullLogicalChanged"
+		///		
+		///		        	LoggerRelevantEventCache wird nach oben in die TopRootJobList propagiert.
+		///		
+		///		        /// <summary>
+		///		        /// Dictionary von JobLists mit ihren Namen als Keys.
+		///		        /// </summary>
+		///		        internal Dictionary<string, JobList> JobsByName;
+		///		  														|
+		///		   														+-> einzelne Job-Id, z.B. "CheckServers" oder "SubJob1"
+		///		
+		///		        	JobsByName werden nach oben in die TopRootJobList propagiert.
+		///		
+		///		        /// <summary>
+		///		        /// Dictionary von LogicalNodes mit ihren Namen als Keys.
+		///		        /// </summary>
+		///		        internal Dictionary<string, LogicalNode> NodesByName;
+		///		  														|
+		///		   														+-> einzelne Knoten-Id, z.B. "Datum" oder "Check_D"
+		///		
+		///		        	NodesByName werden nicht nach oben in die TopRootJobList propagiert,
+		///		        	sondern sind für jede JobList spezifisch.
+		///		
+		///		        /// <summary>
+		///		        /// Dictionary von LogicalNodes mit ihren Namen als Keys.
+		///		        /// </summary>
+		///		        internal Dictionary<string, LogicalNode> TreeRootLastChanceNodesByName;
+		///		  														|
+		///		   														+-> einzelne Knoten-Id, z.B. "Datum" oder "Check_D"
+		///		
+		///		        	TreeRootLastChanceNodesByName werden nach oben in die TopRootJobList propagiert.
+		///		
+		///		        /// <summary>
+		///		        /// Dictionary von LogicalNodes mit ihren Ids als Keys.
+		///		        /// </summary>
+		///		        internal Dictionary<string, LogicalNode> NodesById;
+		///		  														|
+		///		   														+-> einzelne Knoten-Id, z.B. "Datum" oder "Check_D" oder "Child_1_@26"
+		///		
+		///		        	NodesById werden nach oben in die TopRootJobList propagiert.
+		///		
+		///		        #endregion tree globals
 
 
 
+«»

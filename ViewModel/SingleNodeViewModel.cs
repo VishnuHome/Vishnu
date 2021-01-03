@@ -346,7 +346,7 @@ namespace Vishnu.ViewModel
 
         private bool canReloadTaskTreeExecute()
         {
-            bool canReload = !(this._myLogicalNode is NodeConnector) && this._myLogicalNode.CanTreeStart;
+            bool canReload = !(this._myLogicalNode is NodeConnector); // && this._myLogicalNode.CanTreeStart;
             return canReload;
         }
 

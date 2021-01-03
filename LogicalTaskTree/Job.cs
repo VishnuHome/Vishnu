@@ -274,7 +274,7 @@ namespace LogicalTaskTree
             this.Checkers = new Dictionary<string, NodeCheckerBase>();
             this.Triggers = new Dictionary<string, TriggerShell>();
             this.Loggers = new Dictionary<string, LoggerShell>();
-            this._workers = new Dictionary<string, Dictionary<string, WorkerShell[]>>();
+            this.WorkersDictionary = new Dictionary<string, Dictionary<string, WorkerShell[]>>();
             this.SnapshotNames = new List<string>();
             this.EventTriggers = new Dictionary<string, Dictionary<string, TriggerShell>>();
             this.BreakWithResult = false;
@@ -290,16 +290,12 @@ namespace LogicalTaskTree
             this.SnapshotUserControlPath = @"DefaultNodeControls\SnapshotUserControl.dll";
         }
 
-        #endregion public members
-
-        #region internal members
-
         #region tree globals
 
         /// <summary>
         /// Liste von internen Triggern für einen jobPackage.Job.
         /// </summary>
-        internal Dictionary<string, Dictionary<string, TriggerShell>> EventTriggers { get; set; }
+        public Dictionary<string, Dictionary<string, TriggerShell>> EventTriggers { get; set; }
 
         // Hilfsproperty für das Hinzufügen von Workern zum
         // privaten Dictionary _workers.
@@ -309,18 +305,22 @@ namespace LogicalTaskTree
         /// Ist ein Dictionary mit WorkerShell-Arrays zu aus
         /// Knoten-Id + ":" + TreeEvents-String gebildeten Keys.
         /// </summary>
-        internal Workers Workers { get; private set; }
+        public Workers Workers { get; private set; }
+
+        /// <summary>
+        /// Liste von externen Arbeitsroutinen für einen jobPackage.Job.
+        /// </summary>
+        public Dictionary<string, Dictionary<string, WorkerShell[]>> WorkersDictionary { get; set; }
 
         #endregion tree globals
+
+        #endregion public members
+
+        #region internal members
 
         #endregion internal members
 
         #region private members
-
-        // <summary>
-        // Liste von externen Arbeitsroutinen für einen jobPackage.Job.
-        // </summary>
-        private Dictionary<string, Dictionary<string, WorkerShell[]>> _workers { get; set; }
 
         private bool _isDefaultSnapshot;
         private string _constantNodeUserControlPath;
@@ -341,13 +341,13 @@ namespace LogicalTaskTree
             string internalEvents = TreeEvent.GetInternalEventNamesForUserEventNames(treeEvent);
             if (!String.IsNullOrEmpty(internalEvents))
             {
-                if (!this._workers.ContainsKey(internalEvents))
+                if (!this.WorkersDictionary.ContainsKey(internalEvents))
                 {
-                    this._workers.Add(internalEvents, new Dictionary<string, WorkerShell[]>());
+                    this.WorkersDictionary.Add(internalEvents, new Dictionary<string, WorkerShell[]>());
                 }
-                if (!this._workers[internalEvents].ContainsKey(id))
+                if (!this.WorkersDictionary[internalEvents].ContainsKey(id))
                 {
-                    this._workers[internalEvents].Add(id, workerArray);
+                    this.WorkersDictionary[internalEvents].Add(id, workerArray);
                 }
             }
         }
@@ -359,7 +359,7 @@ namespace LogicalTaskTree
             string[] id_treeEvents = findCombinedKey(node_event);
             if (id_treeEvents != null)
             {
-                if (this._workers[id_treeEvents[1]].ContainsKey(id_treeEvents[0]))
+                if (this.WorkersDictionary[id_treeEvents[1]].ContainsKey(id_treeEvents[0]))
                 //if ((id_treeEvents[1].StartsWith("Any") && this._workers.ContainsKey(id_treeEvents[1])) || this._workers[id_treeEvents[1]].ContainsKey(id_treeEvents[0])) // 04.08.2018
                 {
                     return true;
@@ -378,12 +378,12 @@ namespace LogicalTaskTree
             string id;
             string treeEvent;
             this.getSplitKey(node_event, out id, out treeEvent);
-            foreach (string treeEvents in this._workers.Keys)
+            foreach (string treeEvents in this.WorkersDictionary.Keys)
             {
                 //if (treeEvents.Contains(treeEvent) || treeEvent == "")
                 //if (!String.IsNullOrEmpty(treeEvent) && treeEvents.Contains(treeEvent) || this._workers[treeEvents].ContainsKey(id))
-                if (!String.IsNullOrEmpty(treeEvent) && treeEvents.Contains(treeEvent) && this._workers[treeEvents].ContainsKey(id)
-                    || String.IsNullOrEmpty(treeEvent) && this._workers[treeEvents].ContainsKey(id))
+                if (!String.IsNullOrEmpty(treeEvent) && treeEvents.Contains(treeEvent) && this.WorkersDictionary[treeEvents].ContainsKey(id)
+                    || String.IsNullOrEmpty(treeEvent) && this.WorkersDictionary[treeEvents].ContainsKey(id))
                 {
                     return new string[] { id, treeEvents };
                 }
@@ -394,13 +394,13 @@ namespace LogicalTaskTree
         // Liefert die Keys des privaten Dictionarys _workers.
         private Dictionary<string, Dictionary<string, WorkerShell[]>>.KeyCollection getKeys()
         {
-            return this._workers.Keys;
+            return this.WorkersDictionary.Keys;
         }
 
         // Liefert die Values des privaten Dictionarys _workers.
         private Dictionary<string, Dictionary<string, WorkerShell[]>>.ValueCollection getValues()
         {
-            return this._workers.Values;
+            return this.WorkersDictionary.Values;
         }
 
         // Liefert zu einem aus Knoten-Id + : + TreeEvent-Name zusammengesetzten Key
@@ -410,9 +410,9 @@ namespace LogicalTaskTree
             string[] id_treeEvents = findCombinedKey(node_event);
             if (id_treeEvents != null)
             {
-                if (this._workers[id_treeEvents[1]].ContainsKey(id_treeEvents[0]))
+                if (this.WorkersDictionary[id_treeEvents[1]].ContainsKey(id_treeEvents[0]))
                 {
-                    return this._workers[id_treeEvents[1]][id_treeEvents[0]];
+                    return this.WorkersDictionary[id_treeEvents[1]][id_treeEvents[0]];
                 }
             }
             return null;
@@ -446,7 +446,7 @@ namespace LogicalTaskTree
     /// Dictionary, das WorkerShell-Arrays zu aus Knoten-Id + ":" + TreeEvents
     /// gebildeten Keys enthält.
     /// </summary>
-    class Workers
+    public class Workers
     {
         #region public members
 
@@ -477,23 +477,23 @@ namespace LogicalTaskTree
             this._jobAddWorkers(node_event, workerArray);
         }
 
-        #endregion public members
-
-        #region internal members
-
         // Liefert die Keys des in Job privaten Dictionarys '_workers' über die bei der
         // Instanziierung dieser Klasse durch die instanziierenden Klasse (Job)
         // übergebene Funktion 'jobGetKeys'.
         /// <summary>
         /// Liefert die Keys von Workers.
         /// </summary>
-        internal Dictionary<string, Dictionary<string, WorkerShell[]>>.KeyCollection Keys
+        public Dictionary<string, Dictionary<string, WorkerShell[]>>.KeyCollection Keys
         {
             get
             {
                 return this._jobGetKeys();
             }
         }
+
+        #endregion public members
+
+        #region internal members
 
         // Liefert die Values des in Job privaten Dictionarys '_workers' über die bei der
         // Instanziierung dieser Klasse durch die instanziierenden Klasse (Job)

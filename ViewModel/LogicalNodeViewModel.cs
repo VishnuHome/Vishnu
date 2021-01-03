@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Text;
 using NetEti.ApplicationControl;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace Vishnu.ViewModel
 {
@@ -244,7 +245,7 @@ namespace Vishnu.ViewModel
             {
                 return this._parent;
             }
-            private set
+            set
             {
                 this._parent = value;
                 this.RaisePropertyChanged("Parent");
@@ -1072,8 +1073,10 @@ namespace Vishnu.ViewModel
             object nextUserParent = callback(depth, (IExpandableNode)this, userObject);
             if (nextUserParent != null)
             {
-                foreach (IExpandableNode child in this.Children)
-                    (child as LogicalNodeViewModel).traverse(depth + 1, callback, nextUserParent);
+                for (int i = 0; i < this.Children.Count; i++)
+                {
+                    (this.Children[i] as LogicalNodeViewModel).traverse(depth + 1, callback, nextUserParent);
+                }
             }
             return nextUserParent;
         }
@@ -1325,31 +1328,43 @@ namespace Vishnu.ViewModel
         /// </summary>
         protected void ReloadTaskTree()
         {
-            JobList shadowJobList = this._myLogicalNode.Reload();
+            JobList shadowJobList = null;
+            try
+            {
+                shadowJobList = this._myLogicalNode.Reload();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(String.Format($"Fehler beim neu Laden des Jobs: {ex.Message}"));
+            }
             if (shadowJobList != null)
             {
                 // Das DummyLogicalTaskTree-ViewModel
                 DummyLogicalTaskTreeViewModel dummyLogicalTaskTreeViewModel = new DummyLogicalTaskTreeViewModel();
-                JobListViewModel shadowJobListViewModel = new JobListViewModel(dummyLogicalTaskTreeViewModel, null, shadowJobList, false, null);
-                if (shadowJobListViewModel != null)
+                JobListViewModel shadowTopRootJobListViewModel = new JobListViewModel(dummyLogicalTaskTreeViewModel, null, shadowJobList, false, null);
+                if (shadowTopRootJobListViewModel != null)
                 {
-                    Dictionary<string, LogicalNodeViewModel> vmFinder = new Dictionary<string, LogicalNodeViewModel>();
-                    shadowJobListViewModel.Traverse(IndexTreeElement, vmFinder);
-
-                    this._treesDiffer = false;
-                    this.GetTopRootJobListViewModel().Traverse(DiffTreeElement, vmFinder);
+                    JobListViewModel treeTopRootJobListViewModel = this.GetTopRootJobListViewModel();
+                    try
+                    {
+                        LogicalTaskTreeMerger.Merge(treeTopRootJobListViewModel, shadowTopRootJobListViewModel);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(String.Format($"Fehler beim Abgleich der Jobs: {ex.Message}"));
+                    }
 
                     InfoController.Say("#RELOAD# -------------------------------------------------------------------------------------------------------------------------------");
                     Thread.Sleep(100);
                     List<string> allTreeInfos = new List<string>();
-                    object result1 = this.GetTopRootJobListViewModel().Traverse(ListTreeElement, allTreeInfos);
+                    object result1 = treeTopRootJobListViewModel.Traverse(ListTreeElement, allTreeInfos);
                     string bigMessage = String.Join(System.Environment.NewLine, allTreeInfos);
                     InfoController.Say("#RELOAD# " + bigMessage);
                     Thread.Sleep(100);
                     InfoController.Say("#RELOAD# -------------------------------------------------------------------------------------------------------------------------------");
                     Thread.Sleep(100);
                     allTreeInfos.Clear();
-                    object result2 = shadowJobListViewModel.Traverse(ListTreeElement, allTreeInfos);
+                    object result2 = shadowTopRootJobListViewModel.Traverse(ListTreeElement, allTreeInfos);
                     bigMessage = String.Join(System.Environment.NewLine, allTreeInfos);
                     InfoController.Say("#RELOAD# " + bigMessage);
                     Thread.Sleep(100);
@@ -1414,92 +1429,6 @@ namespace Vishnu.ViewModel
                         allTreeInfos.Add(deptString + "NOTHING " + expandableNode.Path);
                     }
                 }
-            }
-            return userObject;
-        }
-
-        /// <summary>
-        /// Fügt Informationen über die übergebene ExpandableNode in eine als object übergebene Stringlist ein.
-        /// </summary>
-        /// <param name="depth">Nullbasierter Zähler der Rekursionstiefe eines Knotens im LogicalTaskTree.</param>
-        /// <param name="expandableNode">Basisklasse eines ViewModel-Knotens im LogicalTaskTree.</param>
-        /// <param name="userObject">Ein beliebiges durchgeschliffenes UserObject (hier: Dictionary&lt;string, LogicalNodeViewModel&gt;).</param>
-        /// <returns>Das Dictionary&lt;string, LogicalNodeViewModel&gt; oder null.</returns>
-        protected object DiffTreeElement(int depth, IExpandableNode expandableNode, object userObject)
-        {
-            Dictionary<string, LogicalNodeViewModel> vmFinder = (Dictionary<string, LogicalNodeViewModel>)userObject;
-            if (vmFinder.ContainsKey(expandableNode.Path))
-            {
-                LogicalNodeViewModel shadowTreeVM = vmFinder[expandableNode.Path];
-                if (shadowTreeVM.Equals(expandableNode as LogicalNodeViewModel))
-                {
-                    return userObject; // Weiter im Tree
-                }
-                else
-                {
-                    this.TransferNode(shadowTreeVM, expandableNode as LogicalNodeViewModel);
-                }
-            }
-            else
-            {
-                throw new ApplicationException(String.Format($"Unerwarteter Suchfehler auf {expandableNode.Path}."));
-            }
-            // Dieser auskommentierte ELSE-Zweig sollte überflüssig sein, da sich umbenannte oder ausgetauschte Knoten bei
-            // gleicher Kinderzahl des Parent-Knoten auf jeden Fall schon dort in der LogicalExpression manifestiert haben sollten.
-            //else
-            //{
-            //    string parentPath = System.IO.Path.GetDirectoryName(expandableNode.Path);
-            //    if (vmFinder.ContainsKey(parentPath))
-            //    {
-            //        LogicalNodeViewModel shadowTreeParentVM = vmFinder[parentPath];
-            //        this.TransferNode(shadowTreeParentVM, (expandableNode as LogicalNodeViewModel).Parent);
-            //    }
-            //    else
-            //    {
-            //        throw new ApplicationException(String.Format($"Unerwarteter Suchfehler auf {parentPath}."));
-            //    }
-            //}
-
-            return null; // Bricht die Rekursion für diesen Zweig ab.
-        }
-
-        private void TransferNode(LogicalNodeViewModel shadowTreeVM, LogicalNodeViewModel logicalNodeVM)
-        {
-            LogicalNode shadowNode = shadowTreeVM.GetLogicalNode();
-            LogicalNode logicalNode = logicalNodeVM.GetLogicalNode();
-            if (shadowNode != null && logicalNode != null)
-            {
-                if (!this._treesDiffer)
-                {
-                    this.TransferTreeGlobals(shadowNode.GetTopRootJobList(), logicalNode.GetTopRootJobList());
-                    this._treesDiffer = true;
-                }
-                InfoController.Say(String.Format($"#RELOAD# Transferring Node {shadowTreeVM.Path} from ShadowTree to Tree."));
-
-            }
-        }
-
-        private void TransferTreeGlobals(JobList shadowRootJobList, JobList treeRootJobList)
-        {
-            InfoController.Say(String.Format($"#RELOAD# Transferring Tree Globals from ShadowTree to Tree."));
-        }
-
-        /// <summary>
-        /// Fügt den Path der ExpandableNode als Key und die ExpandableNode als Value in ein als object übergebenes Dictionary ein.
-        /// </summary>
-        /// <param name="depth">Nullbasierter Zähler der Rekursionstiefe eines Knotens im LogicalTaskTree.</param>
-        /// <param name="expandableNode">Basisklasse eines ViewModel-Knotens im LogicalTaskTree.</param>
-        /// <param name="userObject">Ein beliebiges durchgeschliffenes UserObject (hier: Dictionary&lt;string, LogicalNodeViewModel&gt;).</param>
-        /// <returns>Das bisher gefüllte Dictionary mit Path als Key und dem LogicalNodeViewModel als Value.</returns>
-        protected object IndexTreeElement(int depth, IExpandableNode expandableNode, object userObject)
-        {
-            Dictionary<string, LogicalNodeViewModel> vmFinder = (Dictionary<string, LogicalNodeViewModel>)userObject;
-            if (expandableNode is LogicalNodeViewModel)
-            {
-                LogicalNodeViewModel logicalNodeViewModel = expandableNode as LogicalNodeViewModel;
-                // string key = Regex.Replace(logicalNodeViewModel.Path, @"Internal_\d+", "Internal");
-                string key = logicalNodeViewModel.Path;
-                vmFinder.Add(key, logicalNodeViewModel);
             }
             return userObject;
         }
@@ -1731,7 +1660,6 @@ namespace Vishnu.ViewModel
         private string _freeComment;
         private bool _isInSleepTime;
         private string _sleepTimeTo;
-        private bool _treesDiffer;
 
         // True, wenn die Kinder dieses Knotens noch nicht geladen wurden.
         private bool _hasDummyChild

@@ -1490,6 +1490,17 @@ namespace LogicalTaskTree
             return this.Id ?? "null" + "/" + this.Name ?? "null";
         }
 
+        /// <summary>
+        /// Nächsthöhere JobList für diesen Knoten oder der Knoten selbst,
+        /// wenn er eine JobList ist.
+        /// </summary>
+        public JobList RootJobList;
+
+        /// <summary>
+        /// Oberste JobList.
+        /// </summary>
+        public JobList TreeRootJobList;
+
         #endregion public members
 
         #region internal members
@@ -1636,17 +1647,6 @@ namespace LogicalTaskTree
         #endregion internal members
 
         #region protected members
-
-        /// <summary>
-        /// Nächsthöhere JobList für diesen Knoten oder der Knoten selbst,
-        /// wenn er eine JobList ist.
-        /// </summary>
-        protected JobList RootJobList;
-
-        /// <summary>
-        /// Oberste JobList.
-        /// </summary>
-        protected JobList TreeRootJobList;
 
         /// <summary>
         /// Zusätzliche Parameter, die für den gesamten Tree Gültigkeit haben oder null.

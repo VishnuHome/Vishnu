@@ -422,80 +422,80 @@ namespace LogicalTaskTree
             return this.syntaxTree.ShowFlat();
         }
 
-        #endregion public members
-
-        #region internal members
-
         #region tree globals
 
         // Der externe Job mit logischem Ausdruck und u.a. Dictionary der Worker.
-        internal Job Job { get; set; }
+        public Job Job { get; set; }
 
         /// <summary>
         /// Dictionary von externen Prüfroutinen für einen jobPackage.Job mit Namen als Key.
         /// Wird als Lookup für unaufgelöste JobConnector-Referenzen genutzt.
         /// </summary>
-        internal Dictionary<string, NodeCheckerBase> AllCheckers { get; set; }
+        public Dictionary<string, NodeCheckerBase> AllCheckers { get; set; }
 
         /// <summary>
         /// Liste von NodeConnectoren, die beim Parsen der Jobs noch nicht aufgelöst
         /// werden konnten.
         /// </summary>
-        internal List<NodeConnector> UnsatisfiedNodeConnectors;
+        public List<NodeConnector> UnsatisfiedNodeConnectors;
 
         /// <summary>
         /// Dictionary von externen Prüfroutinen für eine JobList, die nicht in
         /// der LogicalExpression referenziert werden; Checker, die ausschließlich
         /// über ValueModifier angesprochen werden.
         /// </summary>
-        internal Dictionary<string, NodeCheckerBase> TreeExternalCheckers { get; set; }
+        public Dictionary<string, NodeCheckerBase> TreeExternalCheckers { get; set; }
 
         /// <summary>
         /// Liste von externen SingleNodes für die TopRootJobList, die in keiner
         /// der LogicalExpressions referenziert werden; Nodes, die ausschließlich
         /// über NodeConnectoren angesprochen werden.
         /// </summary>
-        internal List<SingleNode> TreeExternalSingleNodes { get; set; }
+        public List<SingleNode> TreeExternalSingleNodes { get; set; }
 
         /// <summary>
         /// Cache zur Beschleunigung der Verarbeitung von TreeEvents
         /// bezogen auf EventTrigger.
         /// </summary>
-        internal List<string> TriggerRelevantEventCache;
+        public List<string> TriggerRelevantEventCache;
 
         /// <summary>
         /// Cache zur Beschleunigung der Verarbeitung von TreeEvents
         /// bezogen auf Worker.
         /// </summary>
-        internal List<string> WorkerRelevantEventCache;
+        public List<string> WorkerRelevantEventCache;
 
         /// <summary>
         /// Cache zur Beschleunigung der Verarbeitung von TreeEvents
         /// bezogen auf Logger.
         /// </summary>
-        internal List<string> LoggerRelevantEventCache;
+        public List<string> LoggerRelevantEventCache;
 
         /// <summary>
         /// Dictionary von JobLists mit ihren Namen als Keys.
         /// </summary>
-        internal Dictionary<string, JobList> JobsByName;
+        public Dictionary<string, JobList> JobsByName;
 
         /// <summary>
         /// Dictionary von LogicalNodes mit ihren Namen als Keys.
         /// </summary>
-        internal Dictionary<string, LogicalNode> NodesByName;
+        public Dictionary<string, LogicalNode> NodesByName;
 
         /// <summary>
         /// Dictionary von LogicalNodes mit ihren Namen als Keys.
         /// </summary>
-        internal Dictionary<string, LogicalNode> TreeRootLastChanceNodesByName;
+        public Dictionary<string, LogicalNode> TreeRootLastChanceNodesByName;
 
         /// <summary>
         /// Dictionary von LogicalNodes mit ihren Ids als Keys.
         /// </summary>
-        internal Dictionary<string, LogicalNode> NodesById;
+        public Dictionary<string, LogicalNode> NodesById;
 
         #endregion tree globals
+
+        #endregion public members
+
+        #region internal members
 
         /// <summary>
         /// Bei True befindet sich diese JobList in einer kurzen Wartephase
