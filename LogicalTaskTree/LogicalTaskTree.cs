@@ -19,6 +19,11 @@ namespace LogicalTaskTree
     {
         #region public members
 
+        /// <summary>
+        /// Pro Tree eindeutiger ID-Zusatz.
+        /// </summary>
+        public static int TreeId;
+
         #region IDisposable Implementation
 
         private bool _disposed; // = false wird vom System vorbelegt;
@@ -120,7 +125,13 @@ namespace LogicalTaskTree
         /// <param name="jobProvider">Die Datenquelle für den Job</param>
         public LogicalTaskTree(TreeParameters treeParams, IJobProvider jobProvider)
         {
+            //treeParams.BusinessLogicRoot = this;
             this._rootJobList = new JobList(treeParams, jobProvider);
+        }
+
+        static LogicalTaskTree()
+        {
+            LogicalTaskTree.TreeId = 0; // Pro Tree eindeutiger ID-Zusatz.
         }
 
         #endregion public members

@@ -132,7 +132,7 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Überschriebene ToString()-Methode.
         /// </summary>
-        /// <returns>Id des Knoten + ":" + ReturnObject.ToString()</returns>
+        /// <returns>Verkettete Properties als String.</returns>
         public override string ToString()
         {
             StringBuilder stringBuilder = new StringBuilder(base.ToString());
@@ -196,39 +196,47 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
-        /// Vergleicht den Inhalt dieses LogicalNodeViewModels nach logischen Gesichtspunkten
-        /// mit dem Inhalt eines übergebenen LogicalNodeViewModels.
+        /// Vergleicht den Inhalt dieses SingleNodeViewModels nach logischen Gesichtspunkten
+        /// mit dem Inhalt eines übergebenen SingleNodeViewModels.
         /// </summary>
-        /// <param name="obj">Das LogicalNodeViewModel zum Vergleich.</param>
-        /// <returns>True, wenn das übergebene Result inhaltlich gleich diesem Result ist.</returns>
+        /// <param name="obj">Das SingleNodeViewModel zum Vergleich.</param>
+        /// <returns>True, wenn das übergebene SingleNodeViewModel inhaltlich gleich diesem ist.</returns>
         public override bool Equals(object obj)
         {
-            return base.Equals(obj);
-            /*
             if (!base.Equals(obj))
             {
                 return false;
             }
-            LogicalNode logicalNode = this.GetLogicalNode();
-            LogicalNode objLogicalNode = (obj as LogicalNodeViewModel).GetLogicalNode();
-            if (logicalNode != null && objLogicalNode != null)
+            if (Object.ReferenceEquals(this, obj))
             {
-
+                return true;
             }
-            return false;
-            */
+            return this.ToString() == (obj as SingleNodeViewModel).ToString();
         }
 
         /// <summary>
-        /// Erzeugt einen Hashcode für dieses LogicalNodeViewModel.
+        /// Erzeugt einen Hashcode für dieses SingleNodeViewModel.
         /// </summary>
         /// <returns>Integer mit Hashwert.</returns>
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return this.ToString().GetHashCode();
         }
 
         #endregion public members
+
+        #region internal members
+
+        /// <summary>
+        /// Führt im Verlauf eines externen Tree-Relod einen technischen Run
+        /// für die korrekte Initialisierung des JobListViewModels aus.
+        /// </summary>
+        internal void TechnicalRun()
+        {
+            this.runTaskTreeExecute(null);
+        }
+
+        #endregion internal members
 
         #region protected members
 
@@ -336,17 +344,13 @@ namespace Vishnu.ViewModel
 
         private void reloadTaskTreeExecute(object parameter)
         {
-            if (!(this._myLogicalNode is NodeConnector))
-            {
-                InfoController.Say(String.Format($"#RELOAD# SingleNodeViewModel.reloadTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {this.RootJobListViewModel.Name}"));
-
-                this.ReloadTaskTree();
-            }
+            InfoController.Say(String.Format($"#RELOAD# SingleNodeViewModel.reloadTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {this.RootJobListViewModel.Name}"));
+            this.ReloadTaskTree();
         }
 
         private bool canReloadTaskTreeExecute()
         {
-            bool canReload = !(this._myLogicalNode is NodeConnector); // && this._myLogicalNode.CanTreeStart;
+            bool canReload = true; // !(this._myLogicalNode is NodeConnector); // && this._myLogicalNode.CanTreeStart;
             return canReload;
         }
 

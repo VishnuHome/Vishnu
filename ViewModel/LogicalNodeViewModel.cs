@@ -12,8 +12,7 @@ using Vishnu.Interchange;
 using System.Collections.Generic;
 using System.Text;
 using NetEti.ApplicationControl;
-using System.Text.RegularExpressions;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace Vishnu.ViewModel
 {
@@ -269,7 +268,7 @@ namespace Vishnu.ViewModel
                     {
                         // Kinder nachladen, wenn nötig.
                         this.Children.Remove(_dummyChild);
-                        this.loadChildren();
+                        this.LoadChildren();
                     }
                     this.RaisePropertyChanged("IsExpanded");
                 }
@@ -368,6 +367,25 @@ namespace Vishnu.ViewModel
             }
         }
 
+        /// <summary>
+        /// Zusätzliche Parameter, die für den gesamten Tree Gültigkeit haben oder null.
+        /// </summary>
+        public TreeParameters TreeParams
+        {
+            get
+            {
+                return this._treeParams;
+            }
+            set
+            {
+                if (this._treeParams != value)
+                {
+                    this._treeParams = value;
+                    this.RaisePropertyChanged("TreeParams");
+                }
+            }
+        }
+
         #endregion ViewModel properties
 
         #region Node properties
@@ -380,7 +398,7 @@ namespace Vishnu.ViewModel
         {
             get
             {
-                return this._myLogicalNode.Id;
+                return this._myLogicalNode?.Id ?? "NULL";
             }
         }
 
@@ -392,7 +410,7 @@ namespace Vishnu.ViewModel
         {
             get
             {
-                return this._myLogicalNode.IsSnapshotDummy;
+                return this._myLogicalNode?.IsSnapshotDummy ?? false;
             }
         }
 
@@ -453,7 +471,7 @@ namespace Vishnu.ViewModel
         {
             get
             {
-                return this._myLogicalNode.UserControlPath;
+                return this._myLogicalNode?.UserControlPath;
             }
         }
 
@@ -719,13 +737,13 @@ namespace Vishnu.ViewModel
         {
             get
             {
-                if (this._myLogicalNode is NodeConnector)
+                if (this._myLogicalNode != null && this._myLogicalNode is NodeConnector)
                 {
                     return (this._myLogicalNode as NodeConnector).ReferencedNodeId;
                 }
                 else
                 {
-                    return this._myLogicalNode.Id;
+                    return this._myLogicalNode?.Id ?? "NULL";
                 }
             }
         }
@@ -742,7 +760,7 @@ namespace Vishnu.ViewModel
                 {
                     debugNodeInfos += ", Ref: " + this.OriginalNodeId;
                 }
-                debugNodeInfos += ")";
+                debugNodeInfos += ") " + this.TreeParams.Name;
                 return debugNodeInfos;
             }
         }
@@ -760,6 +778,15 @@ namespace Vishnu.ViewModel
         }
 
         #endregion Node properties
+
+        /// <summary>
+        /// Ausrichtung des Trees beim Start der Anwendung.
+        ///   AlternatingHorizontal: Alternierender Aufbau, waagerecht beginnend (Default).
+        ///   Vertical: Senkrechter Aufbau.
+        ///   Horizontal: Waagerechter Aufbau.
+        ///   AlternatingVertical: Alternierender Aufbau, senkrecht beginnend.
+        /// </summary>
+        public TreeOrientation StartTreeOrientation { get; set; }
 
         #endregion published members
 
@@ -792,15 +819,19 @@ namespace Vishnu.ViewModel
         /// <param name="myLogicalNode">Der zugeordnete Knoten aus dem LogicalTaskTree.</param>
         /// <param name="lazyLoadChildren">Bei True werden die Kinder erst beim Öffnen des TreeView-Knotens nachgeladen.</param>
         /// <param name="uIMain">Das Root-FrameworkElement zu diesem ViewModel.</param>
-        public LogicalNodeViewModel(OrientedTreeViewModelBase logicalTaskTreeViewModel, LogicalNodeViewModel parent, LogicalNode myLogicalNode, bool lazyLoadChildren, FrameworkElement uIMain)
+        public LogicalNodeViewModel(OrientedTreeViewModelBase logicalTaskTreeViewModel, LogicalNodeViewModel parent,
+            LogicalNode myLogicalNode, bool lazyLoadChildren, FrameworkElement uIMain) : base()
         {
             this.RootLogicalTaskTreeViewModel = logicalTaskTreeViewModel;
+            this.TreeParams = logicalTaskTreeViewModel.TreeParams;
             this.UIMain = uIMain;
             this.UIDispatcher = null;
             this.Parent = parent;
             this.lazyLoadChildren = lazyLoadChildren;
             this._canExpanderExpand = true;
 
+            this.TreeRefreshLocker = new object();
+            this.IsRefreshing = false;
             this.SetBLNode(myLogicalNode, true);
             this.Visibility = System.Windows.Visibility.Visible;
             this.VisualState = VisualNodeState.None;
@@ -813,7 +844,7 @@ namespace Vishnu.ViewModel
             }
             else
             {
-                this.loadChildren();
+                this.LoadChildren();
             }
             this.ExpandedEventCommand = new RelayCommand(this.HandleExpanderExpandedEvent, this.CanHandleExpanderExpandedEvent);
             this.CollapsedEventCommand = new RelayCommand(this.HandleExpanderCollapsedEvent);
@@ -827,6 +858,7 @@ namespace Vishnu.ViewModel
         /// <param name="mainTreeOrientation">Ausrichtug des Trees</param>
         public void SetChildOrientation(TreeOrientation mainTreeOrientation)
         {
+            this.StartTreeOrientation = mainTreeOrientation;
             switch (mainTreeOrientation)
             {
                 case TreeOrientation.Vertical:
@@ -1084,13 +1116,21 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Überschriebene ToString()-Methode.
         /// </summary>
-        /// <returns>Id des Knoten + ":" + ReturnObject.ToString()</returns>
+        /// <returns>Verkettete Properties als String.</returns>
         public override string ToString()
         {
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine(String.Format($"{this.GetLogicalNode().NodeType}: {this.GetLogicalNode()?.NameId ?? ""}"));
+            LogicalNode logicalNode = this.GetLogicalNode();
+            if (logicalNode != null)
+            {
+                stringBuilder.AppendLine(String.Format($"{logicalNode.NodeType}: {logicalNode?.NameId ?? ""}"));
+            }
+            else
+            {
+                stringBuilder.AppendLine(String.Format($"{this.GetType()}: {this.Id ?? "" + "." + this.Name ?? ""}"));
+            }
             stringBuilder.AppendLine(String.Format($"Source: {this.OriginalNodeId ?? ""}"));
-            if (this.Children.Count > 0)
+            if (this.Children?.Count > 0)
             {
                 stringBuilder.AppendLine(String.Format($"Children: {this.Children.Count}"));
             }
@@ -1099,7 +1139,7 @@ namespace Vishnu.ViewModel
                 stringBuilder.AppendLine(String.Format($"IsSnapshotDummy"));
             }
             stringBuilder.AppendLine(String.Format($"Path: {this.Path ?? ""}"));
-            stringBuilder.AppendLine(String.Format($"UserControlPath: {this.UserControlPath??""}"));
+            stringBuilder.AppendLine(String.Format($"UserControlPath: {this.UserControlPath ?? ""}"));
             return stringBuilder.ToString();
         }
 
@@ -1108,20 +1148,20 @@ namespace Vishnu.ViewModel
         /// mit dem Inhalt eines übergebenen LogicalNodeViewModels.
         /// </summary>
         /// <param name="obj">Das LogicalNodeViewModel zum Vergleich.</param>
-        /// <returns>True, wenn das übergebene Result inhaltlich gleich diesem Result ist.</returns>
+        /// <returns>True, wenn das übergebene LogicalNodeViewModel inhaltlich gleich diesem ist.</returns>
         public override bool Equals(object obj)
         {
-            if (obj == null || this.GetType() != obj.GetType())
-            {
-                return false;
-            }
-            if (String.IsNullOrEmpty(this.Path) || String.IsNullOrEmpty(this.OriginalNodeId))
+            if (!base.Equals(obj))
             {
                 return false;
             }
             if (Object.ReferenceEquals(this, obj))
             {
                 return true;
+            }
+            if (String.IsNullOrEmpty(this.Path) || String.IsNullOrEmpty(this.OriginalNodeId))
+            {
+                return false;
             }
             if (this.ToString() != obj.ToString())
             {
@@ -1142,6 +1182,75 @@ namespace Vishnu.ViewModel
         #endregion public members
 
         #region internal members
+
+        /// <summary>
+        /// Dient zum Serren der Verarbeitung während eines laufenden Tree-Refreshs.
+        /// </summary>
+        internal object TreeRefreshLocker;
+
+        /// <summary>
+        /// Zeigt an, ob gerade ein Tree-Refresh läuft.
+        /// </summary>
+        internal volatile bool IsRefreshing;
+
+        /// <summary>
+        /// Refresht den Visual-Tree nach einer Veränderung in den ViewModels.
+        /// Nur für inhaltliche Änderungen bei unveränderter Struktur geeignet,
+        /// dafür aber sehr schnell.
+        /// </summary>
+        /// <returns>False, wenn irgendwas schiefgegangen ist, ansonsten true.</returns>
+        internal bool LeanTreeRefresh()
+        {
+            // return false; // TEST 20.08.2020 Nagel
+            bool rtn = true;
+            lock (this.TreeRefreshLocker)
+            {
+                this.IsRefreshing = true;
+                using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
+                {
+                    if (!this.RefreshTreeView(this, this._myLogicalNode))
+                    {
+                        rtn = false;
+                    }
+                }
+                this.IsRefreshing = false;
+                // Thread.Sleep(100); DEBUG
+            }
+            return rtn;
+        }
+
+        /// <summary>
+        /// Refresht den Visual-Tree nach einer Veränderung in den ViewModels.
+        /// Für inhaltliche und strukturelle Änderungen im Tree geeignet,
+        /// dafür aber etwas langsam (im Dialog aber schnell genug).
+        /// </summary>
+        internal void FullTreeRefresh()
+        {
+            using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
+            {
+                lock (this.TreeRefreshLocker)
+                {
+                    ObservableCollection<LogicalNodeViewModel> shadowTree = new ObservableCollection<LogicalNodeViewModel>();
+                    if (this.Children?.Count > 0)
+                    {
+                        shadowTree.Add(this.Children[0]); // Retten für die Restaurierung aktueller Tree-Parameter wie zum Beispiel
+                    }
+                    // IsExpanded nach Neuerstellung des Trees aus dem Snapshot. 
+                    this.Children.Clear();
+                    //          this.SetChildOrientation(this.RootLogicalTaskTreeViewModel.TreeOrientationState);
+                    this.LoadChildren();
+                    this.TransferShadowTreeProperties(shadowTree, this.Children, new Stack<int>());
+                    if (shadowTree?.Count > 0)
+                    {
+                        shadowTree[0].Dispose();
+                    }
+                    shadowTree.Clear();
+                    //Thread.Sleep(100); DEBUG
+                    this.IsRefreshing = false;
+                    //Thread.Sleep(100); DEBUG
+                }
+            }
+        }
 
         /// <summary>
         /// Setzt die Business-Logic Node für dieses LogicalNodeViewModel.
@@ -1184,9 +1293,9 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
-        /// Disposed die Business-Logic Node für dieses LogicalNodeViewModel.
+        /// Gigt die Business-Logic Node für dieses LogicalNodeViewModel frei.
         /// </summary>
-        private void UnsetBLNode()
+        internal void UnsetBLNode()
         {
             if (this._myLogicalNode != null)
             {
@@ -1230,7 +1339,7 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Lädt die Kinder eines Knotens. 
         /// </summary>
-        protected void loadChildren()
+        protected void LoadChildren()
         {
             if (this._myLogicalNode is NodeList)
             {
@@ -1283,7 +1392,7 @@ namespace Vishnu.ViewModel
         /// <param name="node">LogicalNode der ViewModel-Root.</param>
         /// <returns>True, wenn der Teilbaum aktualisiert werden konnte;
         /// bei False muss ein Full-TreeRefresh ausgeführt werden.</returns>
-        protected bool refreshTreeView(LogicalNodeViewModel nodeViewModel, LogicalNode node)
+        protected bool RefreshTreeView(LogicalNodeViewModel nodeViewModel, LogicalNode node)
         {
             if (!nodeViewModel.SetBLNode(node, false))
             {
@@ -1301,7 +1410,7 @@ namespace Vishnu.ViewModel
                 {
                     if (node.Children.Count > i)
                     {
-                        if (!this.refreshTreeView(nodeViewModel.Children[i], node.Children[i]))
+                        if (!this.RefreshTreeView(nodeViewModel.Children[i], node.Children[i]))
                         {
                             return false;
                         }
@@ -1324,6 +1433,67 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Überträgt Eigenschaften von einem gesicherten Branch auf einen aktiven Branch.
+        /// </summary>
+        /// <param name="sourceTree">Der gesicherte Branch.</param>
+        /// <param name="destinationTree">Der aktive Branch.</param>
+        /// <param name="indices">Ein Stack zum Zwischenspeichern von Indices auf jeder Hierarchieebene.</param>
+        protected void TransferShadowTreeProperties(ObservableCollection<LogicalNodeViewModel> sourceTree,
+              ObservableCollection<LogicalNodeViewModel> destinationTree, Stack<int> indices)
+        {
+            for (int i = 0; i < destinationTree.Count; i++)
+            {
+                indices.Push(i);
+                LogicalNodeViewModel node = destinationTree[i];
+                LogicalNodeViewModel sibling = this.SearchSibling(sourceTree, indices);
+                if (sibling != null)
+                {
+                    this.TransferSiblingProperties(sibling, node);
+                }
+                if ((node is NodeListViewModel) || (node is JobListViewModel) || (node is SnapshotViewModel))
+                {
+                    this.TransferShadowTreeProperties(sourceTree, node.Children, indices);
+                }
+                indices.Pop();
+            }
+        }
+
+        /// <summary>
+        /// Sucht einen Knoten in einem Tree-Branch zu einer gegebenen Index-Hierarchie im Stack "indices".
+        /// </summary>
+        /// <param name="sourceTree">Der zu durchsuchende Branch.</param>
+        /// <param name="indices">Ein Stack mit zwischengespeicherten Indices auf jeder Hierarchieebene bis zu einem Zielknoten.</param>
+        /// <returns>Ein gefundenes LogicalNodeViewModel oder null.</returns>
+        protected LogicalNodeViewModel SearchSibling(ObservableCollection<LogicalNodeViewModel> sourceTree, Stack<int> indices)
+        {
+            int[] indexArray = new int[indices.Count];
+            indices.CopyTo(indexArray, 0);
+            LogicalNodeViewModel node = null;
+            ObservableCollection<LogicalNodeViewModel> source = sourceTree;
+            for (int i = indexArray.Length - 1; i >= 0; i--)
+            {
+                if (indexArray[i] >= source.Count)
+                {
+                    return null;
+                }
+                node = source[indexArray[i]];
+                source = node.Children;
+            }
+            return node;
+        }
+
+        /// <summary>
+        /// Überträgt bestimmte Eigenschaftn im VisualTree von sibling auf node.
+        /// </summary>
+        /// <param name="sibling">Der Quellknoten (LogicalNodeViewModel).</param>
+        /// <param name="node">Der Zielknoten (LogicalNodeViewModel)</param>
+        protected void TransferSiblingProperties(LogicalNodeViewModel sibling, LogicalNodeViewModel node)
+        {
+            node.IsExpanded = sibling.IsExpanded;
+            node.ChildOrientation = sibling.ChildOrientation;
+        }
+
+        /// <summary>
         /// Lädt den gesamten Tree inklusive JobDescription.xml neu. 
         /// </summary>
         protected void ReloadTaskTree()
@@ -1340,20 +1510,27 @@ namespace Vishnu.ViewModel
             if (shadowJobList != null)
             {
                 // Das DummyLogicalTaskTree-ViewModel
-                DummyLogicalTaskTreeViewModel dummyLogicalTaskTreeViewModel = new DummyLogicalTaskTreeViewModel();
+                DummyLogicalTaskTreeViewModel dummyLogicalTaskTreeViewModel = new DummyLogicalTaskTreeViewModel(shadowJobList.TreeParams);
                 JobListViewModel shadowTopRootJobListViewModel = new JobListViewModel(dummyLogicalTaskTreeViewModel, null, shadowJobList, false, null);
                 if (shadowTopRootJobListViewModel != null)
                 {
+                    shadowTopRootJobListViewModel.SetChildOrientation(this.StartTreeOrientation);
+                    shadowTopRootJobListViewModel.ExpandTree(shadowTopRootJobListViewModel, false);
                     JobListViewModel treeTopRootJobListViewModel = this.GetTopRootJobListViewModel();
-                    try
-                    {
-                        LogicalTaskTreeMerger.Merge(treeTopRootJobListViewModel, shadowTopRootJobListViewModel);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(String.Format($"Fehler beim Abgleich der Jobs: {ex.Message}"));
-                    }
 
+                    //Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+                    //{
+                        using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
+                        {
+
+                            LogicalTaskTreeMerger.Merge(treeTopRootJobListViewModel, shadowTopRootJobListViewModel);
+                            // this.GetTopRootJobListViewModel().FullTreeRefresh();
+                        }
+                    //}));
+
+                    shadowTopRootJobListViewModel.Dispose();
+
+                    /*
                     InfoController.Say("#RELOAD# -------------------------------------------------------------------------------------------------------------------------------");
                     Thread.Sleep(100);
                     List<string> allTreeInfos = new List<string>();
@@ -1369,28 +1546,8 @@ namespace Vishnu.ViewModel
                     InfoController.Say("#RELOAD# " + bigMessage);
                     Thread.Sleep(100);
                     InfoController.Say("#RELOAD# -------------------------------------------------------------------------------------------------------------------------------");
+                    */
                 }
-                /*
-                this.MainLogicalNodeView = new ReadOnlyCollection<JobListViewModel>(
-                  new JobListViewModel[]
-                  {
-                      new JobListViewModel(this, null, this._root, false, this._uIMain)
-                  });
-                this.MainLogicalNodeView[0].SetChildOrientation(startTreeOrientation);
-                this.MainLogicalNodeView[0].ExpandTree(this.MainLogicalNodeView[0], false);
-
-                // Das Main-ViewModel
-                MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(logicalTaskTreeViewModel, this._mainWindow.ForceRecalculateWindowMeasures, SingleInstanceApplication._appSettings.FlatNodeListFilter, SingleInstanceApplication._appSettings.DemoModus ? "-DEMO-" : "");
-
-                // Verbinden von Main-Window mit Main-ViewModel
-                this._mainWindow.DataContext = mainWindowViewModel; //mainViewModel;
-
-                //if (SingleInstanceApplication._appSettings.Autostart)
-                //{
-                //    SingleInstanceApplication._businessLogic.Tree.UserRun();
-                //}
-                */
-
             }
         }
 
@@ -1435,7 +1592,7 @@ namespace Vishnu.ViewModel
 
         /// <summary>
         /// Speichert die Bildschirmposition des zugehörigen
-        /// Controls in der Geschäftslogig.
+        /// Controls in der Geschäftslogik.
         /// </summary>
         /// <param name="parentView">Das zugehörige Control.</param>
         protected override void ParentViewToBL(DynamicUserControlBase parentView)
@@ -1660,6 +1817,7 @@ namespace Vishnu.ViewModel
         private string _freeComment;
         private bool _isInSleepTime;
         private string _sleepTimeTo;
+        private TreeParameters _treeParams;
 
         // True, wenn die Kinder dieses Knotens noch nicht geladen wurden.
         private bool _hasDummyChild

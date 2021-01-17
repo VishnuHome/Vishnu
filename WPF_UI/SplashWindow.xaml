@@ -54,7 +54,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <Image Source="/Vishnu.WPF_UI;component/Media/oak.png" Opacity=".8"
+            <Image Source="/Vishnu.WPF_UI;component/Media/Tree.png" Opacity=".8"
              Width="120" Height="100" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,30,10,0"/>
             <Grid VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="175" Background="#00FFFFFF">
                 <Grid.OpacityMask>

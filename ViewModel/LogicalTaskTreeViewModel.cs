@@ -94,11 +94,14 @@ namespace Vishnu.ViewModel
         /// <param name="uiMain">Das Vishnu-MainWindow.</param>
         /// <param name="startTreeOrientation">Die Startausrichtung des Baums.</param>
         /// <param name="flatNodeListFilter">Ein Filter für anzuzeigende NodeTypes.</param>
-        public LogicalTaskTreeViewModel(LogicalTaskTree.LogicalTaskTree businessLogic, FrameworkElement uiMain, TreeOrientation startTreeOrientation, NodeTypes flatNodeListFilter)
+        /// <param name="treeParams">Parameter für den gesamten Tree.</param>
+        public LogicalTaskTreeViewModel(LogicalTaskTree.LogicalTaskTree businessLogic, FrameworkElement uiMain,
+            TreeOrientation startTreeOrientation, NodeTypes flatNodeListFilter, TreeParameters treeParams) : base(treeParams)
         {
             this._businessLogic = businessLogic;
             this._uIMain = uiMain;
             this._root = businessLogic.Tree;
+            //this.TreeParams.ViewModelRoot = this;
 
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(new DependencyObject()))
             {
@@ -236,8 +239,6 @@ namespace Vishnu.ViewModel
         //private int _maxTestAusgabeCount = 1;
         private bool _isInSleepTime;
         private string _sleepTimeTo;
-
-        private LogicalTaskTreeViewModel() { }
 
         private static void flatNodeListAddIfNew(LogicalNodeViewModel root, ObservableCollection<LogicalNodeViewModel> flatNodeList)
         {

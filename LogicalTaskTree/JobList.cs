@@ -4,6 +4,7 @@ using System.Linq;
 using NetEti.ExpressionParser;
 using Vishnu.Interchange;
 using NetEti.ApplicationControl;
+using System.Text;
 
 namespace LogicalTaskTree
 {
@@ -492,6 +493,45 @@ namespace LogicalTaskTree
         public Dictionary<string, LogicalNode> NodesById;
 
         #endregion tree globals
+
+        /// <summary>
+        /// Überschriebene ToString()-Methode.
+        /// </summary>
+        /// <returns>Verkettete Properties als String.</returns>
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new StringBuilder(base.ToString());
+            stringBuilder.AppendLine(String.Format($"LogicalExpression: {this.LogicalExpression ?? ""}"));
+            return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Vergleicht den Inhalt dieser JobList nach logischen Gesichtspunkten
+        /// mit dem Inhalt einer übergebenen JobList.
+        /// </summary>
+        /// <param name="obj">Die JobList zum Vergleich.</param>
+        /// <returns>True, wenn die übergebene JobList inhaltlich gleich dieser ist.</returns>
+        public override bool Equals(object obj)
+        {
+            if (!base.Equals(obj))
+            {
+                return false;
+            }
+            if (Object.ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            return this.LogicalExpression == (obj as JobList).LogicalExpression;
+        }
+
+        /// <summary>
+        /// Erzeugt einen Hashcode für diese JobList.
+        /// </summary>
+        /// <returns>Integer mit Hashwert.</returns>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode() + this.LogicalExpression.GetHashCode();
+        }
 
         #endregion public members
 

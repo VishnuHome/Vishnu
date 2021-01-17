@@ -111,12 +111,10 @@ namespace Vishnu.ViewModel
         public SnapshotViewModel(OrientedTreeViewModelBase logicalTaskTreeViewModel, LogicalNodeViewModel parent, LogicalTaskTree.Snapshot snapshot, bool lazyLoadChildren, FrameworkElement uIMain)
           : base(logicalTaskTreeViewModel, parent, snapshot, lazyLoadChildren, uIMain)
         {
-            this._btnRefreshSnapshotRelayCommand = new RelayCommand(refreshSnapshotExecute, canRefreshSnapshotExecute);
+            this._btnRefreshSnapshotRelayCommand = new RelayCommand(RefreshSnapshotExecute, canRefreshSnapshotExecute);
             this._btnSwitchTaskTreeViewRelayCommand = new RelayCommand(switchTaskTreeViewExecute, canSwitchTaskTreeViewExecute);
             (this._myLogicalNode as Snapshot).SnapshotRefreshed -= SnapshotViewModel_SnapshotRefreshed;
             (this._myLogicalNode as Snapshot).SnapshotRefreshed += SnapshotViewModel_SnapshotRefreshed;
-            this._treeRefreshLocker = new object();
-            this._isRefreshing = false;
             this.RaisePropertyChanged("IsSnapshotDummy");
         }
 
@@ -126,108 +124,14 @@ namespace Vishnu.ViewModel
 
         private RelayCommand _btnRefreshSnapshotRelayCommand;
         private RelayCommand _btnSwitchTaskTreeViewRelayCommand;
-        private bool _isRefreshing;
-        private object _treeRefreshLocker;
 
-        private void refreshSnapshotExecute(object parameter)
+        private void RefreshSnapshotExecute(object parameter)
         {
-            if (!this._isRefreshing)
+            if (!this.IsRefreshing)
             {
-                this._isRefreshing = true;
+                this.IsRefreshing = true;
                 ((this._myLogicalNode) as Snapshot).RefreshSnapshot();
             }
-        }
-
-        private void fullTreeRefresh()
-        {
-            using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
-            {
-                lock (this._treeRefreshLocker)
-                {
-                    ObservableCollection<LogicalNodeViewModel> shadowTree = new ObservableCollection<LogicalNodeViewModel>();
-                    if (this.Children?.Count > 0)
-                    {
-                        shadowTree.Add(this.Children[0]); // Retten für die Restaurierung aktueller Tree-Parameter wie zum Beispiel
-                    }
-                    // IsExpanded nach Neuerstellung des Trees aus dem Snapshot. 
-                    this.Children.Clear();
-                    //          this.SetChildOrientation(this.RootLogicalTaskTreeViewModel.TreeOrientationState);
-                    this.loadChildren();
-                    this.transferShadowTreeProperties(shadowTree, this.Children, new Stack<int>());
-                    if (shadowTree?.Count > 0)
-                    {
-                        shadowTree[0].Dispose();
-                    }
-                    shadowTree.Clear();
-                    //Thread.Sleep(100); DEBUG
-                    this._isRefreshing = false;
-                    //Thread.Sleep(100); DEBUG
-                }
-            }
-        }
-
-        private bool leanTreeRefresh()
-        {
-            // return false; // TEST 20.08.2020 Nagel
-            bool rtn = true;
-            lock (this._treeRefreshLocker)
-            {
-                this._isRefreshing = true;
-                using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
-                {
-                    if (!this.refreshTreeView(this, this._myLogicalNode))
-                    {
-                        rtn = false;
-                    }
-                }
-                this._isRefreshing = false;
-                // Thread.Sleep(100); DEBUG
-            }
-            return rtn;
-        }
-
-        private void transferShadowTreeProperties(ObservableCollection<LogicalNodeViewModel> sourceTree,
-              ObservableCollection<LogicalNodeViewModel> destinationTree, Stack<int> indices)
-        {
-            for (int i = 0; i < destinationTree.Count; i++)
-            {
-                indices.Push(i);
-                LogicalNodeViewModel node = destinationTree[i];
-                LogicalNodeViewModel sibling = this.searchSibling(sourceTree, indices);
-                if (sibling != null)
-                {
-                    this.transferSiblingProperties(sibling, node);
-                }
-                if ((node is NodeListViewModel) || (node is JobListViewModel) || (node is SnapshotViewModel))
-                {
-                    this.transferShadowTreeProperties(sourceTree, node.Children, indices);
-                }
-                indices.Pop();
-            }
-        }
-
-        private LogicalNodeViewModel searchSibling(ObservableCollection<LogicalNodeViewModel> sourceTree, Stack<int> indices)
-        {
-            int[] indexArray = new int[indices.Count];
-            indices.CopyTo(indexArray, 0);
-            LogicalNodeViewModel node = null;
-            ObservableCollection<LogicalNodeViewModel> source = sourceTree;
-            for (int i = indexArray.Length - 1; i >= 0; i--)
-            {
-                if (indexArray[i] >= source.Count)
-                {
-                    return null;
-                }
-                node = source[indexArray[i]];
-                source = node.Children;
-            }
-            return node;
-        }
-
-        private void transferSiblingProperties(LogicalNodeViewModel sibling, LogicalNodeViewModel node)
-        {
-            node.IsExpanded = sibling.IsExpanded;
-            node.ChildOrientation = sibling.ChildOrientation;
         }
 
         private bool canRefreshSnapshotExecute()
@@ -268,14 +172,14 @@ namespace Vishnu.ViewModel
             {
                 if ((this._myLogicalNode as Snapshot).WasDefaultSnapshot)
                 {
-                    this.fullTreeRefresh();
+                    this.FullTreeRefresh();
                 }
                 else
                 {
-                    if (!this.leanTreeRefresh())
+                    if (!this.LeanTreeRefresh())
                     {
                         // (this._myLogicalNode as Snapshot).SaveLastSnapshotForDebugging();
-                        this.fullTreeRefresh();
+                        this.FullTreeRefresh();
                         return;
                     }
                 }

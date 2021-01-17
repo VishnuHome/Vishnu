@@ -43,7 +43,7 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// ViewModel für den LogicalTaskTree.
         /// </summary>
-        public LogicalTaskTreeViewModel LogicalTaskTreeVM { get; set; }
+        public LogicalTaskTreeViewModel TreeVM { get; set; }
 
         /// <summary>
         /// Liste von JobListViewModels mit ihren Checkern.
@@ -53,12 +53,12 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Command für den Run-Button im LogicalTaskTreeControl.
         /// </summary>
-        public ICommand RunJobGroups { get { return this.LogicalTaskTreeVM.RunLogicalTaskTree; } }
+        public ICommand RunJobGroups { get { return this.TreeVM.RunLogicalTaskTree; } }
 
         /// <summary>
         /// Command für den Break-Button im LogicalTaskTreeControl.
         /// </summary>
-        public ICommand BreakJobGroups { get { return this.LogicalTaskTreeVM.BreakLogicalTaskTree; } }
+        public ICommand BreakJobGroups { get { return this.TreeVM.BreakLogicalTaskTree; } }
 
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Vishnu.ViewModel
         /// <param name="additionalWindowHeaderInfo">Optionaler Zusatztext für den Fenstertitel.</param>
         public MainWindowViewModel(LogicalTaskTreeViewModel logicalTaskTreeViewModel, Action<object> initWindowSize, NodeTypes flatNodeListFilter, string additionalWindowHeaderInfo)
         {
-            this.LogicalTaskTreeVM = logicalTaskTreeViewModel;
+            this.TreeVM = logicalTaskTreeViewModel;
             this._initSizeRelayCommand = new RelayCommand(initWindowSize);
             this._flatNodeListFilter = flatNodeListFilter;
             this.JobGroupsVM = this.SelectJobGroups();
@@ -95,7 +95,7 @@ namespace Vishnu.ViewModel
         /// <param name="windowAspects">Aktuelle UI-Eigenschaften (z.B. WindowTop, WindowWidth, ...).</param>
         public void SaveTreeState(WindowAspects windowAspects)
         {
-            this.LogicalTaskTreeVM.SaveTreeState(windowAspects);
+            this.TreeVM.SaveTreeState(windowAspects);
         }
 
         #endregion public members
@@ -109,7 +109,7 @@ namespace Vishnu.ViewModel
         private ObservableCollection<JobGroupViewModel> SelectJobGroups()
         {
             ObservableCollection<JobGroupViewModel> selectedJobGroups = new ObservableCollection<JobGroupViewModel>();
-            foreach (LogicalNodeViewModel root in LogicalTaskTreeViewModel.FlattenTree(LogicalTaskTreeVM.MainLogicalNodeView[0], new ObservableCollection<LogicalNodeViewModel>(), this._flatNodeListFilter))
+            foreach (LogicalNodeViewModel root in LogicalTaskTreeViewModel.FlattenTree(TreeVM.MainLogicalNodeView[0], new ObservableCollection<LogicalNodeViewModel>(), this._flatNodeListFilter))
             {
                 if (root is JobListViewModel)
                 {

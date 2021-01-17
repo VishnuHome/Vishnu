@@ -36,7 +36,8 @@
             <DataTemplate DataType="{x:Type vm:JobListViewModel}">
                 <Border Name="ItemBorder" HorizontalAlignment="Stretch" Padding="5" Background="Transparent" BorderThickness="3"
                         CornerRadius="6" MouseDown="ItemBorder_MouseDown" Visibility="{Binding Visibility}">
-                    <Grid HorizontalAlignment="Stretch" ToolTip="{Binding LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400">
+                    <Grid Name="MainGrid" HorizontalAlignment="Stretch" ToolTip="{Binding LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400"
+                          ContextMenu="{DynamicResource cmMainGrid}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -144,6 +145,8 @@
                                 </ControlTemplate>
                             </Button.Template>
                         </Button>
+                        <TextBlock Name="DebugNodeInfos" Grid.Row="1" Grid.Column="1"  Grid.ColumnSpan="7"
+                                   Text="{Binding DebugNodeInfos}" Visibility="Collapsed" />
                         <TextBlock Name="ShortResultText" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="7"
                                    Text="{Binding ShortResult, StringFormat=Ergebnis: {0}}"
                                    Visibility="Collapsed" />
@@ -151,7 +154,9 @@
                 </Border>
                 <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding DebugMode}" Value="True">
-                        <Setter TargetName="ShortResultText" Property="Visibility" Value="Visible" />
+                        <!-- Setter TargetName="ShortResultText" Property="Visibility" Value="Visible" /-->
+                        <Setter TargetName="NameText" Property="Visibility" Value="collapsed" />
+                        <Setter TargetName="DebugNodeInfos" Property="Visibility" Value="Visible" />
                     </DataTrigger>
                     <MultiDataTrigger>
                         <MultiDataTrigger.Conditions>
@@ -212,6 +217,14 @@
                         <Setter TargetName="ShortResultText" Property="Grid.RowSpan" Value="2" />
                         <Setter TargetName="ShortResultText" Property="Grid.Column" Value="3" />
                         <Setter TargetName="ShortResultText" Property="LayoutTransform">
+                            <Setter.Value>
+                                <RotateTransform Angle="-90" />
+                            </Setter.Value>
+                        </Setter>
+                        <Setter TargetName="DebugNodeInfos" Property="Grid.Row" Value="2" />
+                        <Setter TargetName="DebugNodeInfos" Property="Grid.RowSpan" Value="2" />
+                        <Setter TargetName="DebugNodeInfos" Property="Grid.Column" Value="3" />
+                        <Setter TargetName="DebugNodeInfos" Property="LayoutTransform">
                             <Setter.Value>
                                 <RotateTransform Angle="-90" />
                             </Setter.Value>

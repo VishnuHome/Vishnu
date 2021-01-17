@@ -844,6 +844,8 @@ ERLEDIGT: BugFix: Direkter UserRun auf getriggerte Knoten führte zum doppelten S
 
 Stand: 01.12.2020 Version 4.9.3.1 ()
 
+ERLEDIGT: Vishnu-Splashscreen auf lizenzfreien Tree umstellen.
+
 -------------------------------------------------------------------------------------------------------------
 
 ###################
@@ -885,12 +887,13 @@ Nächsten Lauf bei JobLists anzeigen.
 TrueFalseExceptionChecker Release-Zweig überprüfen
 CopyClickOnceStarter Pfad überprüfen
 Job.EventTriggers.Values Key ist nur die KnotenId, nicht der Pfad
-UserParameter-Reader Parameter-Propagation nach Aktualisierung checken
 MailTo-Parameter
 SMS
 WhatsApp
 Telegram
+Voll dynamische Snapshots und Trees
 HotPlug neu checken und erweitern
+UserParameter-Reader Parameter-Propagation nach Aktualisierung checken
 Doku: Job-Parameter ergänzen, bekannte Probleme, woher kommt der Name
 Vishnu Verwaltungsansicht, Uptime, Parameter, Referenzen, Tree, ProcessId, Aufrufparameter, etc.
 VishnuViewer Verzeichniszugriff optional durch WebApi ersetzen
@@ -1005,7 +1008,6 @@ FileWatcherTrigger initialisieren sich nicht korrekt, wenn das
 Die Hotspots beim Klick auf einen Knoten dehnen sich zu weit (Expander auf/zu)
 FXCop über alles jagen/ReSharper
 aktuelle Castle-Doku für Vishnu und Framework erstellen
-Voll dynamische Snapshots und Trees
 Umfassendes Abfangen und user-freundliches Ausgeben von Fehlern, vor allem bei Fehlern
 		in der XML-Definition von Trees
 Logging abschalten per File-Exists?

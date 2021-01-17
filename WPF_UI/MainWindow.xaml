@@ -22,7 +22,7 @@
         <Style TargetType="{x:Type Window}">
             <Setter Property="Background" Value="{StaticResource WindowBGBrush}"/>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding LogicalTaskTreeVM.IsInSleepTime}" Value="true">
+                <DataTrigger Binding="{Binding TreeVM.IsInSleepTime}" Value="true">
                     <Setter Property="Background" Value="{StaticResource WindowBGBrushSleepMode}"/>
                 </DataTrigger>
             </Style.Triggers>
@@ -45,12 +45,12 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" HorizontalAlignment="Center" Foreground="AliceBlue"
-                   Text="{Binding LogicalTaskTreeVM.SleepTimeTo}">
+                   Text="{Binding TreeVM.SleepTimeTo}">
             <TextBlock.Style>
                 <Style TargetType="TextBlock">
                     <Setter Property="Visibility" Value="Collapsed" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding LogicalTaskTreeVM.IsInSleepTime}" Value="true">
+                        <DataTrigger Binding="{Binding TreeVM.IsInSleepTime}" Value="true">
                             <Setter Property="Visibility" Value="Visible" />
                         </DataTrigger>
                     </Style.Triggers>
@@ -62,7 +62,7 @@
                 <Style TargetType="{x:Type TabControl}">
                     <Setter Property="Background" Value="{StaticResource WindowBGBrush}"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding LogicalTaskTreeVM.IsInSleepTime}" Value="true">
+                        <DataTrigger Binding="{Binding TreeVM.IsInSleepTime}" Value="true">
                             <Setter Property="Background" Value="{StaticResource WindowBGBrushSleepMode}"/>
                         </DataTrigger>
                     </Style.Triggers>
@@ -71,7 +71,7 @@
             <TabItem Header="Logical Task Tree" Name="TreeTab" Loaded="TreeTabLoaded">
                 <Grid>
                     <local:LogicalTaskTreeControl x:Name="LogicalTaskTreeControl1" Focusable="True" 
-                                              DataContext="{Binding LogicalTaskTreeVM}"/>
+                                              DataContext="{Binding TreeVM}"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Jobs" Name="JobTabs" Loaded="JobTabLoaded">

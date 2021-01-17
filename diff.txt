@@ -1,0 +1,2553 @@
+diff --git a/DefaultNodeControls/JobListUserControl/JobListUserControl.xaml b/DefaultNodeControls/JobListUserControl/JobListUserControl.xaml
+index 9ecbf0f..fc7dffe 100644
+--- a/DefaultNodeControls/JobListUserControl/JobListUserControl.xaml
++++ b/DefaultNodeControls/JobListUserControl/JobListUserControl.xaml
+@@ -36,7 +36,8 @@
+             <DataTemplate DataType="{x:Type vm:JobListViewModel}">
+                 <Border Name="ItemBorder" HorizontalAlignment="Stretch" Padding="5" Background="Transparent" BorderThickness="3"
+                         CornerRadius="6" MouseDown="ItemBorder_MouseDown" Visibility="{Binding Visibility}">
+-                    <Grid HorizontalAlignment="Stretch" ToolTip="{Binding LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400">
++                    <Grid Name="MainGrid" HorizontalAlignment="Stretch" ToolTip="{Binding LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400"
++                          ContextMenu="{DynamicResource cmMainGrid}">
+                         <Grid.ColumnDefinitions>
+                             <ColumnDefinition Width="*"></ColumnDefinition>
+                             <ColumnDefinition Width="Auto"></ColumnDefinition>
+@@ -144,6 +145,8 @@
+                                 </ControlTemplate>
+                             </Button.Template>
+                         </Button>
++                        <TextBlock Name="DebugNodeInfos" Grid.Row="1" Grid.Column="1"  Grid.ColumnSpan="7"
++                                   Text="{Binding DebugNodeInfos}" Visibility="Collapsed" />
+                         <TextBlock Name="ShortResultText" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="7"
+                                    Text="{Binding ShortResult, StringFormat=Ergebnis: {0}}"
+                                    Visibility="Collapsed" />
+@@ -151,7 +154,9 @@
+                 </Border>
+                 <DataTemplate.Triggers>
+                     <DataTrigger Binding="{Binding DebugMode}" Value="True">
+-                        <Setter TargetName="ShortResultText" Property="Visibility" Value="Visible" />
++                        <!-- Setter TargetName="ShortResultText" Property="Visibility" Value="Visible" /-->
++                        <Setter TargetName="NameText" Property="Visibility" Value="collapsed" />
++                        <Setter TargetName="DebugNodeInfos" Property="Visibility" Value="Visible" />
+                     </DataTrigger>
+                     <MultiDataTrigger>
+                         <MultiDataTrigger.Conditions>
+@@ -216,6 +221,14 @@
+                                 <RotateTransform Angle="-90" />
+                             </Setter.Value>
+                         </Setter>
++                        <Setter TargetName="DebugNodeInfos" Property="Grid.Row" Value="2" />
++                        <Setter TargetName="DebugNodeInfos" Property="Grid.RowSpan" Value="2" />
++                        <Setter TargetName="DebugNodeInfos" Property="Grid.Column" Value="3" />
++                        <Setter TargetName="DebugNodeInfos" Property="LayoutTransform">
++                            <Setter.Value>
++                                <RotateTransform Angle="-90" />
++                            </Setter.Value>
++                        </Setter>
+                         <Setter TargetName="NodeStateImage" Property="Grid.Row" Value="1" />
+                         <Setter TargetName="NodeStateImage" Property="Grid.Column" Value="2" />
+                         <Setter TargetName="NodeStateImage" Property="VerticalAlignment" Value="Bottom" />
+diff --git a/LogicalTaskTree/JobList.cs b/LogicalTaskTree/JobList.cs
+index d6cf667..9e7a145 100644
+--- a/LogicalTaskTree/JobList.cs
++++ b/LogicalTaskTree/JobList.cs
+@@ -4,6 +4,7 @@ using System.Linq;
+ using NetEti.ExpressionParser;
+ using Vishnu.Interchange;
+ using NetEti.ApplicationControl;
++using System.Text;
+ 
+ namespace LogicalTaskTree
+ {
+@@ -493,6 +494,45 @@ namespace LogicalTaskTree
+ 
+         #endregion tree globals
+ 
++        /// <summary>
++        /// Überschriebene ToString()-Methode.
++        /// </summary>
++        /// <returns>Verkettete Properties als String.</returns>
++        public override string ToString()
++        {
++            StringBuilder stringBuilder = new StringBuilder(base.ToString());
++            stringBuilder.AppendLine(String.Format($"LogicalExpression: {this.LogicalExpression ?? ""}"));
++            return stringBuilder.ToString();
++        }
++
++        /// <summary>
++        /// Vergleicht den Inhalt dieser JobList nach logischen Gesichtspunkten
++        /// mit dem Inhalt einer übergebenen JobList.
++        /// </summary>
++        /// <param name="obj">Die JobList zum Vergleich.</param>
++        /// <returns>True, wenn die übergebene JobList inhaltlich gleich dieser ist.</returns>
++        public override bool Equals(object obj)
++        {
++            if (!base.Equals(obj))
++            {
++                return false;
++            }
++            if (Object.ReferenceEquals(this, obj))
++            {
++                return true;
++            }
++            return this.LogicalExpression == (obj as JobList).LogicalExpression;
++        }
++
++        /// <summary>
++        /// Erzeugt einen Hashcode für diese JobList.
++        /// </summary>
++        /// <returns>Integer mit Hashwert.</returns>
++        public override int GetHashCode()
++        {
++            return base.GetHashCode() + this.LogicalExpression.GetHashCode();
++        }
++
+         #endregion public members
+ 
+         #region internal members
+diff --git a/LogicalTaskTree/JobProviderBase.cs b/LogicalTaskTree/JobProviderBase.cs
+index f210eb1..5284ecf 100644
+--- a/LogicalTaskTree/JobProviderBase.cs
++++ b/LogicalTaskTree/JobProviderBase.cs
+@@ -92,7 +92,6 @@ namespace LogicalTaskTree
+             this.LoadedJobPackages = new Dictionary<string, JobPackage>();
+             this._appSettings = GenericSingletonProvider.GetInstance<AppSettings>();
+             this.ReachableServers = new Dictionary<string, bool>();
+-            LogicalNode.InternalIdBase = 0; // Pro Tree eindeutiger ID-Zusatz für anonyme Knoten.
+         }
+ 
+         #endregion public members
+diff --git a/LogicalTaskTree/LogicalNode.cs b/LogicalTaskTree/LogicalNode.cs
+index 09767fd..1112684 100644
+--- a/LogicalTaskTree/LogicalNode.cs
++++ b/LogicalTaskTree/LogicalNode.cs
+@@ -9,6 +9,7 @@ using Vishnu.Interchange;
+ using System.Collections.Concurrent;
+ using NetEti.MVVMini;
+ using LogicalTaskTree.Provider;
++using System.Text;
+ 
+ namespace LogicalTaskTree
+ {
+@@ -149,11 +150,6 @@ namespace LogicalTaskTree
+ 
+         #region IVisnuNode implementation
+ 
+-        /// <summary>
+-        /// Pro Tree eindeutiger ID-Zusatz für anonyme Knoten.
+-        /// </summary>
+-        public static int InternalIdBase;
+-
+         /// <summary>
+         /// Die eindeutige Kennung des Knotens (identisch zur Property Id).
+         /// </summary>
+@@ -1390,7 +1386,10 @@ namespace LogicalTaskTree
+         {
+             JobList rootJobList = this.GetTopRootJobList();
+             InfoController.Say(String.Format($"#RELOAD# LogicalNode.ReloadBranch Id/Name: {this.IdInfo}, RootJobList: {rootJobList.IdInfo}"));
+-            JobList newBranch = new JobList(this.TreeParams, new ProductionJobProvider());
++            TreeParameters shadowTreeParams = new TreeParameters(String.Format($"ShadowTree {LogicalTaskTree.TreeId++}"),
++                this.TreeParams.ParentView) { CheckerDllDirectory = this.TreeParams.CheckerDllDirectory };
++
++            JobList newBranch = new JobList(shadowTreeParams, new ProductionJobProvider());
+             return newBranch;
+         }
+ 
+@@ -1482,24 +1481,73 @@ namespace LogicalTaskTree
+         }
+ 
+         /// <summary>
+-        /// Überschriebene ToString-Methode (für Debug- und Logging-Zwecke).
++        /// Nächsthöhere JobList für diesen Knoten oder der Knoten selbst,
++        /// wenn er eine JobList ist.
++        /// </summary>
++        public JobList RootJobList;
++
++        /// <summary>
++        /// Oberste JobList.
++        /// </summary>
++        public JobList TreeRootJobList;
++
++        /// <summary>
++        /// Zusätzliche Parameter, die für den gesamten Tree Gültigkeit haben oder null.
+         /// </summary>
+-        /// <returns>Id + '/' + Name</returns>
++        public TreeParameters TreeParams { get; private set; }
++
++        /// <summary>
++        /// Überschriebene ToString()-Methode.
++        /// </summary>
++        /// <returns>Verkettete Properties als String.</returns>
+         public override string ToString()
+         {
+-            return this.Id ?? "null" + "/" + this.Name ?? "null";
++            StringBuilder stringBuilder = new StringBuilder();
++            stringBuilder.AppendLine(String.Format($"{this.NodeType}: {this?.NameId ?? ""}"));
++            if (this.Children.Count > 0)
++            {
++                stringBuilder.AppendLine(String.Format($"Children: {this.Children.Count}"));
++            }
++            if (this.IsSnapshotDummy)
++            {
++                stringBuilder.AppendLine(String.Format($"IsSnapshotDummy"));
++            }
++            stringBuilder.AppendLine(String.Format($"Path: {this.Path ?? ""}"));
++            stringBuilder.AppendLine(String.Format($"UserControlPath: {this.UserControlPath ?? ""}"));
++            return stringBuilder.ToString();
+         }
+ 
+         /// <summary>
+-        /// Nächsthöhere JobList für diesen Knoten oder der Knoten selbst,
+-        /// wenn er eine JobList ist.
++        /// Vergleicht den Inhalt dieser LogicalNode nach logischen Gesichtspunkten
++        /// mit dem Inhalt einer übergebenen LogicalNode.
+         /// </summary>
+-        public JobList RootJobList;
++        /// <param name="obj">Die LogicalNode zum Vergleich.</param>
++        /// <returns>True, wenn die übergebene LogicalNode inhaltlich gleich dieser ist.</returns>
++        public override bool Equals(object obj)
++        {
++            if (obj == null || this.GetType() != obj.GetType())
++            {
++                return false;
++            }
++            if (Object.ReferenceEquals(this, obj))
++            {
++                return true;
++            }
++            if (String.IsNullOrEmpty(this.Path))
++            {
++                return false;
++            }
++            return (this.ToString() == obj.ToString());
++        }
+ 
+         /// <summary>
+-        /// Oberste JobList.
++        /// Erzeugt einen Hashcode für diese LogicalNode.
+         /// </summary>
+-        public JobList TreeRootJobList;
++        /// <returns>Integer mit Hashwert.</returns>
++        public override int GetHashCode()
++        {
++            return this.ToString().GetHashCode();
++        }
+ 
+         #endregion public members
+ 
+@@ -1648,11 +1696,6 @@ namespace LogicalTaskTree
+ 
+         #region protected members
+ 
+-        /// <summary>
+-        /// Zusätzliche Parameter, die für den gesamten Tree Gültigkeit haben oder null.
+-        /// </summary>
+-        protected TreeParameters TreeParams;
+-
+         /// <summary>
+         /// Applikationseinstellungen.
+         /// </summary>
+diff --git a/LogicalTaskTree/LogicalTaskTree.cs b/LogicalTaskTree/LogicalTaskTree.cs
+index 2dde04a..a450b86 100644
+--- a/LogicalTaskTree/LogicalTaskTree.cs
++++ b/LogicalTaskTree/LogicalTaskTree.cs
+@@ -19,6 +19,11 @@ namespace LogicalTaskTree
+     {
+         #region public members
+ 
++        /// <summary>
++        /// Pro Tree eindeutiger ID-Zusatz.
++        /// </summary>
++        public static int TreeId;
++
+         #region IDisposable Implementation
+ 
+         private bool _disposed; // = false wird vom System vorbelegt;
+@@ -120,9 +125,15 @@ namespace LogicalTaskTree
+         /// <param name="jobProvider">Die Datenquelle für den Job</param>
+         public LogicalTaskTree(TreeParameters treeParams, IJobProvider jobProvider)
+         {
++            //treeParams.BusinessLogicRoot = this;
+             this._rootJobList = new JobList(treeParams, jobProvider);
+         }
+ 
++        static LogicalTaskTree()
++        {
++            LogicalTaskTree.TreeId = 0; // Pro Tree eindeutiger ID-Zusatz.
++        }
++
+         #endregion public members
+ 
+         #region private members
+diff --git a/LogicalTaskTree/NodeConnector.cs b/LogicalTaskTree/NodeConnector.cs
+index c790ea0..6b7ffbb 100644
+--- a/LogicalTaskTree/NodeConnector.cs
++++ b/LogicalTaskTree/NodeConnector.cs
+@@ -1,4 +1,5 @@
+ ﻿using System;
++using System.Text;
+ using NetEti.Globals;
+ using Vishnu.Interchange;
+ 
+@@ -379,6 +380,74 @@ namespace LogicalTaskTree
+             // keine Weiterleitung - nur bei UserBreak.
+         }
+ 
++        /// <summary>
++        /// Überschriebene ToString()-Methode.
++        /// </summary>
++        /// <returns>Verkettete Properties als String.</returns>
++        public override string ToString()
++        {
++            StringBuilder stringBuilder = new StringBuilder(base.ToString());
++            string slavePathName = "";
++            string referencedNodeName = "";
++            string checkerParameters = "";
++
++            if (this.Checker != null)
++            {
++                if (this.Checker is CheckerShell)
++                {
++                    slavePathName = (this.Checker as CheckerShell).SlavePathName ?? "";
++                    checkerParameters = (this.Checker as CheckerShell).CheckerParameters ?? "";
++                    referencedNodeName = (this.Checker as CheckerShell).ReferencedNodeName ?? "";
++                }
++                else
++                {
++                    slavePathName = (this.Checker as ValueModifier<object>).SlavePathName ?? "";
++                    referencedNodeName = (this.Checker as ValueModifier<object>).ReferencedNodeName ?? "";
++                }
++            }
++            if (!String.IsNullOrEmpty(slavePathName))
++            {
++                stringBuilder.AppendLine(String.Format($"SlavePathName: {slavePathName}"));
++            }
++            if (!String.IsNullOrEmpty(referencedNodeName))
++            {
++                stringBuilder.AppendLine(String.Format($"ReferencedNodeName: {referencedNodeName}"));
++            }
++            if (!String.IsNullOrEmpty(checkerParameters))
++            {
++                stringBuilder.AppendLine(String.Format($"CheckerParameters: {checkerParameters}"));
++            }
++            return stringBuilder.ToString();
++        }
++
++        /// <summary>
++        /// Vergleicht den Inhalt dieses NodeConnectors nach logischen Gesichtspunkten
++        /// mit dem Inhalt eines übergebenen NodeConnectors.
++        /// </summary>
++        /// <param name="obj">Der NodeConnector zum Vergleich.</param>
++        /// <returns>True, wenn der übergebene NodeConnector inhaltlich gleich diesem ist.</returns>
++        public override bool Equals(object obj)
++        {
++            if (!base.Equals(obj))
++            {
++                return false;
++            }
++            if (Object.ReferenceEquals(this, obj))
++            {
++                return true;
++            }
++            return this.ToString() == (obj as NodeConnector).ToString();
++        }
++
++        /// <summary>
++        /// Erzeugt einen Hashcode für diesen NodeConnector.
++        /// </summary>
++        /// <returns>Integer mit Hashwert.</returns>
++        public override int GetHashCode()
++        {
++            return this.ToString().GetHashCode();
++        }
++
+         #endregion public members
+ 
+         #region internal members
+diff --git a/LogicalTaskTree/NodeParent.cs b/LogicalTaskTree/NodeParent.cs
+index d6fdd66..794aeb0 100644
+--- a/LogicalTaskTree/NodeParent.cs
++++ b/LogicalTaskTree/NodeParent.cs
+@@ -43,6 +43,28 @@ namespace LogicalTaskTree
+             this.ThreadUpdateLastSingleNodesFinished(-1); // invalidate
+         }
+ 
++        /// <summary>
++        /// Speichert den Kindknoten am übergebenen Index und hängt sich in die Events des Kindknoten ein.
++        /// </summary>
++        /// <param name="index">Der Index, an dem der Child-Knoten gespeichert werden soll.</param>
++        /// <param name="child">Die zu speichernde Child-Node.</param>
++        public virtual void SetChildAt(int index, LogicalNode child)
++        {
++            this.HookChildEvents(child);
++            this.Children[index] = child;
++        }
++
++        /// <summary>
++        /// Löst die Event-Verknüpfungen mit dem Child-Knoten am Index index und gibt danach den
++        /// Child-Knoten frei.
++        /// </summary>
++        /// <param name="index">Der Index, an dem der Child-Knoten freigegeben werden soll.</param>
++        public virtual void FreeChildAt(int index)
++        {
++            this.UnhookChildEvents(this.Children[index]);
++            this.Children[index] = null;
++        }
++
+         #region internal members
+ 
+         /// <summary>
+@@ -98,8 +120,9 @@ namespace LogicalTaskTree
+         }
+ 
+         /// <summary>
+-        /// Speichert den Kindknoten und hängt sich in die Events des Kindknoten ein.
++        /// Löst die Event-Verknüpfungen mit dem Child-Knoten.
+         /// </summary>
++        /// <param name="child">Der zu lösende Child-Knoten.</param>
+         internal virtual void UnhookChildEvents(LogicalNode child)
+         {
+             child.NodeProgressStarted -= this.SubNodeProgressStarted;
+diff --git a/LogicalTaskTree/SingleNode.cs b/LogicalTaskTree/SingleNode.cs
+index 63060a3..aedda84 100644
+--- a/LogicalTaskTree/SingleNode.cs
++++ b/LogicalTaskTree/SingleNode.cs
+@@ -4,6 +4,7 @@ using System.Threading;
+ using NetEti.Globals;
+ using NetEti.ApplicationControl;
+ using Vishnu.Interchange;
++using System.Text;
+ 
+ namespace LogicalTaskTree
+ {
+@@ -295,6 +296,73 @@ namespace LogicalTaskTree
+             this.SetLastResult(); // Nagel: 01.07.2018 aus dem Lock herausgenommen.
+         }
+ 
++        /// <summary>
++        /// Überschriebene ToString()-Methode.
++        /// </summary>
++        /// <returns>Verkettete Properties als String.</returns>
++        public override string ToString()
++        {
++            StringBuilder stringBuilder = new StringBuilder(base.ToString());
++            string slavePathName = "";
++            string referencedNodeName = "";
++            string checkerParameters = "";
++            if (this.Checker != null)
++            {
++                if (this.Checker is CheckerShell)
++                {
++                    slavePathName = (this.Checker as CheckerShell).SlavePathName ?? "";
++                    checkerParameters = (this.Checker as CheckerShell).CheckerParameters ?? "";
++                    referencedNodeName = (this.Checker as CheckerShell).ReferencedNodeName ?? "";
++                }
++                else
++                {
++                    slavePathName = (this.Checker as ValueModifier<object>).SlavePathName ?? "";
++                    referencedNodeName = (this.Checker as ValueModifier<object>).ReferencedNodeName ?? "";
++                }
++            }
++            if (!String.IsNullOrEmpty(slavePathName))
++            {
++                stringBuilder.AppendLine(String.Format($"SlavePathName: {slavePathName}"));
++            }
++            if (!String.IsNullOrEmpty(referencedNodeName))
++            {
++                stringBuilder.AppendLine(String.Format($"ReferencedNodeName: {referencedNodeName}"));
++            }
++            if (!String.IsNullOrEmpty(checkerParameters))
++            {
++                stringBuilder.AppendLine(String.Format($"CheckerParameters: {checkerParameters}"));
++            }
++            return stringBuilder.ToString();
++        }
++
++        /// <summary>
++        /// Vergleicht den Inhalt dieser SingleNode nach logischen Gesichtspunkten
++        /// mit dem Inhalt einer übergebenen SingleNode.
++        /// </summary>
++        /// <param name="obj">Die SingleNode zum Vergleich.</param>
++        /// <returns>True, wenn die übergebene SingleNode inhaltlich gleich dieser ist.</returns>
++        public override bool Equals(object obj)
++        {
++            if (!base.Equals(obj))
++            {
++                return false;
++            }
++            if (Object.ReferenceEquals(this, obj))
++            {
++                return true;
++            }
++            return this.ToString() == (obj as SingleNode).ToString();
++        }
++
++        /// <summary>
++        /// Erzeugt einen Hashcode für diese SingleNode.
++        /// </summary>
++        /// <returns>Integer mit Hashwert.</returns>
++        public override int GetHashCode()
++        {
++            return this.ToString().GetHashCode();
++        }
++
+         #endregion public members
+ 
+         #region internal members
+diff --git a/ToDo.txt b/ToDo.txt
+index 4750225..4b9f9e7 100644
+--- a/ToDo.txt
++++ b/ToDo.txt
+@@ -844,6 +844,8 @@ ERLEDIGT: BugFix: Direkter UserRun auf getriggerte Knoten f
+ 
+ Stand: 01.12.2020 Version 4.9.3.1 ()
+ 
++ERLEDIGT: Vishnu-Splashscreen auf lizenzfreien Tree umstellen.
++
+ -------------------------------------------------------------------------------------------------------------
+ 
+ ###################
+@@ -885,12 +887,13 @@ N
+ TrueFalseExceptionChecker Release-Zweig �berpr�fen
+ CopyClickOnceStarter Pfad �berpr�fen
+ Job.EventTriggers.Values Key ist nur die KnotenId, nicht der Pfad
+-UserParameter-Reader Parameter-Propagation nach Aktualisierung checken
+ MailTo-Parameter
+ SMS
+ WhatsApp
+ Telegram
++Voll dynamische Snapshots und Trees
+ HotPlug neu checken und erweitern
++UserParameter-Reader Parameter-Propagation nach Aktualisierung checken
+ Doku: Job-Parameter erg�nzen, bekannte Probleme, woher kommt der Name
+ Vishnu Verwaltungsansicht, Uptime, Parameter, Referenzen, Tree, ProcessId, Aufrufparameter, etc.
+ VishnuViewer Verzeichniszugriff optional durch WebApi ersetzen
+@@ -1005,7 +1008,6 @@ FileWatcherTrigger initialisieren sich nicht korrekt, wenn das
+ Die Hotspots beim Klick auf einen Knoten dehnen sich zu weit (Expander auf/zu)
+ FXCop �ber alles jagen/ReSharper
+ aktuelle Castle-Doku f�r Vishnu und Framework erstellen
+-Voll dynamische Snapshots und Trees
+ Umfassendes Abfangen und user-freundliches Ausgeben von Fehlern, vor allem bei Fehlern
+ 		in der XML-Definition von Trees
+ Logging abschalten per File-Exists?
+diff --git a/ViewModel/DummyLogicalTaskTreeViewModel.cs b/ViewModel/DummyLogicalTaskTreeViewModel.cs
+index ef393c1..5bc7876 100644
+--- a/ViewModel/DummyLogicalTaskTreeViewModel.cs
++++ b/ViewModel/DummyLogicalTaskTreeViewModel.cs
+@@ -1,9 +1,16 @@
+-﻿namespace Vishnu.ViewModel
++﻿using Vishnu.Interchange;
++
++namespace Vishnu.ViewModel
+ {
+     /// <summary>
+     /// Ersetzt das LogicalTaskTreeViewModel als Dummy-Parameter beim Reload-Vorgang.
+     /// </summary>
+     public class DummyLogicalTaskTreeViewModel : OrientedTreeViewModelBase
+     {
++        /// <summary>
++        /// Konstruktor - übernimmt die Parameter für den gesamten Tree.
++        /// </summary>
++        /// <param name="treeParams">Parameter für den gesamten Tree.</param>
++        public DummyLogicalTaskTreeViewModel(TreeParameters treeParams) : base(treeParams)  {  }
+     }
+ }
+diff --git a/ViewModel/JobListViewModel.cs b/ViewModel/JobListViewModel.cs
+index 4c16bf2..f97e211 100644
+--- a/ViewModel/JobListViewModel.cs
++++ b/ViewModel/JobListViewModel.cs
+@@ -130,7 +130,7 @@ namespace Vishnu.ViewModel
+         /// <summary>
+         /// Überschriebene ToString()-Methode.
+         /// </summary>
+-        /// <returns>Id des Knoten + ":" + ReturnObject.ToString()</returns>
++        /// <returns>Verkettete Properties als String.</returns>
+         public override string ToString()
+         {
+             StringBuilder stringBuilder = new StringBuilder(base.ToString());
+@@ -145,17 +145,21 @@ namespace Vishnu.ViewModel
+         }
+ 
+         /// <summary>
+-        /// Vergleicht den Inhalt dieses LogicalNodeViewModels nach logischen Gesichtspunkten
+-        /// mit dem Inhalt eines übergebenen LogicalNodeViewModels.
++        /// Vergleicht den Inhalt dieses JobListViewModels nach logischen Gesichtspunkten
++        /// mit dem Inhalt eines übergebenen JobListViewModels.
+         /// </summary>
+-        /// <param name="obj">Das LogicalNodeViewModel zum Vergleich.</param>
+-        /// <returns>True, wenn das übergebene Result inhaltlich gleich diesem Result ist.</returns>
++        /// <param name="obj">Das JobListViewModel zum Vergleich.</param>
++        /// <returns>True, wenn das übergebene JobListViewModel inhaltlich gleich diesem ist.</returns>
+         public override bool Equals(object obj)
+         {
+             if (!base.Equals(obj))
+             {
+                 return false;
+             }
++            if (Object.ReferenceEquals(this, obj))
++            {
++                return true;
++            }
+             LogicalNode logicalNode = this.GetLogicalNode();
+             LogicalNode objLogicalNode = (obj as LogicalNodeViewModel).GetLogicalNode();
+             if (logicalNode != null && objLogicalNode != null)
+@@ -166,7 +170,7 @@ namespace Vishnu.ViewModel
+         }
+ 
+         /// <summary>
+-        /// Erzeugt einen Hashcode für dieses LogicalNodeViewModel.
++        /// Erzeugt einen Hashcode für dieses JobListViewModel.
+         /// </summary>
+         /// <returns>Integer mit Hashwert.</returns>
+         public override int GetHashCode()
+@@ -176,6 +180,19 @@ namespace Vishnu.ViewModel
+ 
+         #endregion public members
+ 
++        #region internal members
++
++        /// <summary>
++        /// Führt im Verlauf eines externen Tree-Relod einen technischen Run
++        /// für die korrekte Initialisierung des JobListViewModels aus.
++        /// </summary>
++        internal void TechnicalRun()
++        {
++            this.runTaskTreeExecute(null);
++        }
++
++        #endregion internal members
++
+         #region private members
+ 
+         private RelayCommand _btnRunTaskTreeRelayCommand;
+diff --git a/ViewModel/LogicalNodeViewModel.cs b/ViewModel/LogicalNodeViewModel.cs
+index 3d518c4..a7f0302 100644
+--- a/ViewModel/LogicalNodeViewModel.cs
++++ b/ViewModel/LogicalNodeViewModel.cs
+@@ -12,8 +12,7 @@ using Vishnu.Interchange;
+ using System.Collections.Generic;
+ using System.Text;
+ using NetEti.ApplicationControl;
+-using System.Text.RegularExpressions;
+-using System.Linq;
++using System.Threading.Tasks;
+ 
+ namespace Vishnu.ViewModel
+ {
+@@ -269,7 +268,7 @@ namespace Vishnu.ViewModel
+                     {
+                         // Kinder nachladen, wenn nötig.
+                         this.Children.Remove(_dummyChild);
+-                        this.loadChildren();
++                        this.LoadChildren();
+                     }
+                     this.RaisePropertyChanged("IsExpanded");
+                 }
+@@ -368,6 +367,25 @@ namespace Vishnu.ViewModel
+             }
+         }
+ 
++        /// <summary>
++        /// Zusätzliche Parameter, die für den gesamten Tree Gültigkeit haben oder null.
++        /// </summary>
++        public TreeParameters TreeParams
++        {
++            get
++            {
++                return this._treeParams;
++            }
++            set
++            {
++                if (this._treeParams != value)
++                {
++                    this._treeParams = value;
++                    this.RaisePropertyChanged("TreeParams");
++                }
++            }
++        }
++
+         #endregion ViewModel properties
+ 
+         #region Node properties
+@@ -380,7 +398,7 @@ namespace Vishnu.ViewModel
+         {
+             get
+             {
+-                return this._myLogicalNode.Id;
++                return this._myLogicalNode?.Id ?? "NULL";
+             }
+         }
+ 
+@@ -392,7 +410,7 @@ namespace Vishnu.ViewModel
+         {
+             get
+             {
+-                return this._myLogicalNode.IsSnapshotDummy;
++                return this._myLogicalNode?.IsSnapshotDummy ?? false;
+             }
+         }
+ 
+@@ -453,7 +471,7 @@ namespace Vishnu.ViewModel
+         {
+             get
+             {
+-                return this._myLogicalNode.UserControlPath;
++                return this._myLogicalNode?.UserControlPath;
+             }
+         }
+ 
+@@ -719,13 +737,13 @@ namespace Vishnu.ViewModel
+         {
+             get
+             {
+-                if (this._myLogicalNode is NodeConnector)
++                if (this._myLogicalNode != null && this._myLogicalNode is NodeConnector)
+                 {
+                     return (this._myLogicalNode as NodeConnector).ReferencedNodeId;
+                 }
+                 else
+                 {
+-                    return this._myLogicalNode.Id;
++                    return this._myLogicalNode?.Id ?? "NULL";
+                 }
+             }
+         }
+@@ -742,7 +760,7 @@ namespace Vishnu.ViewModel
+                 {
+                     debugNodeInfos += ", Ref: " + this.OriginalNodeId;
+                 }
+-                debugNodeInfos += ")";
++                debugNodeInfos += ") " + this.TreeParams.Name;
+                 return debugNodeInfos;
+             }
+         }
+@@ -761,6 +779,15 @@ namespace Vishnu.ViewModel
+ 
+         #endregion Node properties
+ 
++        /// <summary>
++        /// Ausrichtung des Trees beim Start der Anwendung.
++        ///   AlternatingHorizontal: Alternierender Aufbau, waagerecht beginnend (Default).
++        ///   Vertical: Senkrechter Aufbau.
++        ///   Horizontal: Waagerechter Aufbau.
++        ///   AlternatingVertical: Alternierender Aufbau, senkrecht beginnend.
++        /// </summary>
++        public TreeOrientation StartTreeOrientation { get; set; }
++
+         #endregion published members
+ 
+         /// <summary>
+@@ -792,15 +819,19 @@ namespace Vishnu.ViewModel
+         /// <param name="myLogicalNode">Der zugeordnete Knoten aus dem LogicalTaskTree.</param>
+         /// <param name="lazyLoadChildren">Bei True werden die Kinder erst beim Öffnen des TreeView-Knotens nachgeladen.</param>
+         /// <param name="uIMain">Das Root-FrameworkElement zu diesem ViewModel.</param>
+-        public LogicalNodeViewModel(OrientedTreeViewModelBase logicalTaskTreeViewModel, LogicalNodeViewModel parent, LogicalNode myLogicalNode, bool lazyLoadChildren, FrameworkElement uIMain)
++        public LogicalNodeViewModel(OrientedTreeViewModelBase logicalTaskTreeViewModel, LogicalNodeViewModel parent,
++            LogicalNode myLogicalNode, bool lazyLoadChildren, FrameworkElement uIMain) : base()
+         {
+             this.RootLogicalTaskTreeViewModel = logicalTaskTreeViewModel;
++            this.TreeParams = logicalTaskTreeViewModel.TreeParams;
+             this.UIMain = uIMain;
+             this.UIDispatcher = null;
+             this.Parent = parent;
+             this.lazyLoadChildren = lazyLoadChildren;
+             this._canExpanderExpand = true;
+ 
++            this.TreeRefreshLocker = new object();
++            this.IsRefreshing = false;
+             this.SetBLNode(myLogicalNode, true);
+             this.Visibility = System.Windows.Visibility.Visible;
+             this.VisualState = VisualNodeState.None;
+@@ -813,7 +844,7 @@ namespace Vishnu.ViewModel
+             }
+             else
+             {
+-                this.loadChildren();
++                this.LoadChildren();
+             }
+             this.ExpandedEventCommand = new RelayCommand(this.HandleExpanderExpandedEvent, this.CanHandleExpanderExpandedEvent);
+             this.CollapsedEventCommand = new RelayCommand(this.HandleExpanderCollapsedEvent);
+@@ -827,6 +858,7 @@ namespace Vishnu.ViewModel
+         /// <param name="mainTreeOrientation">Ausrichtug des Trees</param>
+         public void SetChildOrientation(TreeOrientation mainTreeOrientation)
+         {
++            this.StartTreeOrientation = mainTreeOrientation;
+             switch (mainTreeOrientation)
+             {
+                 case TreeOrientation.Vertical:
+@@ -1084,13 +1116,21 @@ namespace Vishnu.ViewModel
+         /// <summary>
+         /// Überschriebene ToString()-Methode.
+         /// </summary>
+-        /// <returns>Id des Knoten + ":" + ReturnObject.ToString()</returns>
++        /// <returns>Verkettete Properties als String.</returns>
+         public override string ToString()
+         {
+             StringBuilder stringBuilder = new StringBuilder();
+-            stringBuilder.AppendLine(String.Format($"{this.GetLogicalNode().NodeType}: {this.GetLogicalNode()?.NameId ?? ""}"));
++            LogicalNode logicalNode = this.GetLogicalNode();
++            if (logicalNode != null)
++            {
++                stringBuilder.AppendLine(String.Format($"{logicalNode.NodeType}: {logicalNode?.NameId ?? ""}"));
++            }
++            else
++            {
++                stringBuilder.AppendLine(String.Format($"{this.GetType()}: {this.Id ?? "" + "." + this.Name ?? ""}"));
++            }
+             stringBuilder.AppendLine(String.Format($"Source: {this.OriginalNodeId ?? ""}"));
+-            if (this.Children.Count > 0)
++            if (this.Children?.Count > 0)
+             {
+                 stringBuilder.AppendLine(String.Format($"Children: {this.Children.Count}"));
+             }
+@@ -1099,7 +1139,7 @@ namespace Vishnu.ViewModel
+                 stringBuilder.AppendLine(String.Format($"IsSnapshotDummy"));
+             }
+             stringBuilder.AppendLine(String.Format($"Path: {this.Path ?? ""}"));
+-            stringBuilder.AppendLine(String.Format($"UserControlPath: {this.UserControlPath??""}"));
++            stringBuilder.AppendLine(String.Format($"UserControlPath: {this.UserControlPath ?? ""}"));
+             return stringBuilder.ToString();
+         }
+ 
+@@ -1108,14 +1148,10 @@ namespace Vishnu.ViewModel
+         /// mit dem Inhalt eines übergebenen LogicalNodeViewModels.
+         /// </summary>
+         /// <param name="obj">Das LogicalNodeViewModel zum Vergleich.</param>
+-        /// <returns>True, wenn das übergebene Result inhaltlich gleich diesem Result ist.</returns>
++        /// <returns>True, wenn das übergebene LogicalNodeViewModel inhaltlich gleich diesem ist.</returns>
+         public override bool Equals(object obj)
+         {
+-            if (obj == null || this.GetType() != obj.GetType())
+-            {
+-                return false;
+-            }
+-            if (String.IsNullOrEmpty(this.Path) || String.IsNullOrEmpty(this.OriginalNodeId))
++            if (!base.Equals(obj))
+             {
+                 return false;
+             }
+@@ -1123,6 +1159,10 @@ namespace Vishnu.ViewModel
+             {
+                 return true;
+             }
++            if (String.IsNullOrEmpty(this.Path) || String.IsNullOrEmpty(this.OriginalNodeId))
++            {
++                return false;
++            }
+             if (this.ToString() != obj.ToString())
+             {
+                 return false;
+@@ -1143,6 +1183,75 @@ namespace Vishnu.ViewModel
+ 
+         #region internal members
+ 
++        /// <summary>
++        /// Dient zum Serren der Verarbeitung während eines laufenden Tree-Refreshs.
++        /// </summary>
++        internal object TreeRefreshLocker;
++
++        /// <summary>
++        /// Zeigt an, ob gerade ein Tree-Refresh läuft.
++        /// </summary>
++        internal volatile bool IsRefreshing;
++
++        /// <summary>
++        /// Refresht den Visual-Tree nach einer Veränderung in den ViewModels.
++        /// Nur für inhaltliche Änderungen bei unveränderter Struktur geeignet,
++        /// dafür aber sehr schnell.
++        /// </summary>
++        /// <returns>False, wenn irgendwas schiefgegangen ist, ansonsten true.</returns>
++        internal bool LeanTreeRefresh()
++        {
++            // return false; // TEST 20.08.2020 Nagel
++            bool rtn = true;
++            lock (this.TreeRefreshLocker)
++            {
++                this.IsRefreshing = true;
++                using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
++                {
++                    if (!this.RefreshTreeView(this, this._myLogicalNode))
++                    {
++                        rtn = false;
++                    }
++                }
++                this.IsRefreshing = false;
++                // Thread.Sleep(100); DEBUG
++            }
++            return rtn;
++        }
++
++        /// <summary>
++        /// Refresht den Visual-Tree nach einer Veränderung in den ViewModels.
++        /// Für inhaltliche und strukturelle Änderungen im Tree geeignet,
++        /// dafür aber etwas langsam (im Dialog aber schnell genug).
++        /// </summary>
++        internal void FullTreeRefresh()
++        {
++            using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
++            {
++                lock (this.TreeRefreshLocker)
++                {
++                    ObservableCollection<LogicalNodeViewModel> shadowTree = new ObservableCollection<LogicalNodeViewModel>();
++                    if (this.Children?.Count > 0)
++                    {
++                        shadowTree.Add(this.Children[0]); // Retten für die Restaurierung aktueller Tree-Parameter wie zum Beispiel
++                    }
++                    // IsExpanded nach Neuerstellung des Trees aus dem Snapshot. 
++                    this.Children.Clear();
++                    //          this.SetChildOrientation(this.RootLogicalTaskTreeViewModel.TreeOrientationState);
++                    this.LoadChildren();
++                    this.TransferShadowTreeProperties(shadowTree, this.Children, new Stack<int>());
++                    if (shadowTree?.Count > 0)
++                    {
++                        shadowTree[0].Dispose();
++                    }
++                    shadowTree.Clear();
++                    //Thread.Sleep(100); DEBUG
++                    this.IsRefreshing = false;
++                    //Thread.Sleep(100); DEBUG
++                }
++            }
++        }
++
+         /// <summary>
+         /// Setzt die Business-Logic Node für dieses LogicalNodeViewModel.
+         /// </summary>
+@@ -1184,9 +1293,9 @@ namespace Vishnu.ViewModel
+         }
+ 
+         /// <summary>
+-        /// Disposed die Business-Logic Node für dieses LogicalNodeViewModel.
++        /// Gigt die Business-Logic Node für dieses LogicalNodeViewModel frei.
+         /// </summary>
+-        private void UnsetBLNode()
++        internal void UnsetBLNode()
+         {
+             if (this._myLogicalNode != null)
+             {
+@@ -1230,7 +1339,7 @@ namespace Vishnu.ViewModel
+         /// <summary>
+         /// Lädt die Kinder eines Knotens. 
+         /// </summary>
+-        protected void loadChildren()
++        protected void LoadChildren()
+         {
+             if (this._myLogicalNode is NodeList)
+             {
+@@ -1283,7 +1392,7 @@ namespace Vishnu.ViewModel
+         /// <param name="node">LogicalNode der ViewModel-Root.</param>
+         /// <returns>True, wenn der Teilbaum aktualisiert werden konnte;
+         /// bei False muss ein Full-TreeRefresh ausgeführt werden.</returns>
+-        protected bool refreshTreeView(LogicalNodeViewModel nodeViewModel, LogicalNode node)
++        protected bool RefreshTreeView(LogicalNodeViewModel nodeViewModel, LogicalNode node)
+         {
+             if (!nodeViewModel.SetBLNode(node, false))
+             {
+@@ -1301,7 +1410,7 @@ namespace Vishnu.ViewModel
+                 {
+                     if (node.Children.Count > i)
+                     {
+-                        if (!this.refreshTreeView(nodeViewModel.Children[i], node.Children[i]))
++                        if (!this.RefreshTreeView(nodeViewModel.Children[i], node.Children[i]))
+                         {
+                             return false;
+                         }
+@@ -1323,6 +1432,67 @@ namespace Vishnu.ViewModel
+             }
+         }
+ 
++        /// <summary>
++        /// Überträgt Eigenschaften von einem gesicherten Branch auf einen aktiven Branch.
++        /// </summary>
++        /// <param name="sourceTree">Der gesicherte Branch.</param>
++        /// <param name="destinationTree">Der aktive Branch.</param>
++        /// <param name="indices">Ein Stack zum Zwischenspeichern von Indices auf jeder Hierarchieebene.</param>
++        protected void TransferShadowTreeProperties(ObservableCollection<LogicalNodeViewModel> sourceTree,
++              ObservableCollection<LogicalNodeViewModel> destinationTree, Stack<int> indices)
++        {
++            for (int i = 0; i < destinationTree.Count; i++)
++            {
++                indices.Push(i);
++                LogicalNodeViewModel node = destinationTree[i];
++                LogicalNodeViewModel sibling = this.SearchSibling(sourceTree, indices);
++                if (sibling != null)
++                {
++                    this.TransferSiblingProperties(sibling, node);
++                }
++                if ((node is NodeListViewModel) || (node is JobListViewModel) || (node is SnapshotViewModel))
++                {
++                    this.TransferShadowTreeProperties(sourceTree, node.Children, indices);
++                }
++                indices.Pop();
++            }
++        }
++
++        /// <summary>
++        /// Sucht einen Knoten in einem Tree-Branch zu einer gegebenen Index-Hierarchie im Stack "indices".
++        /// </summary>
++        /// <param name="sourceTree">Der zu durchsuchende Branch.</param>
++        /// <param name="indices">Ein Stack mit zwischengespeicherten Indices auf jeder Hierarchieebene bis zu einem Zielknoten.</param>
++        /// <returns>Ein gefundenes LogicalNodeViewModel oder null.</returns>
++        protected LogicalNodeViewModel SearchSibling(ObservableCollection<LogicalNodeViewModel> sourceTree, Stack<int> indices)
++        {
++            int[] indexArray = new int[indices.Count];
++            indices.CopyTo(indexArray, 0);
++            LogicalNodeViewModel node = null;
++            ObservableCollection<LogicalNodeViewModel> source = sourceTree;
++            for (int i = indexArray.Length - 1; i >= 0; i--)
++            {
++                if (indexArray[i] >= source.Count)
++                {
++                    return null;
++                }
++                node = source[indexArray[i]];
++                source = node.Children;
++            }
++            return node;
++        }
++
++        /// <summary>
++        /// Überträgt bestimmte Eigenschaftn im VisualTree von sibling auf node.
++        /// </summary>
++        /// <param name="sibling">Der Quellknoten (LogicalNodeViewModel).</param>
++        /// <param name="node">Der Zielknoten (LogicalNodeViewModel)</param>
++        protected void TransferSiblingProperties(LogicalNodeViewModel sibling, LogicalNodeViewModel node)
++        {
++            node.IsExpanded = sibling.IsExpanded;
++            node.ChildOrientation = sibling.ChildOrientation;
++        }
++
+         /// <summary>
+         /// Lädt den gesamten Tree inklusive JobDescription.xml neu. 
+         /// </summary>
+@@ -1340,20 +1510,27 @@ namespace Vishnu.ViewModel
+             if (shadowJobList != null)
+             {
+                 // Das DummyLogicalTaskTree-ViewModel
+-                DummyLogicalTaskTreeViewModel dummyLogicalTaskTreeViewModel = new DummyLogicalTaskTreeViewModel();
++                DummyLogicalTaskTreeViewModel dummyLogicalTaskTreeViewModel = new DummyLogicalTaskTreeViewModel(shadowJobList.TreeParams);
+                 JobListViewModel shadowTopRootJobListViewModel = new JobListViewModel(dummyLogicalTaskTreeViewModel, null, shadowJobList, false, null);
+                 if (shadowTopRootJobListViewModel != null)
+                 {
++                    shadowTopRootJobListViewModel.SetChildOrientation(this.StartTreeOrientation);
++                    shadowTopRootJobListViewModel.ExpandTree(shadowTopRootJobListViewModel, false);
+                     JobListViewModel treeTopRootJobListViewModel = this.GetTopRootJobListViewModel();
+-                    try
+-                    {
+-                        LogicalTaskTreeMerger.Merge(treeTopRootJobListViewModel, shadowTopRootJobListViewModel);
+-                    }
+-                    catch (Exception ex)
+-                    {
+-                        MessageBox.Show(String.Format($"Fehler beim Abgleich der Jobs: {ex.Message}"));
+-                    }
+ 
++                    //Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
++                    //{
++                        using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
++                        {
++
++                            LogicalTaskTreeMerger.Merge(treeTopRootJobListViewModel, shadowTopRootJobListViewModel);
++                            // this.GetTopRootJobListViewModel().FullTreeRefresh();
++                        }
++                    //}));
++
++                    shadowTopRootJobListViewModel.Dispose();
++
++                    /*
+                     InfoController.Say("#RELOAD# -------------------------------------------------------------------------------------------------------------------------------");
+                     Thread.Sleep(100);
+                     List<string> allTreeInfos = new List<string>();
+@@ -1369,28 +1546,8 @@ namespace Vishnu.ViewModel
+                     InfoController.Say("#RELOAD# " + bigMessage);
+                     Thread.Sleep(100);
+                     InfoController.Say("#RELOAD# -------------------------------------------------------------------------------------------------------------------------------");
++                    */
+                 }
+-                /*
+-                this.MainLogicalNodeView = new ReadOnlyCollection<JobListViewModel>(
+-                  new JobListViewModel[]
+-                  {
+-                      new JobListViewModel(this, null, this._root, false, this._uIMain)
+-                  });
+-                this.MainLogicalNodeView[0].SetChildOrientation(startTreeOrientation);
+-                this.MainLogicalNodeView[0].ExpandTree(this.MainLogicalNodeView[0], false);
+-
+-                // Das Main-ViewModel
+-                MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(logicalTaskTreeViewModel, this._mainWindow.ForceRecalculateWindowMeasures, SingleInstanceApplication._appSettings.FlatNodeListFilter, SingleInstanceApplication._appSettings.DemoModus ? "-DEMO-" : "");
+-
+-                // Verbinden von Main-Window mit Main-ViewModel
+-                this._mainWindow.DataContext = mainWindowViewModel; //mainViewModel;
+-
+-                //if (SingleInstanceApplication._appSettings.Autostart)
+-                //{
+-                //    SingleInstanceApplication._businessLogic.Tree.UserRun();
+-                //}
+-                */
+-
+             }
+         }
+ 
+@@ -1435,7 +1592,7 @@ namespace Vishnu.ViewModel
+ 
+         /// <summary>
+         /// Speichert die Bildschirmposition des zugehörigen
+-        /// Controls in der Geschäftslogig.
++        /// Controls in der Geschäftslogik.
+         /// </summary>
+         /// <param name="parentView">Das zugehörige Control.</param>
+         protected override void ParentViewToBL(DynamicUserControlBase parentView)
+@@ -1660,6 +1817,7 @@ namespace Vishnu.ViewModel
+         private string _freeComment;
+         private bool _isInSleepTime;
+         private string _sleepTimeTo;
++        private TreeParameters _treeParams;
+ 
+         // True, wenn die Kinder dieses Knotens noch nicht geladen wurden.
+         private bool _hasDummyChild
+diff --git a/ViewModel/LogicalTaskTreeMerger.cs b/ViewModel/LogicalTaskTreeMerger.cs
+index ece1338..d54d9e8 100644
+--- a/ViewModel/LogicalTaskTreeMerger.cs
++++ b/ViewModel/LogicalTaskTreeMerger.cs
+@@ -151,36 +151,40 @@ namespace Vishnu.ViewModel
+     /// </remarks>
+     internal static class LogicalTaskTreeMerger
+     {
+-        private static Dictionary<string, LogicalNodeViewModel> shadowVMFinder;
+-        private static Dictionary<string, LogicalNodeViewModel> treeVMFinder;
+ 
+-        internal static void Merge(JobListViewModel activeTree, JobListViewModel newTree)
++        static LogicalTaskTreeMerger()
+         {
+-            // Trees indizieren.
++            LogicalTaskTreeMerger._reloadedSingleNodes = new List<string>();
++        }
+ 
+-            LogicalTaskTreeMerger.shadowVMFinder = new Dictionary<string, LogicalNodeViewModel>();
+-            newTree.Traverse(IndexTreeElement, LogicalTaskTreeMerger.shadowVMFinder);
++        private static Dictionary<string, LogicalNodeViewModel> _shadowVMFinder;
++        private static Dictionary<string, LogicalNodeViewModel> _treeVMFinder;
+ 
+-            LogicalTaskTreeMerger.treeVMFinder = new Dictionary<string, LogicalNodeViewModel>();
+-            activeTree.Traverse(IndexTreeElement, LogicalTaskTreeMerger.treeVMFinder);
++        // Enthält Pfade von SingleNodes, die im Zuge eines Reload des LogicalTaskTrees neu eingebaut wurden.
++        // Bei der späteren Ausführung der Run-Methode dieser Nodes dürfen dynamisch geladene DLLs einmalig
++        // nicht aus dem Cache genommen werden.
++        private static List<string> _reloadedSingleNodes { get; set; }
+ 
+-            activeTree.Traverse(DeleteOldReferences, LogicalTaskTreeMerger.shadowVMFinder);
++        internal static void Merge(JobListViewModel activeTree, JobListViewModel newTree)
++        {
++            // Trees indizieren.
++            LogicalTaskTreeMerger._shadowVMFinder = new Dictionary<string, LogicalNodeViewModel>();
++            newTree.Traverse(IndexTreeElement, LogicalTaskTreeMerger._shadowVMFinder);
++            LogicalTaskTreeMerger._treeVMFinder = new Dictionary<string, LogicalNodeViewModel>();
++            activeTree.Traverse(IndexTreeElement, LogicalTaskTreeMerger._treeVMFinder);
+ 
+-            activeTree.Traverse(DiffTreeElement, LogicalTaskTreeMerger.shadowVMFinder);
++            // TODO: Position und Ausführung noch zu klären
++            // activeTree.Traverse(DeleteOldReferences, LogicalTaskTreeMerger._shadowVMFinder);
+ 
+-        }
++            // Durchläuft den aktiven Tree und prüft parallel den neu geladenen "ShadowTree" auf Gleichheit, bzw. Ungleichheit.
++            // Da hinzugekommene oder ausgetauschte Knoten immer auch über Unterschiede in den LogicalExpressions der
++            // übergeordneten JobLists gefunden werden, bleiben keine Veränderungen unbemerkt.
++            // Bei differierenden JobLists wird aus pragmatischen Erwägungen zusätzlich noch versucht, eventuell gleich
++            // gebliebene Children zu erhalten, damit bei großen Jobs nicht alle Children neu gestartet werden müssen.
++            // Darüber hinaus möglicherweise noch gleiche isomorphe Teilbäume an unterschiedlichen Hierarchie-Ebenen werden nicht
++            // gesucht, der Nutzen wäre eher gering bei ungleich höherem Aufwand.
++            activeTree.Traverse(DiffTreeElement, LogicalTaskTreeMerger._shadowVMFinder);
+ 
+-        /// <summary>
+-        /// Löscht Informationen 
+-        /// </summary>
+-        /// <param name="depth">Nullbasierter Zähler der Rekursionstiefe eines Knotens im LogicalTaskTree.</param>
+-        /// <param name="expandableNode">Basisklasse eines ViewModel-Knotens im LogicalTaskTree.</param>
+-        /// <param name="userObject">Ein beliebiges durchgeschliffenes UserObject (hier: Dictionary&lt;string, LogicalNodeViewModel&gt;).</param>
+-        /// <returns>Das Dictionary&lt;string, LogicalNodeViewModel&gt; oder null.</returns>
+-        internal static object DeleteOldReferences(int depth, IExpandableNode expandableNode, object userObject)
+-        {
+-            InfoController.Say(String.Format($"#RELOAD# TODO delete Node-Globals {expandableNode.Path} from active Tree."));
+-            return userObject;
+         }
+ 
+         /// <summary>
+@@ -196,15 +200,16 @@ namespace Vishnu.ViewModel
+             if (vmFinder.ContainsKey(expandableNode.Path))
+             {
+                 LogicalNodeViewModel shadowTreeVM = vmFinder[expandableNode.Path];
+-                LogicalTaskTreeMerger.CheckIfJobListAndTransferGlobals(shadowTreeVM, expandableNode as LogicalNodeViewModel);
+-                if (shadowTreeVM.Equals(expandableNode as LogicalNodeViewModel))
++                LogicalNodeViewModel activeTreeVM = expandableNode as LogicalNodeViewModel;
++                LogicalNode shadowNode = shadowTreeVM.GetLogicalNode();
++                LogicalNode activeNode = activeTreeVM.GetLogicalNode();
++                if (shadowNode.Equals(activeNode))
+                 {
+-                    // nur zum Test: this.TransferNode(shadowTreeVM, expandableNode as LogicalNodeViewModel); // TEST
+                     return userObject; // Weiter im Tree
+                 }
+                 else
+                 {
+-                    LogicalTaskTreeMerger.TransferNode(shadowTreeVM, expandableNode as LogicalNodeViewModel);
++                    LogicalTaskTreeMerger.TransferNode(shadowTreeVM, activeTreeVM, shadowNode, activeNode);
+                 }
+             }
+             else
+@@ -230,90 +235,146 @@ namespace Vishnu.ViewModel
+             return null; // Bricht die Rekursion für diesen Zweig ab.
+         }
+ 
+-        private static void CheckIfJobListAndTransferGlobals(LogicalNodeViewModel shadowTreeVM, LogicalNodeViewModel logicalNodeVM)
++        private static void TransferNode(LogicalNodeViewModel shadowTreeVM, LogicalNodeViewModel activeTreeVM,
++            LogicalNode shadowNode, LogicalNode activeNode)
+         {
+-            JobList shadowNode = shadowTreeVM.GetLogicalNode() as JobList;
+-            JobList logicalNode = logicalNodeVM.GetLogicalNode() as JobList;
+-            if (shadowNode != null && logicalNode != null)
++            InfoController.Say(String.Format($"#RELOAD# Transferring Node {shadowTreeVM.Path} from ShadowTree to Tree."));
++
++            if (activeNode.Mother == null)
+             {
+-                LogicalTaskTreeMerger.TransferJobListGlobals(shadowNode, logicalNode);
+-                LogicalTaskTreeMerger.RemoveOldJobListGlobals(shadowNode, logicalNode);
++                // throw new ApplicationException("Der Top-Job kann nicht im laufenden Betrieb ausgetauscht werden!");
++                InfoController.Say(String.Format($"#RELOAD# Not transferring Root-Node {shadowTreeVM.Path} from ShadowTree to Tree."));
++                return;
+             }
+-        }
+ 
+-        private static void TransferNode(LogicalNodeViewModel shadowTreeVM, LogicalNodeViewModel logicalNodeVM)
+-        {
+-            LogicalNode shadowNode = shadowTreeVM.GetLogicalNode();
+-            LogicalNode logicalNode = logicalNodeVM.GetLogicalNode();
+-            if (shadowNode != null && logicalNode != null)
++            LogicalNodeViewModel activeParentVM = activeTreeVM.Parent;
++            NodeParent activeParent = activeNode.Mother as NodeParent;
++            int nodeIndex = -1;
++            for (int i = 0; i < activeParent.Children.Count; i++)
+             {
+-                InfoController.Say(String.Format($"#RELOAD# Transferring Node {shadowTreeVM.Path} from ShadowTree to Tree."));
+-                NodeParent parent = logicalNode.Mother as NodeParent;
+-                if (parent != null)
++                if (activeParent.Children[i].Equals(activeNode))
+                 {
+-                    int nodeIndex = -1;
+-                    for (int i = 0; i < parent.Children.Count; i++)
+-                    {
+-                        if (parent.Children[i].Equals(logicalNode))
+-                        {
+-                            nodeIndex = i;
+-                            break;
+-                        }
+-                    }
+-                    if (nodeIndex >= 0)
+-                    {
+-                        logicalNode.Break(true);
+-                        shadowNode.Mother = parent;
+-                        shadowNode.RootJobList = logicalNode.RootJobList;
+-                        shadowNode.TreeRootJobList = logicalNode.TreeRootJobList;
+-                        parent.Children[nodeIndex] = shadowNode;
+-                        try
+-                        {
+-                            LogicalTaskTreeMerger.AdjustBranchRootJobListGlobals(shadowNode);
+-                        }
+-                        catch (Exception)
+-                        {
+-                            throw;
+-                        }
+-                    }
+-                    else
+-                    {
+-                        throw new ApplicationException(String.Format($"Parent-Index nicht gefunden, Knoten: {logicalNode.Path}"));
+-                    }
+-                }
+-                else
+-                {
+-                    throw new ApplicationException("Der Top-Job kann nicht im laufenden Betrieb ausgetauscht wertden!");
++                    nodeIndex = i;
++                    break;
+                 }
++            }
++            if (nodeIndex < 0)
++            {
++                throw new ApplicationException(String.Format($"Parent-Index nicht gefunden, Knoten: {activeNode.Path}"));
++            }
+ 
+-                LogicalNodeViewModel parentVM = logicalNodeVM.Parent;
+-                if (parentVM != null)
++            JobListViewModel tempVM = LogicalTaskTreeMerger.CheckIfJobListAndTransferGlobals(shadowTreeVM, activeTreeVM, shadowNode, activeNode);
++            
++            if (tempVM == null)
++            {
++                // Logik für alle ViewModels/Knoten außer JobListViewModel/JobList
++                activeNode.Break(true);
++            }
++            shadowNode.Mother = activeParent;
++            shadowNode.RootJobList = activeNode.RootJobList;
++            shadowNode.TreeRootJobList = activeNode.TreeRootJobList;
++            activeParent.SetChildAt(nodeIndex, shadowNode);
++            shadowTreeVM.Parent = activeParentVM;
++            shadowTreeVM.RootLogicalTaskTreeViewModel = activeTreeVM.RootLogicalTaskTreeViewModel;
++
++            activeParentVM.Children[nodeIndex].Dispose();
++            activeParentVM.Children[nodeIndex] = null;
++            activeParentVM.Children[nodeIndex] = shadowTreeVM;
++
++            try
++            {
++                LogicalTaskTreeMerger.AdjustBranchRootJobListGlobals(shadowNode);
++            }
++            catch (Exception)
++            {
++                throw;
++            }
++
++            // Nach Einhängen in den activeTree wird die shadowNode zum aktiven Knoten, muss aber zusammem mit den neuen Child-Knoten gestartet werden.
++            //if (activeTreeVM is JobListViewModel)
++            //{
++            //    (activeTreeVM as JobListViewModel).TechnicalRun();
++            //}
++            //else
++            //{
++            //    if (activeTreeVM is SingleNodeViewModel)
++            //    {
++            //        (activeTreeVM as SingleNodeViewModel).TechnicalRun();
++            //    }
++            //}
++            shadowNode.Run(new TreeEvent("UserRun", shadowNode.Id, shadowNode.Id, shadowNode.Name, shadowNode.Path, null, NodeLogicalState.None, null, null));
++
++            if (tempVM != null)
++            {
++                // Logik für JobListViewModel/JobList:
++                // Jetzt die vorher gesicherten, gleichgebliebenen und noch laufenden Child-Knoten wieder einhängen.
++                for (int i = 0; i < tempVM.Children.Count; i++)
+                 {
+-                    int nodeIndex = -1;
+-                    for (int i = 0; i < parentVM.Children.Count; i++)
++                    if (tempVM.Children[i] != null)
+                     {
+-                        if (parentVM.Children[i].Equals(logicalNodeVM))
+-                        {
+-                            nodeIndex = i;
+-                            break;
+-                        }
++                        activeParentVM.Children[nodeIndex].Children[i] = tempVM.Children[i];
++                        activeNode.Children[i] = tempVM.GetLogicalNode().Children[i];
+                     }
+-                    if (nodeIndex >= 0)
+-                    {
+-                        shadowTreeVM.Parent = parentVM;
+-                        shadowTreeVM.RootLogicalTaskTreeViewModel = logicalNodeVM.RootLogicalTaskTreeViewModel;
+-                        parentVM.Children[nodeIndex] = shadowTreeVM;
+-                    }
+-                    else
++                }
++            }
++            // activeParentVM.FullTreeRefresh();
++        }
++
++        private static JobListViewModel CheckIfJobListAndTransferGlobals(LogicalNodeViewModel shadowTreeVM, LogicalNodeViewModel activeTreeVM,
++            LogicalNode shadowNode, LogicalNode activeNode)
++        {
++            if (shadowNode is JobList && activeNode is JobList)
++            {
++                JobListViewModel tempVM = LogicalTaskTreeMerger.TransferEqualJobListChildren(shadowTreeVM as JobListViewModel, activeTreeVM as JobListViewModel, shadowNode as JobList, activeNode as JobList);
++                LogicalTaskTreeMerger.AddNewJobListGlobals(shadowNode as JobList, activeNode as JobList);
++                LogicalTaskTreeMerger.RemoveOldJobListGlobals(shadowNode as JobList, activeNode as JobList);
++                return tempVM; // Enthält die gleichgebliebenen, laufenden Child-Knoten der auszutauschenden JobListViewModels (kann leer sein).
++            }
++            return null;
++        }
++
++        private static JobListViewModel TransferEqualJobListChildren(JobListViewModel shadowTreeVM, JobListViewModel activeTreeVM, JobList shadowNode, JobList activeNode)
++        {
++            // Das JobListViewModel tempVM ist ein temporärer Datenspeicher, die Konstruktor-Parameter sind nur Dummies.
++            JobListViewModel tempVM = new JobListViewModel(shadowTreeVM.RootLogicalTaskTreeViewModel, shadowTreeVM.GetTopRootJobListViewModel(), shadowNode, true, null);
++            // überflüssig, da die ViewModels jeweils eine Referenz auf ihre Business-Nodes ghalten:
++            //     JobList tempNode = new JobList(shadowNode, shadowNode.GetTopRootJobList());
++            //     tempVM.SetBLNode(tempNode, true);
++
++            // Eventuelle gleichgebliebene direkte Nachkommen von logicalNode auf shadowNode übertragen.
++            // Die gesamte shadowNode inklusive Children wird in einem späteren Schritt auf den aktiven Tree übertragen.
++            for (int i = 0; i < shadowNode.Children.Count; i++)
++            {
++                for (int j = 0; j < activeNode.Children.Count; j++)
++                {
++                    if (activeNode.Children[j].Equals(shadowNode.Children[i]))
+                     {
+-                        throw new ApplicationException(String.Format($"Parent-Index nicht gefunden, Knoten: {logicalNodeVM.Path}"));
++                        tempVM.Children[i] = activeTreeVM.Children[j];
++                        // tempNode.Children[i] = activeNode.Children[j];
++                        // tempVM.Children[i].SetBLNode(tempNode.Children[i], true);
++
++                        shadowTreeVM.Children[i].UnsetBLNode(); // Wegen nachfolgendem Run auf die shadowNode, wird danach aus tempNode gefüllt.
++                        shadowTreeVM.Children[i] = null; // Wegen nachfolgendem Run auf die shadowNode, wird danach aus tempNode gefüllt.
++                        shadowNode.FreeChildAt(i);
++
++                        // falsch, da Referenz von tempNode auf activeTree: activeTreeVM.Children[j].UnsetBLNode();
++                        activeTreeVM.Children[j] = null; // Übertragene Knoten sollen beim späteren Break auf logicalNode nicht mit abgebrochen werden.
++                        activeNode.FreeChildAt(j);
++                        break;
+                     }
+                 }
+-                else
++            }
++            for (int j = 0; j < activeNode.Children.Count; j++)
++            {
++                if (activeNode.Children[j] != null)
+                 {
+-                    throw new ApplicationException("Der Top-Job kann nicht im laufenden Betrieb ausgetauscht wertden!");
++                    activeTreeVM.Children[j].UnsetBLNode(); // Wegfallende Knoten freigeben.
++                    activeTreeVM.Children[j] = null; // Wegfallende Knoten freigeben.
++                    activeNode.Children[j].Break(true); // TODO: checken, ob notwendig
++                    activeNode.FreeChildAt(j);
+                 }
+             }
++            return tempVM; // Enthält die gleichgebliebenen, laufenden Child-Knoten der auszutauschenden JobListViewModels (kann leer sein).
+         }
+ 
+         /// <summary>
+@@ -346,7 +407,7 @@ namespace Vishnu.ViewModel
+         private static void ChangeOldReferences(LogicalNode changingNode, JobList treeJobList)
+         {
+             // Generell funktioniert foreach hier nicht, da u.U. die Auflistungen geändert werden.
+-            LogicalNodeViewModel shadowTreeVM = LogicalTaskTreeMerger.shadowVMFinder[treeJobList.IdPath];
++            LogicalNodeViewModel shadowTreeVM = LogicalTaskTreeMerger._shadowVMFinder[treeJobList.IdPath];
+             JobList shadowJobList = shadowTreeVM.GetLogicalNode() as JobList;
+             List<String> keys;
+             try
+@@ -550,49 +611,49 @@ namespace Vishnu.ViewModel
+             }
+         }
+ 
+-        private static void TransferJobListGlobals(JobList shadowJobList, JobList treeJobList)
++        private static void AddNewJobListGlobals(JobList shadowJobList, JobList activeJobList)
+         {
+             InfoController.Say(String.Format($"#RELOAD# Transferring Tree Globals from ShadowTree to Tree."));
+ 
+             foreach (string key in shadowJobList.Job.EventTriggers.Keys)
+             {
+-                if (!treeJobList.Job.EventTriggers.ContainsKey(key))
++                if (!activeJobList.Job.EventTriggers.ContainsKey(key))
+                 {
+-                    treeJobList.Job.EventTriggers.Add(key, shadowJobList.Job.EventTriggers[key]);
++                    activeJobList.Job.EventTriggers.Add(key, shadowJobList.Job.EventTriggers[key]);
+                 }
+                 else
+                 {
+                     foreach (string keyKey in shadowJobList.Job.EventTriggers[key].Keys)
+                     {
+-                        if (!treeJobList.Job.EventTriggers[key].ContainsKey(keyKey))
++                        if (!activeJobList.Job.EventTriggers[key].ContainsKey(keyKey))
+                         {
+-                            treeJobList.Job.EventTriggers[key].Add(keyKey, shadowJobList.Job.EventTriggers[key][keyKey]);
++                            activeJobList.Job.EventTriggers[key].Add(keyKey, shadowJobList.Job.EventTriggers[key][keyKey]);
+                         }
+                     }
+                 }
+             }
+             foreach (string key in shadowJobList.Job.WorkersDictionary.Keys)
+             {
+-                if (!treeJobList.Job.WorkersDictionary.ContainsKey(key))
++                if (!activeJobList.Job.WorkersDictionary.ContainsKey(key))
+                 {
+-                    treeJobList.Job.WorkersDictionary.Add(key, shadowJobList.Job.WorkersDictionary[key]);
++                    activeJobList.Job.WorkersDictionary.Add(key, shadowJobList.Job.WorkersDictionary[key]);
+                 }
+                 else
+                 {
+                     foreach (string keyKey in shadowJobList.Job.WorkersDictionary[key].Keys)
+                     {
+-                        if (!treeJobList.Job.WorkersDictionary[key].ContainsKey(keyKey))
++                        if (!activeJobList.Job.WorkersDictionary[key].ContainsKey(keyKey))
+                         {
+-                            treeJobList.Job.WorkersDictionary[key].Add(keyKey, shadowJobList.Job.WorkersDictionary[key][keyKey]);
++                            activeJobList.Job.WorkersDictionary[key].Add(keyKey, shadowJobList.Job.WorkersDictionary[key][keyKey]);
+                         }
+                         else
+                         {
+-                            List<WorkerShell> combinedTreeWorkers = treeJobList.Job.WorkersDictionary[key][keyKey].ToList();
++                            List<WorkerShell> combinedTreeWorkers = activeJobList.Job.WorkersDictionary[key][keyKey].ToList();
+                             foreach (WorkerShell keyKeyShadowWorker in shadowJobList.Job.WorkersDictionary[key][keyKey])
+                             {
+                                 string shadowSlave = keyKeyShadowWorker.SlavePathName;
+                                 bool found = false;
+-                                foreach (WorkerShell keyKeyTreeWorker in treeJobList.Job.WorkersDictionary[key][keyKey])
++                                foreach (WorkerShell keyKeyTreeWorker in activeJobList.Job.WorkersDictionary[key][keyKey])
+                                 {
+                                     string treeSlave = keyKeyTreeWorker.SlavePathName;
+                                     if (treeSlave == shadowSlave)
+@@ -606,9 +667,9 @@ namespace Vishnu.ViewModel
+                                     combinedTreeWorkers.Add(keyKeyShadowWorker);
+                                 }
+                             }
+-                            if (treeJobList.Job.WorkersDictionary[key][keyKey].Length < combinedTreeWorkers.Count)
++                            if (activeJobList.Job.WorkersDictionary[key][keyKey].Length < combinedTreeWorkers.Count)
+                             {
+-                                treeJobList.Job.WorkersDictionary[key][keyKey] = combinedTreeWorkers.ToArray();
++                                activeJobList.Job.WorkersDictionary[key][keyKey] = combinedTreeWorkers.ToArray();
+                             }
+                         }
+                     }
+@@ -616,22 +677,22 @@ namespace Vishnu.ViewModel
+             }
+             foreach (string key in shadowJobList.AllCheckers.Keys)
+             {
+-                if (!treeJobList.AllCheckers.ContainsKey(key))
++                if (!activeJobList.AllCheckers.ContainsKey(key))
+                 {
+-                    treeJobList.AllCheckers.Add(key, shadowJobList.AllCheckers[key]);
++                    activeJobList.AllCheckers.Add(key, shadowJobList.AllCheckers[key]);
+                 }
+             }
+             foreach (string key in shadowJobList.TreeExternalCheckers.Keys)
+             {
+-                if (!treeJobList.TreeExternalCheckers.ContainsKey(key))
++                if (!activeJobList.TreeExternalCheckers.ContainsKey(key))
+                 {
+-                    treeJobList.TreeExternalCheckers.Add(key, shadowJobList.AllCheckers[key]);
++                    activeJobList.TreeExternalCheckers.Add(key, shadowJobList.AllCheckers[key]);
+                 }
+             }
+             foreach (SingleNode shadowNode in shadowJobList.TreeExternalSingleNodes)
+             {
+                 bool found = false;
+-                foreach (SingleNode treeNode in treeJobList.TreeExternalSingleNodes)
++                foreach (SingleNode treeNode in activeJobList.TreeExternalSingleNodes)
+                 {
+                     if (treeNode.Equals(shadowNode))
+                     {
+@@ -641,82 +702,82 @@ namespace Vishnu.ViewModel
+                 }
+                 if (!found)
+                 {
+-                    treeJobList.TreeExternalSingleNodes.Add(shadowNode);
++                    activeJobList.TreeExternalSingleNodes.Add(shadowNode);
+                 }
+             }
+             foreach (string key in shadowJobList.TriggerRelevantEventCache)
+             {
+-                if (!treeJobList.TriggerRelevantEventCache.Contains(key))
++                if (!activeJobList.TriggerRelevantEventCache.Contains(key))
+                 {
+-                    treeJobList.TriggerRelevantEventCache.Add(key);
++                    activeJobList.TriggerRelevantEventCache.Add(key);
+                 }
+             }
+             foreach (string key in shadowJobList.LoggerRelevantEventCache)
+             {
+-                if (!treeJobList.LoggerRelevantEventCache.Contains(key))
++                if (!activeJobList.LoggerRelevantEventCache.Contains(key))
+                 {
+-                    treeJobList.LoggerRelevantEventCache.Add(key);
++                    activeJobList.LoggerRelevantEventCache.Add(key);
+                 }
+             }
+             foreach (string key in shadowJobList.WorkerRelevantEventCache)
+             {
+-                if (!treeJobList.WorkerRelevantEventCache.Contains(key))
++                if (!activeJobList.WorkerRelevantEventCache.Contains(key))
+                 {
+-                    treeJobList.WorkerRelevantEventCache.Add(key);
++                    activeJobList.WorkerRelevantEventCache.Add(key);
+                 }
+             }
+             foreach (string key in shadowJobList.JobsByName.Keys)
+             {
+-                if (!treeJobList.JobsByName.ContainsKey(key))
++                if (!activeJobList.JobsByName.ContainsKey(key))
+                 {
+-                    treeJobList.JobsByName.Add(key, shadowJobList.JobsByName[key]);
++                    activeJobList.JobsByName.Add(key, shadowJobList.JobsByName[key]);
+                 }
+             }
+             foreach (string key in shadowJobList.NodesByName.Keys)
+             {
+-                if (!treeJobList.NodesByName.ContainsKey(key))
++                if (!activeJobList.NodesByName.ContainsKey(key))
+                 {
+-                    treeJobList.NodesByName.Add(key, shadowJobList.NodesByName[key]);
++                    activeJobList.NodesByName.Add(key, shadowJobList.NodesByName[key]);
+                 }
+             }
+             foreach (string key in shadowJobList.TreeRootLastChanceNodesByName.Keys)
+             {
+-                if (!treeJobList.TreeRootLastChanceNodesByName.ContainsKey(key))
++                if (!activeJobList.TreeRootLastChanceNodesByName.ContainsKey(key))
+                 {
+-                    treeJobList.TreeRootLastChanceNodesByName.Add(key, shadowJobList.TreeRootLastChanceNodesByName[key]);
++                    activeJobList.TreeRootLastChanceNodesByName.Add(key, shadowJobList.TreeRootLastChanceNodesByName[key]);
+                 }
+             }
+             foreach (string key in shadowJobList.NodesById.Keys)
+             {
+-                if (!treeJobList.NodesById.ContainsKey(key))
++                if (!activeJobList.NodesById.ContainsKey(key))
+                 {
+-                    treeJobList.NodesById.Add(key, shadowJobList.NodesById[key]);
++                    activeJobList.NodesById.Add(key, shadowJobList.NodesById[key]);
+                 }
+             }
+         }
+ 
+-        private static void RemoveOldJobListGlobals(JobList shadowJobList, JobList treeJobList)
++        private static void RemoveOldJobListGlobals(JobList shadowJobList, JobList activeJobList)
+         {
+             InfoController.Say(String.Format($"#RELOAD# Transferring Tree Globals from ShadowTree to Tree."));
+ 
+             List<string> keys;
+             try
+             {
+-                keys = new List<string>(treeJobList.Job.EventTriggers.Keys);
++                keys = new List<string>(activeJobList.Job.EventTriggers.Keys);
+                 foreach (string key in keys)
+                 {
+                     if (!shadowJobList.Job.EventTriggers.ContainsKey(key))
+                     {
+-                        treeJobList.Job.EventTriggers.Remove(key);
++                        activeJobList.Job.EventTriggers.Remove(key);
+                     }
+                     else
+                     {
+-                        List<string> keyKeys = new List<string>(treeJobList.Job.EventTriggers[key].Keys);
++                        List<string> keyKeys = new List<string>(activeJobList.Job.EventTriggers[key].Keys);
+                         foreach (string keyKey in keyKeys)
+                         {
+                             if (!shadowJobList.Job.EventTriggers[key].ContainsKey(keyKey))
+                             {
+-                                treeJobList.Job.EventTriggers[key].Remove(keyKey);
++                                activeJobList.Job.EventTriggers[key].Remove(keyKey);
+                             }
+                         }
+                     }
+@@ -730,26 +791,26 @@ namespace Vishnu.ViewModel
+ 
+             try
+             {
+-                keys = new List<string>(treeJobList.Job.WorkersDictionary.Keys);
++                keys = new List<string>(activeJobList.Job.WorkersDictionary.Keys);
+                 foreach (string key in keys)
+                 {
+                     if (!shadowJobList.Job.WorkersDictionary.ContainsKey(key))
+                     {
+-                        treeJobList.Job.WorkersDictionary.Remove(key);
++                        activeJobList.Job.WorkersDictionary.Remove(key);
+                     }
+                     else
+                     {
+-                        List<string> keyKeys = new List<string>(treeJobList.Job.WorkersDictionary[key].Keys);
++                        List<string> keyKeys = new List<string>(activeJobList.Job.WorkersDictionary[key].Keys);
+                         foreach (string keyKey in keyKeys)
+                         {
+                             if (!shadowJobList.Job.WorkersDictionary[key].ContainsKey(keyKey))
+                             {
+-                                treeJobList.Job.WorkersDictionary[key].Remove(keyKey);
++                                activeJobList.Job.WorkersDictionary[key].Remove(keyKey);
+                             }
+                             else
+                             {
+                                 List<WorkerShell> combinedTreeWorkers = new List<WorkerShell>();
+-                                foreach (WorkerShell keyKeyTreeWorker in treeJobList.Job.WorkersDictionary[key][keyKey])
++                                foreach (WorkerShell keyKeyTreeWorker in activeJobList.Job.WorkersDictionary[key][keyKey])
+                                 {
+                                     string treeSlave = keyKeyTreeWorker.SlavePathName;
+                                     bool found = false;
+@@ -767,9 +828,9 @@ namespace Vishnu.ViewModel
+                                         combinedTreeWorkers.Add(keyKeyTreeWorker);
+                                     }
+                                 }
+-                                if (treeJobList.Job.WorkersDictionary[key][keyKey].Length > combinedTreeWorkers.Count)
++                                if (activeJobList.Job.WorkersDictionary[key][keyKey].Length > combinedTreeWorkers.Count)
+                                 {
+-                                    treeJobList.Job.WorkersDictionary[key][keyKey] = combinedTreeWorkers.ToArray();
++                                    activeJobList.Job.WorkersDictionary[key][keyKey] = combinedTreeWorkers.ToArray();
+                                 }
+                             }
+                         }
+@@ -783,12 +844,12 @@ namespace Vishnu.ViewModel
+             }
+             try
+             {
+-                keys = new List<string>(treeJobList.AllCheckers.Keys);
++                keys = new List<string>(activeJobList.AllCheckers.Keys);
+                 foreach (string key in keys)
+                 {
+                     if (!shadowJobList.AllCheckers.ContainsKey(key))
+                     {
+-                        treeJobList.AllCheckers.Remove(key);
++                        activeJobList.AllCheckers.Remove(key);
+                     }
+                 }
+             }
+@@ -798,12 +859,12 @@ namespace Vishnu.ViewModel
+             }
+             try
+             {
+-                keys = new List<string>(treeJobList.TreeExternalCheckers.Keys);
++                keys = new List<string>(activeJobList.TreeExternalCheckers.Keys);
+                 foreach (string key in keys)
+                 {
+                     if (!shadowJobList.TreeExternalCheckers.ContainsKey(key))
+                     {
+-                        treeJobList.TreeExternalCheckers.Remove(key);
++                        activeJobList.TreeExternalCheckers.Remove(key);
+                     }
+                 }
+             }
+@@ -814,7 +875,7 @@ namespace Vishnu.ViewModel
+             try
+             {
+                 List<SingleNode> remainingSingleNodes = new List<SingleNode>();
+-                foreach (SingleNode treeNode in treeJobList.TreeExternalSingleNodes)
++                foreach (SingleNode treeNode in activeJobList.TreeExternalSingleNodes)
+                 {
+                     bool found = false;
+                     foreach (SingleNode shadowNode in shadowJobList.TreeExternalSingleNodes)
+@@ -830,9 +891,9 @@ namespace Vishnu.ViewModel
+                         remainingSingleNodes.Add(treeNode);
+                     }
+                 }
+-                if (treeJobList.TreeExternalSingleNodes.Count > remainingSingleNodes.Count)
++                if (activeJobList.TreeExternalSingleNodes.Count > remainingSingleNodes.Count)
+                 {
+-                    treeJobList.TreeExternalSingleNodes = remainingSingleNodes;
++                    activeJobList.TreeExternalSingleNodes = remainingSingleNodes;
+                 }
+             }
+             catch (Exception ex5)
+@@ -841,12 +902,12 @@ namespace Vishnu.ViewModel
+             }
+             try
+             {
+-                keys = new List<string>(treeJobList.TriggerRelevantEventCache);
++                keys = new List<string>(activeJobList.TriggerRelevantEventCache);
+                 foreach (string key in keys)
+                 {
+                     if (!shadowJobList.TriggerRelevantEventCache.Contains(key))
+                     {
+-                        treeJobList.TriggerRelevantEventCache.Remove(key);
++                        activeJobList.TriggerRelevantEventCache.Remove(key);
+                     }
+                 }
+             }
+@@ -856,12 +917,12 @@ namespace Vishnu.ViewModel
+             }
+             try
+             {
+-                keys = new List<string>(treeJobList.LoggerRelevantEventCache);
++                keys = new List<string>(activeJobList.LoggerRelevantEventCache);
+                 foreach (string key in keys)
+                 {
+                     if (!shadowJobList.LoggerRelevantEventCache.Contains(key))
+                     {
+-                        treeJobList.LoggerRelevantEventCache.Remove(key);
++                        activeJobList.LoggerRelevantEventCache.Remove(key);
+                     }
+                 }
+             }
+@@ -871,12 +932,12 @@ namespace Vishnu.ViewModel
+             }
+             try
+             {
+-                keys = new List<string>(treeJobList.WorkerRelevantEventCache);
++                keys = new List<string>(activeJobList.WorkerRelevantEventCache);
+                 foreach (string key in keys)
+                 {
+                     if (!shadowJobList.WorkerRelevantEventCache.Contains(key))
+                     {
+-                        treeJobList.WorkerRelevantEventCache.Remove(key);
++                        activeJobList.WorkerRelevantEventCache.Remove(key);
+                     }
+                 }
+             }
+@@ -886,12 +947,12 @@ namespace Vishnu.ViewModel
+             }
+             try
+             {
+-                keys = new List<string>(treeJobList.JobsByName.Keys);
++                keys = new List<string>(activeJobList.JobsByName.Keys);
+                 foreach (string key in keys)
+                 {
+                     if (!shadowJobList.JobsByName.ContainsKey(key))
+                     {
+-                        treeJobList.JobsByName.Remove(key);
++                        activeJobList.JobsByName.Remove(key);
+                     }
+                 }
+             }
+@@ -901,12 +962,12 @@ namespace Vishnu.ViewModel
+             }
+             try
+             {
+-                keys = new List<string>(treeJobList.NodesByName.Keys);
++                keys = new List<string>(activeJobList.NodesByName.Keys);
+                 foreach (string key in keys)
+                 {
+                     if (!shadowJobList.NodesByName.ContainsKey(key))
+                     {
+-                        treeJobList.NodesByName.Remove(key);
++                        activeJobList.NodesByName.Remove(key);
+                     }
+                 }
+             }
+@@ -916,12 +977,12 @@ namespace Vishnu.ViewModel
+             }
+             try
+             {
+-                keys = new List<string>(treeJobList.TreeRootLastChanceNodesByName.Keys);
++                keys = new List<string>(activeJobList.TreeRootLastChanceNodesByName.Keys);
+                 foreach (string key in keys)
+                 {
+                     if (!shadowJobList.TreeRootLastChanceNodesByName.ContainsKey(key))
+                     {
+-                        treeJobList.TreeRootLastChanceNodesByName.Remove(key);
++                        activeJobList.TreeRootLastChanceNodesByName.Remove(key);
+                     }
+                 }
+             }
+@@ -931,12 +992,12 @@ namespace Vishnu.ViewModel
+             }
+             try
+             {
+-                keys = new List<string>(treeJobList.NodesById.Keys);
++                keys = new List<string>(activeJobList.NodesById.Keys);
+                 foreach (string key in keys)
+                 {
+                     if (!shadowJobList.NodesById.ContainsKey(key))
+                     {
+-                        treeJobList.NodesById.Remove(key);
++                        activeJobList.NodesById.Remove(key);
+                     }
+                 }
+             }
+diff --git a/ViewModel/LogicalTaskTreeViewModel.cs b/ViewModel/LogicalTaskTreeViewModel.cs
+index e10f1ed..eca639f 100644
+--- a/ViewModel/LogicalTaskTreeViewModel.cs
++++ b/ViewModel/LogicalTaskTreeViewModel.cs
+@@ -94,11 +94,14 @@ namespace Vishnu.ViewModel
+         /// <param name="uiMain">Das Vishnu-MainWindow.</param>
+         /// <param name="startTreeOrientation">Die Startausrichtung des Baums.</param>
+         /// <param name="flatNodeListFilter">Ein Filter für anzuzeigende NodeTypes.</param>
+-        public LogicalTaskTreeViewModel(LogicalTaskTree.LogicalTaskTree businessLogic, FrameworkElement uiMain, TreeOrientation startTreeOrientation, NodeTypes flatNodeListFilter)
++        /// <param name="treeParams">Parameter für den gesamten Tree.</param>
++        public LogicalTaskTreeViewModel(LogicalTaskTree.LogicalTaskTree businessLogic, FrameworkElement uiMain,
++            TreeOrientation startTreeOrientation, NodeTypes flatNodeListFilter, TreeParameters treeParams) : base(treeParams)
+         {
+             this._businessLogic = businessLogic;
+             this._uIMain = uiMain;
+             this._root = businessLogic.Tree;
++            //this.TreeParams.ViewModelRoot = this;
+ 
+             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+             {
+@@ -237,8 +240,6 @@ namespace Vishnu.ViewModel
+         private bool _isInSleepTime;
+         private string _sleepTimeTo;
+ 
+-        private LogicalTaskTreeViewModel() { }
+-
+         private static void flatNodeListAddIfNew(LogicalNodeViewModel root, ObservableCollection<LogicalNodeViewModel> flatNodeList)
+         {
+             SingleNodeViewModel rootSvm = root as SingleNodeViewModel;
+diff --git a/ViewModel/MainWindowViewModel.cs b/ViewModel/MainWindowViewModel.cs
+index 6fabf3a..c84084c 100644
+--- a/ViewModel/MainWindowViewModel.cs
++++ b/ViewModel/MainWindowViewModel.cs
+@@ -43,7 +43,7 @@ namespace Vishnu.ViewModel
+         /// <summary>
+         /// ViewModel für den LogicalTaskTree.
+         /// </summary>
+-        public LogicalTaskTreeViewModel LogicalTaskTreeVM { get; set; }
++        public LogicalTaskTreeViewModel TreeVM { get; set; }
+ 
+         /// <summary>
+         /// Liste von JobListViewModels mit ihren Checkern.
+@@ -53,12 +53,12 @@ namespace Vishnu.ViewModel
+         /// <summary>
+         /// Command für den Run-Button im LogicalTaskTreeControl.
+         /// </summary>
+-        public ICommand RunJobGroups { get { return this.LogicalTaskTreeVM.RunLogicalTaskTree; } }
++        public ICommand RunJobGroups { get { return this.TreeVM.RunLogicalTaskTree; } }
+ 
+         /// <summary>
+         /// Command für den Break-Button im LogicalTaskTreeControl.
+         /// </summary>
+-        public ICommand BreakJobGroups { get { return this.LogicalTaskTreeVM.BreakLogicalTaskTree; } }
++        public ICommand BreakJobGroups { get { return this.TreeVM.BreakLogicalTaskTree; } }
+ 
+ 
+         /// <summary>
+@@ -77,7 +77,7 @@ namespace Vishnu.ViewModel
+         /// <param name="additionalWindowHeaderInfo">Optionaler Zusatztext für den Fenstertitel.</param>
+         public MainWindowViewModel(LogicalTaskTreeViewModel logicalTaskTreeViewModel, Action<object> initWindowSize, NodeTypes flatNodeListFilter, string additionalWindowHeaderInfo)
+         {
+-            this.LogicalTaskTreeVM = logicalTaskTreeViewModel;
++            this.TreeVM = logicalTaskTreeViewModel;
+             this._initSizeRelayCommand = new RelayCommand(initWindowSize);
+             this._flatNodeListFilter = flatNodeListFilter;
+             this.JobGroupsVM = this.SelectJobGroups();
+@@ -95,7 +95,7 @@ namespace Vishnu.ViewModel
+         /// <param name="windowAspects">Aktuelle UI-Eigenschaften (z.B. WindowTop, WindowWidth, ...).</param>
+         public void SaveTreeState(WindowAspects windowAspects)
+         {
+-            this.LogicalTaskTreeVM.SaveTreeState(windowAspects);
++            this.TreeVM.SaveTreeState(windowAspects);
+         }
+ 
+         #endregion public members
+@@ -109,7 +109,7 @@ namespace Vishnu.ViewModel
+         private ObservableCollection<JobGroupViewModel> SelectJobGroups()
+         {
+             ObservableCollection<JobGroupViewModel> selectedJobGroups = new ObservableCollection<JobGroupViewModel>();
+-            foreach (LogicalNodeViewModel root in LogicalTaskTreeViewModel.FlattenTree(LogicalTaskTreeVM.MainLogicalNodeView[0], new ObservableCollection<LogicalNodeViewModel>(), this._flatNodeListFilter))
++            foreach (LogicalNodeViewModel root in LogicalTaskTreeViewModel.FlattenTree(TreeVM.MainLogicalNodeView[0], new ObservableCollection<LogicalNodeViewModel>(), this._flatNodeListFilter))
+             {
+                 if (root is JobListViewModel)
+                 {
+diff --git a/ViewModel/OrientedTreeViewModelBase.cs b/ViewModel/OrientedTreeViewModelBase.cs
+index f8340b8..12f6d55 100644
+--- a/ViewModel/OrientedTreeViewModelBase.cs
++++ b/ViewModel/OrientedTreeViewModelBase.cs
+@@ -36,6 +36,20 @@ namespace Vishnu.ViewModel
+             }
+         }
+ 
++        /// <summary>
++        /// Zusätzliche Parameter, die für den gesamten Tree Gültigkeit haben oder null.
++        /// </summary>
++        public TreeParameters TreeParams { get; private set; }
++
++        /// <summary>
++        /// Konstruktor - übernimmt die Parameter für den gesamten Tree.
++        /// </summary>
++        /// <param name="treeParams">Parameter für den gesamten Tree.</param>
++        public OrientedTreeViewModelBase(TreeParameters treeParams)
++        {
++            this.TreeParams = treeParams;
++        }
++
+         /// <summary>
+         /// ItemsSource für die TreeView in LogicalTaskTreeControl.
+         /// </summary>
+diff --git a/ViewModel/SingleNodeViewModel.cs b/ViewModel/SingleNodeViewModel.cs
+index 2d6b0b2..299869f 100644
+--- a/ViewModel/SingleNodeViewModel.cs
++++ b/ViewModel/SingleNodeViewModel.cs
+@@ -132,7 +132,7 @@ namespace Vishnu.ViewModel
+         /// <summary>
+         /// Überschriebene ToString()-Methode.
+         /// </summary>
+-        /// <returns>Id des Knoten + ":" + ReturnObject.ToString()</returns>
++        /// <returns>Verkettete Properties als String.</returns>
+         public override string ToString()
+         {
+             StringBuilder stringBuilder = new StringBuilder(base.ToString());
+@@ -196,40 +196,48 @@ namespace Vishnu.ViewModel
+         }
+ 
+         /// <summary>
+-        /// Vergleicht den Inhalt dieses LogicalNodeViewModels nach logischen Gesichtspunkten
+-        /// mit dem Inhalt eines übergebenen LogicalNodeViewModels.
++        /// Vergleicht den Inhalt dieses SingleNodeViewModels nach logischen Gesichtspunkten
++        /// mit dem Inhalt eines übergebenen SingleNodeViewModels.
+         /// </summary>
+-        /// <param name="obj">Das LogicalNodeViewModel zum Vergleich.</param>
+-        /// <returns>True, wenn das übergebene Result inhaltlich gleich diesem Result ist.</returns>
++        /// <param name="obj">Das SingleNodeViewModel zum Vergleich.</param>
++        /// <returns>True, wenn das übergebene SingleNodeViewModel inhaltlich gleich diesem ist.</returns>
+         public override bool Equals(object obj)
+         {
+-            return base.Equals(obj);
+-            /*
+             if (!base.Equals(obj))
+             {
+                 return false;
+             }
+-            LogicalNode logicalNode = this.GetLogicalNode();
+-            LogicalNode objLogicalNode = (obj as LogicalNodeViewModel).GetLogicalNode();
+-            if (logicalNode != null && objLogicalNode != null)
++            if (Object.ReferenceEquals(this, obj))
+             {
+-
++                return true;
+             }
+-            return false;
+-            */
++            return this.ToString() == (obj as SingleNodeViewModel).ToString();
+         }
+ 
+         /// <summary>
+-        /// Erzeugt einen Hashcode für dieses LogicalNodeViewModel.
++        /// Erzeugt einen Hashcode für dieses SingleNodeViewModel.
+         /// </summary>
+         /// <returns>Integer mit Hashwert.</returns>
+         public override int GetHashCode()
+         {
+-            return base.GetHashCode();
++            return this.ToString().GetHashCode();
+         }
+ 
+         #endregion public members
+ 
++        #region internal members
++
++        /// <summary>
++        /// Führt im Verlauf eines externen Tree-Relod einen technischen Run
++        /// für die korrekte Initialisierung des JobListViewModels aus.
++        /// </summary>
++        internal void TechnicalRun()
++        {
++            this.runTaskTreeExecute(null);
++        }
++
++        #endregion internal members
++
+         #region protected members
+ 
+         /// <summary>
+@@ -336,17 +344,13 @@ namespace Vishnu.ViewModel
+ 
+         private void reloadTaskTreeExecute(object parameter)
+         {
+-            if (!(this._myLogicalNode is NodeConnector))
+-            {
+-                InfoController.Say(String.Format($"#RELOAD# SingleNodeViewModel.reloadTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {this.RootJobListViewModel.Name}"));
+-
+-                this.ReloadTaskTree();
+-            }
++            InfoController.Say(String.Format($"#RELOAD# SingleNodeViewModel.reloadTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {this.RootJobListViewModel.Name}"));
++            this.ReloadTaskTree();
+         }
+ 
+         private bool canReloadTaskTreeExecute()
+         {
+-            bool canReload = !(this._myLogicalNode is NodeConnector); // && this._myLogicalNode.CanTreeStart;
++            bool canReload = true; // !(this._myLogicalNode is NodeConnector); // && this._myLogicalNode.CanTreeStart;
+             return canReload;
+         }
+ 
+diff --git a/ViewModel/SnapshotViewModel.cs b/ViewModel/SnapshotViewModel.cs
+index b6e3af1..67e0c6e 100644
+--- a/ViewModel/SnapshotViewModel.cs
++++ b/ViewModel/SnapshotViewModel.cs
+@@ -111,12 +111,10 @@ namespace Vishnu.ViewModel
+         public SnapshotViewModel(OrientedTreeViewModelBase logicalTaskTreeViewModel, LogicalNodeViewModel parent, LogicalTaskTree.Snapshot snapshot, bool lazyLoadChildren, FrameworkElement uIMain)
+           : base(logicalTaskTreeViewModel, parent, snapshot, lazyLoadChildren, uIMain)
+         {
+-            this._btnRefreshSnapshotRelayCommand = new RelayCommand(refreshSnapshotExecute, canRefreshSnapshotExecute);
++            this._btnRefreshSnapshotRelayCommand = new RelayCommand(RefreshSnapshotExecute, canRefreshSnapshotExecute);
+             this._btnSwitchTaskTreeViewRelayCommand = new RelayCommand(switchTaskTreeViewExecute, canSwitchTaskTreeViewExecute);
+             (this._myLogicalNode as Snapshot).SnapshotRefreshed -= SnapshotViewModel_SnapshotRefreshed;
+             (this._myLogicalNode as Snapshot).SnapshotRefreshed += SnapshotViewModel_SnapshotRefreshed;
+-            this._treeRefreshLocker = new object();
+-            this._isRefreshing = false;
+             this.RaisePropertyChanged("IsSnapshotDummy");
+         }
+ 
+@@ -126,110 +124,16 @@ namespace Vishnu.ViewModel
+ 
+         private RelayCommand _btnRefreshSnapshotRelayCommand;
+         private RelayCommand _btnSwitchTaskTreeViewRelayCommand;
+-        private bool _isRefreshing;
+-        private object _treeRefreshLocker;
+ 
+-        private void refreshSnapshotExecute(object parameter)
++        private void RefreshSnapshotExecute(object parameter)
+         {
+-            if (!this._isRefreshing)
++            if (!this.IsRefreshing)
+             {
+-                this._isRefreshing = true;
++                this.IsRefreshing = true;
+                 ((this._myLogicalNode) as Snapshot).RefreshSnapshot();
+             }
+         }
+ 
+-        private void fullTreeRefresh()
+-        {
+-            using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
+-            {
+-                lock (this._treeRefreshLocker)
+-                {
+-                    ObservableCollection<LogicalNodeViewModel> shadowTree = new ObservableCollection<LogicalNodeViewModel>();
+-                    if (this.Children?.Count > 0)
+-                    {
+-                        shadowTree.Add(this.Children[0]); // Retten für die Restaurierung aktueller Tree-Parameter wie zum Beispiel
+-                    }
+-                    // IsExpanded nach Neuerstellung des Trees aus dem Snapshot. 
+-                    this.Children.Clear();
+-                    //          this.SetChildOrientation(this.RootLogicalTaskTreeViewModel.TreeOrientationState);
+-                    this.loadChildren();
+-                    this.transferShadowTreeProperties(shadowTree, this.Children, new Stack<int>());
+-                    if (shadowTree?.Count > 0)
+-                    {
+-                        shadowTree[0].Dispose();
+-                    }
+-                    shadowTree.Clear();
+-                    //Thread.Sleep(100); DEBUG
+-                    this._isRefreshing = false;
+-                    //Thread.Sleep(100); DEBUG
+-                }
+-            }
+-        }
+-
+-        private bool leanTreeRefresh()
+-        {
+-            // return false; // TEST 20.08.2020 Nagel
+-            bool rtn = true;
+-            lock (this._treeRefreshLocker)
+-            {
+-                this._isRefreshing = true;
+-                using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
+-                {
+-                    if (!this.refreshTreeView(this, this._myLogicalNode))
+-                    {
+-                        rtn = false;
+-                    }
+-                }
+-                this._isRefreshing = false;
+-                // Thread.Sleep(100); DEBUG
+-            }
+-            return rtn;
+-        }
+-
+-        private void transferShadowTreeProperties(ObservableCollection<LogicalNodeViewModel> sourceTree,
+-              ObservableCollection<LogicalNodeViewModel> destinationTree, Stack<int> indices)
+-        {
+-            for (int i = 0; i < destinationTree.Count; i++)
+-            {
+-                indices.Push(i);
+-                LogicalNodeViewModel node = destinationTree[i];
+-                LogicalNodeViewModel sibling = this.searchSibling(sourceTree, indices);
+-                if (sibling != null)
+-                {
+-                    this.transferSiblingProperties(sibling, node);
+-                }
+-                if ((node is NodeListViewModel) || (node is JobListViewModel) || (node is SnapshotViewModel))
+-                {
+-                    this.transferShadowTreeProperties(sourceTree, node.Children, indices);
+-                }
+-                indices.Pop();
+-            }
+-        }
+-
+-        private LogicalNodeViewModel searchSibling(ObservableCollection<LogicalNodeViewModel> sourceTree, Stack<int> indices)
+-        {
+-            int[] indexArray = new int[indices.Count];
+-            indices.CopyTo(indexArray, 0);
+-            LogicalNodeViewModel node = null;
+-            ObservableCollection<LogicalNodeViewModel> source = sourceTree;
+-            for (int i = indexArray.Length - 1; i >= 0; i--)
+-            {
+-                if (indexArray[i] >= source.Count)
+-                {
+-                    return null;
+-                }
+-                node = source[indexArray[i]];
+-                source = node.Children;
+-            }
+-            return node;
+-        }
+-
+-        private void transferSiblingProperties(LogicalNodeViewModel sibling, LogicalNodeViewModel node)
+-        {
+-            node.IsExpanded = sibling.IsExpanded;
+-            node.ChildOrientation = sibling.ChildOrientation;
+-        }
+-
+         private bool canRefreshSnapshotExecute()
+         {
+             return true;
+@@ -268,14 +172,14 @@ namespace Vishnu.ViewModel
+             {
+                 if ((this._myLogicalNode as Snapshot).WasDefaultSnapshot)
+                 {
+-                    this.fullTreeRefresh();
++                    this.FullTreeRefresh();
+                 }
+                 else
+                 {
+-                    if (!this.leanTreeRefresh())
++                    if (!this.LeanTreeRefresh())
+                     {
+                         // (this._myLogicalNode as Snapshot).SaveLastSnapshotForDebugging();
+-                        this.fullTreeRefresh();
++                        this.FullTreeRefresh();
+                         return;
+                     }
+                 }
+diff --git a/ViewModel/VishnuViewModelBase.cs b/ViewModel/VishnuViewModelBase.cs
+index b5514ea..6ae7495 100644
+--- a/ViewModel/VishnuViewModelBase.cs
++++ b/ViewModel/VishnuViewModelBase.cs
+@@ -1,4 +1,5 @@
+ ﻿using NetEti.MVVMini;
++using System;
+ using Vishnu.Interchange;
+ 
+ namespace Vishnu.ViewModel
+@@ -74,6 +75,30 @@ namespace Vishnu.ViewModel
+             }
+         }
+ 
++        /// <summary>
++        /// Eindeutiger GlobalUniqueIdentifier.
++        /// Wird im Konstruktor vergeben und fließt in die überschriebene Equals-Methode ein.
++        /// Dadurch wird erreicht, dass nach Reload von Teilen des LogicalTaskTree und erneutem
++        /// Reload von vorherigen Ständen des LogicalTaskTree Elemente des ursprünglich 
++        /// gecachten VisualTree fälschlicherweise anstelle der neu geladenen Elemente in den
++        /// neuen VisualTree übernommen werden.
++        /// </summary>
++        public string VisualTreeCacheBreaker
++        {
++            get
++            {
++                return this._visualTreeCacheBreaker;
++            }
++            private set
++            {
++                if (this._visualTreeCacheBreaker != value)
++                {
++                    this._userDataContext = value;
++                    this.RaisePropertyChanged("VisualTreeCacheBreaker");
++                }
++            }
++        }
++
+         /// <summary>
+         /// Kann überschrieben werden, um das Parent-Control
+         /// in der Geschäftslogik zu speichern.
+@@ -83,8 +108,41 @@ namespace Vishnu.ViewModel
+         {
+         }
+ 
++        /// <summary>
++        /// Konstruktor - setzt den VisualTreeCacheBreaker.
++        /// </summary>
++        public VishnuViewModelBase()
++        {
++            this._visualTreeCacheBreaker = Guid.NewGuid().ToString();
++        }
++
++        /// <summary>
++        /// Vergleicht den Inhalt dieses LogicalNodeViewModels nach logischen Gesichtspunkten
++        /// mit dem Inhalt eines übergebenen LogicalNodeViewModels.
++        /// </summary>
++        /// <param name="obj">Das LogicalNodeViewModel zum Vergleich.</param>
++        /// <returns>True, wenn das übergebene LogicalNodeViewModel inhaltlich gleich diesem ist.</returns>
++        public override bool Equals(object obj)
++        {
++            if (obj == null || this.GetType() != obj.GetType())
++            {
++                return false;
++            }
++            return (Object.ReferenceEquals(this, obj));
++        }
++
++        /// <summary>
++        /// Erzeugt einen Hashcode für dieses LogicalNodeViewModel.
++        /// </summary>
++        /// <returns>Integer mit Hashwert.</returns>
++        public override int GetHashCode()
++        {
++            return base.GetHashCode() + this.VisualTreeCacheBreaker.GetHashCode();
++        }
++
+         private Interchange.Result _result;
+         private object _userDataContext;
+         private DynamicUserControlBase _parentView;
++        private readonly string _visualTreeCacheBreaker;
+     }
+ }
+diff --git a/Vishnu.Interchange/TreeParameters.cs b/Vishnu.Interchange/TreeParameters.cs
+index 3dbc42a..940352e 100644
+--- a/Vishnu.Interchange/TreeParameters.cs
++++ b/Vishnu.Interchange/TreeParameters.cs
+@@ -84,5 +84,19 @@ namespace Vishnu.Interchange
+         {
+             return base.GetHashCode();
+         }
++
++        /// <summary>
++        /// Interner, Assembly-übergreifender Parameter.
++        /// Enthält den LogicalTaskTree als Objekt, um hier einen Assembly-Verweis auf LogicalTaskTree zu vermeiden.
++        /// Wird innerhalb der Assembly Vishnu.ViewModel wieder aufgelöst. Dort existiert ein Verweis auf LogicalTaskTree.
++        /// </summary>
++        public object BusinessLogicRoot { get; set; }
++
++        /// <summary>
++        /// Interner, Assembly-übergreifender Parameter.
++        /// Enthält das LogicalTaskTreeViewModel als Objekt, um hier einen Assembly-Verweis auf Vishnu.ViewModel zu vermeiden.
++        /// Wird innerhalb der Assembly Vishnu.ViewModel wieder aufgelöst.
++        /// </summary>
++        public object ViewModelRoot { get; set; }
+     }
+ }
+diff --git a/Vishnu.Interchange/VishnuAssemblyLoader.cs b/Vishnu.Interchange/VishnuAssemblyLoader.cs
+index 174bf60..22b1d54 100644
+--- a/Vishnu.Interchange/VishnuAssemblyLoader.cs
++++ b/Vishnu.Interchange/VishnuAssemblyLoader.cs
+@@ -49,6 +49,16 @@ namespace Vishnu.Interchange
+                 GenericSingletonProvider.GetInstance<AppSettings>().AssemblyDirectories);
+         }
+ 
++        /// <summary>
++        /// Registriert Pfade von dynamisch zu ladenden Assemblies, die beim nächsten Ladevorgang auf jeden
++        /// Fall neu von der Festplatte und nicht aus einem eventuell gecachtem Image geladen werden sollen.
++        /// </summary>
++        /// <param name="assemblyPathName">Der Pfad der Assembly, die beim nächsten Ladevorgang nicht aus dem Cache genommen werden soll.</param>
++        public static void RegisterAssemblyPathForForcedNextReloading(string assemblyPathName)
++        {
++            VishnuAssemblyLoader.AssembliesToBeReloadedNext.TryAdd(assemblyPathName, true);
++        }
++
+         /// <summary>
+         /// Lädt ein Objekt vom übergebenen Typ aus der angegebenen Assembly dynamisch.
+         /// Alle von der angegebenen Assembly referenzierten Assemblies werden zusätzlich
+@@ -56,15 +66,22 @@ namespace Vishnu.Interchange
+         /// </summary>
+         /// <param name="assemblyPathName">Die Assembly, die das zu ladende Objekt publiziert.</param>
+         /// <param name="objectType">Der Typ des aus der Assembly zu instanzierenden Objekts</param>
++        /// <param name="force">Optional - bei true wird die Assembly nicht aus dem Cache genomen, default: false</param>
+         /// <returns>Instanz aus der übergebenen Assembly vom übergebenen Typ oder null</returns>
+-        public object DynamicLoadObjectOfTypeFromAssembly(string assemblyPathName, Type objectType)
++        public object DynamicLoadObjectOfTypeFromAssembly(string assemblyPathName, Type objectType, bool force = false)
+         {
++            if (VishnuAssemblyLoader.AssembliesToBeReloadedNext.ContainsKey(assemblyPathName))
++            {
++                force = true;
++                bool success;
++                VishnuAssemblyLoader.AssembliesToBeReloadedNext.TryRemove(assemblyPathName, out success);
++            }
+             Exception lastException = null;
+             try
+             {
+                 ThreadLocker.LockNameGlobal("AssemblyLoader");
+                 object candidate = null;
+-                Assembly slave = dynamicLoadAssembly(assemblyPathName, false);
++                Assembly slave = dynamicLoadAssembly(assemblyPathName, false, force);
+                 if (slave != null)
+                 {
+                     Type[] exports = slave.GetExportedTypes();
+@@ -115,6 +132,9 @@ namespace Vishnu.Interchange
+         private List<string> _assemblyDirectories;
+ 
+         static ConcurrentDictionary<string, KeyValuePair<Assembly, int>> LoadedAssembliesByNameAndChangeCount;
++
++        static ConcurrentDictionary<string, bool> AssembliesToBeReloadedNext;
++
+         const int MAXASSEMBLYRELOADS = 0; // 2;
+ 
+         /// <summary>
+@@ -123,6 +143,7 @@ namespace Vishnu.Interchange
+         static VishnuAssemblyLoader()
+         {
+             LoadedAssembliesByNameAndChangeCount = new ConcurrentDictionary<string, KeyValuePair<Assembly, int>>();
++            AssembliesToBeReloadedNext = new ConcurrentDictionary<string, bool>();
+         }
+ 
+         /// <summary>
+@@ -130,8 +151,9 @@ namespace Vishnu.Interchange
+         /// </summary>
+         /// <param name="slavePathName">Pfad der zu ladenden Assembly.</param>
+         /// <param name="quiet">Keine Meldung bei Misserfolg.</param>
++        /// <param name="force">Optional - bei true wird die Assembly nicht aus dem Cache genomen, default: false</param>
+         /// <returns>Geladene Assembly oder null</returns>
+-        private Assembly dynamicLoadAssembly(string slavePathName, bool quiet)
++        private Assembly dynamicLoadAssembly(string slavePathName, bool quiet, bool force = false)
+         {
+             Assembly candidate = null;
+             foreach (string assemblyDirectory in (new List<string> { "" }).Union(this._assemblyDirectories))
+@@ -141,7 +163,7 @@ namespace Vishnu.Interchange
+                 {
+                     dllPath += ".dll";
+                 }
+-                candidate = this.directLoadAssembly(dllPath, quiet);
++                candidate = this.directLoadAssembly(dllPath, quiet, force);
+                 if (candidate != null)
+                 {
+                     break;
+@@ -157,7 +179,7 @@ namespace Vishnu.Interchange
+             return candidate;
+         }
+ 
+-        private Assembly directLoadAssembly(string dllPath, bool quiet)
++        private Assembly directLoadAssembly(string dllPath, bool quiet, bool force = false)
+         {
+             Assembly candidate = null;
+             string currentDir = Environment.CurrentDirectory;
+@@ -167,7 +189,7 @@ namespace Vishnu.Interchange
+                 candidate = null;
+                 // Gibt die Dll im Filesystem direkt nach Laden wieder frei.
+                 string dllName = Path.GetFileName(dllPath);
+-                if (VishnuAssemblyLoader.LoadedAssembliesByNameAndChangeCount.ContainsKey(dllName)
++                if (!force && VishnuAssemblyLoader.LoadedAssembliesByNameAndChangeCount.ContainsKey(dllName)
+                   && (VishnuAssemblyLoader.LoadedAssembliesByNameAndChangeCount[dllName].Value) > MAXASSEMBLYRELOADS)
+                 {
+                     candidate = (Assembly)VishnuAssemblyLoader.LoadedAssembliesByNameAndChangeCount[dllName].Key;
+diff --git a/Vishnu/App.cs b/Vishnu/App.cs
+index 54ff964..360f5f0 100644
+--- a/Vishnu/App.cs
++++ b/Vishnu/App.cs
+@@ -227,8 +227,11 @@ namespace Vishnu
+             // Demo: hart verdrahteter JobProvider:
+             // App._businessLogic = new LogicalTaskTree.LogicalTaskTree(new TreeParameters("Tree 1", null), new MixedTestJobProvider());
+ 
++            // Die für den gesamten Tree gültigen Parameter
++            TreeParameters treeParameters = new TreeParameters(String.Format($"Tree {++LogicalTaskTree.LogicalTaskTree.TreeId}"), null);
++
+             // Der Produktions-JobProvider mit extern über XML definierten Jobs:
+-            SingleInstanceApplication._businessLogic = new LogicalTaskTree.LogicalTaskTree(new TreeParameters("Tree 1", null), new ProductionJobProvider());
++            SingleInstanceApplication._businessLogic = new LogicalTaskTree.LogicalTaskTree(treeParameters, new ProductionJobProvider());
+ 
+             // Das Main-Window
+             this._mainWindow = new WPF_UI.MainWindow();
+@@ -238,10 +241,13 @@ namespace Vishnu
+                                                                                         // Vishnu-MainWindow oder Defaults.
+             this._mainWindow.Closed += mainWindow_Closed;
+             // Das LogicalTaskTree-ViewModel
+-            LogicalTaskTreeViewModel logicalTaskTreeViewModel = new LogicalTaskTreeViewModel(SingleInstanceApplication._businessLogic, this._mainWindow, SingleInstanceApplication._appSettings.StartTreeOrientation, SingleInstanceApplication._appSettings.FlatNodeListFilter);
++            LogicalTaskTreeViewModel logicalTaskTreeViewModel = new LogicalTaskTreeViewModel(
++                SingleInstanceApplication._businessLogic, this._mainWindow, SingleInstanceApplication._appSettings.StartTreeOrientation,
++                SingleInstanceApplication._appSettings.FlatNodeListFilter, treeParameters);
+ 
+             // Das Main-ViewModel
+-            MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(logicalTaskTreeViewModel, this._mainWindow.ForceRecalculateWindowMeasures, SingleInstanceApplication._appSettings.FlatNodeListFilter, SingleInstanceApplication._appSettings.DemoModus ? "-DEMO-" : "");
++            MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(logicalTaskTreeViewModel, this._mainWindow.ForceRecalculateWindowMeasures,
++                SingleInstanceApplication._appSettings.FlatNodeListFilter, SingleInstanceApplication._appSettings.DemoModus ? "-DEMO-" : "");
+ 
+             // Verbinden von Main-Window mit Main-ViewModel
+             this._mainWindow.DataContext = mainWindowViewModel; //mainViewModel;
+diff --git a/WPF_UI/Assets/LogicalTaskTreeControlResourceDictionary.xaml b/WPF_UI/Assets/LogicalTaskTreeControlResourceDictionary.xaml
+index 7f164a2..7777b7d 100644
+--- a/WPF_UI/Assets/LogicalTaskTreeControlResourceDictionary.xaml
++++ b/WPF_UI/Assets/LogicalTaskTreeControlResourceDictionary.xaml
+@@ -53,6 +53,10 @@
+         <GradientStop Color="#66000066" Offset="1" />
+         <GradientStop Color="#44000000" Offset="0" />
+     </RadialGradientBrush>
++    <LinearGradientBrush x:Key="MenuButtonBrush" StartPoint="0.5, 0" EndPoint="0.5, 1">
++        <GradientStop Color="#FFEAEBF2" Offset="0" />
++        <GradientStop Color="#FFBBBBBB" Offset="1" />
++    </LinearGradientBrush>
+     <Thickness x:Key="NodeConnectorWidth" Left="6" Top="0" Right="0" Bottom="0" />
+     <Thickness x:Key="NodeConnectorHeight" Left="0" Top="2" Right="0" Bottom="0" />
+     <Thickness x:Key="NodeConnectorWidthAsHeight" Left="0" Top="6" Right="0" Bottom="0" />
+@@ -68,13 +72,84 @@
+     <SolidColorBrush x:Key="ToggleButtonArrowCheckedMouseOver.Brush">Cyan</SolidColorBrush>
+     <attached:BinaryModificationSwitch x:Key="OrientationModificationSwitch">Unchanged</attached:BinaryModificationSwitch>
+ 
++    <Style x:Key="MenuButtonTemplate" TargetType="Button">
++        <Setter Property="Background" Value="{StaticResource MenuButtonBrush}" />
++        <Setter Property="Foreground" Value="DarkGreen" />
++        <Setter Property="Template">
++            <Setter.Value>
++                <ControlTemplate TargetType="Button">
++                    <Border CornerRadius="5" Background="{TemplateBinding Background}" BorderThickness="3">
++                        <ContentPresenter Margin="3" HorizontalAlignment="Center" VerticalAlignment="Center">
++                        </ContentPresenter>
++                    </Border>
++                </ControlTemplate>
++            </Setter.Value>
++        </Setter>
++        <Style.Triggers>
++            <Trigger Property="IsMouseOver" Value="True">
++                <Setter Property="RenderTransformOrigin" Value="0.5, 0.5"/>
++                <Setter Property="RenderTransform">
++                    <Setter.Value>
++                        <ScaleTransform ScaleX="1.1" ScaleY="1.2"/>
++                    </Setter.Value>
++                </Setter>
++            </Trigger>
++        </Style.Triggers>
++    </Style>
++    <Style TargetType="MenuItem">
++        <Setter Property="Template">
++            <Setter.Value>
++                <ControlTemplate TargetType="{x:Type MenuItem}">
++                    <Border BorderBrush="Green" BorderThickness="1" CornerRadius="6" Margin="3">
++                        <ContentPresenter Margin="2" Name="HeaderHost" ContentSource="Header"/>
++                    </Border>
++                </ControlTemplate>
++            </Setter.Value>
++        </Setter>
++    </Style>
++    <Style TargetType="ContextMenu">
++        <Setter Property="Template">
++            <Setter.Value>
++                <ControlTemplate TargetType="ContextMenu">
++                    <Border CornerRadius="7" BorderBrush="Black" BorderThickness="1" Padding="1"
++                            Background="{StaticResource VerticalItemAreaBrush}" SnapsToDevicePixels="True">
++                        <ItemsPresenter />
++                    </Border>
++                </ControlTemplate>
++            </Setter.Value>
++        </Setter>
++    </Style>
+     <ContextMenu x:Key="cmMainGrid">
+-        <MenuItem Header="Reload tree" Command="{Binding ReloadLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}" />
+-        <MenuItem Header="Menu item 2" />
+         <Separator />
+-        <MenuItem Header="Menu item 3" />
++        <MenuItem>
++            <MenuItem.Header>
++                <Button Style="{StaticResource MenuButtonTemplate}"
++                        Command="{Binding ReloadLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
++                    <Button.Content>
++                        <StackPanel Orientation="Horizontal">
++                            <Image Source="../Media/available_updates.png" Width="15" Height="15" Margin="0,0,5,0"/>
++                            <TextBlock Text="Reload tree" />
++                        </StackPanel>
++                    </Button.Content>
++                </Button>
++            </MenuItem.Header>
++        </MenuItem>
++        <Separator />
++        <!--<MenuItem>
++            <MenuItem.Header>
++                <Button Style="{StaticResource MenuButtonTemplate}"
++                        Command="{Binding ReloadLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
++                    <Button.Content>
++                        <StackPanel Orientation="Horizontal">
++                            <Image Source="../Media/available_updates.png" Width="15" Height="15" Margin="0,0,5,0"/>
++                            <TextBlock Text="Reload tree" />
++                        </StackPanel>
++                    </Button.Content>
++                </Button>
++            </MenuItem.Header>
++        </MenuItem>-->
+     </ContextMenu>
+-    
++
+     <sys:Double x:Key="ToggleButtonArrow.StrokeThickness">2</sys:Double>
+     <sys:Double x:Key="ToggleButtonArrowChecked.StrokeThickness">1</sys:Double>
+     <DropShadowBitmapEffect x:Key="DropShadowEffect" />
+diff --git a/WPF_UI/SplashWindow.xaml b/WPF_UI/SplashWindow.xaml
+index e90c635..3de5da6 100644
+--- a/WPF_UI/SplashWindow.xaml
++++ b/WPF_UI/SplashWindow.xaml
+@@ -54,7 +54,7 @@
+             <Grid.RowDefinitions>
+                 <RowDefinition Height="*" />
+             </Grid.RowDefinitions>
+-            <Image Source="/Vishnu.WPF_UI;component/Media/oak.png" Opacity=".8"
++            <Image Source="/Vishnu.WPF_UI;component/Media/Tree.png" Opacity=".8"
+              Width="120" Height="100" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,30,10,0"/>
+             <Grid VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="175" Background="#00FFFFFF">
+                 <Grid.OpacityMask>
+diff --git a/WPF_UI/Vishnu.WPF_UI.csproj b/WPF_UI/Vishnu.WPF_UI.csproj
+index 589ec01..69b1ec5 100644
+--- a/WPF_UI/Vishnu.WPF_UI.csproj
++++ b/WPF_UI/Vishnu.WPF_UI.csproj
+@@ -194,6 +194,12 @@
+   <ItemGroup>
+     <Resource Include="Media\self_distract.png" />
+   </ItemGroup>
++  <ItemGroup>
++    <Resource Include="Media\Tree.png" />
++  </ItemGroup>
++  <ItemGroup>
++    <Resource Include="Media\available_updates.png" />
++  </ItemGroup>
+   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+        Other similar extension points exist, see Microsoft.Common.targets.

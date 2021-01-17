@@ -43,6 +43,28 @@ namespace LogicalTaskTree
             this.ThreadUpdateLastSingleNodesFinished(-1); // invalidate
         }
 
+        /// <summary>
+        /// Speichert den Kindknoten am übergebenen Index und hängt sich in die Events des Kindknoten ein.
+        /// </summary>
+        /// <param name="index">Der Index, an dem der Child-Knoten gespeichert werden soll.</param>
+        /// <param name="child">Die zu speichernde Child-Node.</param>
+        public virtual void SetChildAt(int index, LogicalNode child)
+        {
+            this.HookChildEvents(child);
+            this.Children[index] = child;
+        }
+
+        /// <summary>
+        /// Löst die Event-Verknüpfungen mit dem Child-Knoten am Index index und gibt danach den
+        /// Child-Knoten frei.
+        /// </summary>
+        /// <param name="index">Der Index, an dem der Child-Knoten freigegeben werden soll.</param>
+        public virtual void FreeChildAt(int index)
+        {
+            this.UnhookChildEvents(this.Children[index]);
+            this.Children[index] = null;
+        }
+
         #region internal members
 
         /// <summary>
@@ -98,8 +120,9 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
-        /// Speichert den Kindknoten und hängt sich in die Events des Kindknoten ein.
+        /// Löst die Event-Verknüpfungen mit dem Child-Knoten.
         /// </summary>
+        /// <param name="child">Der zu lösende Child-Knoten.</param>
         internal virtual void UnhookChildEvents(LogicalNode child)
         {
             child.NodeProgressStarted -= this.SubNodeProgressStarted;

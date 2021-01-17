@@ -50,21 +50,38 @@ namespace Vishnu.Interchange
         }
 
         /// <summary>
+        /// Registriert Pfade von dynamisch zu ladenden Assemblies, die beim nächsten Ladevorgang auf jeden
+        /// Fall neu von der Festplatte und nicht aus einem eventuell gecachtem Image geladen werden sollen.
+        /// </summary>
+        /// <param name="assemblyPathName">Der Pfad der Assembly, die beim nächsten Ladevorgang nicht aus dem Cache genommen werden soll.</param>
+        public static void RegisterAssemblyPathForForcedNextReloading(string assemblyPathName)
+        {
+            VishnuAssemblyLoader.AssembliesToBeReloadedNext.TryAdd(assemblyPathName, true);
+        }
+
+        /// <summary>
         /// Lädt ein Objekt vom übergebenen Typ aus der angegebenen Assembly dynamisch.
         /// Alle von der angegebenen Assembly referenzierten Assemblies werden zusätzlich
         /// auch in assemblyDirectories gesucht.
         /// </summary>
         /// <param name="assemblyPathName">Die Assembly, die das zu ladende Objekt publiziert.</param>
         /// <param name="objectType">Der Typ des aus der Assembly zu instanzierenden Objekts</param>
+        /// <param name="force">Optional - bei true wird die Assembly nicht aus dem Cache genomen, default: false</param>
         /// <returns>Instanz aus der übergebenen Assembly vom übergebenen Typ oder null</returns>
-        public object DynamicLoadObjectOfTypeFromAssembly(string assemblyPathName, Type objectType)
+        public object DynamicLoadObjectOfTypeFromAssembly(string assemblyPathName, Type objectType, bool force = false)
         {
+            if (VishnuAssemblyLoader.AssembliesToBeReloadedNext.ContainsKey(assemblyPathName))
+            {
+                force = true;
+                bool success;
+                VishnuAssemblyLoader.AssembliesToBeReloadedNext.TryRemove(assemblyPathName, out success);
+            }
             Exception lastException = null;
             try
             {
                 ThreadLocker.LockNameGlobal("AssemblyLoader");
                 object candidate = null;
-                Assembly slave = dynamicLoadAssembly(assemblyPathName, false);
+                Assembly slave = dynamicLoadAssembly(assemblyPathName, false, force);
                 if (slave != null)
                 {
                     Type[] exports = slave.GetExportedTypes();
@@ -115,6 +132,9 @@ namespace Vishnu.Interchange
         private List<string> _assemblyDirectories;
 
         static ConcurrentDictionary<string, KeyValuePair<Assembly, int>> LoadedAssembliesByNameAndChangeCount;
+
+        static ConcurrentDictionary<string, bool> AssembliesToBeReloadedNext;
+
         const int MAXASSEMBLYRELOADS = 0; // 2;
 
         /// <summary>
@@ -123,6 +143,7 @@ namespace Vishnu.Interchange
         static VishnuAssemblyLoader()
         {
             LoadedAssembliesByNameAndChangeCount = new ConcurrentDictionary<string, KeyValuePair<Assembly, int>>();
+            AssembliesToBeReloadedNext = new ConcurrentDictionary<string, bool>();
         }
 
         /// <summary>
@@ -130,8 +151,9 @@ namespace Vishnu.Interchange
         /// </summary>
         /// <param name="slavePathName">Pfad der zu ladenden Assembly.</param>
         /// <param name="quiet">Keine Meldung bei Misserfolg.</param>
+        /// <param name="force">Optional - bei true wird die Assembly nicht aus dem Cache genomen, default: false</param>
         /// <returns>Geladene Assembly oder null</returns>
-        private Assembly dynamicLoadAssembly(string slavePathName, bool quiet)
+        private Assembly dynamicLoadAssembly(string slavePathName, bool quiet, bool force = false)
         {
             Assembly candidate = null;
             foreach (string assemblyDirectory in (new List<string> { "" }).Union(this._assemblyDirectories))
@@ -141,7 +163,7 @@ namespace Vishnu.Interchange
                 {
                     dllPath += ".dll";
                 }
-                candidate = this.directLoadAssembly(dllPath, quiet);
+                candidate = this.directLoadAssembly(dllPath, quiet, force);
                 if (candidate != null)
                 {
                     break;
@@ -157,7 +179,7 @@ namespace Vishnu.Interchange
             return candidate;
         }
 
-        private Assembly directLoadAssembly(string dllPath, bool quiet)
+        private Assembly directLoadAssembly(string dllPath, bool quiet, bool force = false)
         {
             Assembly candidate = null;
             string currentDir = Environment.CurrentDirectory;
@@ -167,7 +189,7 @@ namespace Vishnu.Interchange
                 candidate = null;
                 // Gibt die Dll im Filesystem direkt nach Laden wieder frei.
                 string dllName = Path.GetFileName(dllPath);
-                if (VishnuAssemblyLoader.LoadedAssembliesByNameAndChangeCount.ContainsKey(dllName)
+                if (!force && VishnuAssemblyLoader.LoadedAssembliesByNameAndChangeCount.ContainsKey(dllName)
                   && (VishnuAssemblyLoader.LoadedAssembliesByNameAndChangeCount[dllName].Value) > MAXASSEMBLYRELOADS)
                 {
                     candidate = (Assembly)VishnuAssemblyLoader.LoadedAssembliesByNameAndChangeCount[dllName].Key;

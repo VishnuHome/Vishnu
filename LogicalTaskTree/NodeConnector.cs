@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using NetEti.Globals;
 using Vishnu.Interchange;
 
@@ -377,6 +378,74 @@ namespace LogicalTaskTree
         public override void Break(bool userBreak)
         {
             // keine Weiterleitung - nur bei UserBreak.
+        }
+
+        /// <summary>
+        /// Überschriebene ToString()-Methode.
+        /// </summary>
+        /// <returns>Verkettete Properties als String.</returns>
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new StringBuilder(base.ToString());
+            string slavePathName = "";
+            string referencedNodeName = "";
+            string checkerParameters = "";
+
+            if (this.Checker != null)
+            {
+                if (this.Checker is CheckerShell)
+                {
+                    slavePathName = (this.Checker as CheckerShell).SlavePathName ?? "";
+                    checkerParameters = (this.Checker as CheckerShell).CheckerParameters ?? "";
+                    referencedNodeName = (this.Checker as CheckerShell).ReferencedNodeName ?? "";
+                }
+                else
+                {
+                    slavePathName = (this.Checker as ValueModifier<object>).SlavePathName ?? "";
+                    referencedNodeName = (this.Checker as ValueModifier<object>).ReferencedNodeName ?? "";
+                }
+            }
+            if (!String.IsNullOrEmpty(slavePathName))
+            {
+                stringBuilder.AppendLine(String.Format($"SlavePathName: {slavePathName}"));
+            }
+            if (!String.IsNullOrEmpty(referencedNodeName))
+            {
+                stringBuilder.AppendLine(String.Format($"ReferencedNodeName: {referencedNodeName}"));
+            }
+            if (!String.IsNullOrEmpty(checkerParameters))
+            {
+                stringBuilder.AppendLine(String.Format($"CheckerParameters: {checkerParameters}"));
+            }
+            return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Vergleicht den Inhalt dieses NodeConnectors nach logischen Gesichtspunkten
+        /// mit dem Inhalt eines übergebenen NodeConnectors.
+        /// </summary>
+        /// <param name="obj">Der NodeConnector zum Vergleich.</param>
+        /// <returns>True, wenn der übergebene NodeConnector inhaltlich gleich diesem ist.</returns>
+        public override bool Equals(object obj)
+        {
+            if (!base.Equals(obj))
+            {
+                return false;
+            }
+            if (Object.ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            return this.ToString() == (obj as NodeConnector).ToString();
+        }
+
+        /// <summary>
+        /// Erzeugt einen Hashcode für diesen NodeConnector.
+        /// </summary>
+        /// <returns>Integer mit Hashwert.</returns>
+        public override int GetHashCode()
+        {
+            return this.ToString().GetHashCode();
         }
 
         #endregion public members

@@ -4,6 +4,7 @@ using System.Threading;
 using NetEti.Globals;
 using NetEti.ApplicationControl;
 using Vishnu.Interchange;
+using System.Text;
 
 namespace LogicalTaskTree
 {
@@ -293,6 +294,73 @@ namespace LogicalTaskTree
                 this._returnObject = returnObject;
             }
             this.SetLastResult(); // Nagel: 01.07.2018 aus dem Lock herausgenommen.
+        }
+
+        /// <summary>
+        /// Überschriebene ToString()-Methode.
+        /// </summary>
+        /// <returns>Verkettete Properties als String.</returns>
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new StringBuilder(base.ToString());
+            string slavePathName = "";
+            string referencedNodeName = "";
+            string checkerParameters = "";
+            if (this.Checker != null)
+            {
+                if (this.Checker is CheckerShell)
+                {
+                    slavePathName = (this.Checker as CheckerShell).SlavePathName ?? "";
+                    checkerParameters = (this.Checker as CheckerShell).CheckerParameters ?? "";
+                    referencedNodeName = (this.Checker as CheckerShell).ReferencedNodeName ?? "";
+                }
+                else
+                {
+                    slavePathName = (this.Checker as ValueModifier<object>).SlavePathName ?? "";
+                    referencedNodeName = (this.Checker as ValueModifier<object>).ReferencedNodeName ?? "";
+                }
+            }
+            if (!String.IsNullOrEmpty(slavePathName))
+            {
+                stringBuilder.AppendLine(String.Format($"SlavePathName: {slavePathName}"));
+            }
+            if (!String.IsNullOrEmpty(referencedNodeName))
+            {
+                stringBuilder.AppendLine(String.Format($"ReferencedNodeName: {referencedNodeName}"));
+            }
+            if (!String.IsNullOrEmpty(checkerParameters))
+            {
+                stringBuilder.AppendLine(String.Format($"CheckerParameters: {checkerParameters}"));
+            }
+            return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Vergleicht den Inhalt dieser SingleNode nach logischen Gesichtspunkten
+        /// mit dem Inhalt einer übergebenen SingleNode.
+        /// </summary>
+        /// <param name="obj">Die SingleNode zum Vergleich.</param>
+        /// <returns>True, wenn die übergebene SingleNode inhaltlich gleich dieser ist.</returns>
+        public override bool Equals(object obj)
+        {
+            if (!base.Equals(obj))
+            {
+                return false;
+            }
+            if (Object.ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            return this.ToString() == (obj as SingleNode).ToString();
+        }
+
+        /// <summary>
+        /// Erzeugt einen Hashcode für diese SingleNode.
+        /// </summary>
+        /// <returns>Integer mit Hashwert.</returns>
+        public override int GetHashCode()
+        {
+            return this.ToString().GetHashCode();
         }
 
         #endregion public members

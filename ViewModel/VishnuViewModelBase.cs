@@ -1,4 +1,5 @@
 ﻿using NetEti.MVVMini;
+using System;
 using Vishnu.Interchange;
 
 namespace Vishnu.ViewModel
@@ -75,6 +76,30 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Eindeutiger GlobalUniqueIdentifier.
+        /// Wird im Konstruktor vergeben und fließt in die überschriebene Equals-Methode ein.
+        /// Dadurch wird erreicht, dass nach Reload von Teilen des LogicalTaskTree und erneutem
+        /// Reload von vorherigen Ständen des LogicalTaskTree Elemente des ursprünglich 
+        /// gecachten VisualTree fälschlicherweise anstelle der neu geladenen Elemente in den
+        /// neuen VisualTree übernommen werden.
+        /// </summary>
+        public string VisualTreeCacheBreaker
+        {
+            get
+            {
+                return this._visualTreeCacheBreaker;
+            }
+            private set
+            {
+                if (this._visualTreeCacheBreaker != value)
+                {
+                    this._userDataContext = value;
+                    this.RaisePropertyChanged("VisualTreeCacheBreaker");
+                }
+            }
+        }
+
+        /// <summary>
         /// Kann überschrieben werden, um das Parent-Control
         /// in der Geschäftslogik zu speichern.
         /// </summary>
@@ -83,8 +108,41 @@ namespace Vishnu.ViewModel
         {
         }
 
+        /// <summary>
+        /// Konstruktor - setzt den VisualTreeCacheBreaker.
+        /// </summary>
+        public VishnuViewModelBase()
+        {
+            this._visualTreeCacheBreaker = Guid.NewGuid().ToString();
+        }
+
+        /// <summary>
+        /// Vergleicht den Inhalt dieses LogicalNodeViewModels nach logischen Gesichtspunkten
+        /// mit dem Inhalt eines übergebenen LogicalNodeViewModels.
+        /// </summary>
+        /// <param name="obj">Das LogicalNodeViewModel zum Vergleich.</param>
+        /// <returns>True, wenn das übergebene LogicalNodeViewModel inhaltlich gleich diesem ist.</returns>
+        public override bool Equals(object obj)
+        {
+            if (obj == null || this.GetType() != obj.GetType())
+            {
+                return false;
+            }
+            return (Object.ReferenceEquals(this, obj));
+        }
+
+        /// <summary>
+        /// Erzeugt einen Hashcode für dieses LogicalNodeViewModel.
+        /// </summary>
+        /// <returns>Integer mit Hashwert.</returns>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode() + this.VisualTreeCacheBreaker.GetHashCode();
+        }
+
         private Interchange.Result _result;
         private object _userDataContext;
         private DynamicUserControlBase _parentView;
+        private readonly string _visualTreeCacheBreaker;
     }
 }

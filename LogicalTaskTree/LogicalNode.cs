@@ -9,6 +9,7 @@ using Vishnu.Interchange;
 using System.Collections.Concurrent;
 using NetEti.MVVMini;
 using LogicalTaskTree.Provider;
+using System.Text;
 
 namespace LogicalTaskTree
 {
@@ -148,11 +149,6 @@ namespace LogicalTaskTree
         #endregion events
 
         #region IVisnuNode implementation
-
-        /// <summary>
-        /// Pro Tree eindeutiger ID-Zusatz für anonyme Knoten.
-        /// </summary>
-        public static int InternalIdBase;
 
         /// <summary>
         /// Die eindeutige Kennung des Knotens (identisch zur Property Id).
@@ -1390,7 +1386,10 @@ namespace LogicalTaskTree
         {
             JobList rootJobList = this.GetTopRootJobList();
             InfoController.Say(String.Format($"#RELOAD# LogicalNode.ReloadBranch Id/Name: {this.IdInfo}, RootJobList: {rootJobList.IdInfo}"));
-            JobList newBranch = new JobList(this.TreeParams, new ProductionJobProvider());
+            TreeParameters shadowTreeParams = new TreeParameters(String.Format($"ShadowTree {LogicalTaskTree.TreeId++}"),
+                this.TreeParams.ParentView) { CheckerDllDirectory = this.TreeParams.CheckerDllDirectory };
+
+            JobList newBranch = new JobList(shadowTreeParams, new ProductionJobProvider());
             return newBranch;
         }
 
@@ -1482,15 +1481,6 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
-        /// Überschriebene ToString-Methode (für Debug- und Logging-Zwecke).
-        /// </summary>
-        /// <returns>Id + '/' + Name</returns>
-        public override string ToString()
-        {
-            return this.Id ?? "null" + "/" + this.Name ?? "null";
-        }
-
-        /// <summary>
         /// Nächsthöhere JobList für diesen Knoten oder der Knoten selbst,
         /// wenn er eine JobList ist.
         /// </summary>
@@ -1500,6 +1490,64 @@ namespace LogicalTaskTree
         /// Oberste JobList.
         /// </summary>
         public JobList TreeRootJobList;
+
+        /// <summary>
+        /// Zusätzliche Parameter, die für den gesamten Tree Gültigkeit haben oder null.
+        /// </summary>
+        public TreeParameters TreeParams { get; private set; }
+
+        /// <summary>
+        /// Überschriebene ToString()-Methode.
+        /// </summary>
+        /// <returns>Verkettete Properties als String.</returns>
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine(String.Format($"{this.NodeType}: {this?.NameId ?? ""}"));
+            if (this.Children.Count > 0)
+            {
+                stringBuilder.AppendLine(String.Format($"Children: {this.Children.Count}"));
+            }
+            if (this.IsSnapshotDummy)
+            {
+                stringBuilder.AppendLine(String.Format($"IsSnapshotDummy"));
+            }
+            stringBuilder.AppendLine(String.Format($"Path: {this.Path ?? ""}"));
+            stringBuilder.AppendLine(String.Format($"UserControlPath: {this.UserControlPath ?? ""}"));
+            return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Vergleicht den Inhalt dieser LogicalNode nach logischen Gesichtspunkten
+        /// mit dem Inhalt einer übergebenen LogicalNode.
+        /// </summary>
+        /// <param name="obj">Die LogicalNode zum Vergleich.</param>
+        /// <returns>True, wenn die übergebene LogicalNode inhaltlich gleich dieser ist.</returns>
+        public override bool Equals(object obj)
+        {
+            if (obj == null || this.GetType() != obj.GetType())
+            {
+                return false;
+            }
+            if (Object.ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if (String.IsNullOrEmpty(this.Path))
+            {
+                return false;
+            }
+            return (this.ToString() == obj.ToString());
+        }
+
+        /// <summary>
+        /// Erzeugt einen Hashcode für diese LogicalNode.
+        /// </summary>
+        /// <returns>Integer mit Hashwert.</returns>
+        public override int GetHashCode()
+        {
+            return this.ToString().GetHashCode();
+        }
 
         #endregion public members
 
@@ -1647,11 +1695,6 @@ namespace LogicalTaskTree
         #endregion internal members
 
         #region protected members
-
-        /// <summary>
-        /// Zusätzliche Parameter, die für den gesamten Tree Gültigkeit haben oder null.
-        /// </summary>
-        protected TreeParameters TreeParams;
 
         /// <summary>
         /// Applikationseinstellungen.

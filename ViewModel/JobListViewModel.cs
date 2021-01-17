@@ -130,7 +130,7 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Überschriebene ToString()-Methode.
         /// </summary>
-        /// <returns>Id des Knoten + ":" + ReturnObject.ToString()</returns>
+        /// <returns>Verkettete Properties als String.</returns>
         public override string ToString()
         {
             StringBuilder stringBuilder = new StringBuilder(base.ToString());
@@ -145,16 +145,20 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
-        /// Vergleicht den Inhalt dieses LogicalNodeViewModels nach logischen Gesichtspunkten
-        /// mit dem Inhalt eines übergebenen LogicalNodeViewModels.
+        /// Vergleicht den Inhalt dieses JobListViewModels nach logischen Gesichtspunkten
+        /// mit dem Inhalt eines übergebenen JobListViewModels.
         /// </summary>
-        /// <param name="obj">Das LogicalNodeViewModel zum Vergleich.</param>
-        /// <returns>True, wenn das übergebene Result inhaltlich gleich diesem Result ist.</returns>
+        /// <param name="obj">Das JobListViewModel zum Vergleich.</param>
+        /// <returns>True, wenn das übergebene JobListViewModel inhaltlich gleich diesem ist.</returns>
         public override bool Equals(object obj)
         {
             if (!base.Equals(obj))
             {
                 return false;
+            }
+            if (Object.ReferenceEquals(this, obj))
+            {
+                return true;
             }
             LogicalNode logicalNode = this.GetLogicalNode();
             LogicalNode objLogicalNode = (obj as LogicalNodeViewModel).GetLogicalNode();
@@ -166,7 +170,7 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
-        /// Erzeugt einen Hashcode für dieses LogicalNodeViewModel.
+        /// Erzeugt einen Hashcode für dieses JobListViewModel.
         /// </summary>
         /// <returns>Integer mit Hashwert.</returns>
         public override int GetHashCode()
@@ -175,6 +179,19 @@ namespace Vishnu.ViewModel
         }
 
         #endregion public members
+
+        #region internal members
+
+        /// <summary>
+        /// Führt im Verlauf eines externen Tree-Relod einen technischen Run
+        /// für die korrekte Initialisierung des JobListViewModels aus.
+        /// </summary>
+        internal void TechnicalRun()
+        {
+            this.runTaskTreeExecute(null);
+        }
+
+        #endregion internal members
 
         #region private members
 

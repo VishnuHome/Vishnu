@@ -227,8 +227,11 @@ namespace Vishnu
             // Demo: hart verdrahteter JobProvider:
             // App._businessLogic = new LogicalTaskTree.LogicalTaskTree(new TreeParameters("Tree 1", null), new MixedTestJobProvider());
 
+            // Die für den gesamten Tree gültigen Parameter
+            TreeParameters treeParameters = new TreeParameters(String.Format($"Tree {++LogicalTaskTree.LogicalTaskTree.TreeId}"), null);
+
             // Der Produktions-JobProvider mit extern über XML definierten Jobs:
-            SingleInstanceApplication._businessLogic = new LogicalTaskTree.LogicalTaskTree(new TreeParameters("Tree 1", null), new ProductionJobProvider());
+            SingleInstanceApplication._businessLogic = new LogicalTaskTree.LogicalTaskTree(treeParameters, new ProductionJobProvider());
 
             // Das Main-Window
             this._mainWindow = new WPF_UI.MainWindow();
@@ -238,10 +241,13 @@ namespace Vishnu
                                                                                         // Vishnu-MainWindow oder Defaults.
             this._mainWindow.Closed += mainWindow_Closed;
             // Das LogicalTaskTree-ViewModel
-            LogicalTaskTreeViewModel logicalTaskTreeViewModel = new LogicalTaskTreeViewModel(SingleInstanceApplication._businessLogic, this._mainWindow, SingleInstanceApplication._appSettings.StartTreeOrientation, SingleInstanceApplication._appSettings.FlatNodeListFilter);
+            LogicalTaskTreeViewModel logicalTaskTreeViewModel = new LogicalTaskTreeViewModel(
+                SingleInstanceApplication._businessLogic, this._mainWindow, SingleInstanceApplication._appSettings.StartTreeOrientation,
+                SingleInstanceApplication._appSettings.FlatNodeListFilter, treeParameters);
 
             // Das Main-ViewModel
-            MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(logicalTaskTreeViewModel, this._mainWindow.ForceRecalculateWindowMeasures, SingleInstanceApplication._appSettings.FlatNodeListFilter, SingleInstanceApplication._appSettings.DemoModus ? "-DEMO-" : "");
+            MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(logicalTaskTreeViewModel, this._mainWindow.ForceRecalculateWindowMeasures,
+                SingleInstanceApplication._appSettings.FlatNodeListFilter, SingleInstanceApplication._appSettings.DemoModus ? "-DEMO-" : "");
 
             // Verbinden von Main-Window mit Main-ViewModel
             this._mainWindow.DataContext = mainWindowViewModel; //mainViewModel;

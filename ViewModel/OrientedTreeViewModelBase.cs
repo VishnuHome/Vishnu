@@ -37,6 +37,20 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Zusätzliche Parameter, die für den gesamten Tree Gültigkeit haben oder null.
+        /// </summary>
+        public TreeParameters TreeParams { get; private set; }
+
+        /// <summary>
+        /// Konstruktor - übernimmt die Parameter für den gesamten Tree.
+        /// </summary>
+        /// <param name="treeParams">Parameter für den gesamten Tree.</param>
+        public OrientedTreeViewModelBase(TreeParameters treeParams)
+        {
+            this.TreeParams = treeParams;
+        }
+
+        /// <summary>
         /// ItemsSource für die TreeView in LogicalTaskTreeControl.
         /// </summary>
         public ReadOnlyCollection<JobListViewModel> MainLogicalNodeView { get; protected set; }

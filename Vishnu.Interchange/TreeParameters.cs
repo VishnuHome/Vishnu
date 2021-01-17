@@ -84,5 +84,19 @@ namespace Vishnu.Interchange
         {
             return base.GetHashCode();
         }
+
+        /// <summary>
+        /// Interner, Assembly-übergreifender Parameter.
+        /// Enthält den LogicalTaskTree als Objekt, um hier einen Assembly-Verweis auf LogicalTaskTree zu vermeiden.
+        /// Wird innerhalb der Assembly Vishnu.ViewModel wieder aufgelöst. Dort existiert ein Verweis auf LogicalTaskTree.
+        /// </summary>
+        public object BusinessLogicRoot { get; set; }
+
+        /// <summary>
+        /// Interner, Assembly-übergreifender Parameter.
+        /// Enthält das LogicalTaskTreeViewModel als Objekt, um hier einen Assembly-Verweis auf Vishnu.ViewModel zu vermeiden.
+        /// Wird innerhalb der Assembly Vishnu.ViewModel wieder aufgelöst.
+        /// </summary>
+        public object ViewModelRoot { get; set; }
     }
 }

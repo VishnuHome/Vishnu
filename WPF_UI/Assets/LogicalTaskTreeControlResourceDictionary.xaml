@@ -53,6 +53,10 @@
         <GradientStop Color="#66000066" Offset="1" />
         <GradientStop Color="#44000000" Offset="0" />
     </RadialGradientBrush>
+    <LinearGradientBrush x:Key="MenuButtonBrush" StartPoint="0.5, 0" EndPoint="0.5, 1">
+        <GradientStop Color="#FFEAEBF2" Offset="0" />
+        <GradientStop Color="#FFBBBBBB" Offset="1" />
+    </LinearGradientBrush>
     <Thickness x:Key="NodeConnectorWidth" Left="6" Top="0" Right="0" Bottom="0" />
     <Thickness x:Key="NodeConnectorHeight" Left="0" Top="2" Right="0" Bottom="0" />
     <Thickness x:Key="NodeConnectorWidthAsHeight" Left="0" Top="6" Right="0" Bottom="0" />
@@ -68,13 +72,84 @@
     <SolidColorBrush x:Key="ToggleButtonArrowCheckedMouseOver.Brush">Cyan</SolidColorBrush>
     <attached:BinaryModificationSwitch x:Key="OrientationModificationSwitch">Unchanged</attached:BinaryModificationSwitch>
 
+    <Style x:Key="MenuButtonTemplate" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource MenuButtonBrush}" />
+        <Setter Property="Foreground" Value="DarkGreen" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border CornerRadius="5" Background="{TemplateBinding Background}" BorderThickness="3">
+                        <ContentPresenter Margin="3" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        </ContentPresenter>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="RenderTransformOrigin" Value="0.5, 0.5"/>
+                <Setter Property="RenderTransform">
+                    <Setter.Value>
+                        <ScaleTransform ScaleX="1.1" ScaleY="1.2"/>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="MenuItem">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type MenuItem}">
+                    <Border BorderBrush="Green" BorderThickness="1" CornerRadius="6" Margin="3">
+                        <ContentPresenter Margin="2" Name="HeaderHost" ContentSource="Header"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="ContextMenu">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Border CornerRadius="7" BorderBrush="Black" BorderThickness="1" Padding="1"
+                            Background="{StaticResource VerticalItemAreaBrush}" SnapsToDevicePixels="True">
+                        <ItemsPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     <ContextMenu x:Key="cmMainGrid">
-        <MenuItem Header="Reload tree" Command="{Binding ReloadLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}" />
-        <MenuItem Header="Menu item 2" />
         <Separator />
-        <MenuItem Header="Menu item 3" />
+        <MenuItem>
+            <MenuItem.Header>
+                <Button Style="{StaticResource MenuButtonTemplate}"
+                        Command="{Binding ReloadLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../Media/available_updates.png" Width="15" Height="15" Margin="0,0,5,0"/>
+                            <TextBlock Text="Reload tree" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </MenuItem.Header>
+        </MenuItem>
+        <Separator />
+        <!--<MenuItem>
+            <MenuItem.Header>
+                <Button Style="{StaticResource MenuButtonTemplate}"
+                        Command="{Binding ReloadLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../Media/available_updates.png" Width="15" Height="15" Margin="0,0,5,0"/>
+                            <TextBlock Text="Reload tree" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </MenuItem.Header>
+        </MenuItem>-->
     </ContextMenu>
-    
+
     <sys:Double x:Key="ToggleButtonArrow.StrokeThickness">2</sys:Double>
     <sys:Double x:Key="ToggleButtonArrowChecked.StrokeThickness">1</sys:Double>
     <DropShadowBitmapEffect x:Key="DropShadowEffect" />
