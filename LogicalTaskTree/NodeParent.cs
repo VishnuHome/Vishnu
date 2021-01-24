@@ -16,6 +16,12 @@ namespace LogicalTaskTree
     public abstract class NodeParent : LogicalNode
     {
         /// <summary>
+        /// Enthält Komma-separiert TreeParams.Name und IdInfo der Knoten, in deren
+        /// Events sich dieser NodeParent eingehängt hat oder den Text "NULL".
+        /// </summary>
+        public string HookedTo { get; private set; }
+
+        /// <summary>
         /// Konstruktor für ein Snapshot-Dummy-Element - gibt die Verarbeitung an die Basisklasse "LogicalNode" weiter.
         /// </summary>
         /// <param name="mother">Der Eltern-Knoten</param>
@@ -25,6 +31,7 @@ namespace LogicalTaskTree
             this.LastSingleNodesFinishedLocker = new object();
             this.ThreadRefreshParentNodeLocker = new object();
             this.SubNodeStateChangedLocker = new object();
+            this.HookedTo = "NULL";
             this.ThreadUpdateLastSingleNodesFinished(-1); // invalidate
         }
 
@@ -40,6 +47,7 @@ namespace LogicalTaskTree
             this.IsResultDependant = false;
             this.LastSingleNodesFinishedLocker = new object();
             this.SubNodeStateChangedLocker = new object();
+            this.HookedTo = "NULL";
             this.ThreadUpdateLastSingleNodesFinished(-1); // invalidate
         }
 
@@ -55,14 +63,38 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
-        /// Löst die Event-Verknüpfungen mit dem Child-Knoten am Index index und gibt danach den
-        /// Child-Knoten frei.
+        /// Löst die Event-Verknüpfungen mit dem Child-Knoten am Index index und 
+        /// ruft danach ggf. Dispose für den Child-Knoten auf.
         /// </summary>
         /// <param name="index">Der Index, an dem der Child-Knoten freigegeben werden soll.</param>
         public virtual void FreeChildAt(int index)
         {
-            this.UnhookChildEvents(this.Children[index]);
-            this.Children[index] = null;
+            if (index < this.Children?.Count && this.Children[index] != null)
+            {
+                this.UnhookChildEvents(this.Children[index]);
+                if (this.Children[index] is IDisposable)
+                {
+                    try
+                    {
+                        (this.Children[index] as IDisposable).Dispose();
+                    }
+                    catch { }
+                }
+                this.Children[index] = null;
+            }
+        }
+
+        /// <summary>
+        /// Löst die Event-Verknüpfungen mit dem Child-Knoten am Index index.
+        /// </summary>
+        /// <param name="index">Der Index, an dem der Child-Knoten freigegeben werden soll.</param>
+        public virtual void ReleaseChildAt(int index)
+        {
+            if (index < this.Children?.Count && this.Children[index] != null)
+            {
+                this.UnhookChildEvents(this.Children[index]);
+                this.Children[index] = null;
+            }
         }
 
         #region internal members
@@ -117,6 +149,11 @@ namespace LogicalTaskTree
             child.NodeResultChanged += this.SubNodeResultChanged;
             child.ExceptionRaised += this.SubNodeExceptionRaised;
             child.ExceptionCleared += this.SubNodeExceptionCleared;
+            string childInfo = child.TreeParams.Name + ": " + child.NameId;
+            if (!this.HookedTo.Contains(childInfo))
+            {
+                this.HookedTo = (this.HookedTo + "," + childInfo).Replace("NULL", "").TrimStart(',');
+            }
         }
 
         /// <summary>
@@ -134,6 +171,11 @@ namespace LogicalTaskTree
             child.NodeResultChanged -= this.SubNodeResultChanged;
             child.ExceptionRaised -= this.SubNodeExceptionRaised;
             child.ExceptionCleared -= this.SubNodeExceptionCleared;
+            string childInfo = child.TreeParams.Name + ": " + child.NameId;
+            if (this.HookedTo.Contains(childInfo))
+            {
+                this.HookedTo = (this.HookedTo + ",").Replace(childInfo + ",", "").TrimEnd(',');
+            }
         }
 
         /// <summary>

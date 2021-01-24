@@ -1506,14 +1506,14 @@ namespace LogicalTaskTree
             stringBuilder.AppendLine(String.Format($"{this.NodeType}: {this?.NameId ?? ""}"));
             if (this.Children.Count > 0)
             {
-                stringBuilder.AppendLine(String.Format($"Children: {this.Children.Count}"));
+                stringBuilder.AppendLine(String.Format($"    Children: {this.Children.Count}"));
             }
             if (this.IsSnapshotDummy)
             {
-                stringBuilder.AppendLine(String.Format($"IsSnapshotDummy"));
+                stringBuilder.AppendLine(String.Format($"    IsSnapshotDummy"));
             }
-            stringBuilder.AppendLine(String.Format($"Path: {this.Path ?? ""}"));
-            stringBuilder.AppendLine(String.Format($"UserControlPath: {this.UserControlPath ?? ""}"));
+            stringBuilder.AppendLine(String.Format($"    Path: {this.Path ?? ""}"));
+            stringBuilder.AppendLine(String.Format($"    UserControlPath: {this.UserControlPath ?? ""}"));
             return stringBuilder.ToString();
         }
 
@@ -1547,6 +1547,36 @@ namespace LogicalTaskTree
         public override int GetHashCode()
         {
             return this.ToString().GetHashCode();
+        }
+
+        private const int HOLDEDTREELOOPSLEEPTIMEMILLISECONDS = 100;
+
+        /// <summary>
+        /// Liefert true, wenn die Verarbeitung im Tree gerade angehalten wurde.
+        /// </summary>
+        public static bool IsTreePaused
+        {
+            get
+            {
+                return LogicalNode._isTreePaused;
+            }
+        }
+
+        /// <summary>
+        /// Hält die Verarbeitung im Tree an.
+        /// </summary>
+        public static void PauseTree()
+        {
+            LogicalNode._isTreePaused = true;
+            Thread.Sleep(HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
+        }
+
+        /// <summary>
+        /// Lässt einen angehaltenen Tree weiterlaufen.
+        /// </summary>
+        public static void ResumeTree()
+        {
+            LogicalNode._isTreePaused = false;
         }
 
         #endregion public members
@@ -2009,6 +2039,7 @@ namespace LogicalTaskTree
         private NodeWorkerState _workersState;
 
         private string _lockName;
+        private static volatile bool _isTreePaused;
 
         // Startet asynchron runAsync. Dieser Zwischenschritt wurde nötig, um Timer, auf die mehrere
         // Knoten verweisen, vom run eines Knotens zu entkoppeln (gleichzeitige Ausführung mehrerer runs).
@@ -2020,10 +2051,11 @@ namespace LogicalTaskTree
                 this.TreeRootJobList.IsInSleepTime = this._isInSleepTime;
                 SnapshotManager.RequestSnapshot(this.RootJobList.GetTopRootJobList());
             }
-            if (source?.Name != "UserRun" && this._isInSleepTime)
+            if (source?.Name != "UserRun" && this.IsInSleepTime)
             {
                 return;
             }
+            LogicalNode.WaitWhileTreePaused();
             /* DEBUG+
             if (source == null)
             {
@@ -2097,6 +2129,14 @@ namespace LogicalTaskTree
                         this.OnNodeStateChanged();
                     }
                 }
+            }
+        }
+
+        private static void WaitWhileTreePaused()
+        {
+            while (LogicalNode.IsTreePaused)
+            {
+                Thread.Sleep(LogicalNode.HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
             }
         }
 
@@ -2415,6 +2455,7 @@ namespace LogicalTaskTree
 
         private void AcceptNewLogical(bool? tmpLogical)
         {
+            LogicalNode.WaitWhileTreePaused();
             Guid tmpGuid = Guid.NewGuid();
             this.LastNotNullLogical = tmpLogical;
             //this.ThreadUpdateLastLogical(tmpLogical);

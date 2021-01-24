@@ -101,7 +101,6 @@ namespace Vishnu.ViewModel
             this._businessLogic = businessLogic;
             this._uIMain = uiMain;
             this._root = businessLogic.Tree;
-            //this.TreeParams.ViewModelRoot = this;
 
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(new DependencyObject()))
             {
@@ -145,15 +144,11 @@ namespace Vishnu.ViewModel
                 )
              );
             */
-            this.MainLogicalNodeView = new ReadOnlyCollection<JobListViewModel>(
-                      new JobListViewModel[]
-                      {
-                          new JobListViewModel(this, null, this._root, false, this._uIMain)
-                      });
-            this.MainLogicalNodeView[0].SetChildOrientation(startTreeOrientation);
-            this.MainLogicalNodeView[0].ExpandTree(this.MainLogicalNodeView[0], false);
+            this.TreeVM = new JobListViewModel(this, null, this._root, false, this._uIMain);
+            this.TreeVM.SetChildOrientation(startTreeOrientation);
+            this.TreeVM.ExpandTree(this.TreeVM, false);
             //this._flatNodeListFilter = flatNodeListFilter;
-            //this.FlatNodeViewModelList = LogicalTaskTreeViewModel.FlattenTree(this.MainLogicalNodeView[0], new ObservableCollection<LogicalNodeViewModel>(), this._flatNodeListFilter);
+            //this.FlatNodeViewModelList = LogicalTaskTreeViewModel.FlattenTree(this.TreeVM, new List<LogicalNodeViewModel>(), this._flatNodeListFilter);
         }
 
         /// <summary>
@@ -182,7 +177,7 @@ namespace Vishnu.ViewModel
         {
             Task.Factory.StartNew(() =>
             {
-                ConfigurationManager.SaveLocalConfiguration(this.MainLogicalNodeView[0], this.TreeOrientationState, windowAspects);
+                ConfigurationManager.SaveLocalConfiguration(this.TreeVM, this.TreeOrientationState, windowAspects);
             });
             if (this._uIMain is Window)
             {

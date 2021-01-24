@@ -102,11 +102,6 @@ namespace Vishnu.ViewModel
         /// </summary>
         public ICommand BreakLogicalTaskTree { get { return this._btnBreakTaskTreeRelayCommand; } }
 
-        /// <summary>
-        /// Command für das ContextMenuItem "Reload" im ContextMenu für das "MainGrid" des Controls.
-        /// </summary>
-        public ICommand ReloadLogicalTaskTree { get { return this._btnReloadTaskTreeRelayCommand; } }
-
         #endregion published members
 
         /// <summary>
@@ -122,7 +117,6 @@ namespace Vishnu.ViewModel
             this._btnRunTaskTreeRelayCommand = new RelayCommand(runTaskTreeExecute, canRunTaskTreeExecute);
             this._btnRunOrBreakTaskTreeRelayCommand = new RelayCommand(runOrBreakTaskTreeExecute, canRunOrBreakTaskTreeExecute);
             this._btnBreakTaskTreeRelayCommand = new RelayCommand(breakTaskTreeExecute, canBreakTaskTreeExecute);
-            this._btnReloadTaskTreeRelayCommand = new RelayCommand(reloadTaskTreeExecute, canReloadTaskTreeExecute);
             //this._myLogicalNode.NodeStateChanged -= this.treeElementStateChanged;
             //this._myLogicalNode.NodeStateChanged += this.treeElementStateChanged;
             //this._myLogicalNode.NodeLogicalStateChanged -= this.TreeElementLogicalStateChanged;
@@ -182,15 +176,15 @@ namespace Vishnu.ViewModel
             }
             if (!String.IsNullOrEmpty(slavePathName))
             {
-                stringBuilder.AppendLine(String.Format($"SlavePathName: {slavePathName}"));
+                stringBuilder.AppendLine(String.Format($"    SlavePathName: {slavePathName}"));
             }
             if (!String.IsNullOrEmpty(referencedNodeName))
             {
-                stringBuilder.AppendLine(String.Format($"ReferencedNodeName: {referencedNodeName}"));
+                stringBuilder.AppendLine(String.Format($"    ReferencedNodeName: {referencedNodeName}"));
             }
             if (!String.IsNullOrEmpty(checkerParameters))
             {
-                stringBuilder.AppendLine(String.Format($"CheckerParameters: {checkerParameters}"));
+                stringBuilder.AppendLine(String.Format($"    CheckerParameters: {checkerParameters}"));
             }
             return stringBuilder.ToString();
         }
@@ -267,7 +261,6 @@ namespace Vishnu.ViewModel
         private RelayCommand _btnRunTaskTreeRelayCommand;
         private RelayCommand _btnRunOrBreakTaskTreeRelayCommand;
         private RelayCommand _btnBreakTaskTreeRelayCommand;
-        private RelayCommand _btnReloadTaskTreeRelayCommand;
 
         private void runTaskTreeExecute(object parameter)
         {
@@ -340,18 +333,6 @@ namespace Vishnu.ViewModel
             bool canStart = this._myLogicalNode.CanTreeStart;
             //return !canStart;
             return true;
-        }
-
-        private void reloadTaskTreeExecute(object parameter)
-        {
-            InfoController.Say(String.Format($"#RELOAD# SingleNodeViewModel.reloadTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {this.RootJobListViewModel.Name}"));
-            this.ReloadTaskTree();
-        }
-
-        private bool canReloadTaskTreeExecute()
-        {
-            bool canReload = true; // !(this._myLogicalNode is NodeConnector); // && this._myLogicalNode.CanTreeStart;
-            return canReload;
         }
 
         private void treeElementStateChanged(object sender, NodeState state)

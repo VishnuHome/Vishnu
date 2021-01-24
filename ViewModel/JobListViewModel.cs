@@ -5,6 +5,7 @@ using NetEti.MVVMini;
 using Vishnu.Interchange;
 using System.Text;
 using System;
+using System.Text.RegularExpressions;
 
 namespace Vishnu.ViewModel
 {
@@ -140,7 +141,8 @@ namespace Vishnu.ViewModel
             {
                 logicalExpression = (logicalNode as JobList).LogicalExpression;
             }
-            stringBuilder.AppendLine(String.Format($"LogicalExpression: {logicalExpression}"));
+            string logicalExpressionReducedSpaces = Regex.Replace(Regex.Replace(logicalExpression, "\\r?\\n", " "), @"\s{2,}", " ");
+            stringBuilder.AppendLine(String.Format($"    LogicalExpression: {logicalExpressionReducedSpaces}"));
             return stringBuilder.ToString();
         }
 

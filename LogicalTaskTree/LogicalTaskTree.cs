@@ -104,7 +104,7 @@ namespace LogicalTaskTree
         #endregion IDisposable Implementation
 
         /// <summary>
-        /// Der LogicalTaskTree - liefert die Wurzel des LogicalTaskTrees. 
+        /// Liefert die RootJobList des LogicalTaskTrees inklusive Setter.
         /// </summary>
         public JobList Tree
         {
@@ -125,7 +125,7 @@ namespace LogicalTaskTree
         /// <param name="jobProvider">Die Datenquelle für den Job</param>
         public LogicalTaskTree(TreeParameters treeParams, IJobProvider jobProvider)
         {
-            //treeParams.BusinessLogicRoot = this;
+            treeParams.BusinessLogicRoot = this;
             this._rootJobList = new JobList(treeParams, jobProvider);
         }
 

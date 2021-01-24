@@ -5,6 +5,7 @@ using NetEti.ExpressionParser;
 using Vishnu.Interchange;
 using NetEti.ApplicationControl;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace LogicalTaskTree
 {
@@ -501,7 +502,8 @@ namespace LogicalTaskTree
         public override string ToString()
         {
             StringBuilder stringBuilder = new StringBuilder(base.ToString());
-            stringBuilder.AppendLine(String.Format($"LogicalExpression: {this.LogicalExpression ?? ""}"));
+            string logicalExpressionReducedSpaces = Regex.Replace(Regex.Replace(this.LogicalExpression ?? "", "\\r?\\n", " "), @"\s{2,}", " ");
+            stringBuilder.AppendLine(String.Format($"    LogicalExpression: {logicalExpressionReducedSpaces}"));
             return stringBuilder.ToString();
         }
 

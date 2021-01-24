@@ -109,7 +109,7 @@ namespace Vishnu.ViewModel
         private ObservableCollection<JobGroupViewModel> SelectJobGroups()
         {
             ObservableCollection<JobGroupViewModel> selectedJobGroups = new ObservableCollection<JobGroupViewModel>();
-            foreach (LogicalNodeViewModel root in LogicalTaskTreeViewModel.FlattenTree(TreeVM.MainLogicalNodeView[0], new ObservableCollection<LogicalNodeViewModel>(), this._flatNodeListFilter))
+            foreach (LogicalNodeViewModel root in LogicalTaskTreeViewModel.FlattenTree(TreeVM.TreeVM, new ObservableCollection<LogicalNodeViewModel>(), this._flatNodeListFilter))
             {
                 if (root is JobListViewModel)
                 {

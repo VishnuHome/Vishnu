@@ -248,12 +248,14 @@ namespace LogicalTaskTree
                     try
                     {
                         this._constantValue = Boolean.Parse(val);
+                        this.Name = this._constantValue.ToString();
                     }
                     catch (Exception ex)
                     {
-                        throw new ArgumentException("Boolsche Konstanten müssen True oder False sein.", ex);
+                        // throw new ArgumentException("Boolsche Konstanten müssen True oder False sein.", ex);
+                        this._constantValue = null;
+                        this.Name = "Null";
                     }
-                    this.Name = this._constantValue.ToString();
                     this._returnConstantValue = true;
                 }
                 else
@@ -322,15 +324,15 @@ namespace LogicalTaskTree
             }
             if (!String.IsNullOrEmpty(slavePathName))
             {
-                stringBuilder.AppendLine(String.Format($"SlavePathName: {slavePathName}"));
+                stringBuilder.AppendLine(String.Format($"    SlavePathName: {slavePathName}"));
             }
             if (!String.IsNullOrEmpty(referencedNodeName))
             {
-                stringBuilder.AppendLine(String.Format($"ReferencedNodeName: {referencedNodeName}"));
+                stringBuilder.AppendLine(String.Format($"    ReferencedNodeName: {referencedNodeName}"));
             }
             if (!String.IsNullOrEmpty(checkerParameters))
             {
-                stringBuilder.AppendLine(String.Format($"CheckerParameters: {checkerParameters}"));
+                stringBuilder.AppendLine(String.Format($"    CheckerParameters: {checkerParameters}"));
             }
             return stringBuilder.ToString();
         }

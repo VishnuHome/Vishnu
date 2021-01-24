@@ -12,7 +12,6 @@ using Vishnu.Interchange;
 using System.Collections.Generic;
 using System.Text;
 using NetEti.ApplicationControl;
-using System.Threading.Tasks;
 
 namespace Vishnu.ViewModel
 {
@@ -103,19 +102,21 @@ namespace Vishnu.ViewModel
                             {
                                 try
                                 {
-                                    logicalNodeViewModel.Dispose();
+                                    (logicalNodeViewModel as IDisposable).Dispose();
                                 }
                                 catch { }
                             }
                         }
-                        // Der BusinessLogic-Knoten darf hier nicht freigegeben werden.
+                        // Der BusinessLogic-Knoten darf hier nur freigegeben aber nicht
+                        // komplett ausgenullt werden.
                         // Derselbe BusinessLogic-Knoten kann von mehreren Generationen ViewModels
                         // referenziert werden!
-                        //try
-                        //{
-                        //    this.UnsetBLNode();
-                        //}
-                        //catch { }
+                        try
+                        {
+                            // falsch, s.o. this.UnsetBLNode();
+                            this.ReleaseBLNode();
+                        }
+                        catch { }
                     }
                 }
                 this._disposed = true;
@@ -152,6 +153,20 @@ namespace Vishnu.ViewModel
         public ICommand SizeChangedEventCommand
         { get; set; }
 
+        /// <summary>
+        /// Command für das ContextMenuItem "Reload" im ContextMenu für das "MainGrid" des Controls.
+        /// </summary>
+        public ICommand ReloadLogicalTaskTree { get { return this._btnReloadTaskTreeRelayCommand; } }
+
+        /// <summary>
+        /// Command für das ContextMenuItem "Log Tree" im ContextMenu für das "MainGrid" des Controls.
+        /// </summary>
+        public ICommand LogLogicalTaskTree { get { return this._btnLogTaskTreeRelayCommand; } }
+
+        /// <summary>
+        /// Command für das ContextMenuItem "Pause Tree" im ContextMenu für das "MainGrid" des Controls.
+        /// </summary>
+        public ICommand PauseResumeLogicalTaskTree { get { return this._btnPauseResumeTaskTreeRelayCommand; } }
 
         #region ViewModel properties
 
@@ -212,6 +227,26 @@ namespace Vishnu.ViewModel
                 {
                     this._isInSleepTime = value;
                     this.RaisePropertyChanged("IsInSleepTime");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns true, wenn der Tree gerade pausiert wurde.
+        /// </summary>
+        /// <returns>True, wenn der Tree gerade pausiert wurde.</returns>
+        public bool IsTreePaused
+        {
+            get
+            {
+                return this._isTreePaused;
+            }
+            set
+            {
+                if (this._isTreePaused != value)
+                {
+                    this._isTreePaused = value;
+                    this.RaisePropertyChanged("IsTreePaused");
                 }
             }
         }
@@ -382,6 +417,26 @@ namespace Vishnu.ViewModel
                 {
                     this._treeParams = value;
                     this.RaisePropertyChanged("TreeParams");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Enthält TreeParams.Name und IdInfo des Knotens, in dessen Events sich dieses
+        /// LogicalNodeViewModel eingehängt hat oder den Text "NULL".
+        /// </summary>
+        public string HookedTo
+        {
+            get
+            {
+                return this._hookedTo;
+            }
+            private set
+            {
+                if (this._hookedTo != value)
+                {
+                    this._hookedTo = value;
+                    this.RaisePropertyChanged("HookedTo");
                 }
             }
         }
@@ -761,6 +816,7 @@ namespace Vishnu.ViewModel
                     debugNodeInfos += ", Ref: " + this.OriginalNodeId;
                 }
                 debugNodeInfos += ") " + this.TreeParams.Name;
+                debugNodeInfos += ", " + this.VisualTreeCacheBreaker.Substring(this.VisualTreeCacheBreaker.Length - 8);
                 return debugNodeInfos;
             }
         }
@@ -801,7 +857,7 @@ namespace Vishnu.ViewModel
         /// <returns>Die für den Knoten gültige, oberste Root-JobList.</returns>
         public JobListViewModel GetTopRootJobListViewModel()
         {
-            if (this.RootJobListViewModel.HasParent)
+            if (this.RootJobListViewModel != null && this.RootJobListViewModel.HasParent)
             {
                 return this.RootJobListViewModel.GetTopRootJobListViewModel();
             }
@@ -830,6 +886,7 @@ namespace Vishnu.ViewModel
             this.lazyLoadChildren = lazyLoadChildren;
             this._canExpanderExpand = true;
 
+            this._hookedTo = "NULL";
             this.TreeRefreshLocker = new object();
             this.IsRefreshing = false;
             this.SetBLNode(myLogicalNode, true);
@@ -849,6 +906,9 @@ namespace Vishnu.ViewModel
             this.ExpandedEventCommand = new RelayCommand(this.HandleExpanderExpandedEvent, this.CanHandleExpanderExpandedEvent);
             this.CollapsedEventCommand = new RelayCommand(this.HandleExpanderCollapsedEvent);
             this.SizeChangedEventCommand = new RelayCommand(this.HandleExpanderSizeChangedEvent);
+            this._btnReloadTaskTreeRelayCommand = new RelayCommand(reloadTaskTreeExecute, canReloadTaskTreeExecute);
+            this._btnLogTaskTreeRelayCommand = new RelayCommand(logTaskTreeExecute, canLogTaskTreeExecute);
+            this._btnPauseResumeTaskTreeRelayCommand = new RelayCommand(pauseResumeTaskTreeExecute, canLogTaskTreeExecute);
             this.RaisePropertyChanged("RootJobListViewModel");
         }
 
@@ -1119,27 +1179,23 @@ namespace Vishnu.ViewModel
         /// <returns>Verkettete Properties als String.</returns>
         public override string ToString()
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder(String.Format($"{this.GetType().Name}: {this.Id ?? "" + "." + this.Name ?? ""}"));
             LogicalNode logicalNode = this.GetLogicalNode();
             if (logicalNode != null)
             {
-                stringBuilder.AppendLine(String.Format($"{logicalNode.NodeType}: {logicalNode?.NameId ?? ""}"));
+                stringBuilder.AppendLine(String.Format($"    {logicalNode.NodeType}: {logicalNode?.NameId ?? ""}"));
             }
-            else
-            {
-                stringBuilder.AppendLine(String.Format($"{this.GetType()}: {this.Id ?? "" + "." + this.Name ?? ""}"));
-            }
-            stringBuilder.AppendLine(String.Format($"Source: {this.OriginalNodeId ?? ""}"));
+            stringBuilder.AppendLine(String.Format($"    Source: {this.OriginalNodeId ?? ""}"));
             if (this.Children?.Count > 0)
             {
-                stringBuilder.AppendLine(String.Format($"Children: {this.Children.Count}"));
+                stringBuilder.AppendLine(String.Format($"    Children: {this.Children.Count}"));
             }
             if (this.IsSnapshotDummy)
             {
-                stringBuilder.AppendLine(String.Format($"IsSnapshotDummy"));
+                stringBuilder.AppendLine(String.Format($"    IsSnapshotDummy"));
             }
-            stringBuilder.AppendLine(String.Format($"Path: {this.Path ?? ""}"));
-            stringBuilder.AppendLine(String.Format($"UserControlPath: {this.UserControlPath ?? ""}"));
+            stringBuilder.AppendLine(String.Format($"    Path: {this.Path ?? ""}"));
+            stringBuilder.AppendLine(String.Format($"    UserControlPath: {this.UserControlPath ?? ""}"));
             return stringBuilder.ToString();
         }
 
@@ -1262,7 +1318,7 @@ namespace Vishnu.ViewModel
             if (this._myLogicalNode != null && this._myLogicalNode.GetType() != node.GetType())
             {
 #if DEBUG
-                InfoController.Say(String.Format("SetBLNode: this._myLogicalNode.GetType().Name: {0} not equal node.GetType().Name: {1}",
+                InfoController.Say(String.Format("#RELOAD# SetBLNode: this._myLogicalNode.GetType().Name: {0} not equal node.GetType().Name: {1}",
                   this._myLogicalNode.GetType().Name, node.GetType().Name));
 #endif
                 return false;
@@ -1270,7 +1326,7 @@ namespace Vishnu.ViewModel
             if (!init && this._myLogicalNode == null)
             {
 #if DEBUG
-                InfoController.Say("SetBLNode: this._myLogicalNode was null");
+                InfoController.Say("#RELOAD# SetBLNode: this._myLogicalNode was null");
 #endif
                 return false;
             }
@@ -1289,13 +1345,31 @@ namespace Vishnu.ViewModel
             this._myLogicalNode.PropertiesChanged += this.SubNodePropertiesChanged; // 14.03.2020
 
             this.SingleNodes = this._myLogicalNode.SingleNodes;
+            this.HookedTo = this._myLogicalNode.TreeParams.Name + ": " + this._myLogicalNode.NameId;
             return true;
         }
 
         /// <summary>
-        /// Gigt die Business-Logic Node für dieses LogicalNodeViewModel frei.
+        /// Gibt die Business-Logic Node für dieses LogicalNodeViewModel frei
+        /// und nullt den BusinessLogic-Knoten (ggf. über IDisposable).
         /// </summary>
         internal void UnsetBLNode()
+        {
+            if (this._myLogicalNode != null)
+            {
+                this.ReleaseBLNode();
+                if (this._myLogicalNode is IDisposable)
+                {
+                    (this._myLogicalNode as IDisposable).Dispose();
+                }
+                this._myLogicalNode = null;
+            }
+        }
+
+        /// <summary>
+        /// Gibt die Business-Logic Node für dieses LogicalNodeViewModel frei.
+        /// </summary>
+        internal void ReleaseBLNode()
         {
             if (this._myLogicalNode != null)
             {
@@ -1309,12 +1383,8 @@ namespace Vishnu.ViewModel
                 this._myLogicalNode.NodeResultChanged -= this.subResultChanged; // 30.07.2018
                 this._myLogicalNode.NodeWorkersStateChanged -= this.SubNodeWorkersStateChanged; // 07.08.2018
                 this._myLogicalNode.PropertiesChanged -= this.SubNodePropertiesChanged; // 14.03.2020
-                if (this._myLogicalNode is IDisposable)
-                {
-                    (this._myLogicalNode as IDisposable).Dispose();
-                }
-                this._myLogicalNode = null;
             }
+            this.HookedTo = "NULL";
         }
 
         #endregion internal members
@@ -1516,78 +1586,22 @@ namespace Vishnu.ViewModel
                 {
                     shadowTopRootJobListViewModel.SetChildOrientation(this.StartTreeOrientation);
                     shadowTopRootJobListViewModel.ExpandTree(shadowTopRootJobListViewModel, false);
-                    JobListViewModel treeTopRootJobListViewModel = this.GetTopRootJobListViewModel();
+                    JobListViewModel treeTopRootJobListViewModel = this.GetTopRootJobListViewModel() ?? this as JobListViewModel;
 
                     //Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
                     //{
-                        using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
-                        {
+                    using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
+                    {
 
-                            LogicalTaskTreeMerger.Merge(treeTopRootJobListViewModel, shadowTopRootJobListViewModel);
-                            // this.GetTopRootJobListViewModel().FullTreeRefresh();
-                        }
+                        LogicalTaskTreeMerger.Merge(treeTopRootJobListViewModel, shadowTopRootJobListViewModel);
+                        // this.GetTopRootJobListViewModel().FullTreeRefresh();
+                    }
                     //}));
 
                     shadowTopRootJobListViewModel.Dispose();
 
-                    /*
-                    InfoController.Say("#RELOAD# -------------------------------------------------------------------------------------------------------------------------------");
-                    Thread.Sleep(100);
-                    List<string> allTreeInfos = new List<string>();
-                    object result1 = treeTopRootJobListViewModel.Traverse(ListTreeElement, allTreeInfos);
-                    string bigMessage = String.Join(System.Environment.NewLine, allTreeInfos);
-                    InfoController.Say("#RELOAD# " + bigMessage);
-                    Thread.Sleep(100);
-                    InfoController.Say("#RELOAD# -------------------------------------------------------------------------------------------------------------------------------");
-                    Thread.Sleep(100);
-                    allTreeInfos.Clear();
-                    object result2 = shadowTopRootJobListViewModel.Traverse(ListTreeElement, allTreeInfos);
-                    bigMessage = String.Join(System.Environment.NewLine, allTreeInfos);
-                    InfoController.Say("#RELOAD# " + bigMessage);
-                    Thread.Sleep(100);
-                    InfoController.Say("#RELOAD# -------------------------------------------------------------------------------------------------------------------------------");
-                    */
                 }
             }
-        }
-
-        /// <summary>
-        /// Fügt Informationen über die übergebene ExpandableNode in eine als object übergebene Stringlist ein.
-        /// </summary>
-        /// <param name="depth">Nullbasierter Zähler der Rekursionstiefe eines Knotens im LogicalTaskTree.</param>
-        /// <param name="expandableNode">Basisklasse eines ViewModel-Knotens im LogicalTaskTree.</param>
-        /// <param name="userObject">Ein beliebiges durchgeschliffenes UserObject (hier: List&lt;string&gt;).</param>
-        /// <returns>Die bisher gefüllte Stringlist mit Knoteninformationen.</returns>
-        protected object ListTreeElement(int depth, IExpandableNode expandableNode, object userObject)
-        {
-            string deptString = depth > 0 ? new String(' ', depth * 2) : "";
-            List<string> allTreeInfos = (List<string>)userObject;
-            if (expandableNode is JobListViewModel)
-            {
-                JobListViewModel jobListViewModel = expandableNode as JobListViewModel;
-                allTreeInfos.Add(deptString + jobListViewModel.ToString().Replace(Environment.NewLine, ", "));
-            }
-            else
-            {
-                if (expandableNode is SingleNodeViewModel)
-                {
-                    SingleNodeViewModel singleNodeViewModel = expandableNode as SingleNodeViewModel;
-                    allTreeInfos.Add(deptString + singleNodeViewModel.ToString().Replace(Environment.NewLine, ", "));
-                }
-                else
-                {
-                    if (expandableNode is LogicalNodeViewModel)
-                    {
-                        LogicalNodeViewModel logicalNodeViewModel = expandableNode as LogicalNodeViewModel;
-                        allTreeInfos.Add(deptString + logicalNodeViewModel.ToString().Replace(Environment.NewLine, ", "));
-                    }
-                    else
-                    {
-                        allTreeInfos.Add(deptString + "NOTHING " + expandableNode.Path);
-                    }
-                }
-            }
-            return userObject;
         }
 
         /// <summary>
@@ -1644,6 +1658,10 @@ namespace Vishnu.ViewModel
         /// <param name="state">Die geänderte Eigenschaft der Quelle.</param>
         protected virtual void subStateChanged(object sender, NodeState state)
         {
+            if (this.IsTreePaused != LogicalNode.IsTreePaused)
+            {
+                this.IsTreePaused = LogicalNode.IsTreePaused;
+            }
             //System.Diagnostics.StackTrace s = new System.Diagnostics.StackTrace(System.Threading.Thread.CurrentThread, true);
             //string callingMethod = s.GetFrame(2).GetMethod().Name;
             //InfoController.Say(String.Format("#SUB# LogicalNodeViewModel.subStateChanged {0} LogicalState: {1}, Caller: {2}"
@@ -1789,6 +1807,7 @@ namespace Vishnu.ViewModel
             if (args.Properties.Contains("IsInSleepTime"))
             {
                 this.IsInSleepTime = this._myLogicalNode.IsInSleepTime;
+                this.IsTreePaused = LogicalNode.IsTreePaused;
                 this.SleepTimeTo = String.Format("Ruhezeit bis {0:c}", this._myLogicalNode.SleepTimeTo);
             }
             foreach (string propertyName in args.Properties)
@@ -1813,11 +1832,17 @@ namespace Vishnu.ViewModel
         private int _singleNodes;
         private LogicalNodeViewModel _parent;
         private bool _canExpanderExpand;
+
         private System.Windows.Visibility _visibility;
         private string _freeComment;
         private bool _isInSleepTime;
         private string _sleepTimeTo;
         private TreeParameters _treeParams;
+        private RelayCommand _btnReloadTaskTreeRelayCommand;
+        private RelayCommand _btnLogTaskTreeRelayCommand;
+        private RelayCommand _btnPauseResumeTaskTreeRelayCommand;
+        private string _hookedTo;
+        private bool _isTreePaused;
 
         // True, wenn die Kinder dieses Knotens noch nicht geladen wurden.
         private bool _hasDummyChild
@@ -1829,6 +1854,44 @@ namespace Vishnu.ViewModel
         private LogicalNodeViewModel()
         {
             this._canExpanderExpand = true;
+        }
+
+        private void reloadTaskTreeExecute(object parameter)
+        {
+            InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.reloadTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
+            this.ReloadTaskTree();
+        }
+
+        private bool canReloadTaskTreeExecute()
+        {
+            bool canReload = true; // !(this._myLogicalNode is NodeConnector); // && this._myLogicalNode.CanTreeStart;
+            return canReload;
+        }
+
+        private void logTaskTreeExecute(object parameter)
+        {
+            InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.logTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
+            LogicalTaskTreeMerger.LogTaskTree(this, false);
+        }
+
+        private void pauseResumeTaskTreeExecute(object parameter)
+        {
+            if (!LogicalNode.IsTreePaused)
+            {
+                InfoController.Say(String.Format($"#RELOAD# Pausing Tree"));
+                LogicalNode.PauseTree();
+            }
+            else
+            {
+                InfoController.Say(String.Format($"#RELOAD# Continuing Tree"));
+                LogicalNode.ResumeTree();
+            }
+        }
+
+        private bool canLogTaskTreeExecute()
+        {
+            bool canLog = true;
+            return canLog;
         }
 
         #endregion private members

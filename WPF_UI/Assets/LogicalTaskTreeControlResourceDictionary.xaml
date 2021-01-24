@@ -123,31 +123,106 @@
         <Separator />
         <MenuItem>
             <MenuItem.Header>
-                <Button Style="{StaticResource MenuButtonTemplate}"
+                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
                         Command="{Binding ReloadLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../Media/available_updates.png" Width="15" Height="15" Margin="0,0,5,0"/>
-                            <TextBlock Text="Reload tree" />
+                            <TextBlock Text="Reload Tree" />
                         </StackPanel>
                     </Button.Content>
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="ButtonBase.Click">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <BooleanAnimationUsingKeyFrames Storyboard.Target="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+											                                Storyboard.TargetProperty="IsOpen"
+											                                >
+                                        <DiscreteBooleanKeyFrame Value="False" KeyTime="0:0:0.3"/>
+                                    </BooleanAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem>
+            <MenuItem.Header>
+                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
+                        Command="{Binding LogLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../Media/dumpTree.png" Width="15" Height="15" Margin="0,0,5,0"/>
+                            <TextBlock Text="Log Tree" />
+                        </StackPanel>
+                    </Button.Content>
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="ButtonBase.Click">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <BooleanAnimationUsingKeyFrames Storyboard.Target="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+											                                Storyboard.TargetProperty="IsOpen"
+											                                >
+                                        <DiscreteBooleanKeyFrame Value="False" KeyTime="0:0:0.3"/>
+                                    </BooleanAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem>
+            <MenuItem.Header>
+                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
+                        Command="{Binding PauseResumeLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Name="PauseTreeImage" Width="15" Height="15" Margin="0,0,5,0">
+                                <Image.Style>
+                                    <Style TargetType="{x:Type Image}">
+                                        <Setter Property="Source" Value="../Media/pauseTree.png" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsTreePaused}" Value="True">
+                                                <Setter Property="Source" Value="../Media/play.png" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Image.Style>
+                            </Image>
+                            <!-- TextBlock Name="PauseTreeText" Text="Pause Tree" /-->
+                            <TextBlock Name="PauseTreeText">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="Text" Value="Pause Tree" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsTreePaused}" Value="True">
+                                                <Setter Property="Text" Value="Resume Tree" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Button.Content>
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="ButtonBase.Click">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <BooleanAnimationUsingKeyFrames Storyboard.Target="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+											                                Storyboard.TargetProperty="IsOpen"
+											                                >
+                                        <DiscreteBooleanKeyFrame Value="False" KeyTime="0:0:0.3"/>
+                                    </BooleanAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
                 </Button>
             </MenuItem.Header>
         </MenuItem>
         <Separator />
-        <!--<MenuItem>
-            <MenuItem.Header>
-                <Button Style="{StaticResource MenuButtonTemplate}"
-                        Command="{Binding ReloadLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="../Media/available_updates.png" Width="15" Height="15" Margin="0,0,5,0"/>
-                            <TextBlock Text="Reload tree" />
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-            </MenuItem.Header>
-        </MenuItem>-->
     </ContextMenu>
 
     <sys:Double x:Key="ToggleButtonArrow.StrokeThickness">2</sys:Double>

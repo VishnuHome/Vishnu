@@ -100,6 +100,14 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Vergibt einen neuen GlobalUniqueIdentifier für den VisualTreeCacheBreaker.
+        /// </summary>
+        public void RefreshVisualTreeCacheBreaker()
+        {
+            this.VisualTreeCacheBreaker = Guid.NewGuid().ToString();
+        }
+
+        /// <summary>
         /// Kann überschrieben werden, um das Parent-Control
         /// in der Geschäftslogik zu speichern.
         /// </summary>

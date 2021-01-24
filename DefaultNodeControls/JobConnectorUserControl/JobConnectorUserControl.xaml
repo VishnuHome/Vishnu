@@ -33,7 +33,8 @@
             </x:Code>
             <DataTemplate DataType="{x:Type vm:JobConnectorViewModel}">
                 <Border Name="ItemBorder" Background="Transparent" MouseDown="ItemBorder_MouseDown" Visibility="{Binding Visibility}">
-                    <Grid ToolTip="{Binding LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400">
+                    <Grid Name="MainGrid" ToolTip="{Binding LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400"
+                          ContextMenu="{DynamicResource cmMainGrid}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>

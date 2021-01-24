@@ -407,15 +407,15 @@ namespace LogicalTaskTree
             }
             if (!String.IsNullOrEmpty(slavePathName))
             {
-                stringBuilder.AppendLine(String.Format($"SlavePathName: {slavePathName}"));
+                stringBuilder.AppendLine(String.Format($"    SlavePathName: {slavePathName}"));
             }
             if (!String.IsNullOrEmpty(referencedNodeName))
             {
-                stringBuilder.AppendLine(String.Format($"ReferencedNodeName: {referencedNodeName}"));
+                stringBuilder.AppendLine(String.Format($"    ReferencedNodeName: {referencedNodeName}"));
             }
             if (!String.IsNullOrEmpty(checkerParameters))
             {
-                stringBuilder.AppendLine(String.Format($"CheckerParameters: {checkerParameters}"));
+                stringBuilder.AppendLine(String.Format($"    CheckerParameters: {checkerParameters}"));
             }
             return stringBuilder.ToString();
         }

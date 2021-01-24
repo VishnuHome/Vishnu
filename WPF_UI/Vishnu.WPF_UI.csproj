@@ -200,6 +200,15 @@
   <ItemGroup>
     <Resource Include="Media\available_updates.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Media\dumpTree.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Media\pauseTree.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Media\play.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
