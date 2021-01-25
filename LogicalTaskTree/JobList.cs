@@ -433,7 +433,7 @@ namespace LogicalTaskTree
         /// Dictionary von externen Prüfroutinen für einen jobPackage.Job mit Namen als Key.
         /// Wird als Lookup für unaufgelöste JobConnector-Referenzen genutzt.
         /// </summary>
-        public Dictionary<string, NodeCheckerBase> AllCheckers { get; set; }
+        public Dictionary<string, NodeCheckerBase> AllCheckersForUnreferencingNodeConnectors { get; set; }
 
         /// <summary>
         /// Liste von NodeConnectoren, die beim Parsen der Jobs noch nicht aufgelöst
@@ -1062,7 +1062,7 @@ namespace LogicalTaskTree
             this._lastExecutedWorkersSendersEvents = new Dictionary<string, Dictionary<string, List<WorkerShell>>>();
             this._lastExecutedWorkersSendersEventsLocker = new object();
             this.LoggerRelevantEventCache = new List<string>();
-            this.AllCheckers = this.Job.Checkers.ToDictionary(c => c.Key, c => c.Value);
+            this.AllCheckersForUnreferencingNodeConnectors = this.Job.Checkers.ToDictionary(c => c.Key, c => c.Value);
             this.UnsatisfiedNodeConnectors = new List<NodeConnector>();
             this.TreeExternalSingleNodes = new List<SingleNode>();
             this.TreeExternalCheckers = this.Job.Checkers.Where(c => { return (c.Value is CheckerShell); }).ToDictionary(c => c.Key, c => c.Value);
@@ -1087,9 +1087,9 @@ namespace LogicalTaskTree
             {
                 foreach (NodeConnector nodeConnector in this.UnsatisfiedNodeConnectors)
                 {
-                    if (!this.RootJobList.AllCheckers.ContainsKey(nodeConnector.Name))
+                    if (!this.RootJobList.AllCheckersForUnreferencingNodeConnectors.ContainsKey(nodeConnector.Name))
                     {
-                        this.RootJobList.AllCheckers.Add(nodeConnector.Name, this.AllCheckers[nodeConnector.Name]);
+                        this.RootJobList.AllCheckersForUnreferencingNodeConnectors.Add(nodeConnector.Name, this.AllCheckersForUnreferencingNodeConnectors[nodeConnector.Name]);
                     }
                 }
                 foreach (string key in this.Job.EventTriggers.Keys)
@@ -1370,7 +1370,7 @@ namespace LogicalTaskTree
             for (int i = 0; i < this.UnsatisfiedNodeConnectors.Count; i++)
             {
                 NodeConnector actNodeConnector = this.UnsatisfiedNodeConnectors[i];
-                string checkerReference = this.AllCheckers[actNodeConnector.Name].GetCheckerReference();
+                string checkerReference = this.AllCheckersForUnreferencingNodeConnectors[actNodeConnector.Name].GetCheckerReference();
                 if (checkerReference != null)
                 {
                     // Es handelt sich um einen ValueModifier, der auf einen existierenden Checker verweist.

@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using NetEti.MVVMini;
 using LogicalTaskTree.Provider;
 using System.Text;
+// using System.Windows.Threading;
 
 namespace LogicalTaskTree
 {
@@ -1565,18 +1566,20 @@ namespace LogicalTaskTree
         /// <summary>
         /// Hält die Verarbeitung im Tree an.
         /// </summary>
-        public static void PauseTree()
+        public void PauseTree()
         {
             LogicalNode._isTreePaused = true;
+            this.OnNodeStateChanged();
             Thread.Sleep(HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
         }
 
         /// <summary>
         /// Lässt einen angehaltenen Tree weiterlaufen.
         /// </summary>
-        public static void ResumeTree()
+        public void ResumeTree()
         {
             LogicalNode._isTreePaused = false;
+            this.OnNodeStateChanged();
         }
 
         #endregion public members
@@ -2134,11 +2137,27 @@ namespace LogicalTaskTree
 
         private static void WaitWhileTreePaused()
         {
+            // LogicalNode.DoEvents(); // funktioniert nicht, Button-Icon und -Text wechseln nicht.
             while (LogicalNode.IsTreePaused)
             {
                 Thread.Sleep(LogicalNode.HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
             }
         }
+        
+        /*
+        private static void DoEvents()
+        {
+            var frame = new DispatcherFrame();
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.DataBind,
+                new DispatcherOperationCallback(
+                    delegate (object f)
+                    {
+                        ((DispatcherFrame)f).Continue = false;
+                        return null;
+                    }), frame);
+            Dispatcher.PushFrame(frame);
+        }
+        */
 
         /// <summary>
         /// Eigene (Timer-)Task Action für den Run eines (Teil-)Baums.

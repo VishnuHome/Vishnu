@@ -90,7 +90,7 @@
     <Compile Include="JobGroupViewModel.cs" />
     <Compile Include="JobListViewModel.cs" />
     <Compile Include="LogicalNodeViewModel.cs" />
-    <Compile Include="LogicalTaskTreeMerger.cs" />
+    <Compile Include="LogicalTaskTreeManager.cs" />
     <Compile Include="LogicalTaskTreeViewModel.cs" />
     <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="NodeErrorViewModel.cs" />

@@ -247,14 +247,19 @@ namespace LogicalTaskTree
                     string val = this.Id.Substring(6);
                     try
                     {
-                        this._constantValue = Boolean.Parse(val);
-                        this.Name = this._constantValue.ToString();
+                        if (this._constantValue != null)
+                        {
+                            this._constantValue = Boolean.Parse(val);
+                            this.Name = this._constantValue.ToString();
+                        }
+                        else
+                        {
+                            this.Name = "Null";
+                        }
                     }
                     catch (Exception ex)
                     {
-                        // throw new ArgumentException("Boolsche Konstanten müssen True oder False sein.", ex);
-                        this._constantValue = null;
-                        this.Name = "Null";
+                        throw new ArgumentException("Erweiterte boolsche Konstanten müssen True, False oder null sein.", ex);
                     }
                     this._returnConstantValue = true;
                 }
@@ -531,7 +536,7 @@ namespace LogicalTaskTree
                     this._lastSucceeded = 100;
                     if (this._returnConstantValue)
                     {
-                        logical = (bool)this._constantValue;
+                        logical = (bool?)this._constantValue;
                     }
                     else
                     {

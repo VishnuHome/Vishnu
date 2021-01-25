@@ -251,6 +251,16 @@ namespace Vishnu.ViewModel
             }
         }
 
+        //private static void ProcessUITasks()
+        //{
+        //    DispatcherFrame frame = new DispatcherFrame();
+        //    Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(delegate (object parameter) {
+        //        frame.Continue = false;
+        //        return null;
+        //    }), null);
+        //    Dispatcher.PushFrame(frame);
+        //}
+        
         /// <summary>
         /// Das Ende einer möglichen Ruhezeit als formatierter String.
         /// </summary>
@@ -1593,7 +1603,7 @@ namespace Vishnu.ViewModel
                     using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
                     {
 
-                        LogicalTaskTreeMerger.Merge(treeTopRootJobListViewModel, shadowTopRootJobListViewModel);
+                        LogicalTaskTreeManager.MergeTaskTrees(treeTopRootJobListViewModel, shadowTopRootJobListViewModel);
                         // this.GetTopRootJobListViewModel().FullTreeRefresh();
                     }
                     //}));
@@ -1871,20 +1881,20 @@ namespace Vishnu.ViewModel
         private void logTaskTreeExecute(object parameter)
         {
             InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.logTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
-            LogicalTaskTreeMerger.LogTaskTree(this, false);
+            LogicalTaskTreeManager.LogTaskTree(this, false);
         }
 
         private void pauseResumeTaskTreeExecute(object parameter)
         {
-            if (!LogicalNode.IsTreePaused)
+            if (!this.IsTreePaused)
             {
                 InfoController.Say(String.Format($"#RELOAD# Pausing Tree"));
-                LogicalNode.PauseTree();
+                this._myLogicalNode?.PauseTree();
             }
             else
             {
                 InfoController.Say(String.Format($"#RELOAD# Continuing Tree"));
-                LogicalNode.ResumeTree();
+                this._myLogicalNode?.ResumeTree();
             }
         }
 

@@ -50,6 +50,22 @@ namespace Vishnu.Interchange
         }
 
         /// <summary>
+        /// Löscht den internen Assembly-Cache, sodass alle Assemblies beim nächsten Aufruf neu geladen werden.
+        /// </summary>
+        public static void ClearCache()
+        {
+            try
+            {
+                ThreadLocker.LockNameGlobal("AssemblyLoader");
+                VishnuAssemblyLoader.AssembliesToBeReloadedNext.Clear();
+            }
+            finally
+            {
+                ThreadLocker.UnlockNameGlobal("AssemblyLoader");
+            }
+        }
+
+        /// <summary>
         /// Registriert Pfade von dynamisch zu ladenden Assemblies, die beim nächsten Ladevorgang auf jeden
         /// Fall neu von der Festplatte und nicht aus einem eventuell gecachtem Image geladen werden sollen.
         /// </summary>
@@ -198,6 +214,11 @@ namespace Vishnu.Interchange
                 {
                     candidate = System.Reflection.Assembly.Load(System.IO.File.ReadAllBytes(dllPath));
                     int loadedCounter = 0;
+                    if (force)
+                    {
+                        KeyValuePair<Assembly, int> success;
+                        VishnuAssemblyLoader.LoadedAssembliesByNameAndChangeCount.TryRemove(dllName, out success);
+                    }
                     if (!VishnuAssemblyLoader.LoadedAssembliesByNameAndChangeCount.ContainsKey(dllName))
                     {
                         VishnuAssemblyLoader.LoadedAssembliesByNameAndChangeCount.TryAdd(dllName, new KeyValuePair<Assembly, int>(candidate, 0));

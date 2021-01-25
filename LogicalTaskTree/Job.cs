@@ -501,7 +501,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Liefert die Values von Workers.
         /// </summary>
-        internal Dictionary<string, Dictionary<string, WorkerShell[]>>.ValueCollection Values
+        public Dictionary<string, Dictionary<string, WorkerShell[]>>.ValueCollection Values
         {
             get
             {
