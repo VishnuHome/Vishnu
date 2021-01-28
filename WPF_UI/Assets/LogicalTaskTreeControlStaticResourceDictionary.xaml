@@ -4,8 +4,6 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib"
                     xmlns:base="clr-namespace:Vishnu.Interchange;assembly=Vishnu.Interchange"
                     xmlns:attached="clr-namespace:Vishnu.WPF_UI.DependencyProperties">
-    <SolidColorBrush x:Key="WindowBGBrush" Color="LemonChiffon"/>
-    <SolidColorBrush x:Key="WindowBGBrushSleepMode" Color="DeepSkyBlue"/>
     <ResourceDictionary x:Key="BitmapImageDictionary">
         <BitmapImage x:Key="None" UriSource="../Media/empty.png" />
         <BitmapImage x:Key="Working" UriSource="../Media/running_man.png" />

@@ -33,6 +33,10 @@ namespace Vishnu.WPF_UI.ValueConverter
             {
                 return new SolidColorBrush(Colors.Orange);
             }
+            if (!((values[0] is bool) || (values[0] is null)))
+            {
+                return new SolidColorBrush(Colors.Orange); // sonst später Exception, da values[0] nur object ist; // TODO: hier die eigentliche Ursache ermitteln
+            }
             FrameworkElement owner = values[1] as FrameworkElement;
             try
             {

@@ -179,12 +179,14 @@
                                             </Border>
                                         </Grid>
                                         <ControlTemplate.Triggers>
-                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}}, Path=(attached:AttachedPropertiesContainer.ParentChildOrientation)}" Value="Horizontal">
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
+                                                Path=(attached:AttachedPropertiesContainer.ParentChildOrientation)}" Value="Horizontal">
                                                 <Setter Property="Grid.Column" TargetName="ToggleButtonBorder" Value="0" />
                                                 <Setter Property="Grid.Row" TargetName="ToggleButtonBorder" Value="1" />
                                                 <Setter Property="Grid.ColumnSpan" TargetName="ToggleButtonBorder" Value="3" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}}, Path=(attached:AttachedPropertiesContainer.HasParent)}" Value="false">
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
+                                                Path=(attached:AttachedPropertiesContainer.HasParent)}" Value="false">
                                                 <Setter Property="Grid.Column" TargetName="ToggleButtonBorder" Value="0" />
                                                 <Setter Property="Grid.Row" TargetName="ToggleButtonBorder" Value="0" />
                                                 <Setter Property="Grid.ColumnSpan" TargetName="ToggleButtonBorder" Value="3" />

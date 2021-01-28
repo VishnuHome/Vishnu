@@ -33,15 +33,14 @@ namespace Vishnu.WPF_UI.ValueConverter
             {
                 return new BitmapImage(new Uri("../Media/checkmark_small.png", UriKind.Relative));
             }
-            //try
-            //{
-                status = (VisualNodeState)(values[0]); // hier Exception, da values[0] == null ist;
-            //}
-            //catch
-            //{
-            //    // TODO: hier die eigentliche Ursache ermitteln
-            //    // return DependencyProperty.UnsetValue;
-            //}
+            if ((values[0]) is VisualNodeState)
+            {
+                status = (VisualNodeState)(values[0]); // hier Exception, da values[0] == null ist; // TODO: hier die eigentliche Ursache ermitteln
+            }
+            else
+            {
+                status = VisualNodeState.None;
+            }
             ResourceDictionary targets = (ResourceDictionary)(values[1]);
             switch (status)
             {

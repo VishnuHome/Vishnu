@@ -226,6 +226,15 @@ System.InvalidCastException: Die angegebene Umwandlung ist ungültig.
    bei Vishnu.EntryPoint.Main(String[] args) in C:\Users\micro\Documents\private4\WPF\Eti\VishnuHome\Vishnu\Vishnu\App.cs:Zeile 32.
 ---------------------------
 OK   
+
+((MS.Internal.NamedObject)values[0])._name
+	{DependencyProperty.UnsetValue}
+
+
+
+
+
+
 ---------------------------
     
 ---------------------------
