@@ -28,11 +28,20 @@ namespace Vishnu.WPF_UI.ValueConverter
         /// <returns>BitmapImage.</returns>
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
+            VisualNodeState status = VisualNodeState.None;
             if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(new DependencyObject()))
             {
                 return new BitmapImage(new Uri("../Media/checkmark_small.png", UriKind.Relative));
             }
-            VisualNodeState status = (VisualNodeState)(values[0]);
+            //try
+            //{
+                status = (VisualNodeState)(values[0]); // hier Exception, da values[0] == null ist;
+            //}
+            //catch
+            //{
+            //    // TODO: hier die eigentliche Ursache ermitteln
+            //    // return DependencyProperty.UnsetValue;
+            //}
             ResourceDictionary targets = (ResourceDictionary)(values[1]);
             switch (status)
             {

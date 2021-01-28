@@ -1598,18 +1598,13 @@ namespace Vishnu.ViewModel
                     shadowTopRootJobListViewModel.ExpandTree(shadowTopRootJobListViewModel, false);
                     JobListViewModel treeTopRootJobListViewModel = this.GetTopRootJobListViewModel() ?? this as JobListViewModel;
 
-                    //Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-                    //{
                     using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
                     {
 
                         LogicalTaskTreeManager.MergeTaskTrees(treeTopRootJobListViewModel, shadowTopRootJobListViewModel);
                         // this.GetTopRootJobListViewModel().FullTreeRefresh();
                     }
-                    //}));
-
                     shadowTopRootJobListViewModel.Dispose();
-
                 }
             }
         }

@@ -247,7 +247,7 @@ namespace Vishnu
 
             // Das Main-ViewModel
             MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(logicalTaskTreeViewModel, this._mainWindow.ForceRecalculateWindowMeasures,
-                SingleInstanceApplication._appSettings.FlatNodeListFilter, SingleInstanceApplication._appSettings.DemoModus ? "-DEMO-" : "");
+                SingleInstanceApplication._appSettings.FlatNodeListFilter, SingleInstanceApplication._appSettings.DemoModus ? "-DEMO-" : "", treeParameters);
 
             // Verbinden von Main-Window mit Main-ViewModel
             this._mainWindow.DataContext = mainWindowViewModel; //mainViewModel;

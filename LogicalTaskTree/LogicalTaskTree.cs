@@ -15,7 +15,7 @@ namespace LogicalTaskTree
     ///
     /// 18.08.2014 Erik Nagel: erstellt
     /// </remarks>
-    public class LogicalTaskTree : IDisposable
+    public class LogicalTaskTree : IDisposable, IBusinessLogicRoot
     {
         #region public members
 
@@ -23,6 +23,11 @@ namespace LogicalTaskTree
         /// Pro Tree eindeutiger ID-Zusatz.
         /// </summary>
         public static int TreeId;
+
+        /// <summary>
+        /// Zusätzliche Parameter, die für den gesamten Tree Gültigkeit haben oder null.
+        /// </summary>
+        public TreeParameters TreeParams { get; private set; }
 
         #region IDisposable Implementation
 
@@ -103,6 +108,32 @@ namespace LogicalTaskTree
 
         #endregion IDisposable Implementation
 
+        #region IBusinessLogicRoot Implementation
+
+        /// <summary>
+        /// Liefert die oberste JobList des Trees als IVishnuNode.
+        /// </summary>
+        /// <returns>Die oberste JobList des Trees.</returns>
+        public IVishnuNode GetTopJobList()
+        {
+            return this.Tree;
+        }
+
+        /// <summary>
+        /// Setzt die oberste JobList des Trees.
+        /// Returnt die bisher oberste JobList.
+        /// </summary>
+        /// <param name="topJobList">Die neue oberste JobList des Trees.</param>
+        /// <returns>Die bisher oberste JobList des Trees.</returns>
+        public IVishnuNode SetTopJobList(IVishnuNode topJobList)
+        {
+            JobList oldTopJobList = this.Tree;
+            this.Tree = topJobList as JobList;
+            return oldTopJobList;
+        }
+
+        #endregion IBusinessLogicRoot Implementation
+
         /// <summary>
         /// Liefert die RootJobList des LogicalTaskTrees inklusive Setter.
         /// </summary>
@@ -126,6 +157,7 @@ namespace LogicalTaskTree
         public LogicalTaskTree(TreeParameters treeParams, IJobProvider jobProvider)
         {
             treeParams.BusinessLogicRoot = this;
+            this.TreeParams = treeParams;
             this._rootJobList = new JobList(treeParams, jobProvider);
         }
 

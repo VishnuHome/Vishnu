@@ -346,7 +346,10 @@ namespace LogicalTaskTree
         /// </summary>
         public override JobList Reload()
         {
-            // keine Weiterleitung 
+            if (this._node != null)
+            {
+                return this._node.Reload();
+            }
             return null;
         }
 

@@ -17,9 +17,48 @@ namespace Vishnu.ViewModel
     ///
     /// 09.01.2014 Erik Nagel: erstellt
     /// </remarks>
-    public class MainWindowViewModel : ObservableObject
+    public class MainWindowViewModel : ObservableObject, IViewModelRoot
     {
         #region public members
+
+        #region IViewModelRoot Implementation
+
+        /// <summary>
+        /// Liefert das oberste JobListViewModel des Trees als IVishnuViewModel.
+        /// </summary>
+        /// <returns>Das oberste JobListViewModel des Trees als IVishnuViewModel.</returns>
+        public IVishnuViewModel GetTopJobListViewModel()
+        {
+            return this.TreeVM.TreeVM;
+        }
+
+        /// <summary>
+        /// Setzt das oberste JobListViewModel des Trees.
+        /// Returnt das bisherige oberste JobListViewModel.
+        /// </summary>
+        /// <param name="topJobListViewModel">Das neue oberste JobListViewModel des Trees.</param>
+        /// <returns>Das bisherige oberste JobListViewModel des Trees.</returns>
+        public IVishnuViewModel SetTopJobListViewModel(IVishnuViewModel topJobListViewModel)
+        {
+            JobListViewModel oldTopJobListViewModel = this.TreeVM.TreeVM;
+            this.TreeVM.TreeVM = topJobListViewModel as JobListViewModel;
+            return oldTopJobListViewModel;
+        }
+
+        /// <summary>
+        /// Aktualisiert die ViewModels von eventuellen zusätzliche Ansichten,
+        /// die dieselbe BusinessLogic abbilden (hier: JobGroupViewModel).
+        /// </summary>
+        public void RefreshDependentAlternativeViewModels()
+        {
+            ObservableCollection<JobGroupViewModel> oldJobGroups = this.JobGroupsVM;
+            this.JobGroupsVM = this.SelectJobGroups();
+            oldJobGroups?.Clear();
+            oldJobGroups = null;
+        }
+
+
+        #endregion IViewModelRoot Implementation
 
         /// <summary>
         /// Der Titel des Haupt-Fensters.
@@ -41,6 +80,11 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Zusätzliche Parameter, die für den gesamten Tree Gültigkeit haben oder null.
+        /// </summary>
+        public TreeParameters TreeParams { get; private set; }
+
+        /// <summary>
         /// ViewModel für den LogicalTaskTree.
         /// </summary>
         public LogicalTaskTreeViewModel TreeVM { get; set; }
@@ -48,7 +92,20 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Liste von JobListViewModels mit ihren Checkern.
         /// </summary>
-        public ObservableCollection<JobGroupViewModel> JobGroupsVM { get; private set; }
+        public ObservableCollection<JobGroupViewModel> JobGroupsVM {
+            get
+            {
+                return this._jobGroupsVM;
+            }
+            private set
+            {
+                if (this._jobGroupsVM != value)
+                {
+                    this._jobGroupsVM = value;
+                    RaisePropertyChanged("JobGroupsVM");
+                }
+            }
+        }
 
         /// <summary>
         /// Command für den Run-Button im LogicalTaskTreeControl.
@@ -75,7 +132,9 @@ namespace Vishnu.ViewModel
         /// <param name="initWindowSize">Restauriert die Fenstergröße abhängig vom Fensterinhalt.</param>
         /// <param name="flatNodeListFilter">Filter für definierte Knotentypen.</param>
         /// <param name="additionalWindowHeaderInfo">Optionaler Zusatztext für den Fenstertitel.</param>
-        public MainWindowViewModel(LogicalTaskTreeViewModel logicalTaskTreeViewModel, Action<object> initWindowSize, NodeTypes flatNodeListFilter, string additionalWindowHeaderInfo)
+        /// <param name="treeParams">Parameter für den gesamten Tree.</param>
+        public MainWindowViewModel(LogicalTaskTreeViewModel logicalTaskTreeViewModel, Action<object> initWindowSize, NodeTypes flatNodeListFilter,
+            string additionalWindowHeaderInfo, TreeParameters treeParams)
         {
             this.TreeVM = logicalTaskTreeViewModel;
             this._initSizeRelayCommand = new RelayCommand(initWindowSize);
@@ -84,6 +143,8 @@ namespace Vishnu.ViewModel
             this.WindowTitle = "Vishnu Logical Process Monitor"
                 + " - " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
                 + "  " + additionalWindowHeaderInfo;
+            treeParams.ViewModelRoot = this;
+            this.TreeParams = treeParams;
             //this.MoveWindowToStartPosition();
 
         }
@@ -102,6 +163,7 @@ namespace Vishnu.ViewModel
 
         #region private members
 
+        private ObservableCollection<JobGroupViewModel> _jobGroupsVM;
         private RelayCommand _initSizeRelayCommand;
         private NodeTypes _flatNodeListFilter;
         private string _windowTitle;

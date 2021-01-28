@@ -229,7 +229,21 @@ namespace Vishnu.ViewModel
             // Darüber hinaus möglicherweise noch gleiche isomorphe Teilbäume an unterschiedlichen Hierarchie-Ebenen werden nicht
             // gesucht, der Nutzen wäre eher gering bei ungleich höherem Aufwand.
             activeTree.Traverse(DiffTreeElement, LogicalTaskTreeManager._shadowVMFinder);
+            try
+            {
+                activeTree.GetLogicalNode()?.PauseTree();
+                InfoController.Say(String.Format($"#RELOAD# Trees paused"));
+                InfoController.FlushAll();
 
+                //Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+                //{
+                activeTree.TreeParams.ViewModelRoot.RefreshDependentAlternativeViewModels();
+                //}));
+            }
+            finally
+            {
+                activeTree.GetLogicalNode()?.ResumeTree();
+            }
             VishnuAssemblyLoader.ClearCache(); // Sorgt dafür, dass alle DLLs neu geladen werden.
         }
 

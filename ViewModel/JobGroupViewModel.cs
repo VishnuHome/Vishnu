@@ -14,7 +14,7 @@ namespace Vishnu.ViewModel
     ///
     /// 01.09.2014 Erik Nagel: erstellt
     /// </remarks>
-    public class JobGroupViewModel : ObservableObject
+    public class JobGroupViewModel : VishnuViewModelBase // ObservableObject
     {
         /// <summary>
         /// ViewModel für den LogicalTaskTree.

@@ -144,6 +144,27 @@
                         ItemsSource="{Binding Children}"
                     >
                 <Border BorderBrush="Gray" BorderThickness="1" Margin="1">
+                    <Border.Style>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="Background" Value="{StaticResource ItemAreaBrush}"/>
+                            <Style.Triggers>
+                                <Trigger Property="UIElement.IsMouseOver" Value="True">
+                                    <Setter
+                                                    Property="Background"                     
+                                                    Value="{StaticResource SelectedItemAreaBrush}" />
+                                    <Setter
+                                                    Property="BorderBrush"                     
+                                                    Value="{StaticResource SelectedItemBorderBrush}" />
+                                    <Setter
+                                                    Property="TextElement.Foreground"                   
+                                                    Value="{DynamicResource {x:Static SystemColors.ControlLightBrush}}" />
+                                    <Setter
+                                                    Property="BitmapEffect"                  
+                                                    Value="{StaticResource DropShadowEffect}" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
                     <ContentControl>
                         <ContentControl.Content>
                             <MultiBinding Converter="{StaticResource path2UserControlBase, diag:PresentationTraceSources.TraceLevel=High}">

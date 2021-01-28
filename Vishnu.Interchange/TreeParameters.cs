@@ -87,16 +87,19 @@ namespace Vishnu.Interchange
 
         /// <summary>
         /// Interner, Assembly-übergreifender Parameter.
-        /// Enthält den LogicalTaskTree als Objekt, um hier einen Assembly-Verweis auf LogicalTaskTree zu vermeiden.
-        /// Wird innerhalb der Assembly Vishnu.ViewModel wieder aufgelöst. Dort existiert ein Verweis auf LogicalTaskTree.
+        /// Enthält den LogicalTaskTree als IBusinessLogicRoot, um hier einen direkten
+        /// Assembly-Verweis auf LogicalTaskTree zu vermeiden.
+        /// Wird innerhalb der Assembly Vishnu.ViewModel wieder aufgelöst.
+        /// Dort existiert ein Verweis auf LogicalTaskTree.
         /// </summary>
-        public object BusinessLogicRoot { get; set; }
+        public IBusinessLogicRoot BusinessLogicRoot { get; set; }
 
         /// <summary>
         /// Interner, Assembly-übergreifender Parameter.
-        /// Enthält das LogicalTaskTreeViewModel als Objekt, um hier einen Assembly-Verweis auf Vishnu.ViewModel zu vermeiden.
+        /// Enthält das LogicalTaskTreeViewModel als IViewModelRoot, um hier einen direkten
+        /// Assembly-Verweis auf Vishnu.ViewModel zu vermeiden.
         /// Wird innerhalb der Assembly Vishnu.ViewModel wieder aufgelöst.
         /// </summary>
-        public object ViewModelRoot { get; set; }
+        public IViewModelRoot ViewModelRoot { get; set; }
     }
 }

@@ -68,7 +68,6 @@ namespace Vishnu.ViewModel
         public OrientedTreeViewModelBase(TreeParameters treeParams)
         {
             this.TreeParams = treeParams;
-            treeParams.ViewModelRoot = this;
             this.MainLogicalNodeView = new List<JobListViewModel>();
         }
 
