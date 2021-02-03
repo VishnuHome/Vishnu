@@ -230,10 +230,7 @@ OK
 ((MS.Internal.NamedObject)values[0])._name
 	{DependencyProperty.UnsetValue}
 
-
-
-
-
+		_name	"{DependencyProperty.UnsetValue}"	string
 
 ---------------------------
     

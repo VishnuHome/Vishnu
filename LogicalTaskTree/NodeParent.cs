@@ -15,6 +15,8 @@ namespace LogicalTaskTree
     /// </remarks>
     public abstract class NodeParent : LogicalNode
     {
+        #region public members
+
         /// <summary>
         /// Enthält Komma-separiert TreeParams.Name und IdInfo der Knoten, in deren
         /// Events sich dieser NodeParent eingehängt hat oder den Text "NULL".
@@ -96,6 +98,8 @@ namespace LogicalTaskTree
                 this.Children[index] = null;
             }
         }
+
+        #endregion public members
 
         #region internal members
 
@@ -397,7 +401,7 @@ namespace LogicalTaskTree
         protected virtual void SubNodeProgressFinished(object sender, CommonProgressChangedEventArgs args)
         {
             this.ThreadUpdateLastSingleNodesFinished(-1); // führt zur Neuauswertung.
-            if (args.CountSucceeded < this.Children.Count)
+            if (args.CountSucceeded < this.Children.Count) // TODO: der IF ist so kompletter Unfug!
             {
                 this.OnNodeProgressChanged(this.Id + "." + this.Name + " | " + args.ItemName, this.SingleNodes, this.SingleNodesFinished, ItemsTypes.itemGroups);
             }

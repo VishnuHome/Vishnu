@@ -4,6 +4,7 @@ using System;
 using Vishnu.Interchange;
 using System.Threading;
 using System.Text;
+using NetEti.ApplicationControl; // TEST: 01.02.2021 Nagel
 
 namespace LogicalTaskTree
 {
@@ -558,6 +559,20 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
+        /// Setzt bestimmte Eigenschaften auf die Werte der übergebenen LogicalNode "source". 
+        /// </summary>
+        /// <param name="source">LogicalNode mit zu übernehmenden Eigenschaften.</param>
+        public override void InitFromNode(LogicalNode source)
+        {
+            base.InitFromNode(source);
+            if (source != null && source is NodeList)
+            {
+                this.ThreadUpdateLastSingleNodes((source as NodeList).LastSingleNodes);
+                this.ThreadUpdateLastSingleNodesFinished((source as NodeList).LastSingleNodesFinished);
+            }
+        }
+
+        /// <summary>
         /// Abbrechen der Task.
         /// Wenn der Knoten selber beschäftigt ist, dann diesen zum Abbruch veranlassen,
         /// ansonsten die Abbruch-Anforderung an alle Kinder weitergeben.
@@ -574,6 +589,7 @@ namespace LogicalTaskTree
             // ... dann die NodeList selbst stoppen.
             base.Break(userBreak);
         }
+
 
         #endregion public members
 
@@ -632,7 +648,7 @@ namespace LogicalTaskTree
                       this.Children.Where(c =>
                       {
                           // 08.08.2018+ return c.LogicalState == NodeLogicalState.Fault;
-                          return c.LastExceptions.Count > 0; // 08.08.2018- wegwn Testfall WrongFalseException
+                          return c.LastExceptions.Count > 0; // 08.08.2018- wegen Testfall WrongFalseException
                       }).Count(); // 02.08.2018-
                     this.LastCountResults = lastFaultResults == 0 ? lastCountResults : 0;
                     return this.LastCountResults;

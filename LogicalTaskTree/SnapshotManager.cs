@@ -99,16 +99,29 @@ namespace LogicalTaskTree
             {
                 SnapshotManager._snapshotRequested = false;
                 Exception exception = null;
+                bool treePausedByMe = false;
                 try
                 {
-                    lock (SnapshotManager._saveLocker) // 10.08.2016 Nagel+-
+                    LogicalNode.WaitWhileSnapshotProhibited(); // Keinen Snapshot erzeugen, solange der Tree anderweitig gestoppt wurde.
+                    lock (SnapshotManager._saveLocker)
                     {
+                        ((LogicalNode)tree).PauseTree(); // Jetzt den Tree selbst für die Dauer der Snapshot-Erzeugung anhalten.
+                        treePausedByMe = true;
+                        InfoController.Say(String.Format($"#RELOAD# Pausing Tree (SM)"));
                         SnapshotManager.saveSnapshot((LogicalNode)tree);
                     }
                 }
                 catch (Exception ex)
                 {
                     exception = ex;
+                }
+                finally
+                {
+                    if (treePausedByMe)
+                    {
+                        ((LogicalNode)tree).ResumeTree();
+                        InfoController.Say(String.Format($"#RELOAD# Continuing Tree (SM)"));
+                    }
                 }
                 if (exception != null)
                 {

@@ -22,7 +22,7 @@ namespace Vishnu.ViewModel
     ///
     /// 05.01.2013 Erik Nagel: erstellt
     /// </remarks>
-    public class JobListViewModel : LogicalNodeViewModel
+    public class JobListViewModel : NodeListViewModel // LogicalNodeViewModel
     {
         #region public members
 
@@ -183,15 +183,6 @@ namespace Vishnu.ViewModel
         #endregion public members
 
         #region internal members
-
-        /// <summary>
-        /// Führt im Verlauf eines externen Tree-Relod einen technischen Run
-        /// für die korrekte Initialisierung des JobListViewModels aus.
-        /// </summary>
-        internal void TechnicalRun()
-        {
-            this.runTaskTreeExecute(null);
-        }
 
         #endregion internal members
 

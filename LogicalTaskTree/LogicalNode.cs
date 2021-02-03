@@ -18,6 +18,11 @@ namespace LogicalTaskTree
     #region definitions
 
     /// <summary>
+    /// Wird aufgerufen, wenn sich der Verarbeitungszustand eines Knotens geändert hat.
+    /// </summary>
+    public delegate void AllStatesChangedEventHandler();
+
+    /// <summary>
     /// Wird aufgerufen, wenn sich das logische Ergebnis eines Knotens geändert hat.
     /// </summary>
     /// <param name="sender">Die Ereignis-Quelle.</param>
@@ -85,6 +90,11 @@ namespace LogicalTaskTree
     {
 
         #region events
+
+        /// <summary>
+        /// Wird aufgerufen, wenn sich der Verarbeitungszustand eines Knotens geändert hat.
+        /// </summary>
+        public static event AllStatesChangedEventHandler AllNodesStateChanged;
 
         /// <summary>
         /// Dieses Event aus IVishnuNode.INotifyPropertiesChanged kann von LogicalNodeViewmodel abonniert werden.
@@ -211,6 +221,22 @@ namespace LogicalTaskTree
         #endregion IVisnuNode implementation
 
         #region properties (alphabetic)
+
+        /// <summary>
+        /// Liefert true, wenn die Verarbeitung im Tree gerade angehalten wurde.
+        /// </summary>
+        public static volatile bool IsTreePaused;
+
+        /// <summary>
+        /// Liefert true, wenn die Verarbeitung im Tree gerade angehalten werden soll
+        /// aber schon erzeugte logische Änderungen noch zuende verteilt werden.
+        /// </summary>
+        public static volatile bool IsTreeFlushing;
+
+        /// <summary>
+        /// Liefert true, wenn gerade keine Snapshots erlaubt sind.
+        /// </summary>
+        public static volatile bool IsSnapshotProhibited;
 
         /// <summary>
         /// Ein Teilbaum kann u.U. schon ein eindeutiges logisches Ergebnis haben,
@@ -650,11 +676,23 @@ namespace LogicalTaskTree
         #region event publisher
 
         /// <summary>
+        /// Löst das NodeStateChanged-Ereignis aus.
+        /// </summary>
+        internal static void OnAllNodesStateChanged()
+        {
+            if (AllNodesStateChanged != null)
+            {
+                AllNodesStateChanged();
+            }
+        }
+
+        /// <summary>
         /// Verarbeitet die Änderung von Logical für diesen Knoten.
         /// Führt ggf. zugeordnete Worker aus.
         /// </summary>
         internal virtual void DoNodeLogicalChanged()
         {
+            LogicalNode.WaitWhileTreePaused(); // vermeidet Deadlocks
             lock (this._nodeLogicalChangedLocker)
             {
                 bool? tmpLogical = this.Logical; // mit Thread-entkoppelten
@@ -867,6 +905,7 @@ namespace LogicalTaskTree
         /// <param name="itemsType">Art der zu zählenden Elemente - Teile eines Ganzen, Ganze Elemente oder Element-Gruppen.</param>
         protected virtual void OnNodeProgressChanged(string itemsName, long countAll, long countSucceeded, ItemsTypes itemsType)
         {
+            LogicalNode.WaitWhileTreePaused();
             if (this.IsThreadValid(Thread.CurrentThread))
             {
                 CommonProgressChangedEventArgs args = new CommonProgressChangedEventArgs(itemsName, countAll, countSucceeded, itemsType, null);
@@ -887,6 +926,7 @@ namespace LogicalTaskTree
         /// <param name="itemsType">Art der zu zählenden Elemente - Teile eines Ganzen, Ganze Elemente oder Element-Gruppen.</param>
         protected virtual void OnNodeProgressFinished(string itemsName, long countAll, long countSucceeded, ItemsTypes itemsType)
         {
+            LogicalNode.WaitWhileTreePaused();
             if (this.IsThreadValid(Thread.CurrentThread))
             {
                 this.ProcessTreeEvent("Finished", null);
@@ -1116,6 +1156,9 @@ namespace LogicalTaskTree
         static LogicalNode()
         {
             LogicalNode._invalidThreads = new ConcurrentDictionary<Thread, bool>();
+            LogicalNode.IsSnapshotProhibited = false;
+            LogicalNode.IsTreeFlushing = false;
+            LogicalNode.IsTreePaused = false;
         }
 
         /// <summary>
@@ -1220,6 +1263,21 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
+        /// Löscht interne Caches, so dass alles neu ausgewertet wird.
+        /// </summary>
+        public virtual void Invalidate()
+        {
+        }
+
+        /// <summary>
+        /// Setzt bestimmte Eigenschaften auf die Werte der übergebenen LogicalNode "source". 
+        /// </summary>
+        /// <param name="source">LogicalNode mit zu übernehmenden Eigenschaften.</param>
+        public virtual void InitFromNode(LogicalNode source)
+        {
+        }
+
+        /// <summary>
         /// Startet die Verarbeitung dieses Knotens nach einem Start
         /// durch den Anwender. Gibt die Information, dass der Start
         /// durch den Anwender erfolgte, im TreeEvent an Run weiter.
@@ -1244,7 +1302,7 @@ namespace LogicalTaskTree
         /// Prüft, ob ein Knoten gestartet werden kann und startet dann den Knoten, seinen Trigger,
         /// oder beide (über StartNodeOrTrigger).
         /// </summary>
-        /// <param name="source">Auslösendes TreeEvent oder null.</param>
+        /// <param name="source">Auslösendes TreeEvent.</param>
         public virtual void Run(TreeEvent source)
         {
             this.ProcessTreeEvent(source.Name, source);
@@ -1360,7 +1418,10 @@ namespace LogicalTaskTree
             {
                 (this.Trigger as TriggerShell).UnregisterTriggerIt(this.Path);
             }
-            this.Logical = null; // essenziell
+            if (!LogicalNode.IsTreePaused) // muss geprüft werden, ansonsten Deadlock beim Reload
+            {
+                this.Logical = null; // essenziell
+            }
         }
 
         /// <summary>
@@ -1553,14 +1614,19 @@ namespace LogicalTaskTree
         private const int HOLDEDTREELOOPSLEEPTIMEMILLISECONDS = 100;
 
         /// <summary>
-        /// Liefert true, wenn die Verarbeitung im Tree gerade angehalten wurde.
+        /// Verhindert Snapshots.
         /// </summary>
-        public static bool IsTreePaused
+        public void ProhibitSnapshots()
         {
-            get
-            {
-                return LogicalNode._isTreePaused;
-            }
+            LogicalNode.IsSnapshotProhibited = true;
+        }
+
+        /// <summary>
+        /// Erlaubt Snapshots.
+        /// </summary>
+        public void AllowSnapshots()
+        {
+            LogicalNode.IsSnapshotProhibited = false;
         }
 
         /// <summary>
@@ -1568,8 +1634,10 @@ namespace LogicalTaskTree
         /// </summary>
         public void PauseTree()
         {
-            LogicalNode._isTreePaused = true;
-            this.OnNodeStateChanged();
+            LogicalNode.IsTreeFlushing = true;
+            LogicalNode.OnAllNodesStateChanged();
+            Thread.Sleep(HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
+            LogicalNode.IsTreePaused = true;
             Thread.Sleep(HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
         }
 
@@ -1578,8 +1646,9 @@ namespace LogicalTaskTree
         /// </summary>
         public void ResumeTree()
         {
-            LogicalNode._isTreePaused = false;
-            this.OnNodeStateChanged();
+            LogicalNode.IsTreeFlushing = false;
+            LogicalNode.IsTreePaused = false;
+            LogicalNode.OnAllNodesStateChanged();
         }
 
         #endregion public members
@@ -2042,7 +2111,6 @@ namespace LogicalTaskTree
         private NodeWorkerState _workersState;
 
         private string _lockName;
-        private static volatile bool _isTreePaused;
 
         // Startet asynchron runAsync. Dieser Zwischenschritt wurde nötig, um Timer, auf die mehrere
         // Knoten verweisen, vom run eines Knotens zu entkoppeln (gleichzeitige Ausführung mehrerer runs).
@@ -2058,7 +2126,7 @@ namespace LogicalTaskTree
             {
                 return;
             }
-            LogicalNode.WaitWhileTreePaused();
+            LogicalNode.WaitWhileTreePausedOrFlushing();
             /* DEBUG+
             if (source == null)
             {
@@ -2135,15 +2203,40 @@ namespace LogicalTaskTree
             }
         }
 
-        private static void WaitWhileTreePaused()
+        /// <summary>
+        /// Wartet, falls gerade keine Snapshots erlaubt sind, solange, bis die Sperre wieder aufgehoben wurde.
+        /// </summary>
+        internal static void WaitWhileSnapshotProhibited()
         {
-            // LogicalNode.DoEvents(); // funktioniert nicht, Button-Icon und -Text wechseln nicht.
+            while (LogicalNode.IsSnapshotProhibited || LogicalNode.IsTreeFlushing || LogicalNode.IsTreePaused)
+            {
+                Thread.Sleep(LogicalNode.HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
+            }
+        }
+
+        /// <summary>
+        /// Wartet, falls der Tree gerade pausiert werden soll oder schon pausiert ist,
+        /// solange, bis die Pause wieder aufgehoben wurde.
+        /// </summary>
+        internal static void WaitWhileTreePausedOrFlushing()
+        {
+            while (LogicalNode.IsTreeFlushing || LogicalNode.IsTreePaused)
+            {
+                Thread.Sleep(LogicalNode.HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
+            }
+        }
+
+        /// <summary>
+        /// Wartet, falls der Tree gerade pausiert wurde, solange, bis die Pause wieder aufgehoben wurde.
+        /// </summary>
+        internal static void WaitWhileTreePaused()
+        {
             while (LogicalNode.IsTreePaused)
             {
                 Thread.Sleep(LogicalNode.HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
             }
         }
-        
+
         /*
         private static void DoEvents()
         {
@@ -2475,6 +2568,7 @@ namespace LogicalTaskTree
         private void AcceptNewLogical(bool? tmpLogical)
         {
             LogicalNode.WaitWhileTreePaused();
+
             Guid tmpGuid = Guid.NewGuid();
             this.LastNotNullLogical = tmpLogical;
             //this.ThreadUpdateLastLogical(tmpLogical);
@@ -2498,6 +2592,7 @@ namespace LogicalTaskTree
           )
         {
             // Diese Routine läuft in einem eigenen Thread, weswegen sie synchronisiert werden muss.
+            LogicalNode.WaitWhileTreePaused(); // vermeidet Deadlocks
             lock (this._validateLastNotNullLogicalLocker)
             {
                 // Hier kommen nur JobLists hin.

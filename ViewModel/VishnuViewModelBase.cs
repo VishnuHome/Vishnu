@@ -1,5 +1,6 @@
 ﻿using NetEti.MVVMini;
 using System;
+using System.Windows.Threading;
 using Vishnu.Interchange;
 
 namespace Vishnu.ViewModel
@@ -93,8 +94,9 @@ namespace Vishnu.ViewModel
             {
                 if (this._visualTreeCacheBreaker != value)
                 {
-                    this._userDataContext = value;
+                    this._visualTreeCacheBreaker = value;
                     this.RaisePropertyChanged("VisualTreeCacheBreaker");
+                    this.RaisePropertyChanged("DebugNodeInfos");
                 }
             }
         }
@@ -102,7 +104,7 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Vergibt einen neuen GlobalUniqueIdentifier für den VisualTreeCacheBreaker.
         /// </summary>
-        public void RefreshVisualTreeCacheBreaker()
+        public virtual void Invalidate()
         {
             this.VisualTreeCacheBreaker = Guid.NewGuid().ToString();
         }
@@ -151,6 +153,6 @@ namespace Vishnu.ViewModel
         private Interchange.Result _result;
         private object _userDataContext;
         private DynamicUserControlBase _parentView;
-        private readonly string _visualTreeCacheBreaker;
+        private string _visualTreeCacheBreaker;
     }
 }

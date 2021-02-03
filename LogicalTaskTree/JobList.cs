@@ -426,7 +426,9 @@ namespace LogicalTaskTree
 
         #region tree globals
 
-        // Der externe Job mit logischem Ausdruck und u.a. Dictionary der Worker.
+        /// <summary>
+        /// Der externe Job mit logischem Ausdruck und u.a. Dictionary der Worker. 
+        /// </summary>
         public Job Job { get; set; }
 
         /// <summary>

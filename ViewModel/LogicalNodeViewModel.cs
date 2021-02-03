@@ -135,6 +135,8 @@ namespace Vishnu.ViewModel
 
         #region published members
 
+        #region commands
+
         /// <summary>
         /// Dient als erster Bindungsanker zur Attached Property ExpanderBehavior.ExpandedCommandProperty.
         /// </summary>
@@ -167,6 +169,8 @@ namespace Vishnu.ViewModel
         /// Command für das ContextMenuItem "Pause Tree" im ContextMenu für das "MainGrid" des Controls.
         /// </summary>
         public ICommand PauseResumeLogicalTaskTree { get { return this._btnPauseResumeTaskTreeRelayCommand; } }
+
+        #endregion commands
 
         #region ViewModel properties
 
@@ -567,6 +571,8 @@ namespace Vishnu.ViewModel
                 {
                     this._singleNodes = value;
                     this.RaisePropertyChanged("SingleNodes");
+                    this.RaisePropertyChanged("Progress");
+                    this.RaisePropertyChanged("ProgressText");
                 }
             }
         }
@@ -895,6 +901,7 @@ namespace Vishnu.ViewModel
             this.Parent = parent;
             this.lazyLoadChildren = lazyLoadChildren;
             this._canExpanderExpand = true;
+            this.Invalidate();
 
             this._hookedTo = "NULL";
             this.TreeRefreshLocker = new object();
@@ -1342,6 +1349,8 @@ namespace Vishnu.ViewModel
             }
             this.UnsetBLNode();
 
+            LogicalNode.AllNodesStateChanged += this.LogicalNode_AllNodesStateChanged;
+
             this._myLogicalNode = node;
             this._myLogicalNode.PropertiesChanged += subPropertiesChanged;
             this._myLogicalNode.NodeLogicalChanged += this.subLogicalChanged;
@@ -1353,10 +1362,21 @@ namespace Vishnu.ViewModel
             this._myLogicalNode.NodeResultChanged += this.subResultChanged; // 30.07.2018
             this._myLogicalNode.NodeWorkersStateChanged += this.SubNodeWorkersStateChanged; // 07.08.2018
             this._myLogicalNode.PropertiesChanged += this.SubNodePropertiesChanged; // 14.03.2020
-
             this.SingleNodes = this._myLogicalNode.SingleNodes;
             this.HookedTo = this._myLogicalNode.TreeParams.Name + ": " + this._myLogicalNode.NameId;
             return true;
+        }
+
+        private void LogicalNode_AllNodesStateChanged()
+        {
+            if (LogicalNode.IsTreeFlushing || LogicalNode.IsTreePaused)
+            {
+                this.IsTreePaused = true;
+            }
+            else
+            {
+                this.IsTreePaused = false;
+            }
         }
 
         /// <summary>
@@ -1393,8 +1413,20 @@ namespace Vishnu.ViewModel
                 this._myLogicalNode.NodeResultChanged -= this.subResultChanged; // 30.07.2018
                 this._myLogicalNode.NodeWorkersStateChanged -= this.SubNodeWorkersStateChanged; // 07.08.2018
                 this._myLogicalNode.PropertiesChanged -= this.SubNodePropertiesChanged; // 14.03.2020
+
+                LogicalNode.AllNodesStateChanged -= this.LogicalNode_AllNodesStateChanged;
+
             }
             this.HookedTo = "NULL";
+        }
+
+        /// <summary>
+        /// Gibt die Business-Logic Node für dieses LogicalNodeViewModel frei.
+        /// </summary>
+        internal void InitFromNode(LogicalNodeViewModel source)
+        {
+            this._myLogicalNode?.InitFromNode(source.GetLogicalNode());
+            this.SingleNodes = source.SingleNodes;
         }
 
         #endregion internal members
@@ -1598,12 +1630,11 @@ namespace Vishnu.ViewModel
                     shadowTopRootJobListViewModel.ExpandTree(shadowTopRootJobListViewModel, false);
                     JobListViewModel treeTopRootJobListViewModel = this.GetTopRootJobListViewModel() ?? this as JobListViewModel;
 
-                    using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
-                    {
+                    //using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
+                    //{
 
                         LogicalTaskTreeManager.MergeTaskTrees(treeTopRootJobListViewModel, shadowTopRootJobListViewModel);
-                        // this.GetTopRootJobListViewModel().FullTreeRefresh();
-                    }
+                    //}
                     shadowTopRootJobListViewModel.Dispose();
                 }
             }
@@ -1642,7 +1673,6 @@ namespace Vishnu.ViewModel
             this.RaisePropertyChanged("Logical");
         }
 
-
         /// <summary>
         /// Wird angesprungen, wenn sich irgendwo in diesem Teilbaum ein LastNotNullLogical geändert hat.
         /// </summary>
@@ -1663,10 +1693,15 @@ namespace Vishnu.ViewModel
         /// <param name="state">Die geänderte Eigenschaft der Quelle.</param>
         protected virtual void subStateChanged(object sender, NodeState state)
         {
-            if (this.IsTreePaused != LogicalNode.IsTreePaused)
-            {
-                this.IsTreePaused = LogicalNode.IsTreePaused;
-            }
+            //if (LogicalNode.IsTreeFlushing || LogicalNode.IsTreePaused)
+            //{
+            //    this.IsTreePaused = true;
+            //}
+            //else
+            //{
+            //    this.IsTreePaused = false;
+            //}
+
             //System.Diagnostics.StackTrace s = new System.Diagnostics.StackTrace(System.Threading.Thread.CurrentThread, true);
             //string callingMethod = s.GetFrame(2).GetMethod().Name;
             //InfoController.Say(String.Format("#SUB# LogicalNodeViewModel.subStateChanged {0} LogicalState: {1}, Caller: {2}"
@@ -1812,7 +1847,6 @@ namespace Vishnu.ViewModel
             if (args.Properties.Contains("IsInSleepTime"))
             {
                 this.IsInSleepTime = this._myLogicalNode.IsInSleepTime;
-                this.IsTreePaused = LogicalNode.IsTreePaused;
                 this.SleepTimeTo = String.Format("Ruhezeit bis {0:c}", this._myLogicalNode.SleepTimeTo);
             }
             foreach (string propertyName in args.Properties)
@@ -1842,12 +1876,12 @@ namespace Vishnu.ViewModel
         private string _freeComment;
         private bool _isInSleepTime;
         private string _sleepTimeTo;
+        private bool _isTreePaused;
         private TreeParameters _treeParams;
         private RelayCommand _btnReloadTaskTreeRelayCommand;
         private RelayCommand _btnLogTaskTreeRelayCommand;
         private RelayCommand _btnPauseResumeTaskTreeRelayCommand;
         private string _hookedTo;
-        private bool _isTreePaused;
 
         // True, wenn die Kinder dieses Knotens noch nicht geladen wurden.
         private bool _hasDummyChild
@@ -1881,14 +1915,14 @@ namespace Vishnu.ViewModel
 
         private void pauseResumeTaskTreeExecute(object parameter)
         {
-            if (!this.IsTreePaused)
+            if (!LogicalNode.IsTreeFlushing && !LogicalNode.IsTreePaused)
             {
-                InfoController.Say(String.Format($"#RELOAD# Pausing Tree"));
+                InfoController.Say(String.Format($"#RELOAD#         Pausing Tree (VM)"));
                 this._myLogicalNode?.PauseTree();
             }
             else
             {
-                InfoController.Say(String.Format($"#RELOAD# Continuing Tree"));
+                InfoController.Say(String.Format($"#RELOAD#        Resuming Tree (VM)"));
                 this._myLogicalNode?.ResumeTree();
             }
         }
