@@ -111,10 +111,13 @@ namespace VishnuWeb
             // Demo: hart verdrahteter JobProvider:
             // App._businessLogic = new LogicalTaskTree.LogicalTaskTree(new TreeParameters("Tree 1", null), new MixedTestJobProvider());
 
+            // Die für den gesamten Tree gültigen Parameter
+            TreeParameters treeParameters = new TreeParameters(String.Format($"Tree {++LogicalTaskTree.LogicalTaskTree.TreeId}"), null);
+
             // Der Produktions-JobProvider mit extern über XML definierten Jobs:
             try
             {
-                App._businessLogic = new LogicalTaskTree.LogicalTaskTree(new TreeParameters("Tree 1", null), new ProductionJobProvider());
+                App._businessLogic = new LogicalTaskTree.LogicalTaskTree(treeParameters, new ProductionJobProvider());
             }
             catch (Exception ex)
             {
@@ -134,10 +137,10 @@ namespace VishnuWeb
             //this._mainWindow.Closed += mainWindow_Closed;
 
             // Das LogicalTaskTree-ViewModel
-            LogicalTaskTreeViewModel logicalTaskTreeViewModel = new LogicalTaskTreeViewModel(App._businessLogic, this._mainWindow, App._appSettings.StartTreeOrientation, App._appSettings.FlatNodeListFilter);
+            LogicalTaskTreeViewModel logicalTaskTreeViewModel = new LogicalTaskTreeViewModel(App._businessLogic, this._mainWindow, App._appSettings.StartTreeOrientation, App._appSettings.FlatNodeListFilter, treeParameters);
 
             // Das Main-ViewModel
-            MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(logicalTaskTreeViewModel, this._mainWindow.ForceRecalculateWindowMeasures, App._appSettings.FlatNodeListFilter, App._appSettings.DemoModus ? "-DEMO-" : "");
+            MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(logicalTaskTreeViewModel, this._mainWindow.ForceRecalculateWindowMeasures, App._appSettings.FlatNodeListFilter, App._appSettings.DemoModus ? "-DEMO-" : "", treeParameters);
 
             // Verbinden von Main-Window mit Main-ViewModel
             this._mainWindow.DataContext = mainWindowViewModel; //mainViewModel;

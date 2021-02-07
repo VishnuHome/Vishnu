@@ -1040,6 +1040,46 @@ namespace LogicalTaskTree
         #region public members
 
         /// <summary>
+        /// Verhindert Snapshots.
+        /// </summary>
+        public static void ProhibitSnapshots()
+        {
+            LogicalNode.IsSnapshotProhibited = true;
+        }
+
+        /// <summary>
+        /// Erlaubt Snapshots.
+        /// </summary>
+        public static void AllowSnapshots()
+        {
+            LogicalNode.IsSnapshotProhibited = false;
+        }
+
+        /// <summary>
+        /// Hält die Verarbeitung im Tree an.
+        /// </summary>
+        public static void PauseTree()
+        {
+            LogicalNode.IsTreeFlushing = true;
+            LogicalNode.OnAllNodesStateChanged();
+            Thread.Sleep(HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
+            Thread.Sleep(HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
+            Thread.Sleep(HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
+            LogicalNode.IsTreePaused = true;
+            Thread.Sleep(HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
+        }
+
+        /// <summary>
+        /// Lässt einen angehaltenen Tree weiterlaufen.
+        /// </summary>
+        public static void ResumeTree()
+        {
+            LogicalNode.IsTreeFlushing = false;
+            LogicalNode.IsTreePaused = false;
+            LogicalNode.OnAllNodesStateChanged();
+        }
+
+        /// <summary>
         /// Aktualisiert bei TreeEvent-getriggerten Knoten die Werte
         /// des Knotens, bevor mit ihnen weitergearbeitet wird.
         /// Ist bei Situationen wichtig, in dem entweder der Knoten das
@@ -1612,44 +1652,6 @@ namespace LogicalTaskTree
         }
 
         private const int HOLDEDTREELOOPSLEEPTIMEMILLISECONDS = 100;
-
-        /// <summary>
-        /// Verhindert Snapshots.
-        /// </summary>
-        public void ProhibitSnapshots()
-        {
-            LogicalNode.IsSnapshotProhibited = true;
-        }
-
-        /// <summary>
-        /// Erlaubt Snapshots.
-        /// </summary>
-        public void AllowSnapshots()
-        {
-            LogicalNode.IsSnapshotProhibited = false;
-        }
-
-        /// <summary>
-        /// Hält die Verarbeitung im Tree an.
-        /// </summary>
-        public void PauseTree()
-        {
-            LogicalNode.IsTreeFlushing = true;
-            LogicalNode.OnAllNodesStateChanged();
-            Thread.Sleep(HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
-            LogicalNode.IsTreePaused = true;
-            Thread.Sleep(HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
-        }
-
-        /// <summary>
-        /// Lässt einen angehaltenen Tree weiterlaufen.
-        /// </summary>
-        public void ResumeTree()
-        {
-            LogicalNode.IsTreeFlushing = false;
-            LogicalNode.IsTreePaused = false;
-            LogicalNode.OnAllNodesStateChanged();
-        }
 
         #endregion public members
 

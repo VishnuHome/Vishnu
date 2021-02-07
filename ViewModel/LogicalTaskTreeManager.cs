@@ -222,12 +222,10 @@ namespace Vishnu.ViewModel
 
                 // Da im aktiven Tree Knoten ausgetauscht werden, kann es zu null-Referenzen kommen.
                 // Deshalb werden ab hier alle kritischen Aktionen pausiert, bis der Reload durch ist.
-                activeTree.GetLogicalNode()?.ProhibitSnapshots();
-
+                LogicalNode.ProhibitSnapshots();
                 // activeTree.GetLogicalNode()?.PauseTree(); // TEST 20210202
                 // newTree.GetLogicalNode()?.PauseTree(); // TEST 20210202
                 // InfoController.Say(String.Format($"#RELOAD# Trees paused"));
-                // InfoController.FlushAll();
 
                 // Durchläuft den aktiven Tree und prüft parallel den neu geladenen "ShadowTree" auf Gleichheit, bzw. Ungleichheit.
                 // Da hinzugekommene oder ausgetauschte Knoten immer auch über Unterschiede in den LogicalExpressions der
@@ -238,19 +236,22 @@ namespace Vishnu.ViewModel
                 // gesucht, der Nutzen wäre eher gering bei ungleich höherem Aufwand (Ehrlich gesagt, ist mir das zu kompliziert).
                 activeTree.Traverse(DiffTreeElement, LogicalTaskTreeManager._shadowVMFinder);
 
-                // Abschließend muss noch die Jobs-Ansicht aktualisiert werden (LogicalTaskJobGroupsControl).
 
-                //Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-                //{
+                // Abschließend muss noch die Jobs-Ansicht aktualisiert werden (LogicalTaskJobGroupsControl).
+                InfoController.GetInfoPublisher().Publish(activeTree, Environment.NewLine
+    + "--- R E F R E S H  J O B G R O U P S ------------------------------------------------------------------------------------------", InfoType.NoRegex);
+                Thread.Sleep(100);
                 activeTree.TreeParams.ViewModelRoot.RefreshDependentAlternativeViewModels();
-                //}));
+                Thread.Sleep(100);
+                InfoController.GetInfoPublisher().Publish(activeTree, Environment.NewLine
+                    + "-------------------------------------------------------------------------------------------------------------------------------", InfoType.NoRegex);
+                InfoController.FlushAll();
             }
             finally
             {
                 newTree.Dispose();
                 VishnuAssemblyLoader.ClearCache(); // Sorgt dafür, dass alle DLLs neu geladen werden.
-                // activeTree.GetLogicalNode()?.ResumeTree(); TEST 20210202
-                activeTree.GetLogicalNode()?.AllowSnapshots();
+                LogicalNode.AllowSnapshots();
             }
         }
 
@@ -291,8 +292,7 @@ namespace Vishnu.ViewModel
             return null; // Bricht die Rekursion für diesen Zweig ab.
         }
 
-        private static void TransferNode(LogicalNodeViewModel shadowNodeVM, LogicalNodeViewModel activeNodeVM,
-            LogicalNode shadowNode, LogicalNode activeNode)
+        private static void TransferNode(LogicalNodeViewModel shadowNodeVM, LogicalNodeViewModel activeNodeVM, LogicalNode shadowNode, LogicalNode activeNode)
         {
             InfoController.Say(String.Format($"#RELOAD# Transferring Node {shadowNodeVM.Path} from ShadowTree to Tree."));
 
@@ -307,13 +307,15 @@ namespace Vishnu.ViewModel
             NodeParent activeParent = activeNode.Mother as NodeParent;
             LogicalNodeViewModel shadowParentVM = shadowNodeVM.Parent;
             NodeParent shadowParent = shadowNode.Mother as NodeParent;
+            
             int nodeIndex = GetParentNodeIndex(activeNode, activeParent);
 
             // commonChildIndices: Key=activeNode.Children, Value=shadowNode.Children
             Dictionary<int, int> commonChildIndices = null;
             if (shadowNode is JobList && activeNode is JobList)
             {
-                commonChildIndices = LogicalTaskTreeManager.FindEqualJobListChildrenAndSetDummyConstants(shadowNodeVM as JobListViewModel, activeNodeVM as JobListViewModel, shadowNode as JobList, activeNode as JobList);
+                commonChildIndices = LogicalTaskTreeManager.FindEqualJobListChildrenAndSetDummyConstants(
+                    shadowNodeVM as JobListViewModel, activeNodeVM as JobListViewModel, shadowNode as JobList, activeNode as JobList);
             }
 
             try
@@ -333,27 +335,28 @@ namespace Vishnu.ViewModel
                 activeParent.ReleaseChildAt(nodeIndex); // nur freigeben, nicht disposen
                 activeParent.SetChildAt(nodeIndex, shadowNode);
                 activeParentVM.Children[nodeIndex] = shadowNodeVM;
-                activeParentVM.Children[nodeIndex].SetBLNode(shadowNode, true);
+                activeParentVM.Children[nodeIndex].SetBLNode(shadowNode, true); // ?
 
-                // Der Run auf die übernommene ShadowNode darf erst an dieser Stelle erfolgen, also wenn die shadowNode schon im aktiven Tree hängt.
-                // Anderenfalls bekommt der übergeordnete Knoten den Lauf des neuen Knoten und sein LogicalResult nicht mit.
-                activeParent.LastLogical = null;
+                // Der Run auf die übernommene ShadowNode darf erst an dieser Stelle erfolgen, also wenn die shadowNode schon im aktiven
+                // Tree hängt. Anderenfalls bekommt der übergeordnete Knoten den Lauf des neuen Knoten und sein LogicalResult nicht mit.
+                activeParent.LastLogical = null; // Neu-Auswertung erzwingen.
 
-                // activeParent.ResumeTree(); // TEST 20210202
+                // LogicalNode.ResumeTree(); // TEST 20210207
+                // Thread.Sleep(500);
 
                 shadowNode.Run(new TreeEvent("UserRun", shadowNode.Id, shadowNode.Id, shadowNode.Name, shadowNode.Path, null, NodeLogicalState.None, null, null));
                 InfoController.Say(String.Format($"#RELOAD# shadowNode im activeTree started"));
-                Thread.Sleep(500); // Der Run braucht etwas, deshalb muss hier eine Wartezeit eingebaut werden.
+                Thread.Sleep(300); // Der Run braucht etwas, deshalb muss hier eine Wartezeit eingebaut werden.
 
-                // activeParent.PauseTree(); // TEST 20210202
-                // shadowParent.PauseTree(); // TEST 20210202
+                LogicalNode.PauseTree();
 
-                Thread.Sleep(200);
-                InfoController.Say(String.Format($"#RELOAD# {activeParentVM.TreeParams.Name}:{activeParentVM.Id} {(activeParentVM.VisualTreeCacheBreaker)} vor Invalidate()"));
-                Thread.Sleep(200);
+                //Thread.Sleep(200);
+                //InfoController.Say(String.Format($"#RELOAD# {activeParentVM.TreeParams.Name}:{activeParentVM.Id} {(activeParentVM.VisualTreeCacheBreaker)} vor InitFromNode()"));
+                //Thread.Sleep(200);
+                // Werte vom shadowParent in den activeParent übernehmen, die sonst nur bei der Erstinitialisierung gesetzt werden (primär LastSingleNodes).
                 activeParentVM.InitFromNode(shadowParentVM);
-                Thread.Sleep(200);
-                InfoController.Say(String.Format($"#RELOAD# {activeParentVM.TreeParams.Name}:{activeParentVM.Id} {(activeParentVM.VisualTreeCacheBreaker)} nach Invalidate()"));
+                //Thread.Sleep(200);
+                //InfoController.Say(String.Format($"#RELOAD# {activeParentVM.TreeParams.Name}:{activeParentVM.Id} {(activeParentVM.VisualTreeCacheBreaker)} nach InitFromNode()"));
 
                 // Das shadowParentVM und der shadowParent halten noch Referenzen aufeinander
                 // und auf den Shadow-Knoten, der gerade in den activeTree hinüberwandert.
@@ -362,35 +365,33 @@ namespace Vishnu.ViewModel
                 // vorher gekappt werden (sonst würde dieser gleich wieder mit disposed).
                 // shadowParentVM.Children[nodeIndex].ReleaseBLNode(); // nicht erforderlich.
                 shadowParentVM.ReleaseBLNode();
-                shadowParentVM.Children[nodeIndex] = null;
+                shadowParentVM.Children.RemoveAt(nodeIndex);
+                //shadowParentVM.Children[nodeIndex] = null;
                 shadowParent.ReleaseChildAt(nodeIndex);
+                shadowParent.Children.RemoveAt(nodeIndex);
 
                 if (commonChildIndices != null)
                 {
                     // Hier wurde geade eine JobList in den aktiven Tree übernommen und gestartet, die an den Stellen, wo sie mit der
                     // ursprünglichen JobList gemeinsame Kinder hat, noch Dummy-Knoten enthält. Diese Dummy-Knoten müssen jetzt durch
-                    // die ursprünglichen, noch laufenden Kinder der Original-(vor dem Austausch durch die Shadow-JobList)-JobList
+                    // die ursprünglichen, noch laufenden Kinder der Original-JobList (von vor dem Austausch durch die Shadow-JobList)
                     // des aktiven Trees wieder ersetzt werden.
                     JobList activeJobList = activeNode as JobList;
                     JobList shadowJobList = shadowNode as JobList;
                     JobListViewModel shadowJobListVM = shadowNodeVM as JobListViewModel;
                     JobListViewModel activeJobListVM = activeNodeVM as JobListViewModel;
-                    for (int i = 0; i < activeNode.Children.Count; i++) // activeNode (JobList) zeigt hier noch auf den ursprünglichen Knoten des activeTree
+                    int removedNodesCounter = 0;
+                    for (int i = 0; i < activeJobList.Children.Count; i++) // activeNode (JobList) zeigt hier noch auf den ursprünglichen Knoten des activeTree
                     {
-                        if (!commonChildIndices.ContainsKey(i))
+                        int k = i + removedNodesCounter;
+                        if (commonChildIndices.ContainsKey(k))
                         {
-                            // activeJobList.Children[i].Break(true); // Dieser Knoten fällt weg, Break würde aber wegen Tree-Pause nicht zurückkommen.
-                            activeJobListVM.Children[i].Dispose();
-                            activeJobList.FreeChildAt(i);
-                        }
-                        else
-                        {
+                            // Dieser Knoten ist beiden Trees gemeinsam, wird also übernommen
+                            int j = commonChildIndices[k];
 
-                            int j = commonChildIndices[i];
-
-                            // Nicht abbrechen, die ShadowNode hängt schon im active-Tree und der Break würde sich nach oben fortpflanzen
+                            // Nicht abbrechen, die ShadowNode hängt schon im active-Tree und der Break würde sich nach oben fortpflanzen,
                             //                       shadowJobList.Children[j].Break(true);
-                            shadowJobListVM.Children[j].Dispose(); // Ersatzkonstante und Kinder freigeben.
+                            shadowJobListVM.Children[j].Dispose(); // Ersatzkonstante freigeben.
                             shadowJobList.FreeChildAt(j); // Ersatzkonstante freigeben.
 
                             activeJobListVM.Children[i].Parent = shadowJobListVM;
@@ -398,23 +399,24 @@ namespace Vishnu.ViewModel
 
                             activeNode.Children[i].Mother = shadowJobList;
                             activeNode.Children[i].RootJobList = shadowJobList;
-                            activeNode.Children[i].TreeRootJobList = shadowJobList.TreeRootJobList;
+                            activeNode.Children[i].TreeRootJobList = shadowJobList.TreeRootJobList; // ?
 
                             shadowJobList.SetChildAt(j, activeNode.Children[i]); // Referenziert den noch im activeTree laufenden
                                                                                  // Knoten und hängt sich in dessen Events ein.
                             shadowJobListVM.Children[j] = activeJobListVM.Children[i]; // Referenziert das noch im activeTree laufende ViewModel.
-                            shadowJobListVM.Children[j].SetBLNode(activeNode.Children[i], true);
-                            activeJobListVM.Children[i].Invalidate();
+                            shadowJobListVM.Children[j].SetBLNode(shadowJobList.Children[j], true);
+                            shadowJobListVM.Children[j].Invalidate();
 
-                            activeJobListVM.Children[i] = null;
+                            activeJobListVM.Children.RemoveAt(i); // Bei laufendem activeTree träten hier Exceptions in anderen Threads auf.
                             activeJobList.ReleaseChildAt(i);
+                            activeJobList.Children.RemoveAt(i);
 
-                            // shadowJobListVM.Children[j].RefreshVisualTreeCacheBreaker();
+                            removedNodesCounter++;
+                            i--;
+
                         }
                     }
                 }
-
-                // == activeNodeVM: LogicalNodeViewModel activeVMtoDispose = activeParentVM.Children[nodeIndex];
 
                 try
                 {
@@ -426,15 +428,19 @@ namespace Vishnu.ViewModel
                 }
 
                 // Der früher aktive Knoten sollte jetzt abgebrochen und isoliert sein, also komplett freigeben.
-                activeNode = null;
-                activeNodeVM.Dispose();
+                activeNodeVM.ReleaseBLNode();
+
+                LogicalNode.ResumeTree();
+
+                activeNode.Break(false);
+                activeNode = null; // Aus Dokumentatorischen Gründen, wird bei Verlassen dieser Routine sowieso freigegeben.
+
+                activeParentVM.Invalidate();
             }
             finally
             {
-                // activeParent.ResumeTree();
+                LogicalNode.ResumeTree();
             }
-
-            // activeParentVM.FullTreeRefresh();
         }
 
         private static int GetParentNodeIndex(LogicalNode activeNode, NodeParent activeParent)
@@ -465,13 +471,14 @@ namespace Vishnu.ViewModel
         {
             Dictionary<int, int> commonChildIndices = new Dictionary<int, int>();  // Key=activeNode.Children, Value=shadowNode.Children
 
-            // überflüssig, da die ViewModels jeweils eine Referenz auf ihre Business-Nodes ghalten:
+            // überflüssig, da die ViewModels jeweils eine Referenz auf ihre Business-Nodes halten:
             //     JobList tempNode = new JobList(shadowNode, shadowNode.GetTopRootJobList());
             //     tempVM.SetBLNode(tempNode, true);
 
             // Eventuelle gleichgebliebene direkte Nachkommen von logicalNode in shadowNode durch
-            // Konstanten mit gleichen LastNotNullLogical ersetzen (wegen späterem Run auf shadowNode).
+            // Dummy-Konstanten mit gleichen LastNotNullLogical ersetzen (wegen späterem Run auf shadowNode).
             // Die gesamte shadowNode inklusive Children wird in einem späteren Schritt auf den aktiven Tree übertragen.
+            // In einem noch späteren Schritt werden dann die Dummy-Konstanten wieder durch die Originalknoten ersetzt.
             for (int i = 0; i < shadowJobList.Children.Count; i++)
             {
                 for (int j = 0; j < activeJobList.Children.Count; j++)
@@ -904,6 +911,7 @@ namespace Vishnu.ViewModel
             }
             catch (Exception ex1)
             {
+                InfoController.Say(String.Format($"#RELOAD# RemoveOldJobListGlobals Exception 1: {ex1.Message}."));
                 throw;
             }
 

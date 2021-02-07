@@ -28,15 +28,15 @@
             <convert:NotEmptyToTrue x:Key="notEmptyToTrue" />
             <convert:Path2UserControlBase x:Key="path2UserControlBase" />
             <HierarchicalDataTemplate DataType="{x:Type vm:JobGroupViewModel}" ItemsSource="{Binding GroupJobList.Children}">
-                <Border Name="ItemBorder" HorizontalAlignment="Stretch" BorderThickness="3"
-                        CornerRadius="6" Margin="1">
+                <Border Name="ItemBorder" HorizontalAlignment="Stretch" BorderThickness="3" CornerRadius="6" Margin="1">
                     <Border.BorderBrush>
                         <MultiBinding Converter="{StaticResource nullableBoolToBrush, diag:PresentationTraceSources.TraceLevel=High}">
                             <Binding Path="GroupJobList.Logical" />
                             <Binding RelativeSource="{RelativeSource Self}" />
                         </MultiBinding>
                     </Border.BorderBrush>
-                    <Grid>
+                    <Grid Name="MainGrid" HorizontalAlignment="Stretch" ToolTip="{Binding GroupJobList.LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400"
+                          ContextMenu="{DynamicResource cmMainGrid}">
                         <Grid.RowDefinitions>
                             <RowDefinition />
                         </Grid.RowDefinitions>
@@ -55,8 +55,7 @@
                         <Expander Name="Exp" Template="{StaticResource ExpanderStyleHeaderCentered}"
                                   Grid.Row="0" ExpandDirection="Down" IsExpanded="True">
                             <Expander.Header>
-                                <Grid Name="Head" HorizontalAlignment="Stretch" Margin="2"
-                                      ToolTip="{Binding GroupJobList.LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400">
+                                <Grid Name="Head" HorizontalAlignment="Stretch" Margin="2">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                         <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -75,6 +74,7 @@
                                         </Button.Content>
                                     </Button>
                                     <TextBlock Name="IdBlock" Grid.Row="0" Grid.Column="0" Margin="3" Text="{Binding GroupJobList.Id}" Padding="5" TextAlignment="Center"/>
+                                    <TextBlock Name="DebugNodeInfos" Grid.Row="0" Grid.Column="0" Margin="3" Text="{Binding DebugNodeInfos}" Padding="5" TextAlignment="Center" Visibility="Collapsed" />
                                     <TextBlock Name="WorkersStateBlock" Grid.Row="0" Grid.Column="2" FontSize="8">
                                         <TextBlock.Text>
                                             <Binding Path="GroupJobList.WorkersState" Converter="{StaticResource workersStateToText}" />
@@ -123,6 +123,11 @@
                     </Grid>
                 </Border>
                 <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding DebugMode}" Value="True">
+                        <!-- Setter TargetName="ShortResultText" Property="Visibility" Value="Visible" /-->
+                        <Setter TargetName="IdBlock" Property="Visibility" Value="collapsed" />
+                        <Setter TargetName="DebugNodeInfos" Property="Visibility" Value="Visible" />
+                    </DataTrigger>
                     <MultiDataTrigger>
                         <MultiDataTrigger.Conditions>
                             <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True"/>

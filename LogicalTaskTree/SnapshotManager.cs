@@ -4,11 +4,9 @@ using System.IO;
 using System.Linq;
 using NetEti.Globals;
 using System.Xml.Linq;
-using System.Threading;
 using Vishnu.Interchange;
 using System.Collections.Generic;
 using NetEti.ObjectSerializer;
-using System.Runtime.CompilerServices;
 
 namespace LogicalTaskTree
 {
@@ -105,9 +103,9 @@ namespace LogicalTaskTree
                     LogicalNode.WaitWhileSnapshotProhibited(); // Keinen Snapshot erzeugen, solange der Tree anderweitig gestoppt wurde.
                     lock (SnapshotManager._saveLocker)
                     {
-                        ((LogicalNode)tree).PauseTree(); // Jetzt den Tree selbst für die Dauer der Snapshot-Erzeugung anhalten.
+                        LogicalNode.PauseTree(); // Jetzt den Tree selbst für die Dauer der Snapshot-Erzeugung anhalten.
                         treePausedByMe = true;
-                        InfoController.Say(String.Format($"#RELOAD# Pausing Tree (SM)"));
+                        // InfoController.Say(String.Format($"#RELOAD# Pausing Tree (SM)"));
                         SnapshotManager.saveSnapshot((LogicalNode)tree);
                     }
                 }
@@ -119,8 +117,8 @@ namespace LogicalTaskTree
                 {
                     if (treePausedByMe)
                     {
-                        ((LogicalNode)tree).ResumeTree();
-                        InfoController.Say(String.Format($"#RELOAD# Continuing Tree (SM)"));
+                        LogicalNode.ResumeTree();
+                        // InfoController.Say(String.Format($"#RELOAD# Continuing Tree (SM)"));
                     }
                 }
                 if (exception != null)

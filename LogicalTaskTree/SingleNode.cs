@@ -5,6 +5,7 @@ using NetEti.Globals;
 using NetEti.ApplicationControl;
 using Vishnu.Interchange;
 using System.Text;
+using System.Reflection;
 
 namespace LogicalTaskTree
 {
@@ -608,6 +609,7 @@ namespace LogicalTaskTree
             }
             finally
             {
+                InfoController.Say(String.Format($"#RELOAD# {Assembly.GetExecutingAssembly().GetName().Name}.DoRun - Node: {this.IdInfo}, TreeEvent: {source.Name}."));
                 if (!this.IsThreadValid(Thread.CurrentThread))
                 {
                     if (this.Trigger != null)

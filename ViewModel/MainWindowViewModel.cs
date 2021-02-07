@@ -4,7 +4,7 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using Vishnu.Interchange;
 using NetEti.Globals;
-using System.Windows.Media;
+using NetEti.ApplicationControl;
 
 namespace Vishnu.ViewModel
 {
@@ -51,10 +51,13 @@ namespace Vishnu.ViewModel
         /// </summary>
         public void RefreshDependentAlternativeViewModels()
         {
-            ObservableCollection<JobGroupViewModel> oldJobGroups = this.JobGroupsVM;
-            this.JobGroupsVM = this.SelectJobGroups();
-            oldJobGroups?.Clear();
-            oldJobGroups = null;
+            this.SelectJobGroups(this.JobGroupsVM);
+
+            //ObservableCollection<JobGroupViewModel> oldJobGroups = this.JobGroupsVM;
+            //this.JobGroupsVM = this.SelectJobGroups();
+            //this.RaisePropertyChanged("JobGroupsVM");
+            //oldJobGroups?.Clear();
+            //oldJobGroups = null;
         }
 
 
@@ -139,12 +142,12 @@ namespace Vishnu.ViewModel
             this.TreeVM = logicalTaskTreeViewModel;
             this._initSizeRelayCommand = new RelayCommand(initWindowSize);
             this._flatNodeListFilter = flatNodeListFilter;
-            this.JobGroupsVM = this.SelectJobGroups();
+            treeParams.ViewModelRoot = this;
+            this.TreeParams = treeParams;
+            this.JobGroupsVM = this.SelectJobGroups(null);
             this.WindowTitle = "Vishnu Logical Process Monitor"
                 + " - " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
                 + "  " + additionalWindowHeaderInfo;
-            treeParams.ViewModelRoot = this;
-            this.TreeParams = treeParams;
             //this.MoveWindowToStartPosition();
 
         }
@@ -168,11 +171,19 @@ namespace Vishnu.ViewModel
         private NodeTypes _flatNodeListFilter;
         private string _windowTitle;
 
-        private ObservableCollection<JobGroupViewModel> SelectJobGroups()
+        private ObservableCollection<JobGroupViewModel> SelectJobGroups(ObservableCollection<JobGroupViewModel> selectedJobGroups)
         {
-            ObservableCollection<JobGroupViewModel> selectedJobGroups = new ObservableCollection<JobGroupViewModel>();
+            if (selectedJobGroups == null)
+            {
+                selectedJobGroups = new ObservableCollection<JobGroupViewModel>();
+            } 
+            else
+            {
+                selectedJobGroups.Clear();
+            }
             foreach (LogicalNodeViewModel root in LogicalTaskTreeViewModel.FlattenTree(TreeVM.TreeVM, new ObservableCollection<LogicalNodeViewModel>(), this._flatNodeListFilter))
             {
+                InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel from FlattenTree: {root.TreeParams.Name}:{root.Id} {(root.VisualTreeCacheBreaker)}"));
                 if (root is JobListViewModel)
                 {
                     selectedJobGroups.Add(new JobGroupViewModel(root as JobListViewModel, GenericSingletonProvider.GetInstance<AppSettings>().FlatNodeListFilter));

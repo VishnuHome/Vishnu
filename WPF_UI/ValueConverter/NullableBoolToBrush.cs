@@ -1,7 +1,10 @@
-﻿using System;
+﻿using NetEti.ApplicationControl;
+using System;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using Vishnu.ViewModel;
 
 namespace Vishnu.WPF_UI.ValueConverter
 {
@@ -77,8 +80,10 @@ namespace Vishnu.WPF_UI.ValueConverter
                     }
                 }
             }
-            catch (ResourceReferenceKeyNotFoundException)
+            catch (ResourceReferenceKeyNotFoundException ex)
             {
+                VishnuViewModelBase dataContext = owner?.DataContext as VishnuViewModelBase;
+                InfoController.Say(String.Format($"#RELOAD# {Assembly.GetExecutingAssembly().GetName().Name} - Node {dataContext?.GetDebugNodeInfos()}: {ex.Message}."));
                 return new SolidColorBrush(Colors.LightGray);
             }
         }

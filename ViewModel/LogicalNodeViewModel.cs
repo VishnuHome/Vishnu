@@ -155,21 +155,6 @@ namespace Vishnu.ViewModel
         public ICommand SizeChangedEventCommand
         { get; set; }
 
-        /// <summary>
-        /// Command für das ContextMenuItem "Reload" im ContextMenu für das "MainGrid" des Controls.
-        /// </summary>
-        public ICommand ReloadLogicalTaskTree { get { return this._btnReloadTaskTreeRelayCommand; } }
-
-        /// <summary>
-        /// Command für das ContextMenuItem "Log Tree" im ContextMenu für das "MainGrid" des Controls.
-        /// </summary>
-        public ICommand LogLogicalTaskTree { get { return this._btnLogTaskTreeRelayCommand; } }
-
-        /// <summary>
-        /// Command für das ContextMenuItem "Pause Tree" im ContextMenu für das "MainGrid" des Controls.
-        /// </summary>
-        public ICommand PauseResumeLogicalTaskTree { get { return this._btnPauseResumeTaskTreeRelayCommand; } }
-
         #endregion commands
 
         #region ViewModel properties
@@ -884,6 +869,57 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Liefert einen string für Debug-Zwecke.
+        /// </summary>
+        public override string GetDebugNodeInfos()
+        {
+            return this.DebugNodeInfos;
+        }
+
+        #region context menu
+
+        /// <summary>
+        /// Lädt den Tree nach Änderung der JobDescriptions neu.
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
+        public override void ReloadTaskTreeExecute(object parameter)
+        {
+            InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.reloadTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
+            this.ReloadTaskTree();
+        }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        public override bool CanReloadTaskTreeExecute()
+        {
+            return true; // !(this._myLogicalNode is NodeConnector); // && this._myLogicalNode.CanTreeStart;
+        }
+
+        /// <summary>
+        /// Loggt den Tree.
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
+        public override void LogTaskTreeExecute(object parameter)
+        {
+            InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.logTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
+            LogicalTaskTreeManager.LogTaskTree(this, false);
+        }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        public override bool CanLogTaskTreeExecute()
+        {
+            bool canLog = true;
+            return canLog;
+        }
+
+        #endregion context menu
+
+        /// <summary>
         /// Konstruktor
         /// </summary>
         /// <param name="logicalTaskTreeViewModel">ViewModel des übergeordneten LogicalTaskTree.</param>
@@ -899,7 +935,7 @@ namespace Vishnu.ViewModel
             this.UIMain = uIMain;
             this.UIDispatcher = null;
             this.Parent = parent;
-            this.lazyLoadChildren = lazyLoadChildren;
+            this._lazyLoadChildren = lazyLoadChildren;
             this._canExpanderExpand = true;
             this.Invalidate();
 
@@ -923,9 +959,6 @@ namespace Vishnu.ViewModel
             this.ExpandedEventCommand = new RelayCommand(this.HandleExpanderExpandedEvent, this.CanHandleExpanderExpandedEvent);
             this.CollapsedEventCommand = new RelayCommand(this.HandleExpanderCollapsedEvent);
             this.SizeChangedEventCommand = new RelayCommand(this.HandleExpanderSizeChangedEvent);
-            this._btnReloadTaskTreeRelayCommand = new RelayCommand(reloadTaskTreeExecute, canReloadTaskTreeExecute);
-            this._btnLogTaskTreeRelayCommand = new RelayCommand(logTaskTreeExecute, canLogTaskTreeExecute);
-            this._btnPauseResumeTaskTreeRelayCommand = new RelayCommand(pauseResumeTaskTreeExecute, canLogTaskTreeExecute);
             this.RaisePropertyChanged("RootJobListViewModel");
         }
 
@@ -1471,19 +1504,19 @@ namespace Vishnu.ViewModel
                         {
                             if (node is JobList)
                             {
-                                this.Children.Add(new JobListViewModel(this.RootLogicalTaskTreeViewModel, this, (node as JobList), this.lazyLoadChildren, this.UIMain));
+                                this.Children.Add(new JobListViewModel(this.RootLogicalTaskTreeViewModel, this, (node as JobList), this._lazyLoadChildren, this.UIMain));
                             }
                             else
                             {
                                 if (node is Snapshot)
                                 {
-                                    this.Children.Add(new SnapshotViewModel(this.RootLogicalTaskTreeViewModel, this, (node as Snapshot), this.lazyLoadChildren, this.UIMain));
+                                    this.Children.Add(new SnapshotViewModel(this.RootLogicalTaskTreeViewModel, this, (node as Snapshot), this._lazyLoadChildren, this.UIMain));
                                 }
                                 else
                                 {
                                     if (node is NodeList)
                                     {
-                                        this.Children.Add(new NodeListViewModel(this.RootLogicalTaskTreeViewModel, this, (node as NodeList), this.lazyLoadChildren, this.UIMain));
+                                        this.Children.Add(new NodeListViewModel(this.RootLogicalTaskTreeViewModel, this, (node as NodeList), this._lazyLoadChildren, this.UIMain));
                                     }
                                     else
                                     {
@@ -1608,7 +1641,7 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Lädt den gesamten Tree inklusive JobDescription.xml neu. 
         /// </summary>
-        protected void ReloadTaskTree()
+        public void ReloadTaskTree()
         {
             JobList shadowJobList = null;
             try
@@ -1863,7 +1896,7 @@ namespace Vishnu.ViewModel
         private static int _treeEventSemaphore; // = 0 wird vom System vorbelegt;
 
         // Bei True werden die Kinder eines TreeView-Knotens erst beim Öffnen nachgeladen.
-        private bool lazyLoadChildren;
+        private bool _lazyLoadChildren;
         private bool _isExpanded;
         private bool _isSelected;
         private VisualNodeState _visualState;
@@ -1876,11 +1909,8 @@ namespace Vishnu.ViewModel
         private string _freeComment;
         private bool _isInSleepTime;
         private string _sleepTimeTo;
-        private bool _isTreePaused;
+        private volatile bool _isTreePaused;
         private TreeParameters _treeParams;
-        private RelayCommand _btnReloadTaskTreeRelayCommand;
-        private RelayCommand _btnLogTaskTreeRelayCommand;
-        private RelayCommand _btnPauseResumeTaskTreeRelayCommand;
         private string _hookedTo;
 
         // True, wenn die Kinder dieses Knotens noch nicht geladen wurden.
@@ -1893,44 +1923,6 @@ namespace Vishnu.ViewModel
         private LogicalNodeViewModel()
         {
             this._canExpanderExpand = true;
-        }
-
-        private void reloadTaskTreeExecute(object parameter)
-        {
-            InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.reloadTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
-            this.ReloadTaskTree();
-        }
-
-        private bool canReloadTaskTreeExecute()
-        {
-            bool canReload = true; // !(this._myLogicalNode is NodeConnector); // && this._myLogicalNode.CanTreeStart;
-            return canReload;
-        }
-
-        private void logTaskTreeExecute(object parameter)
-        {
-            InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.logTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
-            LogicalTaskTreeManager.LogTaskTree(this, false);
-        }
-
-        private void pauseResumeTaskTreeExecute(object parameter)
-        {
-            if (!LogicalNode.IsTreeFlushing && !LogicalNode.IsTreePaused)
-            {
-                InfoController.Say(String.Format($"#RELOAD#         Pausing Tree (VM)"));
-                this._myLogicalNode?.PauseTree();
-            }
-            else
-            {
-                InfoController.Say(String.Format($"#RELOAD#        Resuming Tree (VM)"));
-                this._myLogicalNode?.ResumeTree();
-            }
-        }
-
-        private bool canLogTaskTreeExecute()
-        {
-            bool canLog = true;
-            return canLog;
         }
 
         #endregion private members
