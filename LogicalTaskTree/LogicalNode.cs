@@ -1487,7 +1487,7 @@ namespace LogicalTaskTree
         private JobList ReloadBranch()
         {
             JobList rootJobList = this.GetTopRootJobList();
-            InfoController.Say(String.Format($"#RELOAD# LogicalNode.ReloadBranch Id/Name: {this.IdInfo}, RootJobList: {rootJobList.IdInfo}"));
+            // InfoController.Say(String.Format($"#RELOAD# LogicalNode.ReloadBranch Id/Name: {this.IdInfo}, RootJobList: {rootJobList.IdInfo}"));
             TreeParameters shadowTreeParams = new TreeParameters(String.Format($"ShadowTree {LogicalTaskTree.TreeId++}"),
                 this.TreeParams.ParentView) { CheckerDllDirectory = this.TreeParams.CheckerDllDirectory };
 

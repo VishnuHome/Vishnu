@@ -183,7 +183,7 @@ namespace Vishnu.ViewModel
             }
             foreach (LogicalNodeViewModel root in LogicalTaskTreeViewModel.FlattenTree(TreeVM.TreeVM, new ObservableCollection<LogicalNodeViewModel>(), this._flatNodeListFilter))
             {
-                InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel from FlattenTree: {root.TreeParams.Name}:{root.Id} {(root.VisualTreeCacheBreaker)}"));
+                // InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel from FlattenTree: {root.TreeParams.Name}:{root.Id} {(root.VisualTreeCacheBreaker)}"));
                 if (root is JobListViewModel)
                 {
                     selectedJobGroups.Add(new JobGroupViewModel(root as JobListViewModel, GenericSingletonProvider.GetInstance<AppSettings>().FlatNodeListFilter));

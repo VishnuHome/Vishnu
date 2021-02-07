@@ -223,9 +223,6 @@ namespace Vishnu.ViewModel
                 // Da im aktiven Tree Knoten ausgetauscht werden, kann es zu null-Referenzen kommen.
                 // Deshalb werden ab hier alle kritischen Aktionen pausiert, bis der Reload durch ist.
                 LogicalNode.ProhibitSnapshots();
-                // activeTree.GetLogicalNode()?.PauseTree(); // TEST 20210202
-                // newTree.GetLogicalNode()?.PauseTree(); // TEST 20210202
-                // InfoController.Say(String.Format($"#RELOAD# Trees paused"));
 
                 // Durchläuft den aktiven Tree und prüft parallel den neu geladenen "ShadowTree" auf Gleichheit, bzw. Ungleichheit.
                 // Da hinzugekommene oder ausgetauschte Knoten immer auch über Unterschiede in den LogicalExpressions der
@@ -294,7 +291,7 @@ namespace Vishnu.ViewModel
 
         private static void TransferNode(LogicalNodeViewModel shadowNodeVM, LogicalNodeViewModel activeNodeVM, LogicalNode shadowNode, LogicalNode activeNode)
         {
-            InfoController.Say(String.Format($"#RELOAD# Transferring Node {shadowNodeVM.Path} from ShadowTree to Tree."));
+            // InfoController.Say(String.Format($"#RELOAD# Transferring Node {shadowNodeVM.Path} from ShadowTree to Tree."));
 
             if (activeNode.Mother == null)
             {
@@ -345,18 +342,13 @@ namespace Vishnu.ViewModel
                 // Thread.Sleep(500);
 
                 shadowNode.Run(new TreeEvent("UserRun", shadowNode.Id, shadowNode.Id, shadowNode.Name, shadowNode.Path, null, NodeLogicalState.None, null, null));
-                InfoController.Say(String.Format($"#RELOAD# shadowNode im activeTree started"));
+                // InfoController.Say(String.Format($"#RELOAD# shadowNode im activeTree started"));
                 Thread.Sleep(300); // Der Run braucht etwas, deshalb muss hier eine Wartezeit eingebaut werden.
 
                 LogicalNode.PauseTree();
 
-                //Thread.Sleep(200);
-                //InfoController.Say(String.Format($"#RELOAD# {activeParentVM.TreeParams.Name}:{activeParentVM.Id} {(activeParentVM.VisualTreeCacheBreaker)} vor InitFromNode()"));
-                //Thread.Sleep(200);
                 // Werte vom shadowParent in den activeParent übernehmen, die sonst nur bei der Erstinitialisierung gesetzt werden (primär LastSingleNodes).
                 activeParentVM.InitFromNode(shadowParentVM);
-                //Thread.Sleep(200);
-                //InfoController.Say(String.Format($"#RELOAD# {activeParentVM.TreeParams.Name}:{activeParentVM.Id} {(activeParentVM.VisualTreeCacheBreaker)} nach InitFromNode()"));
 
                 // Das shadowParentVM und der shadowParent halten noch Referenzen aufeinander
                 // und auf den Shadow-Knoten, der gerade in den activeTree hinüberwandert.
@@ -366,7 +358,6 @@ namespace Vishnu.ViewModel
                 // shadowParentVM.Children[nodeIndex].ReleaseBLNode(); // nicht erforderlich.
                 shadowParentVM.ReleaseBLNode();
                 shadowParentVM.Children.RemoveAt(nodeIndex);
-                //shadowParentVM.Children[nodeIndex] = null;
                 shadowParent.ReleaseChildAt(nodeIndex);
                 shadowParent.Children.RemoveAt(nodeIndex);
 
@@ -738,7 +729,7 @@ namespace Vishnu.ViewModel
 
         private static void AddNewJobListGlobals(JobList shadowJobList, JobList activeJobList)
         {
-            InfoController.Say(String.Format($"#RELOAD# Transferring Tree Globals from ShadowTree to Tree."));
+            // InfoController.Say(String.Format($"#RELOAD# Transferring Tree Globals from ShadowTree to Tree."));
 
             foreach (string key in shadowJobList.Job.EventTriggers.Keys)
             {
@@ -883,8 +874,6 @@ namespace Vishnu.ViewModel
 
         private static void RemoveOldJobListGlobals(JobList shadowJobList, JobList activeJobList)
         {
-            InfoController.Say(String.Format($"#RELOAD# Transferring Tree Globals from ShadowTree to Tree."));
-
             List<string> keys;
             try
             {

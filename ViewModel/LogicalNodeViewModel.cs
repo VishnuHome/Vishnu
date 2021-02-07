@@ -884,7 +884,7 @@ namespace Vishnu.ViewModel
         /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
         public override void ReloadTaskTreeExecute(object parameter)
         {
-            InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.reloadTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
+            // InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.reloadTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
             this.ReloadTaskTree();
         }
 
@@ -903,7 +903,7 @@ namespace Vishnu.ViewModel
         /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
         public override void LogTaskTreeExecute(object parameter)
         {
-            InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.logTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
+            // InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.logTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
             LogicalTaskTreeManager.LogTaskTree(this, false);
         }
 
