@@ -1318,6 +1318,14 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
+        /// Sorgt für eine sofortige Neu-Auswertung aller gecashten Zustände.
+        /// </summary>
+        public virtual void Refresh()
+        {
+            this.OnNodeStateChanged();
+        }
+
+        /// <summary>
         /// Startet die Verarbeitung dieses Knotens nach einem Start
         /// durch den Anwender. Gibt die Information, dass der Start
         /// durch den Anwender erfolgte, im TreeEvent an Run weiter.

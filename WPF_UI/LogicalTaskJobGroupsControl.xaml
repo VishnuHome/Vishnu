@@ -141,6 +141,10 @@
                                                     TargetName="IdBlock"
                                                     Property="Visibility"                     
                                                     Value="Hidden" />
+                        <Setter
+                                                    TargetName="DebugNodeInfos"
+                                                    Property="Visibility"                     
+                                                    Value="Hidden" />
                     </MultiDataTrigger>
                 </DataTemplate.Triggers>
             </HierarchicalDataTemplate>

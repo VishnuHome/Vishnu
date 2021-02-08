@@ -579,6 +579,15 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
+        /// Sorgt für eine sofortige Neu-Auswertung aller gecashten Zustände.
+        /// </summary>
+        public override void Refresh()
+        {
+            this.ThreadRefreshParentNode();
+            base.Refresh();
+        }
+
+        /// <summary>
         /// Abbrechen der Task.
         /// Wenn der Knoten selber beschäftigt ist, dann diesen zum Abbruch veranlassen,
         /// ansonsten die Abbruch-Anforderung an alle Kinder weitergeben.
