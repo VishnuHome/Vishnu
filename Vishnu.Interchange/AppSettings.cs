@@ -473,36 +473,41 @@ namespace Vishnu.Interchange
             {
                 this.UncachedCheckers = new List<string>();
             }
-            this.FlatNodeListFilter = NodeTypes.None;
-            foreach (string filter in this.GetStringValue("FlatNodeListFilter", "none").Split('|'))
+            this.FlatNodeListFilter = NodeTypes.Constant | NodeTypes.JobConnector | NodeTypes.NodeConnector | NodeTypes.NodeList;
+            string filters = this.GetStringValue("FlatNodeListFilter", null);
+            if (filters != null)
             {
-                string cleanFilter = filter.ToLower().Trim();
-                switch (cleanFilter)
+                this.FlatNodeListFilter = NodeTypes.None;
+                foreach (string filter in filters.Split('|'))
                 {
-                    case "nodeconnector":
-                        this.FlatNodeListFilter |= NodeTypes.NodeConnector;
-                        break;
-                    case "valuemodifier":
-                        this.FlatNodeListFilter |= NodeTypes.ValueModifier;
-                        break;
-                    case "constant":
-                        this.FlatNodeListFilter |= NodeTypes.Constant;
-                        break;
-                    case "checker":
-                        this.FlatNodeListFilter |= NodeTypes.Checker;
-                        break;
-                    case "nodelist":
-                        this.FlatNodeListFilter |= NodeTypes.NodeList;
-                        break;
-                    case "joblist":
-                        this.FlatNodeListFilter |= NodeTypes.JobList;
-                        break;
-                    case "snapshot":
-                        this.FlatNodeListFilter |= NodeTypes.Snapshot;
-                        break;
-                    default:
-                        this.FlatNodeListFilter |= NodeTypes.None;
-                        break;
+                    string cleanFilter = filter.ToLower().Trim();
+                    switch (cleanFilter)
+                    {
+                        case "nodeconnector":
+                            this.FlatNodeListFilter |= NodeTypes.NodeConnector;
+                            break;
+                        case "valuemodifier":
+                            this.FlatNodeListFilter |= NodeTypes.ValueModifier;
+                            break;
+                        case "constant":
+                            this.FlatNodeListFilter |= NodeTypes.Constant;
+                            break;
+                        case "checker":
+                            this.FlatNodeListFilter |= NodeTypes.Checker;
+                            break;
+                        case "nodelist":
+                            this.FlatNodeListFilter |= NodeTypes.NodeList;
+                            break;
+                        case "joblist":
+                            this.FlatNodeListFilter |= NodeTypes.JobList;
+                            break;
+                        case "snapshot":
+                            this.FlatNodeListFilter |= NodeTypes.Snapshot;
+                            break;
+                        default:
+                            this.FlatNodeListFilter |= NodeTypes.None;
+                            break;
+                    }
                 }
             }
             if (!Enum.TryParse(this.GetStringValue("StartTriggeredNodesOnUserRun", "Direct"),

@@ -844,7 +844,15 @@ ERLEDIGT: BugFix: Direkter UserRun auf getriggerte Knoten führte zum doppelten S
 
 Stand: 01.12.2020 Version 4.9.3.1 ()
 
+ERLEDIGT: Environment-Parameter mit Vishnu_ Prefix versehen.
 ERLEDIGT: Vishnu-Splashscreen auf lizenzfreien Tree umstellen.
+ERLEDIGT: Kontext-Menü auf rechte Maustaste, dafür Ansicht normalisieren über Umschalt-rechte Maustaste.
+ERLEDIGT: Tree anhalten und weiterlaufen lassen (Context-Menü).
+ERLEDIGT: Tree oder Branch loggen (Context-Menü).
+ERLEDIGT: Fehler: JobSnapshots können kurzzeitige, unlogische Zwischenzustände einfrieren.
+ERLEDIGT: Dynamische Snapshots und Trees - TreeReload, HotPlug neu checken und erweitern (Context-Menü).
+
+Stand: 09.02.2021 Version 5.0.0.0 (HotPlug)
 
 -------------------------------------------------------------------------------------------------------------
 
@@ -863,6 +871,7 @@ Hinweise:
 ###################
 
 --- TODO ----------------------------------------------------------------------------------------------------
+In Listenansicht Shift-Expand und Ctrl-Expand einbauen
 Fehler: wenn im Snapshot ein Teilbaum mit Exception auf false (oder true?) - von Exception weg - geht,
         werden der früheren Exception übergeordnete Strukturknoten (NodeList) nicht von gelb auf Farbe gesetzt.
 Event "SnapshotRefreshed" einführen.
@@ -891,8 +900,6 @@ MailTo-Parameter
 SMS
 WhatsApp
 Telegram
-Voll dynamische Snapshots und Trees
-HotPlug neu checken und erweitern
 UserParameter-Reader Parameter-Propagation nach Aktualisierung checken
 Doku: Job-Parameter ergänzen, bekannte Probleme, woher kommt der Name
 Vishnu Verwaltungsansicht, Uptime, Parameter, Referenzen, Tree, ProcessId, Aufrufparameter, etc.
@@ -962,7 +969,6 @@ Liste von Snapshots mit letzter Ladezeit verfügbar und prüfbar machen
 Fehler in TestJobs\CheckTrueFalseNullExceptionInput: sporadisch tritt bei erstem Run
 		ein Fehler auf (siehe Vishnu\Error_151017_[1|2].jpg)
 UserControl: Verweildauer nicht anzeigen, wenn nicht gesetzt und andere UserControls auch checken.
-Environment-Parameter mit VISHNU_ Prefix versehen.
 Vishnu Windows-Extension einführen und registrieren
 		an JobDescription als Standard festhalten aber zusätzlich
 		zu JobDescription.xml auch JobDescription.vjb zulassen.
@@ -972,7 +978,6 @@ Laden eines Jobs über Dialog ermöglichen
 		geschleudert werden soll.
 Rechte, Staging?
 TreeEvents erweitern: Any... für alle Events?
-In Listenansicht Shift-Expand und Ctrl-Expand einbauen
 Ok so? CheckTrueFalseNullExceptionInput - Setzten eines Unterknoten auf
 		Test-Exception:	der Fortschrittsbalken des Knotens wird weiß mit 0% dargestellt,
 		da der Endknoten selbst 0% Fortschritt hat (wegen der Test-Exception).

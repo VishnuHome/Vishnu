@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Windows;
 using Vishnu.Interchange;
 
 namespace Vishnu.ViewModel
@@ -295,7 +296,12 @@ namespace Vishnu.ViewModel
 
             if (activeNode.Mother == null)
             {
-                // throw new ApplicationException("Der Top-Job kann nicht im laufenden Betrieb ausgetauscht werden!"); TODO: dies auch ermöglichen.
+                // IBusinessLogicRoot xxx = activeNode.TreeParams.BusinessLogicRoot;
+                // IViewModelRoot yyy = activeNode.TreeParams.ViewModelRoot;
+
+                // throw new ApplicationException("Der Top-Job kann nicht im laufenden Betrieb ausgetauscht werden!");
+                // TODO: dies auch ermöglichen. Ansatz: oberhalb des Top-Knoten schon beim Laden der JobDescription.xml einen Pseudo-Knoten erzeugen.
+                MessageBox.Show("Der oberste Job kann nicht im laufenden Betrieb geändert werden!", "Hinweis", MessageBoxButton.OK, MessageBoxImage.Hand);
                 InfoController.Say(String.Format($"#RELOAD# Not transferring Root-Node {shadowNodeVM.Path} from ShadowTree to Tree."));
                 return;
             }

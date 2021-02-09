@@ -42,6 +42,8 @@ namespace Vishnu.ViewModel
         {
             JobListViewModel oldTopJobListViewModel = this.TreeVM.TreeVM;
             this.TreeVM.TreeVM = topJobListViewModel as JobListViewModel;
+            this.RaisePropertyChanged("TreeVM");
+            this.RaisePropertyChanged("JobGroupsVM");
             return oldTopJobListViewModel;
         }
 
@@ -52,14 +54,7 @@ namespace Vishnu.ViewModel
         public void RefreshDependentAlternativeViewModels()
         {
             this.SelectJobGroups(this.JobGroupsVM);
-
-            //ObservableCollection<JobGroupViewModel> oldJobGroups = this.JobGroupsVM;
-            //this.JobGroupsVM = this.SelectJobGroups();
-            //this.RaisePropertyChanged("JobGroupsVM");
-            //oldJobGroups?.Clear();
-            //oldJobGroups = null;
         }
-
 
         #endregion IViewModelRoot Implementation
 
