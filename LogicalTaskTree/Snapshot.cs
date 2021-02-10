@@ -209,8 +209,9 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="mother">Der Eltern-Knoten.</param>
         /// <param name="rootJobList">Die Root-JobList</param>
-        public Snapshot(LogicalNode mother, JobList rootJobList)
-          : base(mother, rootJobList)
+        /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
+        public Snapshot(LogicalNode mother, JobList rootJobList, TreeParameters treeParams)
+          : base(mother, rootJobList, treeParams)
         {
             this._isDefaultSnapshot = false;
             if (this._job != null)
@@ -496,24 +497,24 @@ namespace LogicalTaskTree
                 switch (type)
                 {
                     case "Snapshot":
-                        node2parse = new Snapshot(mother, this.RootJobList);
+                        node2parse = new Snapshot(mother, this.RootJobList, this.TreeParams);
                         node2parse.NodeType = NodeTypes.Snapshot;
                         node2parse.UserControlPath = this.UserControlPath;
                         break;
                     case "JobList":
-                        node2parse = new JobList(mother, this.RootJobList);
+                        node2parse = new JobList(mother, this.RootJobList, this.TreeParams);
                         node2parse.NodeType = NodeTypes.JobList;
                         node2parse.UserControlPath = this.JobListUserControlPath;
                         break;
                     case "NodeList":
-                        node2parse = new NodeList(mother, this.RootJobList);
+                        node2parse = new NodeList(mother, this.RootJobList, this.TreeParams);
                         node2parse.NodeType = NodeTypes.NodeList;
                         node2parse.UserControlPath = this.NodeListUserControlPath;
                         break;
                     case "SingleNode":
                         //case "JobConnector":
                         //case "NodeConnector":
-                        node2parse = new SingleNode(mother, this.RootJobList);
+                        node2parse = new SingleNode(mother, this.RootJobList, this.TreeParams);
                         node2parse.NodeType = NodeTypes.Checker;
                         subType = xElement.Attributes("NodeType").FirstOrDefault().Value;
                         if (subType != "Constant")
@@ -526,7 +527,7 @@ namespace LogicalTaskTree
                         }
                         break;
                     case "JobConnector":
-                        node2parse = new JobConnector(mother, this.RootJobList);
+                        node2parse = new JobConnector(mother, this.RootJobList, this.TreeParams);
                         node2parse.NodeType = NodeTypes.JobConnector;
                         subType = xElement.Attributes("NodeType").FirstOrDefault().Value;
                         node2parse.UserControlPath = this.JobConnectorUserControlPath;

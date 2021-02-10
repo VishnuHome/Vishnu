@@ -483,8 +483,9 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="mother">Der Eltern-Knoten.</param>
         /// <param name="rootJobList">Die Root-JobList</param>
-        public NodeList(LogicalNode mother, JobList rootJobList)
-          : base(mother, rootJobList)
+        /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
+        public NodeList(LogicalNode mother, JobList rootJobList, TreeParameters treeParams)
+          : base(mother, rootJobList, treeParams)
         {
             this.LastSingleNodesLocker = new object();
             this.LastCountResultsLocker = new object();
