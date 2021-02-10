@@ -400,8 +400,9 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="mother">Der Eltern-Knoten.</param>
         /// <param name="rootJobList">Die Root-JobList</param>
-        public JobConnector(LogicalNode mother, JobList rootJobList)
-          : base(mother, rootJobList)
+        /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
+        public JobConnector(LogicalNode mother, JobList rootJobList, TreeParameters treeParams)
+          : base(mother, rootJobList, treeParams)
         {
             this.UserControlPath = rootJobList.JobConnectorUserControlPath;
         }

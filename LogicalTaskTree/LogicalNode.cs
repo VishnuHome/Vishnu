@@ -1206,10 +1206,12 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="mother">Der Eltern-Knoten</param>
         /// <param name="rootJobList">Die Root-JobList</param>
-        public LogicalNode(LogicalNode mother, JobList rootJobList)
+        /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
+        public LogicalNode(LogicalNode mother, JobList rootJobList, TreeParameters treeParams)
           : base(mother)
         {
             this.IsSnapshotDummy = true;
+            this.TreeParams = treeParams;
             this.AppSettings = GenericSingletonProvider.GetInstance<AppSettings>();
             this.DebugMode = this.AppSettings.DebugMode;
             this.RootJobList = rootJobList;
