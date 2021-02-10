@@ -15,4 +15,6 @@
         <BitmapImage x:Key="Error" UriSource="../Media/support.png" />
         <BitmapImage x:Key="InternalError" UriSource="../Media/self_distract.png" />
     </ResourceDictionary>
+    <SolidColorBrush x:Key="WindowBGBrush" Color="LemonChiffon"/>
+    <SolidColorBrush x:Key="WindowBGBrushSleepMode" Color="DeepSkyBlue"/>
 </ResourceDictionary>

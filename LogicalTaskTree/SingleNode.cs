@@ -311,6 +311,8 @@ namespace LogicalTaskTree
         /// <returns>Verkettete Properties als String.</returns>
         public override string ToString()
         {
+            string bla = this.IdInfo;
+
             StringBuilder stringBuilder = new StringBuilder(base.ToString());
             string slavePathName = "";
             string referencedNodeName = "";
@@ -339,7 +341,8 @@ namespace LogicalTaskTree
             }
             if (!String.IsNullOrEmpty(checkerParameters))
             {
-                stringBuilder.AppendLine(String.Format($"    CheckerParameters: {checkerParameters}"));
+                // stringBuilder.AppendLine(String.Format($"    CheckerParameters: {checkerParameters}"));
+                stringBuilder.AppendLine("    CheckerParameters: " + checkerParameters);
             }
             return stringBuilder.ToString();
         }

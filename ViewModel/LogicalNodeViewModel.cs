@@ -502,7 +502,7 @@ namespace Vishnu.ViewModel
         {
             get
             {
-                return this._myLogicalNode.Name;
+                return this._myLogicalNode?.Name;
             }
         }
 
