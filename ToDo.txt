@@ -857,13 +857,25 @@ Stand: 09.02.2021 Version 5.0.0.0 (HotPlug)
 -------------------------------------------------------------------------------------------------------------
 
 ###################
-Veröffentlichungsort: NetEti: \\localhost\Vishnu.Install\
+Vishnu
+	Veröffentlichungsort: NetEti: \\localhost\Vishnu.Install\ 
+	                               (...\ClubChaos\Setup\Vishnu.bin)
 		Url des Installationsordners: \\localhost\Vishnu.Install\
 		Optionen / Herausgebername: Erik Nagel
 		Optionen / Sammlungsname NetEti
-Veröffentlichungsort: NetEti: \\localhost\Vishnu.Install\
+	Veröffentlichungsort: NetEti: \\localhost\Vishnu.Install\
 		Url des Installationsordners: https://neteti.de/Vishnu.Install/
 		Anwendungsupdate/Updatepfad:  https://neteti.de/Vishnu.Install/
+WebViewer
+	Veröffentlichungsort: NetEti: \\localhost\Vishnu.Install\WebViewer\
+	                              (...\ClubChaos\Setup\Vishnu.bin\WebViewer\)
+		Url des Installationsordners: \\localhost\Vishnu.Install\WebViewer\
+		Optionen / Herausgebername: Erik Nagel
+		Optionen / Sammlungsname NetEti
+	Veröffentlichungsort: NetEti: \\localhost\Vishnu.Install\WebViewer\
+		Url des Installationsordners: https://neteti.de/Vishnu.Install/WebViewer/
+		Anwendungsupdate/Updatepfad:  https://neteti.de/Vishnu.Install/WebViewer/
+
 Hinweise:
 		.../Vishnu.Install (bei zuwenig Rechten geht u.a. auch .htaccess-Umleitung von http auf https nicht mehr)
 		vor Erstinstallation neteti.crt lokal installieren
