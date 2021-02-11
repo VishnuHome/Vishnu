@@ -129,8 +129,6 @@ namespace Vishnu.ViewModel
         /// <returns>Verkettete Properties als String.</returns>
         public override string ToString()
         {
-            string bla = this.DebugNodeInfos;
-
             StringBuilder stringBuilder = new StringBuilder(base.ToString());
             string slavePathName = "";
             string referencedNodeName = "";
