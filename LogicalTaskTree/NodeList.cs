@@ -141,14 +141,15 @@ namespace LogicalTaskTree
                 NodeState state = this.ListNodeState;
                 if ((state & NodeState.Busy) == 0) // nur wenn der Knoten selbst nicht beschäftigt ist, die Kinder zusätzlich checken.
                 {
-                    // EmergencyDebug = this.TreeParams + ":" + this.IdInfo; // TEST 06.02.2021 Erik Nagel
+                    string EmergencyDebug = this.TreeParams + ":" + this.IdInfo; // TEST 06.02.2021 Erik Nagel
+                    EmergencyDebug += ", Mother: " + (this.Mother as LogicalNode)?.IdInfo;
                     if (this.Children.Where(c =>
                     {
-                        //if (c == null)
-                        //{
-                        //    InfoController.Say("#RELOAD# " + EmergencyDebug); // TEST 06.02.2021 Erik Nagel
-                        //    InfoController.FlushAll();
-                        //}
+                        if (c == null)
+                        {
+                            InfoController.Say("#RELOAD# " + EmergencyDebug); // TEST 06.02.2021 Erik Nagel
+                            InfoController.FlushAll();
+                        }
                         return (c.State & NodeState.Busy) > 0;
                     }).FirstOrDefault() != null)
                     {
@@ -960,8 +961,6 @@ namespace LogicalTaskTree
         private string _childrenString;
 
         #endregion private members
-
-        public static string EmergencyDebug;
 
     }
 }

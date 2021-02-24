@@ -871,6 +871,7 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Liefert einen string für Debug-Zwecke.
         /// </summary>
+        /// <returns>Ein String für Debug-Zwecke.</returns>
         public override string GetDebugNodeInfos()
         {
             return this.DebugNodeInfos;
@@ -1657,6 +1658,10 @@ namespace Vishnu.ViewModel
                 // Das DummyLogicalTaskTree-ViewModel
                 DummyLogicalTaskTreeViewModel dummyLogicalTaskTreeViewModel = new DummyLogicalTaskTreeViewModel(shadowJobList.TreeParams);
                 JobListViewModel shadowTopRootJobListViewModel = new JobListViewModel(dummyLogicalTaskTreeViewModel, null, shadowJobList, false, null);
+                // DEBUG: 23.02.2021 Nagel+
+                // LogicalTaskTreeManager.LogTaskTree(shadowTopRootJobListViewModel);
+                // Thread.Sleep(1005);
+                // DEBUG: 23.02.2021 Nagel-
                 if (shadowTopRootJobListViewModel != null)
                 {
                     shadowTopRootJobListViewModel.SetChildOrientation(this.StartTreeOrientation);

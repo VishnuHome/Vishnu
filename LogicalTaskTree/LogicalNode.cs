@@ -1064,9 +1064,7 @@ namespace LogicalTaskTree
             LogicalNode.OnAllNodesStateChanged();
             Thread.Sleep(HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
             Thread.Sleep(HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
-            Thread.Sleep(HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
             LogicalNode.IsTreePaused = true;
-            Thread.Sleep(HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
         }
 
         /// <summary>
@@ -1488,6 +1486,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Wird aufgerufen, wenn der Teilbaum neu geladen werden soll.
         /// </summary>
+        /// <returns>Die RootJobList des neu geladenen Jobs.</returns>
         public virtual JobList Reload()
         {
             this.ProcessTreeEvent("Reload", this.Path);

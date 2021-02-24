@@ -143,7 +143,7 @@ namespace Vishnu.ViewModel
                         if ((logicalNode as SingleNode).Checker is CheckerShell)
                         {
                             slavePathName = ((logicalNode as SingleNode).Checker as CheckerShell).SlavePathName ?? "";
-                            checkerParameters = ((logicalNode as SingleNode).Checker as CheckerShell).CheckerParameters ?? "";
+                            checkerParameters = (((logicalNode as SingleNode).Checker as CheckerShell).OriginalCheckerParameters ?? "").ToString();
                             referencedNodeName = ((logicalNode as SingleNode).Checker as CheckerShell).ReferencedNodeName ?? "";
                         }
                         else
@@ -162,7 +162,7 @@ namespace Vishnu.ViewModel
                             if ((logicalNode as NodeConnector).Checker is CheckerShell)
                             {
                                 slavePathName = ((logicalNode as NodeConnector).Checker as CheckerShell).SlavePathName ?? "";
-                                checkerParameters = ((logicalNode as NodeConnector).Checker as CheckerShell).CheckerParameters ?? "";
+                                checkerParameters = (((logicalNode as NodeConnector).Checker as CheckerShell).OriginalCheckerParameters ?? "").ToString();
                                 referencedNodeName = ((logicalNode as NodeConnector).Checker as CheckerShell).ReferencedNodeName ?? "";
                             }
                             else
@@ -176,7 +176,7 @@ namespace Vishnu.ViewModel
             }
             if (!String.IsNullOrEmpty(slavePathName))
             {
-                stringBuilder.AppendLine(String.Format($"    SlavePathName: {slavePathName}"));
+                stringBuilder.AppendLine(System.IO.Path.GetFileName(String.Format($"    SlavePathName: {slavePathName}")));
             }
             if (!String.IsNullOrEmpty(referencedNodeName))
             {

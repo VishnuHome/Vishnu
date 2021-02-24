@@ -320,7 +320,7 @@ namespace LogicalTaskTree
                 if (this.Checker is CheckerShell)
                 {
                     slavePathName = (this.Checker as CheckerShell).SlavePathName ?? "";
-                    checkerParameters = (this.Checker as CheckerShell).CheckerParameters ?? "";
+                    checkerParameters = ((this.Checker as CheckerShell).OriginalCheckerParameters ?? "").ToString();
                     referencedNodeName = (this.Checker as CheckerShell).ReferencedNodeName ?? "";
                 }
                 else
@@ -331,7 +331,7 @@ namespace LogicalTaskTree
             }
             if (!String.IsNullOrEmpty(slavePathName))
             {
-                stringBuilder.AppendLine(String.Format($"    SlavePathName: {slavePathName}"));
+                stringBuilder.AppendLine(System.IO.Path.GetFileName(String.Format($"    SlavePathName: {slavePathName}")));
             }
             if (!String.IsNullOrEmpty(referencedNodeName))
             {

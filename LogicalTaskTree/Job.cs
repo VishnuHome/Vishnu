@@ -456,8 +456,8 @@ namespace LogicalTaskTree
         /// Prüft, ob Workers zu einem aus durch ":" getrennten NodeId und TreeEvent zusammengesetzten
         /// Key ein WorkerShell-Array enthält.
         /// </summary>
-        /// <param name="node_id"></param>
-        /// <returns></returns>
+        /// <param name="node_id">Id des zu prüfenden Knotens.</param>
+        /// <returns>True, wenn Workers den aus NodeId + ":" + TreeEvent zusammengesetzten Key enthält.</returns>
         public bool ContainsCombinedKey(string node_id)
         {
             return this._jobContainsCombinedKey(node_id);
@@ -491,10 +491,6 @@ namespace LogicalTaskTree
             }
         }
 
-        #endregion public members
-
-        #region internal members
-
         // Liefert die Values des in Job privaten Dictionarys '_workers' über die bei der
         // Instanziierung dieser Klasse durch die instanziierenden Klasse (Job)
         // übergebene Funktion 'jobGetValues'.
@@ -508,6 +504,10 @@ namespace LogicalTaskTree
                 return this._jobGetValues();
             }
         }
+
+        #endregion public members
+
+        #region internal members
 
         // Indexer: liefert zu einem aus Knoten-Id + : + TreeEvent-Name zusammengesetzten Key
         // direkt das zugehörige WorkerShell-Array aus dem privaten Dictionarys _workers von Job

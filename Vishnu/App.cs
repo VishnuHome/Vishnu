@@ -506,6 +506,8 @@ namespace Vishnu
             {
                 try
                 {
+                    LogicalTaskTree.LogicalNode.ResumeTree(); // frees all waiting nodes
+                    LogicalTaskTree.LogicalNode.AllowSnapshots(); // to avoid deadlocks.
                     SingleInstanceApplication._businessLogic?.Dispose();
                 }
                 catch { }

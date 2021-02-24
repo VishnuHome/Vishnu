@@ -345,6 +345,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Lädt den Zweig oder Knoten neu.
         /// </summary>
+        /// <returns>Die RootJobList des neu geladenen Jobs.</returns>
         public override JobList Reload()
         {
             if (this._node != null)
@@ -400,7 +401,7 @@ namespace LogicalTaskTree
                 if (this.Checker is CheckerShell)
                 {
                     slavePathName = (this.Checker as CheckerShell).SlavePathName ?? "";
-                    checkerParameters = (this.Checker as CheckerShell).CheckerParameters ?? "";
+                    checkerParameters = ((this.Checker as CheckerShell).OriginalCheckerParameters ?? "").ToString();
                     referencedNodeName = (this.Checker as CheckerShell).ReferencedNodeName ?? "";
                 }
                 else

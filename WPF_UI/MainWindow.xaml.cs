@@ -123,6 +123,7 @@ namespace Vishnu.WPF_UI
         /// Höhe und Breite des Inhalts und die Property SizeToContent auf WidthAndHeight.
         /// Zentriert das Window dann neu relativ zur letzten Position.
         /// </summary>
+        /// <param name="parameter">Optionales Parameter-Objekt, hier ungenutzt.</param>
         public void ForceRecalculateWindowMeasures(object parameter)
         {
             this.SizeToContent = System.Windows.SizeToContent.WidthAndHeight;

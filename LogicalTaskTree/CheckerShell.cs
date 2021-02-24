@@ -203,39 +203,51 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
+        /// Unveränderte Aufrufparameter für die Checker-Dll oder null.
+        /// Die OriginalCheckerParameters können im Gegensatz zu den CheckerParameters
+        /// nicht mehr nachträglich durch ReplaceWildcardsNPathes verändert werden.
+        /// Da ReplaceWildcardsNPathes u.U. auch  Pfade einsetzt, die durch das Caching des ersten
+        /// Auftretens je nach Timing unterschiedlich sein können, sind solche veränderbaren
+        /// Parameter nicht für Equal-Vergleiche geeignet.
+        /// </summary>
+        public object OriginalCheckerParameters { get; private set; }
+
+        /// <summary>
         /// Konstruktor
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
-        public CheckerShell(string slavePathName) : this(slavePathName, null, null, null, false) { }
+        public CheckerShell(string slavePathName) : this(slavePathName, null, null, null, null, false) { }
 
         /// <summary>
         /// Konstruktor
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
         /// <param name="alwaysReload">Bei True wird die Dll für jeden Run neu instanziiert (für den Debug von Memory Leaks).</param>
-        public CheckerShell(string slavePathName, bool alwaysReload) : this(slavePathName, null, null, null, alwaysReload) { }
+        public CheckerShell(string slavePathName, bool alwaysReload) : this(slavePathName, null, null, null, null, alwaysReload) { }
 
         /// <summary>
         /// Konstruktor
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
-        /// <param name="checkerParameters">Spezifische Aufrufparameter.</param>
-        public CheckerShell(string slavePathName, object checkerParameters) : this(slavePathName, checkerParameters, null, null, false) { }
+        /// <param name="checkerParameters">Spezifische Aufrufparameter u.U. mit Variablenersetzung.</param>
+        /// <param name="originalCheckerParameters">Spezifische Aufrufparameter ohne Variablenersetzung.</param>
+        public CheckerShell(string slavePathName, object checkerParameters, object originalCheckerParameters) : this(slavePathName, checkerParameters, originalCheckerParameters, null, null, false) { }
 
         /// <summary>
         /// Konstruktor
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
-        /// <param name="checkerParameters">Spezifische Aufrufparameter.</param>
+        /// <param name="checkerParameters">Spezifische Aufrufparameter u.U. mit Variablenersetzung.</param>
+        /// <param name="originalCheckerParameters">Spezifische Aufrufparameter ohne Variablenersetzung.</param>
         /// <param name="alwaysReload">Bei True wird die Dll für jeden Run neu instanziiert (für den Debug von Memory Leaks).</param>
-        public CheckerShell(string slavePathName, object checkerParameters, bool alwaysReload) : this(slavePathName, checkerParameters, null, null, alwaysReload) { }
+        public CheckerShell(string slavePathName, object checkerParameters, object originalCheckerParameters, bool alwaysReload) : this(slavePathName, checkerParameters, originalCheckerParameters, null, null, alwaysReload) { }
 
         /// <summary>
         /// Konstruktor.
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
         /// <param name="checkerTrigger">Ein Trigger, der den Job wiederholt aufruft.</param>
-        public CheckerShell(string slavePathName, TriggerShell checkerTrigger) : this(slavePathName, null, checkerTrigger, null, false) { }
+        public CheckerShell(string slavePathName, TriggerShell checkerTrigger) : this(slavePathName, null, null, checkerTrigger, null, false) { }
 
         /// <summary>
         /// Konstruktor
@@ -243,33 +255,35 @@ namespace LogicalTaskTree
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
         /// <param name="checkerTrigger">Ein Trigger, der den Job wiederholt aufruft.</param>
         /// <param name="alwaysReload">Bei True wird die Dll für jeden Run neu instanziiert (für den Debug von Memory Leaks).</param>
-        public CheckerShell(string slavePathName, TriggerShell checkerTrigger, bool alwaysReload) : this(slavePathName, null, checkerTrigger, null, alwaysReload) { }
+        public CheckerShell(string slavePathName, TriggerShell checkerTrigger, bool alwaysReload) : this(slavePathName, null, null, checkerTrigger, null, alwaysReload) { }
 
         /// <summary>
         /// Konstruktor
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
-        /// <param name="checkerParameters">Spezifische Aufrufparameter.</param>
+        /// <param name="checkerParameters">Spezifische Aufrufparameter u.U. mit Variablenersetzung.</param>
+        /// <param name="originalCheckerParameters">Spezifische Aufrufparameter ohne Variablenersetzung.</param>
         /// <param name="checkerTrigger">Ein Trigger, der den Job wiederholt aufruft.</param>
-        public CheckerShell(string slavePathName, object checkerParameters, TriggerShell checkerTrigger)
-          : this(slavePathName, checkerParameters, checkerTrigger, null, false) { }
+        public CheckerShell(string slavePathName, object checkerParameters, object originalCheckerParameters, TriggerShell checkerTrigger)
+          : this(slavePathName, checkerParameters, originalCheckerParameters, checkerTrigger, null, false) { }
 
         /// <summary>
         /// Konstruktor
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
-        /// <param name="checkerParameters">Spezifische Aufrufparameter.</param>
+        /// <param name="checkerParameters">Spezifische Aufrufparameter u.U. mit Variablenersetzung.</param>
+        /// <param name="originalCheckerParameters">Spezifische Aufrufparameter ohne Variablenersetzung.</param>
         /// <param name="checkerTrigger">Ein Trigger, der den Job wiederholt aufruft.</param>
         /// <param name="alwaysReload">Bei True wird die Dll für jeden Run neu instanziiert (für den Debug von Memory Leaks).</param>
-        public CheckerShell(string slavePathName, object checkerParameters, TriggerShell checkerTrigger, bool alwaysReload)
-          : this(slavePathName, checkerParameters, checkerTrigger, null, alwaysReload) { }
+        public CheckerShell(string slavePathName, object checkerParameters, object originalCheckerParameters, TriggerShell checkerTrigger, bool alwaysReload)
+          : this(slavePathName, checkerParameters, originalCheckerParameters, checkerTrigger, null, alwaysReload) { }
 
         /// <summary>
         /// Konstruktor
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
         /// <param name="checkerLogger">Ein Logger, der Logging-Informationen weiterverarbeitet.</param>
-        public CheckerShell(string slavePathName, LoggerShell checkerLogger) : this(slavePathName, null, null, checkerLogger, false) { }
+        public CheckerShell(string slavePathName, LoggerShell checkerLogger) : this(slavePathName, null, null, null, checkerLogger, false) { }
 
         /// <summary>
         /// Konstruktor
@@ -277,41 +291,45 @@ namespace LogicalTaskTree
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
         /// <param name="checkerLogger">Ein Logger, der Logging-Informationen weiterverarbeitet.</param>
         /// <param name="alwaysReload">Bei True wird die Dll für jeden Run neu instanziiert (für den Debug von Memory Leaks).</param>
-        public CheckerShell(string slavePathName, LoggerShell checkerLogger, bool alwaysReload) : this(slavePathName, null, null, checkerLogger, alwaysReload) { }
+        public CheckerShell(string slavePathName, LoggerShell checkerLogger, bool alwaysReload) : this(slavePathName, null, null, null, checkerLogger, alwaysReload) { }
 
         /// <summary>
         /// Konstruktor
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
-        /// <param name="checkerParameters">Spezifische Aufrufparameter.</param>
+        /// <param name="checkerParameters">Spezifische Aufrufparameter u.U. mit Variablenersetzung.</param>
+        /// <param name="originalCheckerParameters">Spezifische Aufrufparameter ohne Variablenersetzung.</param>
         /// <param name="checkerLogger">Ein Logger, der Logging-Informationen weiterverarbeitet.</param>
-        public CheckerShell(string slavePathName, object checkerParameters, LoggerShell checkerLogger)
-          : this(slavePathName, checkerParameters, null, checkerLogger, false) { }
+        public CheckerShell(string slavePathName, object checkerParameters, object originalCheckerParameters, LoggerShell checkerLogger)
+          : this(slavePathName, checkerParameters, originalCheckerParameters, null, checkerLogger, false) { }
 
         /// <summary>
         /// Konstruktor
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
-        /// <param name="checkerParameters">Spezifische Aufrufparameter.</param>
+        /// <param name="checkerParameters">Spezifische Aufrufparameter u.U. mit Variablenersetzung.</param>
+        /// <param name="originalCheckerParameters">Spezifische Aufrufparameter ohne Variablenersetzung.</param>
         /// <param name="checkerLogger">Ein Logger, der Logging-Informationen weiterverarbeitet.</param>
         /// <param name="alwaysReloadChecker">Bei True wird die Dll für jeden Run neu instanziiert (für den Debug von Memory Leaks).</param>
-        public CheckerShell(string slavePathName, object checkerParameters, LoggerShell checkerLogger, bool alwaysReloadChecker)
-          : this(slavePathName, checkerParameters, null, checkerLogger, alwaysReloadChecker) { }
+        public CheckerShell(string slavePathName, object checkerParameters, object originalCheckerParameters, LoggerShell checkerLogger, bool alwaysReloadChecker)
+          : this(slavePathName, checkerParameters, originalCheckerParameters, null, checkerLogger, alwaysReloadChecker) { }
 
         /// <summary>
         /// Konstruktor
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
-        /// <param name="checkerParameters">Spezifische Aufrufparameter.</param>
+        /// <param name="checkerParameters">Spezifische Aufrufparameter u.U. mit Variablenersetzung.</param>
+        /// <param name="originalCheckerParameters">Spezifische Aufrufparameter ohne Variablenersetzung.</param>
         /// <param name="checkerTrigger">Ein Trigger, der den Job wiederholt aufruft oder null.</param>
         /// <param name="checkerLogger">Ein Logger, der Logging-Informationen weiterverarbeitet.</param>
         /// <param name="alwaysReload">Bei True wird die Dll für jeden Run neu instanziiert (für den Debug von Memory Leaks).</param>
-        public CheckerShell(string slavePathName, object checkerParameters, TriggerShell checkerTrigger, LoggerShell checkerLogger, bool alwaysReload)
+        public CheckerShell(string slavePathName, object checkerParameters, object originalCheckerParameters, TriggerShell checkerTrigger, LoggerShell checkerLogger, bool alwaysReload)
           : base()
         {
             this.LastReturned = null;
             this.SlavePathName = slavePathName;
             this._checkerParameters = checkerParameters;
+            this.OriginalCheckerParameters = originalCheckerParameters;
             this.CheckerTrigger = checkerTrigger;
             this.CheckerLogger = checkerLogger;
             this._lastDllWriteTime = DateTime.MinValue;
@@ -351,6 +369,7 @@ namespace LogicalTaskTree
 
         private string _slavePathName;
         private object _checkerParameters;
+
         private INodeChecker _slave;
         private DateTime _lastDllWriteTime;
         private VishnuAssemblyLoader _assemblyLoader;

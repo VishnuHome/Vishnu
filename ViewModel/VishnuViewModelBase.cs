@@ -128,6 +128,7 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Liefert einen string für Debug-Zwecke.
         /// </summary>
+        /// <returns>Ein String für Debug-Zwecke.</returns>
         public virtual string GetDebugNodeInfos()
         {
             return this.VisualTreeCacheBreaker;

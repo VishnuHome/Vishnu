@@ -312,8 +312,8 @@ namespace LogicalTaskTree
         /// Überschreibt die Run-Logik aus LogicalNode um ggf.
         /// noch einen vorhandenen SnapshotTrigger und ggf. 
         /// TreeExternals zu starten.
-        /// <param name="source">Bei abhängigen Checkern das auslösende TreeEvent.</param>
         /// </summary>
+        /// <param name="source">Bei abhängigen Checkern das auslösende TreeEvent.</param>
         public override void Run(TreeEvent source)
         {
             if (this.SnapshotTrigger != null)
@@ -378,6 +378,7 @@ namespace LogicalTaskTree
         /// mit den aktuellen Zuständen seiner Knoten als String-List.
         /// Kann für Debug-Zwecke genutzt werden.
         /// </summary>
+        /// <returns>Zusammenfassung des aktuellen Trees mit den aktuellen Zuständen seiner Knoten als String-List.</returns>
         public List<string> GetAllTreeInfos()
         {
             List<string> allTreeInfos = new List<string>();
@@ -1117,7 +1118,10 @@ namespace LogicalTaskTree
             if (this.Mother == null)
             {
                 this.NodeType = NodeTypes.JobList;
-                this.requestSnapshot(null);
+                if (!this.TreeParams.Name.StartsWith("Shadow"))
+                {
+                    this.requestSnapshot(null);
+                }
             }
         }
 

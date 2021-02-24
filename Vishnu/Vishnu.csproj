@@ -6,7 +6,7 @@
   </Target>
   <PropertyGroup>
     <AssemblyRoot Condition="'$(Vishnu_Assemblies)'!=''">$(Vishnu_Assemblies)</AssemblyRoot>
-    <PublishUrl>\\any-fileserver\any-share\VishnuViewer\</PublishUrl>
+    <PublishUrl>\\localhost\Vishnu.Install\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Unc</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -16,11 +16,12 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>true</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>\\any-fileserver\any-share\VishnuViewer\</InstallUrl>
+    <InstallUrl>\\localhost\Vishnu.Install\</InstallUrl>
     <SupportUrl>http://www.neteti.de</SupportUrl>
     <ErrorReportUrl>http://www.neteti.de</ErrorReportUrl>
     <ProductName>Vishnu</ProductName>
-    <PublisherName>any-publisher-id</PublisherName>
+    <PublisherName>Erik Nagel</PublisherName>
+    <SuiteName>NetEti</SuiteName>
     <MinimumRequiredVersion>1.1.0.48</MinimumRequiredVersion>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
@@ -77,14 +78,14 @@
     <ApplicationIcon>Vishnu_multi.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>3089580D1D0A79BF0C011EA8B5FF0B99A39F6E19</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>2D952B82F0C74CCB2B8F6159E292F86931268AC7</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>
     </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <GenerateManifests>true</GenerateManifests>
+    <GenerateManifests>false</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
