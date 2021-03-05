@@ -887,6 +887,7 @@ Hinweise:
 ###################
 
 --- TODO ----------------------------------------------------------------------------------------------------
+Context-Menü schließt nicht automatisch nach dem ersten Funktionsaufruf (Reload any larger branch).
 In Listenansicht Shift-Expand und Ctrl-Expand einbauen
 Fehler: wenn im Snapshot ein Teilbaum mit Exception auf false (oder true?) - von Exception weg - geht,
         werden der früheren Exception übergeordnete Strukturknoten (NodeList) nicht von gelb auf Farbe gesetzt.
