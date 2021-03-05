@@ -1466,10 +1466,8 @@ namespace LogicalTaskTree
             {
                 (this.Trigger as TriggerShell).UnregisterTriggerIt(this.Path);
             }
-            if (!LogicalNode.IsTreePaused) // muss geprüft werden, ansonsten Deadlock beim Reload
-            {
-                this.Logical = null; // essenziell
-            }
+            LogicalNode.WaitWhileTreePaused(); // vermeidet Deadlocks
+            this.Logical = null; // essenziell
         }
 
         /// <summary>
