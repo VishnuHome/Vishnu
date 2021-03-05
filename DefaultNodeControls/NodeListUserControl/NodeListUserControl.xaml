@@ -36,7 +36,7 @@
                 <Border Name="ItemBorder" Padding="5" Background="Transparent" CornerRadius="6" MouseDown="ItemBorder_MouseDown"
                          Visibility="{Binding Visibility}">
                     <Grid Name="MainGrid" ToolTip="{Binding LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400"
-                          ContextMenu="{DynamicResource cmMainGrid}">
+                          ContextMenu="{DynamicResource cmContextMenu}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>

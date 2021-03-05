@@ -36,7 +36,7 @@
                         </MultiBinding>
                     </Border.BorderBrush>
                     <Grid Name="MainGrid" HorizontalAlignment="Stretch" ToolTip="{Binding GroupJobList.LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400"
-                          ContextMenu="{DynamicResource cmMainGrid}">
+                          ContextMenu="{DynamicResource cmContextMenu}">
                         <Grid.RowDefinitions>
                             <RowDefinition />
                         </Grid.RowDefinitions>

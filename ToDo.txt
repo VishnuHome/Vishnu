@@ -854,6 +854,10 @@ ERLEDIGT: Dynamische Snapshots und Trees - TreeReload, HotPlug neu checken und e
 
 Stand: 09.02.2021 Version 5.0.0.0 (HotPlug)
 
+ERLEDIGT: Diverse Bugfixes zum TreeReload.
+ERLEDIGT: KontextMenü: blinkender Button, solange eine Funktion läuft und Schließen des Menüs,
+					wenn eine Funktion abgeschlossen ist.
+
 -------------------------------------------------------------------------------------------------------------
 
 ###################

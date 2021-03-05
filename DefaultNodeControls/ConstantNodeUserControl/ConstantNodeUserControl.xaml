@@ -20,7 +20,7 @@
             <convert:NotEmptyToTrue x:Key="notEmptyToTrue" />
             <DataTemplate DataType="{x:Type vm:SingleNodeViewModel}">
                 <Border Name="ItemBorder" Background="Transparent" Visibility="{Binding Visibility}">
-                    <Grid Name="MainGrid" ContextMenu="{DynamicResource cmMainGrid}">
+                    <Grid Name="MainGrid" ContextMenu="{DynamicResource cmContextMenu}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                         </Grid.ColumnDefinitions>

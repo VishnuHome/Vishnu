@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using Vishnu.Interchange;
 using NetEti.Globals;
 using NetEti.ApplicationControl;
+using System.Windows.Threading;
 
 namespace Vishnu.ViewModel
 {
@@ -87,6 +88,8 @@ namespace Vishnu.ViewModel
         /// </summary>
         public LogicalTaskTreeViewModel TreeVM { get; set; }
 
+        private Dispatcher _dispatcher;
+
         /// <summary>
         /// Liste von JobListViewModels mit ihren Checkern.
         /// </summary>
@@ -135,6 +138,7 @@ namespace Vishnu.ViewModel
             string additionalWindowHeaderInfo, TreeParameters treeParams)
         {
             this.TreeVM = logicalTaskTreeViewModel;
+            this._dispatcher = Dispatcher;
             this._initSizeRelayCommand = new RelayCommand(initWindowSize);
             this._flatNodeListFilter = flatNodeListFilter;
             treeParams.ViewModelRoot = this;
@@ -166,12 +170,18 @@ namespace Vishnu.ViewModel
         private NodeTypes _flatNodeListFilter;
         private string _windowTitle;
 
+        delegate ObservableCollection<JobGroupViewModel> SelectJobGroupsDelegate(ObservableCollection<JobGroupViewModel> selectedJobGroups);
         private ObservableCollection<JobGroupViewModel> SelectJobGroups(ObservableCollection<JobGroupViewModel> selectedJobGroups)
         {
+            if (!this._dispatcher.CheckAccess())
+            {
+                return (ObservableCollection<JobGroupViewModel>)this._dispatcher.Invoke(DispatcherPriority.Background,
+                    new SelectJobGroupsDelegate(SelectJobGroups), selectedJobGroups);
+            }
             if (selectedJobGroups == null)
             {
                 selectedJobGroups = new ObservableCollection<JobGroupViewModel>();
-            } 
+            }
             else
             {
                 selectedJobGroups.Clear();

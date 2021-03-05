@@ -12,6 +12,7 @@ using Vishnu.Interchange;
 using System.Collections.Generic;
 using System.Text;
 using NetEti.ApplicationControl;
+using System.Threading.Tasks;
 
 namespace Vishnu.ViewModel
 {
@@ -880,13 +881,41 @@ namespace Vishnu.ViewModel
         #region context menu
 
         /// <summary>
-        /// Lädt den Tree nach Änderung der JobDescriptions neu.
+        /// Indicates that a ui-trigerred background progress is actually running.
         /// </summary>
-        /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
-        public override void ReloadTaskTreeExecute(object parameter)
+        public string JobInProgress
         {
-            // InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.reloadTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
-            this.ReloadTaskTree();
+            get
+            {
+                return this._jobInProgress;
+            }
+            private set
+            {
+                if (this._jobInProgress != value)
+                {
+                    this._jobInProgress = value;
+                    this.RaisePropertyChanged("JobInProgress");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Indicates that a ui-trigerred background progress is actually running.
+        /// </summary>
+        public bool ContextMenuCanOpen
+        {
+            get
+            {
+                return this._contextMenuCanOpen;
+            }
+            private set
+            {
+                if (this._contextMenuCanOpen != value)
+                {
+                    this._contextMenuCanOpen = value;
+                    this.RaisePropertyChanged("ContextMenuCanOpen");
+                }
+            }
         }
 
         /// <summary>
@@ -899,13 +928,25 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
-        /// Loggt den Tree.
+        /// Lädt den Tree nach Änderung der JobDescriptions neu.
         /// </summary>
         /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
-        public override void LogTaskTreeExecute(object parameter)
+        public override void ReloadTaskTreeExecute(object parameter)
         {
-            // InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.logTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
-            LogicalTaskTreeManager.LogTaskTree(this, false);
+            // InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.reloadTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
+
+            this.ReloadTaskTree();
+        }
+
+        /// <summary>
+        /// Lädt den gesamten Tree inklusive JobDescription.xml asynchron neu. 
+        /// </summary>
+        public async Task ReloadTaskTree()
+        {
+            this.JobInProgress = "ReloadTaskTree";
+            await Task.Run(() => ReloadTaskTreeAsync());
+            this.JobInProgress = "";
+            this.ResetContextMenu();
         }
 
         /// <summary>
@@ -916,6 +957,28 @@ namespace Vishnu.ViewModel
         {
             bool canLog = true;
             return canLog;
+        }
+
+        /// <summary>
+        /// Loggt den Tree.
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
+        public override void LogTaskTreeExecute(object parameter)
+        {
+            // InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.logTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
+
+            this.LogTaskTree();
+        }
+
+        /// <summary>
+        /// Lädt den gesamten Tree inklusive JobDescription.xml asynchron neu. 
+        /// </summary>
+        public async Task LogTaskTree()
+        {
+            this.JobInProgress = "LogTaskTree";
+            await Task.Run(() => LogicalTaskTreeManager.LogTaskTree(this, false));
+            this.JobInProgress = "";
+            this.ResetContextMenu();
         }
 
         #endregion context menu
@@ -934,7 +997,7 @@ namespace Vishnu.ViewModel
             this.RootLogicalTaskTreeViewModel = logicalTaskTreeViewModel;
             this.TreeParams = logicalTaskTreeViewModel.TreeParams;
             this.UIMain = uIMain;
-            this.UIDispatcher = null;
+            this.UIDispatcher = uIMain?.Dispatcher; // Kann bei Reload (ShadowTree) null sein.
             this.Parent = parent;
             this._lazyLoadChildren = lazyLoadChildren;
             this._canExpanderExpand = true;
@@ -943,6 +1006,7 @@ namespace Vishnu.ViewModel
             this._hookedTo = "NULL";
             this.TreeRefreshLocker = new object();
             this.IsRefreshing = false;
+            this.JobInProgress = "";
             this.SetBLNode(myLogicalNode, true);
             this.Visibility = System.Windows.Visibility.Visible;
             this.VisualState = VisualNodeState.None;
@@ -1629,7 +1693,7 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
-        /// Überträgt bestimmte Eigenschaftn im VisualTree von sibling auf node.
+        /// Überträgt bestimmte Eigenschaften im VisualTree von sibling auf node.
         /// </summary>
         /// <param name="sibling">Der Quellknoten (LogicalNodeViewModel).</param>
         /// <param name="node">Der Zielknoten (LogicalNodeViewModel)</param>
@@ -1639,10 +1703,7 @@ namespace Vishnu.ViewModel
             node.ChildOrientation = sibling.ChildOrientation;
         }
 
-        /// <summary>
-        /// Lädt den gesamten Tree inklusive JobDescription.xml neu. 
-        /// </summary>
-        public void ReloadTaskTree()
+        private void ReloadTaskTreeAsync()
         {
             JobList shadowJobList = null;
             try
@@ -1668,14 +1729,27 @@ namespace Vishnu.ViewModel
                     shadowTopRootJobListViewModel.ExpandTree(shadowTopRootJobListViewModel, false);
                     JobListViewModel treeTopRootJobListViewModel = this.GetTopRootJobListViewModel() ?? this as JobListViewModel;
 
-                    //using (DispatcherProcessingDisabled d = this.Dispatcher.DisableProcessing())
-                    //{
+                    LogicalTaskTreeManager.MergeTaskTrees(treeTopRootJobListViewModel,
+                        shadowTopRootJobListViewModel, this.UIDispatcher);
 
-                        LogicalTaskTreeManager.MergeTaskTrees(treeTopRootJobListViewModel, shadowTopRootJobListViewModel);
-                    //}
                     shadowTopRootJobListViewModel.Dispose();
                 }
             }
+        }
+
+        /// <summary>
+        /// Lädt den gesamten Tree inklusive JobDescription.xml asynchron neu. 
+        /// </summary>
+        private async Task ResetContextMenu()
+        {
+            await Task.Run(() => CloseAndFreeContextMenu());
+        }
+
+        private void CloseAndFreeContextMenu()
+        {
+            this.ContextMenuCanOpen = false;
+            Thread.Sleep(300);
+            this.ContextMenuCanOpen = true;
         }
 
         /// <summary>
@@ -1917,6 +1991,8 @@ namespace Vishnu.ViewModel
         private volatile bool _isTreePaused;
         private TreeParameters _treeParams;
         private string _hookedTo;
+        private string _jobInProgress;
+        private bool _contextMenuCanOpen;
 
         // True, wenn die Kinder dieses Knotens noch nicht geladen wurden.
         private bool _hasDummyChild

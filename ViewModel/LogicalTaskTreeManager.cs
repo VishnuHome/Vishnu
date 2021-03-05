@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
+using System.Windows.Threading;
 using Vishnu.Interchange;
 
 namespace Vishnu.ViewModel
@@ -72,6 +73,7 @@ namespace Vishnu.ViewModel
         private static Dictionary<string, LogicalNodeViewModel> _shadowVMFinder;
         private static Dictionary<string, LogicalNodeViewModel> _treeVMFinder;
         private static List<object> _allReferencedObjects;
+        private static Dispatcher _dispatcher;
 
         // Enthält Pfade von SingleNodes, die im Zuge eines Reload des LogicalTaskTrees neu eingebaut wurden.
         // Bei der späteren Ausführung der Run-Methode dieser Nodes dürfen dynamisch geladene DLLs einmalig
@@ -211,8 +213,9 @@ namespace Vishnu.ViewModel
         ///           #endregion tree globals
         /// 
         /// </summary>
-        internal static void MergeTaskTrees(JobListViewModel activeTree, JobListViewModel newTree)
+        internal static void MergeTaskTrees(JobListViewModel activeTree, JobListViewModel newTree, Dispatcher dispatcher)
         {
+            LogicalTaskTreeManager._dispatcher = dispatcher;
             try
             {
                 // Trees indizieren.
@@ -290,8 +293,17 @@ namespace Vishnu.ViewModel
             return null; // Bricht die Rekursion für diesen Zweig ab.
         }
 
+
+        delegate void TransferNodeDelegate(LogicalNodeViewModel shadowNodeVM, LogicalNodeViewModel activeNodeVM, LogicalNode shadowNode, LogicalNode activeNode);
         private static void TransferNode(LogicalNodeViewModel shadowNodeVM, LogicalNodeViewModel activeNodeVM, LogicalNode shadowNode, LogicalNode activeNode)
         {
+            if (!LogicalTaskTreeManager._dispatcher.CheckAccess())
+            {
+                LogicalTaskTreeManager._dispatcher.Invoke(DispatcherPriority.Background,
+                    new TransferNodeDelegate(TransferNode), shadowNodeVM, activeNodeVM, shadowNode, activeNode);
+                return;
+            }
+
             InfoController.Say(String.Format($"#RELOAD# Transferring Node {shadowNodeVM.Path} from ShadowTree to Tree.")); // Thread.Sleep(10);
             InfoController.Say("#RELOAD# ShadowNode >" + shadowNode.ToString() + "<");
             InfoController.Say("#RELOAD# ActiveNode >" + activeNode.ToString() + "<");
