@@ -489,7 +489,8 @@ namespace LogicalTaskTree.Provider
                 string physicalDllPath
                   = replaceWildcardsNPathes(jobChecker.Element("PhysicalPath").Value,
                     _appSettings.AssemblyDirectories.ToArray());
-                bool alwaysReloadChecker = _appSettings.UncachedCheckers.Contains(Path.GetFileNameWithoutExtension(physicalDllPath));
+                bool alwaysReloadChecker = _appSettings.UncachedCheckers.Contains(
+                    Path.GetFileNameWithoutExtension(physicalDllPath));
                 item = jobChecker.Elements("SingleNodeUserControlPath").FirstOrDefault();
                 string singleNodeUserControlPath = item == null ? null : Convert.ToString(item.Value);
                 item = jobChecker.Elements("UserControlPath").FirstOrDefault();
@@ -511,7 +512,8 @@ namespace LogicalTaskTree.Provider
                     int triggeredRunDelay = item == null ? 0 : Convert.ToInt32(item.Value);
                     item = jobChecker.Element("IsGlobal");
                     bool isGlobal = item == null ? false : Convert.ToBoolean(item.Value);
-                    CheckerShell checkerShell = new CheckerShell(physicalDllPath, parameters, trigger, logger, alwaysReloadChecker);
+                    CheckerShell checkerShell = new CheckerShell(
+                        physicalDllPath, parameters, parameters, trigger, logger, alwaysReloadChecker);
                     if (threadLocked)
                     {
                         checkerShell.ThreadLocked = true;
