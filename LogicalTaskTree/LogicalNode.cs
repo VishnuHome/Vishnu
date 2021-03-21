@@ -1094,6 +1094,8 @@ namespace LogicalTaskTree
             {
                 TreeEventTrigger trigger = (this.Trigger as TriggerShell).GetTreeEventTrigger();
                 TreeEvent triggersLastTreeEvent = trigger.LastTreeEvent;
+                string treeEventString = triggersLastTreeEvent == null ? "" : triggersLastTreeEvent.ToString();
+                // InfoController.Say(String.Format($"#MIRROR#01 LogicalNode.GetlastEventSourceIfIsTreeEventTriggered Id/Name: {this.IdInfo}, TriggersLastTreeEvent: {treeEventString}"));
                 if (triggersLastTreeEvent != null) // prüft nur, ob der Trigger überhaupt schon mal gefeuert hat
                 {
                     // TODO: Eventliste komplettieren, elegantere Lösung suchen
@@ -1106,16 +1108,22 @@ namespace LogicalTaskTree
                     // wie in der nachfolgenden Variante; Im Extremfall löste so der abfragende Knoten
                     // selbst die Joblist neu aus und fragte dann in Folge seinen eigenen Zustand ab
                     // (Test - Job: CheckAnyTreeEvent).
-                   source = this.FindNodeById(trigger.ReferencedNodeId); // 16.05.2019 Nagel- dies ist die korrekte Abfrage
+                    source = this.FindNodeById(trigger.ReferencedNodeId); // 16.05.2019 Nagel- dies ist die korrekte Abfrage
                     if ((trigger.InternalEvents.Contains("LastNotNullLogicalToTrue") && source?.LastNotNullLogical == true)
                         || (trigger.InternalEvents.Contains("LastNotNullLogicalToFalse") && source?.LastNotNullLogical == false)
                         || (trigger.InternalEvents.Contains("AnyException") && source?.LastExceptions.Count > 0)
+                        || (trigger.InternalEvents.Contains("LastNotNullLogicalChanged"))
                         || (trigger.InternalEvents.Contains("Breaked") && source?.LastLogicalState == NodeLogicalState.UserAbort))
                     {
+                        //string sourceLastNotNullLogical = source == null ? "NULL" : source.LastNotNullLogical.ToString();
+                        //InfoController.Say(String.Format($"#MIRROR#01.1 LogicalNode.GetlastEventSourceIfIsTreeEventTriggered Id/Name: {this.IdInfo}")
+                        //    + String.Format($", TriggersLastTreeEvent: {treeEventString}, trigger.InternalEvents: {trigger.InternalEvents} source.LastNotNullLogical: {sourceLastNotNullLogical}"));
+                        this.Logical = source.Logical;
                         this.LastExecutingTreeEvent = triggersLastTreeEvent;
                     }
                     else
                     {
+                        //InfoController.Say(String.Format($"#MIRROR#01.2 LogicalNode.GetlastEventSourceIfIsTreeEventTriggered Id/Name: {this.IdInfo}, TriggersLastTreeEvent: {treeEventString}, trigger.InternalEvents: {trigger.InternalEvents}"));
                         this.LastExecutingTreeEvent = null;
                     }
                 }
@@ -1185,6 +1193,7 @@ namespace LogicalTaskTree
                 }
                 return true;
             }
+            // InfoController.Say(String.Format($"#MIRROR#03 CanControlledTreeStart Id/Name: {this.IdInfo}, HasTreeEventTrigger: {(this.Trigger as TriggerShell).HasTreeEventTrigger}"));
             return false;
         }
 
@@ -2471,6 +2480,10 @@ namespace LogicalTaskTree
                     TreeEvent treeEvent = new TreeEvent(TreeEvent.GetUserEventNamesForInternalEventNames(eventName), source.Id,
                       sender.Id, this.Name, this.Path, source.LastNotNullLogical, source.LastLogicalState,
                       source.GetResultsFromResultList(), source.GetResultsFromEnvironment());
+                    //if (source.Id == "CheckReplications")
+                    //{
+                    //    InfoController.Say(String.Format($"#MIRROR#04 ProcessSingleTreeEvent Source: {source.IdInfo}, Event: {eventName}"));
+                    //}
                     TreeEventQueue.AddTreeEventTrigger(treeEvent, sender.Id, trigger);
                 }
             }
