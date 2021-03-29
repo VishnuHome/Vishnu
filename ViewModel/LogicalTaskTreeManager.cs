@@ -324,7 +324,7 @@ namespace Vishnu.ViewModel
             NodeParent activeParent = activeNode.Mother as NodeParent;
             LogicalNodeViewModel shadowParentVM = shadowNodeVM.Parent;
             NodeParent shadowParent = shadowNode.Mother as NodeParent;
-            
+
             int nodeIndex = GetParentNodeIndex(activeNode, activeParent);
 
             // commonChildIndices: Key=activeNode.Children, Value=shadowNode.Children
@@ -382,10 +382,10 @@ namespace Vishnu.ViewModel
 
                 shadowNode.Run(new TreeEvent("UserRun", shadowNode.Id, shadowNode.Id, shadowNode.Name, shadowNode.Path, null, NodeLogicalState.None, null, null));
                 // InfoController.Say(String.Format($"#RELOAD# shadowNode im activeTree started"));
-            
+
                 Thread.Sleep(300); // Der Run braucht etwas, deshalb muss hier eine Wartezeit eingebaut werden.
 
-//                LogicalNode.PauseTree();
+                //                LogicalNode.PauseTree();
                 // InfoController.Say(String.Format($"#RELOAD# nach PauseTree")); Thread.Sleep(10);
 
                 //// Werte vom shadowParent in den activeParent übernehmen, die sonst nur bei der Erstinitialisierung gesetzt werden (primär LastSingleNodes).
@@ -412,7 +412,7 @@ namespace Vishnu.ViewModel
                 }
                 */
                 //shadowParent.ReleaseChildAt(nodeIndex);
-                
+
                 // Achtung: von ShadowParentVM und ShadowParent dürfen keine Knoten entfernt werden, da bei mehreren
                 //          unterschiedlichen Childs desselben Parents ansonsten bei dem/den nächsten Knoten der Index
                 //          im Shadow-Tree nicht mehr zum Index vom active-Tree passen würde.
@@ -454,11 +454,11 @@ namespace Vishnu.ViewModel
                             activeNode.Children[i].TreeRootJobList = shadowJobList.TreeRootJobList; // ?
 
                             shadowJobList.SetChildAt(j, activeNode.Children[i]); // Referenziert den noch im activeTree laufenden
-                                                                                   // Knoten und hängt sich in dessen Events ein.
-                            //shadowJobList.Children.RemoveAt(j);
-                            //shadowJobList.Children.Insert(j, activeNode.Children[i]); // Referenziert den noch im activeTree laufenden
-                            //                                                          // Knoten
-                            //shadowJobList.SetChildAt(j, activeNode.Children[i]);      // und hängt sich in dessen Events ein.
+                                                                                 // Knoten und hängt sich in dessen Events ein.
+                                                                                 //shadowJobList.Children.RemoveAt(j);
+                                                                                 //shadowJobList.Children.Insert(j, activeNode.Children[i]); // Referenziert den noch im activeTree laufenden
+                                                                                 //                                                          // Knoten
+                                                                                 //shadowJobList.SetChildAt(j, activeNode.Children[i]);      // und hängt sich in dessen Events ein.
 
                             //shadowJobListVM.Children[j] = activeJobListVM.Children[i]; // Referenziert das noch im activeTree laufende ViewModel.
                             //shadowJobListVM.Children[j].SetBLNode(shadowJobList.Children[j], true);
@@ -490,7 +490,7 @@ namespace Vishnu.ViewModel
                 // Der früher aktive Knoten sollte jetzt abgebrochen und isoliert sein, also komplett freigeben.
                 activeNodeVM.ReleaseBLNode();
 
-//                LogicalNode.ResumeTree();
+                //                LogicalNode.ResumeTree();
 
                 activeNode.Break(false);
                 activeNode = null; // Aus Dokumentatorischen Gründen, wird bei Verlassen dieser Routine sowieso freigegeben.
@@ -545,7 +545,8 @@ namespace Vishnu.ViewModel
             {
                 for (int j = 0; j < activeJobList.Children.Count; j++)
                 {
-                    if (activeJobList.Children[j].Equals(shadowJobList.Children[i]))
+                    // if (activeJobList.Children[j].Equals(shadowJobList.Children[i]))
+                    if (LogicalTaskTreeManager.BranchesAreEqual(activeJobList.Children[j], shadowJobList.Children[i]))
                     {
                         commonChildIndices.Add(j, i); // Key=activeNode.Children, Value=shadowNode.Children
                         SingleNode constantDummyNode = new SingleNode("@BOOL." + activeJobList.Children[j].LastNotNullLogical.ToString(),
@@ -560,8 +561,27 @@ namespace Vishnu.ViewModel
                     }
                 }
             }
-
             return commonChildIndices;
+        }
+
+        private static bool BranchesAreEqual(LogicalNode logicalNode1, LogicalNode logicalNode2)
+        {
+            if (!logicalNode1.Equals(logicalNode2))
+            {
+                return false;
+            }
+            if (logicalNode1.Children.Count != logicalNode2.Children.Count)
+            {
+                return false;
+            }
+            for (int i = 0; i < logicalNode1.Children.Count; i++)
+            {
+                if (!LogicalTaskTreeManager.BranchesAreEqual(logicalNode1.Children[i], logicalNode2.Children[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>
