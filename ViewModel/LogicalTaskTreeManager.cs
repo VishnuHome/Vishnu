@@ -32,31 +32,37 @@ namespace Vishnu.ViewModel
         /// ansonsten ab der nächsten diesem übergeordneten Joblist.
         /// Wenn der Zusatzparameter "fromTop" auf true steht, wird der gesamte Tree geloggt.
         /// </summary>
-        /// <param name="beyondRootJobList">Ein LogicalNodeViewModel innerhalb des Trees.</param>
-        /// <param name="fromTop">Bei true wird der gesamte Tree geloggt.</param>
-        public static void LogTaskTree(LogicalNodeViewModel beyondRootJobList, bool fromTop = false)
+        /// <param name="logicalNodeViewModel">Ein LogicalNodeViewModel innerhalb des Trees.</param>
+        /// <param name="fromTop">Bei true wird der gesamte Tree geloggt, default: false.</param>
+        /// <param name="header">Optionale Überschritf.</param>
+        public static void LogTaskTree(LogicalNodeViewModel logicalNodeViewModel, bool fromTop = false,
+            string header = "--- V I S H N U - T R E E -----------------------------------------------------------------------------------------------------")
         {
             JobListViewModel rootJobListViewModel;
-            if (beyondRootJobList is JobListViewModel)
+            if (!fromTop)
             {
-                rootJobListViewModel = beyondRootJobList as JobListViewModel;
+                if (logicalNodeViewModel is JobListViewModel)
+                {
+                    rootJobListViewModel = logicalNodeViewModel as JobListViewModel;
+                }
+                else
+                {
+                    rootJobListViewModel = logicalNodeViewModel.RootJobListViewModel;
+                }
             }
             else
             {
-                rootJobListViewModel = beyondRootJobList.GetTopRootJobListViewModel();
+                rootJobListViewModel = logicalNodeViewModel.GetTopRootJobListViewModel() ?? (logicalNodeViewModel as JobListViewModel);
             }
             JobList rootJobList = rootJobListViewModel.GetLogicalNode() as JobList;
-
-            JobListViewModel treeTopRootJobListViewModel = rootJobListViewModel.GetTopRootJobListViewModel() ?? rootJobListViewModel as JobListViewModel;
-            JobList TopRootJobList = treeTopRootJobListViewModel.GetLogicalNode() as JobList;
             LogicalTaskTreeManager._allReferencedObjects = new List<object>();
-            treeTopRootJobListViewModel.Traverse(CollectReferencedObjects, LogicalTaskTreeManager._allReferencedObjects);
+            rootJobListViewModel.Traverse(CollectReferencedObjects, LogicalTaskTreeManager._allReferencedObjects);
 
             List<string> allTreeInfos = new List<string>();
             object result1 = rootJobListViewModel.Traverse(ListTreeElement, allTreeInfos);
             string bigMessage = String.Join(System.Environment.NewLine, allTreeInfos);
             InfoController.GetInfoPublisher().Publish(rootJobListViewModel, Environment.NewLine
-                + "--- V I S H N U - T R E E -----------------------------------------------------------------------------------------------------", InfoType.NoRegex);
+                + header, InfoType.NoRegex);
             Thread.Sleep(100);
             InfoController.GetInfoPublisher().Publish(rootJobListViewModel, Environment.NewLine + bigMessage, InfoType.NoRegex);
             Thread.Sleep(100);
@@ -71,7 +77,7 @@ namespace Vishnu.ViewModel
         }
 
         private static Dictionary<string, LogicalNodeViewModel> _shadowVMFinder;
-        private static Dictionary<string, LogicalNodeViewModel> _treeVMFinder;
+        private static Dictionary<string, LogicalNodeViewModel> _activeVMFinder;
         private static List<object> _allReferencedObjects;
         private static Dispatcher _dispatcher;
 
@@ -221,8 +227,8 @@ namespace Vishnu.ViewModel
                 // Trees indizieren.
                 LogicalTaskTreeManager._shadowVMFinder = new Dictionary<string, LogicalNodeViewModel>();
                 newTree.Traverse(IndexTreeElement, LogicalTaskTreeManager._shadowVMFinder);
-                LogicalTaskTreeManager._treeVMFinder = new Dictionary<string, LogicalNodeViewModel>();
-                activeTree.Traverse(IndexTreeElement, LogicalTaskTreeManager._treeVMFinder);
+                LogicalTaskTreeManager._activeVMFinder = new Dictionary<string, LogicalNodeViewModel>();
+                activeTree.Traverse(IndexTreeElement, LogicalTaskTreeManager._activeVMFinder);
 
                 // Da im aktiven Tree Knoten ausgetauscht werden, kann es zu null-Referenzen kommen.
                 // Deshalb werden ab hier alle kritischen Aktionen pausiert, bis der Reload durch ist.
@@ -335,6 +341,10 @@ namespace Vishnu.ViewModel
                     shadowNodeVM as JobListViewModel, activeNodeVM as JobListViewModel, shadowNode as JobList, activeNode as JobList);
             }
 
+            LogTaskTree(activeNodeVM, fromTop: true,
+                header: "--- V I S H N U - T R E E   1   -----------------------------------------------------------------------------------------------");
+            Thread.Sleep(10);
+
             try
             {
                 // Knoten aus dem aktiven Tree sichern ist nicht nötig, da schon durch activeNode und activeNodeVM referenziert.
@@ -378,6 +388,10 @@ namespace Vishnu.ViewModel
 
                 //InfoController.Say(String.Format($"#RELOAD# vor shadowNode.Run:")); Thread.Sleep(10);
                 //LogTaskTree(shadowParentVM); Thread.Sleep(10);
+                LogTaskTree(shadowNodeVM, fromTop: true,
+                    header: "--- V I S H N U - T R E E  shadow ---------------------------------------------------------------------------------------------");
+                Thread.Sleep(10);
+
                 //InfoController.Say(String.Format($"#RELOAD# direkt vor shadowNode.Run")); Thread.Sleep(10);
 
                 shadowNode.Run(new TreeEvent("UserRun", shadowNode.Id, shadowNode.Id, shadowNode.Name, shadowNode.Path, null, NodeLogicalState.None, null, null));
@@ -413,7 +427,7 @@ namespace Vishnu.ViewModel
                 */
                 //shadowParent.ReleaseChildAt(nodeIndex);
 
-                // Achtung: von ShadowParentVM und ShadowParent dürfen keine Knoten entfernt werden, da bei mehreren
+                // Achtung: von ShadowParentVM und ShadowParent dürfen hier keine Knoten entfernt werden, da bei mehreren
                 //          unterschiedlichen Childs desselben Parents ansonsten bei dem/den nächsten Knoten der Index
                 //          im Shadow-Tree nicht mehr zum Index vom active-Tree passen würde.
                 //          Das Ergebnis wäre Index out of range!
@@ -451,7 +465,7 @@ namespace Vishnu.ViewModel
 
                             activeNode.Children[i].Mother = shadowJobList;
                             activeNode.Children[i].RootJobList = shadowJobList;
-                            activeNode.Children[i].TreeRootJobList = shadowJobList.TreeRootJobList; // ?
+                            // activeNode.Children[i].TreeRootJobList = shadowJobList.TreeRootJobList; // ?
 
                             shadowJobList.SetChildAt(j, activeNode.Children[i]); // Referenziert den noch im activeTree laufenden
                                                                                  // Knoten und hängt sich in dessen Events ein.
@@ -464,7 +478,10 @@ namespace Vishnu.ViewModel
                             //shadowJobListVM.Children[j].SetBLNode(shadowJobList.Children[j], true);
                             shadowJobListVM.Children.RemoveAt(j);
                             shadowJobListVM.Children.Insert(j, activeJobListVM.Children[i]); // Referenziert das noch im activeTree laufende ViewModel.
-                            shadowJobListVM.Children[j].SetBLNode(shadowJobList.Children[j], true);
+
+                            // shadowJobListVM.Children[j].SetBLNode(shadowJobList.Children[j], true); // ?
+                            shadowJobListVM.Children[j].SetBLNode(activeJobList.Children[i], true); // ?
+
                             shadowJobListVM.Children[j].Invalidate();
 
                             activeJobListVM.Children.RemoveAt(i); // Bei laufendem activeTree träten hier Exceptions in anderen Threads auf.
@@ -487,6 +504,13 @@ namespace Vishnu.ViewModel
                     throw;
                 }
 
+                LogTaskTree(activeNodeVM, fromTop: true,
+                    header: "--- V I S H N U - T R E E   2   -----------------------------------------------------------------------------------------------");
+                Thread.Sleep(10);
+
+                shadowParentVM.Children.RemoveAt(nodeIndex); // 18.04.2021 Erik Nagel
+                shadowParent.Children.RemoveAt(nodeIndex); // 18.04.2021 Erik Nagel
+
                 // Der früher aktive Knoten sollte jetzt abgebrochen und isoliert sein, also komplett freigeben.
                 activeNodeVM.ReleaseBLNode();
 
@@ -501,6 +525,9 @@ namespace Vishnu.ViewModel
             }
             finally
             {
+                LogTaskTree(activeNodeVM.GetTopRootJobListViewModel(), fromTop: true,
+                    header: "--- V I S H N U - T R E E final -----------------------------------------------------------------------------------------------");
+                Thread.Sleep(10);
                 LogicalNode.ResumeTree();
             }
         }
@@ -574,6 +601,8 @@ namespace Vishnu.ViewModel
             {
                 return false;
             }
+            // TODO: Bei untergeordneten JobLists kann hier eine frühere Rückkehr erfolgen,
+            //       da diese später ihrerseits auch wieder geprüft werden.
             for (int i = 0; i < logicalNode1.Children.Count; i++)
             {
                 if (!LogicalTaskTreeManager.BranchesAreEqual(logicalNode1.Children[i], logicalNode2.Children[i]))
@@ -590,46 +619,75 @@ namespace Vishnu.ViewModel
         /// Der Knoten muss vorher in den aktiven Tree übernommen worden sein, da die Verarbeitung im aktiven Tree erfolgen
         /// muss.
         /// </summary>
-        /// <param name="newLogicalNode">Die neu in den Tree übernommene LogicalNode.</param>
-        private static void AdjustBranchRootJobListGlobals(LogicalNode newLogicalNode)
+        /// <param name="transferredShadowNode">Die neu in den Tree übernommene LogicalNode.</param>
+        private static void AdjustBranchRootJobListGlobals(LogicalNode transferredShadowNode)
         {
-            newLogicalNode.Traverse(AdjustRootJobListGlobals);
+            if (transferredShadowNode.TreeParams.BusinessLogicRoot == null)
+            {
+                // nur beim Original(Active)-Tree ist BusinessLogicRoot gefüllt.
+                // Übertragen werden darf aber nur von Shadow nach Active.
+                transferredShadowNode.Traverse(AdjustRootJobListGlobals);
+            }
         }
 
         /// <summary>
         /// Ändert bei aus dem ShadowTree in den aktiven Tree übernommenen Knoten Referenzen auf den früheren Knoten
         /// unter gleichem Pfad auf den neuen Knoten.
         /// </summary>
-        private static object AdjustRootJobListGlobals(int depth, LogicalNode newLogicalNode, object userObject)
+        /// <param name="depth">Hierarchie-Tiefe im Tree, wird hier nicht verwendet.</param>
+        /// <param name="transferredShadowNode">Die neu in den Tree übernommene LogicalNode.</param>
+        /// <param name="userObject">Ein optionales user-Objekt, wird hier nicht verwendet.</param>
+        private static object AdjustRootJobListGlobals(int depth, LogicalNode transferredShadowNode, object userObject)
         {
-            LogicalNode changingNode = newLogicalNode;
+            LogicalNode changingNode = transferredShadowNode;
             do
             {
-                newLogicalNode = newLogicalNode.RootJobList;
-                LogicalTaskTreeManager.ChangeOldReferences(changingNode, newLogicalNode as JobList);
-            } while (newLogicalNode.Mother != null);
+                transferredShadowNode = transferredShadowNode.RootJobList;
+                LogicalTaskTreeManager.ChangeOldReferences(changingNode, transferredShadowNode as JobList);
+            } while (transferredShadowNode.Mother != null);
             return null;
         }
 
         private static void ChangeOldReferences(LogicalNode changingNode, JobList treeJobList)
         {
             // Generell funktioniert foreach hier nicht, da u.U. die Auflistungen geändert werden.
+
             LogicalNodeViewModel shadowTreeVM = LogicalTaskTreeManager._shadowVMFinder[treeJobList.IdPath];
             JobList shadowJobList = shadowTreeVM.GetLogicalNode() as JobList;
+            LogicalNodeViewModel activeTreeVM = LogicalTaskTreeManager._activeVMFinder[treeJobList.IdPath];
+            JobList activeJobList = activeTreeVM.GetLogicalNode() as JobList;
+
             List<String> keys;
             try
             {
-                keys = new List<string>(treeJobList.Job.EventTriggers.Keys);
+                keys = new List<string>(activeJobList.Job.EventTriggers.Keys);
                 foreach (string key in keys)
                 {
-                    List<String> keyKeys = new List<string>(treeJobList.Job.EventTriggers[key].Keys);
+                    List<String> keyKeys = new List<string>(activeJobList.Job.EventTriggers[key].Keys);
                     foreach (string keyKey in keyKeys)
                     {
-                        if (changingNode.Id == keyKey)
+                        // if (changingNode.Id == keyKey)
+                        TriggerShell nodeTriggerShell = changingNode.Trigger as TriggerShell;
+                        if (nodeTriggerShell != null && nodeTriggerShell.HasTreeEventTrigger
+                            && nodeTriggerShell.GetTriggerParameters().ToString() == keyKey)
                         {
                             if (shadowJobList != null && shadowJobList.Job.EventTriggers.ContainsKey(key) && shadowJobList.Job.EventTriggers[key].ContainsKey(keyKey))
                             {
-                                treeJobList.Job.EventTriggers[key][keyKey] = shadowJobList.Job.EventTriggers[key][keyKey];
+                                TreeEvent lastTreeEvent = activeJobList.Job.EventTriggers[key][keyKey].GetTreeEventTrigger().LastTreeEvent;
+                                TriggerShell shadowTriggerShell = shadowJobList.Job.EventTriggers[key][keyKey];
+                                shadowTriggerShell.GetTreeEventTrigger().LastTreeEvent = lastTreeEvent;
+                                activeJobList.Job.EventTriggers[key][keyKey] = shadowTriggerShell;
+                                if (lastTreeEvent != null)
+                                {
+                                    LogicalNode source = changingNode.FindNodeById(shadowTriggerShell.GetTreeEventTrigger().ReferencedNodeId);
+                                    changingNode.LastResult = source.LastResult;
+                                    changingNode.LogicalState = source.LogicalState;
+                                    changingNode.Logical = source.Logical;
+                                    changingNode.OnNodeProgressFinished(changingNode.Name, 100, source.SingleNodesFinished, NetEti.Globals.ItemsTypes.items);
+                                    //activeParentVM.InitFromNode(shadowParentVM);
+                                    // changingNode.State = source.State;
+                                    //changingNode.LastNotNullLogical = source.LastNotNullLogical;
+                                }
                             }
                         }
                     }
@@ -642,17 +700,17 @@ namespace Vishnu.ViewModel
             }
             try
             {
-                keys = new List<string>(treeJobList.Job.WorkersDictionary.Keys);
+                keys = new List<string>(activeJobList.Job.WorkersDictionary.Keys);
                 foreach (string key in keys)
                 {
-                    List<String> keyKeys = new List<string>(treeJobList.Job.WorkersDictionary[key].Keys);
+                    List<String> keyKeys = new List<string>(activeJobList.Job.WorkersDictionary[key].Keys);
                     foreach (string keyKey in keyKeys)
                     {
                         if (changingNode.Id == keyKey)
                         {
                             if (shadowJobList != null && shadowJobList.Job.WorkersDictionary.ContainsKey(key) && shadowJobList.Job.WorkersDictionary[key].ContainsKey(keyKey))
                             {
-                                treeJobList.Job.WorkersDictionary[key][keyKey] = shadowJobList.Job.WorkersDictionary[key][keyKey];
+                                activeJobList.Job.WorkersDictionary[key][keyKey] = shadowJobList.Job.WorkersDictionary[key][keyKey];
                             }
                         }
                     }
@@ -665,14 +723,14 @@ namespace Vishnu.ViewModel
             }
             try
             {
-                keys = new List<string>(treeJobList.AllCheckersForUnreferencingNodeConnectors.Keys);
+                keys = new List<string>(activeJobList.AllCheckersForUnreferencingNodeConnectors.Keys);
                 foreach (string key in keys)
                 {
                     if (changingNode.Name == key)
                     {
                         if (shadowJobList != null && shadowJobList.AllCheckersForUnreferencingNodeConnectors.ContainsKey(key))
                         {
-                            treeJobList.AllCheckersForUnreferencingNodeConnectors[key] = shadowJobList.AllCheckersForUnreferencingNodeConnectors[key];
+                            activeJobList.AllCheckersForUnreferencingNodeConnectors[key] = shadowJobList.AllCheckersForUnreferencingNodeConnectors[key];
                         }
                     }
                 }
@@ -684,14 +742,14 @@ namespace Vishnu.ViewModel
             }
             try
             {
-                keys = new List<string>(treeJobList.TreeExternalCheckers.Keys);
+                keys = new List<string>(activeJobList.TreeExternalCheckers.Keys);
                 foreach (string key in keys)
                 {
                     if (changingNode.Id == key)
                     {
                         if (shadowJobList != null && shadowJobList.TreeExternalCheckers.ContainsKey(key))
                         {
-                            treeJobList.TreeExternalCheckers[key] = shadowJobList.TreeExternalCheckers[key];
+                            activeJobList.TreeExternalCheckers[key] = shadowJobList.TreeExternalCheckers[key];
                         }
                     }
                 }
@@ -702,10 +760,10 @@ namespace Vishnu.ViewModel
                 throw;
             }
             /*
-            foreach (SingleNode shadowNode in treeJobList.TreeExternalSingleNodes)
+            foreach (SingleNode shadowNode in activeJobList.TreeExternalSingleNodes)
             {
                 bool found = false;
-                foreach (SingleNode treeNode in treeJobList.TreeExternalSingleNodes)
+                foreach (SingleNode treeNode in activeJobList.TreeExternalSingleNodes)
                 {
                     if (treeNode.Equals(shadowNode))
                     {
@@ -715,41 +773,41 @@ namespace Vishnu.ViewModel
                 }
                 if (!found)
                 {
-                    treeJobList.TreeExternalSingleNodes.Add(shadowNode);
+                    activeJobList.TreeExternalSingleNodes.Add(shadowNode);
                 }
             }
-            foreach (string key in treeJobList.TriggerRelevantEventCache)
+            foreach (string key in activeJobList.TriggerRelevantEventCache)
             {
-                if (!treeJobList.TriggerRelevantEventCache.Contains(key))
+                if (!activeJobList.TriggerRelevantEventCache.Contains(key))
                 {
-                    treeJobList.TriggerRelevantEventCache.Add(key);
+                    activeJobList.TriggerRelevantEventCache.Add(key);
                 }
             }
-            foreach (string key in treeJobList.LoggerRelevantEventCache)
+            foreach (string key in activeJobList.LoggerRelevantEventCache)
             {
-                if (!treeJobList.LoggerRelevantEventCache.Contains(key))
+                if (!activeJobList.LoggerRelevantEventCache.Contains(key))
                 {
-                    treeJobList.LoggerRelevantEventCache.Add(key);
+                    activeJobList.LoggerRelevantEventCache.Add(key);
                 }
             }
-            foreach (string key in treeJobList.WorkerRelevantEventCache)
+            foreach (string key in activeJobList.WorkerRelevantEventCache)
             {
-                if (!treeJobList.WorkerRelevantEventCache.Contains(key))
+                if (!activeJobList.WorkerRelevantEventCache.Contains(key))
                 {
-                    treeJobList.WorkerRelevantEventCache.Add(key);
+                    activeJobList.WorkerRelevantEventCache.Add(key);
                 }
             }
             */
             try
             {
-                keys = new List<string>(treeJobList.JobsByName.Keys);
+                keys = new List<string>(activeJobList.JobsByName.Keys);
                 foreach (string key in keys)
                 {
                     if (changingNode.Id == key)
                     {
                         if (shadowJobList != null && shadowJobList.JobsByName.ContainsKey(key))
                         {
-                            treeJobList.JobsByName[key] = shadowJobList.JobsByName[key];
+                            activeJobList.JobsByName[key] = shadowJobList.JobsByName[key];
                         }
                     }
                 }
@@ -761,14 +819,14 @@ namespace Vishnu.ViewModel
             }
             try
             {
-                keys = new List<string>(treeJobList.NodesByName.Keys);
+                keys = new List<string>(activeJobList.NodesByName.Keys);
                 foreach (string key in keys)
                 {
                     if (changingNode.Id == key)
                     {
                         if (shadowJobList != null && shadowJobList.NodesByName.ContainsKey(key))
                         {
-                            treeJobList.NodesByName[key] = shadowJobList.NodesByName[key];
+                            activeJobList.NodesByName[key] = shadowJobList.NodesByName[key];
                         }
                     }
                 }
@@ -780,14 +838,14 @@ namespace Vishnu.ViewModel
             }
             try
             {
-                keys = new List<string>(treeJobList.TreeRootLastChanceNodesByName.Keys);
+                keys = new List<string>(activeJobList.TreeRootLastChanceNodesByName.Keys);
                 foreach (string key in keys)
                 {
                     if (changingNode.Id == key)
                     {
                         if (shadowJobList != null && shadowJobList.TreeRootLastChanceNodesByName.ContainsKey(key))
                         {
-                            treeJobList.TreeRootLastChanceNodesByName[key] = shadowJobList.TreeRootLastChanceNodesByName[key];
+                            activeJobList.TreeRootLastChanceNodesByName[key] = shadowJobList.TreeRootLastChanceNodesByName[key];
                         }
                     }
                 }
@@ -799,14 +857,14 @@ namespace Vishnu.ViewModel
             }
             try
             {
-                keys = new List<string>(treeJobList.NodesById.Keys);
+                keys = new List<string>(activeJobList.NodesById.Keys);
                 foreach (string key in keys)
                 {
                     if (changingNode.Id == key)
                     {
                         if (shadowJobList != null && shadowJobList.NodesById.ContainsKey(key))
                         {
-                            treeJobList.NodesById[key] = shadowJobList.NodesById[key];
+                            activeJobList.NodesById[key] = shadowJobList.NodesById[key];
                         }
                     }
                 }

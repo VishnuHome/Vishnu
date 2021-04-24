@@ -182,6 +182,10 @@ namespace LogicalTaskTree.Provider
                 {
                     tmpPath = Path.GetFullPath(replaceWildcardsNPathes(jobXML + ".zip", _appSettings.JobDirPathes.ToArray()));
                 }
+                if (!Directory.Exists(tmpPath) && !File.Exists(tmpPath))
+                {
+                    tmpPath = Path.GetFullPath(replaceWildcardsNPathes(jobXML + ".xml", _appSettings.JobDirPathes.ToArray()));
+                }
                 jobXML = unpackIfPacked(tmpPath, isRootJob);
                 _resolvedJobDir = Path.GetDirectoryName(replaceWildcardsNPathes(jobXML, _appSettings.JobDirPathes.ToArray()));
                 _appSettings.JobDirPathes.Push(_resolvedJobDir);
@@ -253,11 +257,14 @@ namespace LogicalTaskTree.Provider
                 {
                     foreach (string dll in Directory.GetFiles(jobDir, "*.dll"))
                     {
-                        IVishnuJobProvider provider = (IVishnuJobProvider)VishnuAssemblyLoader.GetAssemblyLoader().DynamicLoadObjectOfTypeFromAssembly(dll, typeof(IVishnuJobProvider));
-                        if (provider != null)
+                        if (!(new List<string>() { "7z64.dll", "7z32.dll" }).Contains(Path.GetFileName(dll)))
                         {
-                            xmlDoc = provider.GetVishnuJobXml(jobDir);
-                            break;
+                            IVishnuJobProvider provider = (IVishnuJobProvider)VishnuAssemblyLoader.GetAssemblyLoader().DynamicLoadObjectOfTypeFromAssembly(dll, typeof(IVishnuJobProvider));
+                            if (provider != null)
+                            {
+                                xmlDoc = provider.GetVishnuJobXml(jobDir);
+                                break;
+                            }
                         }
                     }
                 }
@@ -745,6 +752,14 @@ namespace LogicalTaskTree.Provider
                 if (xvar != null)
                 {
                     physicalPath = replaceWildcardsNPathes(subJob.Element("PhysicalPath").Value, _appSettings.JobDirPathes.ToArray());
+                }
+                else
+                {
+                    xvar = subJob.Element("LogicalExpression");
+                    if (xvar == null)
+                    {
+                        physicalPath = replaceWildcardsNPathes(subJob.Element("LogicalName").Value, _appSettings.JobDirPathes.ToArray());
+                    }
                 }
                 //====================== Rekursion ======================================================================================
                 int depth = 0;

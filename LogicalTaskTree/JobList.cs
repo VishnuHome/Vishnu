@@ -946,7 +946,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="nodeId">Die Id der zu suchenden Node.</param>
         /// <returns>Die gefundene LogicalNode oder null.</returns>
-        protected override LogicalNode FindNodeById(string nodeId)
+        public override LogicalNode FindNodeById(string nodeId)
         {
             if (this.NodesById.ContainsKey(nodeId))
             {

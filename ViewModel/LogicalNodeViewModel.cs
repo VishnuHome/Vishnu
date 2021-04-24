@@ -1733,6 +1733,10 @@ namespace Vishnu.ViewModel
                         shadowTopRootJobListViewModel, this.UIDispatcher);
 
                     shadowTopRootJobListViewModel.Dispose();
+
+                    LogTaskTree();
+                    Thread.Sleep(10);
+
                 }
             }
         }
