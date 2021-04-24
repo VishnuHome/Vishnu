@@ -6,6 +6,7 @@ using NetEti.ApplicationControl;
 using Vishnu.Interchange;
 using System.Text;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace LogicalTaskTree
 {
@@ -240,33 +241,45 @@ namespace LogicalTaskTree
             this.Logical = null;
             this._environment = new ResultList();
             this._constantValue = null;
+            // Bei allen Konstanten wird nicht der Wert der Konstante, sondern true als
+            // Checker-Ergebnis zurückgegeben, außer die Variablen sind selbst null oder boolean.
             this._returnConstantValue = false;
             if (this.Id.StartsWith(@"@"))
             {
                 // Konstante
+                string name;
                 if (this.Id.StartsWith(@"@BOOL."))
                 {
-                    string val = this.Id.Substring(6);
+                    name = this.Id.Substring(6);
+                }
+                else
+                {
+                    name = this.Id.Substring(1);
+                }
+                if ((new List<string>() { "true", "false", "null" }).Contains(name.ToLower()))
+                {
+                    // Boolean oder null.
+                    this.Name = name;
                     try
                     {
-                        if (this._constantValue != null)
+                        if (this.Name.ToLower().Equals("null"))
                         {
-                            this._constantValue = Boolean.Parse(val);
-                            this.Name = this._constantValue.ToString();
+                            this._constantValue = null;
                         }
                         else
                         {
-                            this.Name = "Null";
+                            this._constantValue = Boolean.Parse(this.Name);
                         }
+                        this._returnConstantValue = true;
                     }
                     catch (Exception ex)
                     {
                         throw new ArgumentException("Erweiterte boolsche Konstanten müssen True, False oder null sein.", ex);
                     }
-                    this._returnConstantValue = true;
                 }
                 else
                 {
+                    // String.
                     if (this.Id.Length > 1)
                     {
                         this.Name = this.Id.Substring(1);
@@ -653,7 +666,7 @@ namespace LogicalTaskTree
         /// <param name="countAll">Gesamtanzahl - entspricht 100%.</param>
         /// <param name="countSucceeded">Erreichte Anzahl - kleiner-gleich 100%.</param>
         /// <param name="itemsType">Art der zu zählenden Elemente - Teile eines Ganzen, Ganze Elemente oder Element-Gruppen.</param>
-        protected override void OnNodeProgressFinished(string itemsName, long countAll, long countSucceeded, ItemsTypes itemsType)
+        public override void OnNodeProgressFinished(string itemsName, long countAll, long countSucceeded, ItemsTypes itemsType)
         {
             this._lastSucceeded = countSucceeded;
             base.OnNodeProgressFinished(itemsName, countAll, countSucceeded, itemsType);

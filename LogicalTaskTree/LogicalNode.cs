@@ -179,7 +179,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                return this.Name;
+                return this.TreeParams.Name + ":" + this.Name;
             }
         }
 
@@ -924,7 +924,7 @@ namespace LogicalTaskTree
         /// <param name="countAll">Gesamtanzahl - entspricht 100%.</param>
         /// <param name="countSucceeded">Erreichte Anzahl - kleiner-gleich 100%.</param>
         /// <param name="itemsType">Art der zu zählenden Elemente - Teile eines Ganzen, Ganze Elemente oder Element-Gruppen.</param>
-        protected virtual void OnNodeProgressFinished(string itemsName, long countAll, long countSucceeded, ItemsTypes itemsType)
+        public virtual void OnNodeProgressFinished(string itemsName, long countAll, long countSucceeded, ItemsTypes itemsType)
         {
             LogicalNode.WaitWhileTreePaused();
             if (this.IsThreadValid(Thread.CurrentThread))
@@ -1901,7 +1901,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="nodeId">Die Id der zu suchenden SingleNode.</param>
         /// <returns>Die gefundene LogicalNode oder null.</returns>
-        protected virtual LogicalNode FindNodeById(string nodeId)
+        public virtual LogicalNode FindNodeById(string nodeId)
         {
             return this.RootJobList.FindNodeById(nodeId);
         }
@@ -2172,13 +2172,13 @@ namespace LogicalTaskTree
                     }
                     this.Logical = this.LastExecutingTreeEvent.Logical;
                     this.OnNodeLogicalChanged();
-                    // InfoController.Say(String.Format($"#TRIGGER# 4 (lookup) Id/Name: {this.IdInfo} - {source.ToString()}  {this.LastExecutingTreeEvent.ToString()}"));
+                    InfoController.Say(String.Format($"#RELOAD# 4 (lookup) Id/Name: {this.NameInfo} - {source.ToString()}  {this.LastExecutingTreeEvent.ToString()}"));
                 }
                 //14.08.2018- */
                 if ((this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
                   || (this.LastLogicalState == NodeLogicalState.UserAbort))
                 {
-                    // InfoController.Say(String.Format($"#TRIGGER# 4 {this.IdInfo} RunAsyncAsync-Aussprung: {source.SourceId}, {source.Logical.ToString()}, {source.SenderId}"));
+                    InfoController.Say(String.Format($"#RELOAD# 4 {this.NameInfo} RunAsyncAsync-Aussprung: {source.SourceId}, {source.Logical.ToString()}, {source.SenderId}"));
                     return;
                 }
                 this.IsRunRequired = true;
@@ -2203,7 +2203,7 @@ namespace LogicalTaskTree
                     _starterThread.IsBackground = true;
                     try
                     {
-                        // InfoController.Say(String.Format($"#TRIGGER# 6 starting Id/Name: {this.IdInfo} - {(source == null ? "null" : source.ToString())}  State: {this.State.ToString()}, LogicalState: {this.LogicalState.ToString()}"));
+                        InfoController.Say(String.Format($"#RELOAD# 6 starting Id/Name: {this.NameInfo} - {(source == null ? "null" : source.ToString())}  State: {this.State.ToString()}, LogicalState: {this.LogicalState.ToString()}"));
                         _starterThread.Start(source);
                     }
                     catch (InvalidOperationException) { }
@@ -2214,7 +2214,7 @@ namespace LogicalTaskTree
                     {
                         this.ThreadUpdateLastState(NodeState.Null);
                         this.State = NodeState.Waiting;
-                        InfoController.Say(String.Format($"#TryRun# waiting Id/Name: {this.IdInfo}, _starterThread.IsAlive: {this._starterThread.IsAlive.ToString()}, _starterThread.IsValid: {this.IsThreadValid(this._starterThread).ToString()} - {(source == null ? "null" : source.ToString())}"));
+                        InfoController.Say(String.Format($"#RELOAD# waiting Id/Name: {this.NameInfo}, _starterThread.IsAlive: {this._starterThread.IsAlive.ToString()}, _starterThread.IsValid: {this.IsThreadValid(this._starterThread).ToString()} - {(source == null ? "null" : source.ToString())}"));
                         this.OnNodeStateChanged();
                     }
                 }
@@ -2279,11 +2279,11 @@ namespace LogicalTaskTree
         {
             if (source != null)
             {
-                InfoController.Say(String.Format($"#TryRun# {source.Name} Id/Name: {this.IdInfo}, State: {this.State}, LogicalState: {this.LogicalState}"));
+                InfoController.Say(String.Format($"#RELOAD# {source.Name} Id/Name: {this.IdInfo}, State: {this.State}, LogicalState: {this.LogicalState}"));
             }
             else
             {
-                InfoController.Say(String.Format($"#TryRun# source==null Id/Name: {this.IdInfo}, State: {this.State}, LogicalState: {this.LogicalState}"));
+                InfoController.Say(String.Format($"#RELOAD# source==null Id/Name: {this.IdInfo}, State: {this.State}, LogicalState: {this.LogicalState}"));
             }
             int waitingLoopCounter = 0;
             do
@@ -2469,10 +2469,10 @@ namespace LogicalTaskTree
             //{
             //    InfoController.Say(String.Format($"#EXD# Trigger Id/Name: {this.Id}/{this.Name} - {eventName}"));
             //}
-            if (eventName == "LastNotNullLogicalToTrue" && (source.Id == "SqlConnection"))
-            {
-                InfoController.Say(String.Format($"#EXD# Trigger Id/Name: {this.Id}/{this.Name} - {eventName}"));
-            }
+            //if (eventName == "LastNotNullLogicalToTrue" && (source.Id == "SqlConnection"))
+            //{
+            //    InfoController.Say(String.Format($"#EXD# Trigger Id/Name: {this.Id}/{this.Name} - {eventName}"));
+            //}
             if (this.TreeRootJobList.TriggerRelevantEventCache.Contains(eventName))
             {
                 foreach (TreeEventTrigger trigger in this.FindEventTriggers(eventName, sender.Id, source.Id))
@@ -2482,7 +2482,7 @@ namespace LogicalTaskTree
                       source.GetResultsFromResultList(), source.GetResultsFromEnvironment());
                     //if (source.Id == "CheckReplications")
                     //{
-                    //    InfoController.Say(String.Format($"#MIRROR#04 ProcessSingleTreeEvent Source: {source.IdInfo}, Event: {eventName}"));
+                    InfoController.Say(String.Format($"#RELOAD#04 ProcessSingleTreeEvent Source: {source.NameInfo}, Event: {eventName}"));
                     //}
                     TreeEventQueue.AddTreeEventTrigger(treeEvent, sender.Id, trigger);
                 }

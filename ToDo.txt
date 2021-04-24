@@ -858,6 +858,11 @@ ERLEDIGT: Diverse Bugfixes zum TreeReload.
 ERLEDIGT: KontextMenü: blinkender Button, solange eine Funktion läuft und Schließen des Menüs,
 					wenn eine Funktion abgeschlossen ist.
 
+Stand: 09.02.2021 Version 5.0.1.6
+ERLEDIGT: SubJobs ohne "PhysicalPath" oder nur mit auf "LogicalName" ohne ".xml" reduziertem
+          "PhysicalPath" laden.
+ERLEDIGT: Bugfixes und Vereinfachungen bei Konstanten mit Boolschem- oder Null-Wert;
+          Farbiger Rand je nach logischem Wert einer Konstanten.
 -------------------------------------------------------------------------------------------------------------
 
 ###################
@@ -899,6 +904,7 @@ Liste von Snapshots mit letzter Ladezeit verfügbar und prüfbar machen
 	oder Events mit ihren Zeiten?
 	Andere Variante: SnapshotTrigger mit zusätzlichem Timer und Error-TreeEvent
 '#' bei Snapshots überdenken und ggf. abschaffen
+Fehler: WPFDialogChecker starten immer im ersten Bildschirm, auch wenn Vishnu im zweiten Bildschirm läuft.
 Dynamische multiple logger ermöglichen.
 Veröffentlichungsparameter nach Company auslagern, wenn möglich
 CheckDiskSpace: Sql-Zugriffe nach Company auslagern, wenn möglich

@@ -17,9 +17,16 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Vishnu.WPF_UI;component/Assets/LogicalTaskTreeControlStaticResourceDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <convert:NullableBoolToBrush x:Key="nullableBoolToBrush" />
             <convert:NotEmptyToTrue x:Key="notEmptyToTrue" />
             <DataTemplate DataType="{x:Type vm:SingleNodeViewModel}">
-                <Border Name="ItemBorder" Background="Transparent" Visibility="{Binding Visibility}">
+                <Border Name="ItemBorder" BorderThickness="1" Background="Transparent" Visibility="{Binding Visibility}">
+                    <Border.BorderBrush>
+                        <MultiBinding Converter="{StaticResource nullableBoolToBrush, diag:PresentationTraceSources.TraceLevel=High}">
+                            <Binding Path="Logical" />
+                            <Binding RelativeSource="{RelativeSource Self}" />
+                        </MultiBinding>
+                    </Border.BorderBrush>
                     <Grid Name="MainGrid" ContextMenu="{DynamicResource cmContextMenu}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>

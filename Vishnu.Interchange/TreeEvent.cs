@@ -70,7 +70,7 @@ namespace Vishnu.Interchange
 
         /// <summary>
         /// Mappt einen String mit durch Pipe ('|') getrennte Benutzer-freundliche Ereignis-Namen
-        /// auf einen normalisierten String mit entsprechendeninternen Ereignis-Namen.
+        /// auf einen normalisierten String mit entsprechendenb internen Ereignis-Namen.
         /// </summary>
         /// <param name="userEventNames">String mit durch '|' getrennten Benutzer-freundlichen Event-Namen.</param>
         /// <returns>Der normalisierte String mit durch '|' getrennten entsprechenden Programm-seitigen Event-Namen.</returns>
