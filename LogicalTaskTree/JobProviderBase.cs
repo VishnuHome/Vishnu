@@ -40,7 +40,7 @@ namespace LogicalTaskTree
             }
             else
             {
-                throw new ArgumentException(String.Format("Der Job '{0}' wurde nicht gefunden.", name));
+                throw new ArgumentException(String.Format("Der Job oder Checker '{0}' wurde nicht gefunden.", name));
             }
         }
 
