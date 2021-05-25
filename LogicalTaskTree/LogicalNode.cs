@@ -1632,6 +1632,11 @@ namespace LogicalTaskTree
             }
             stringBuilder.AppendLine(String.Format($"    Path: {this.Path ?? ""}"));
             stringBuilder.AppendLine(String.Format($"    UserControlPath: {this.UserControlPath ?? ""}"));
+            if (this.Trigger != null && this.Trigger is TriggerShell)
+            {
+                stringBuilder.AppendLine(String.Format(
+                    $"    Trigger: {(this.Trigger as TriggerShell).TriggerParameters}"));
+            }
             return stringBuilder.ToString();
         }
 

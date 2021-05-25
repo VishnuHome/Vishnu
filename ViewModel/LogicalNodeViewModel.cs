@@ -1005,6 +1005,7 @@ namespace Vishnu.ViewModel
 
             this._hookedTo = "NULL";
             this.TreeRefreshLocker = new object();
+            this.SubStateLocker = new object();
             this.IsRefreshing = false;
             this.JobInProgress = "";
             this.SetBLNode(myLogicalNode, true);
@@ -1358,6 +1359,11 @@ namespace Vishnu.ViewModel
         /// Dient zum Serren der Verarbeitung während eines laufenden Tree-Refreshs.
         /// </summary>
         internal object TreeRefreshLocker;
+
+        /// <summary>
+        /// Dient zum Serren der Verarbeitung während subStateChanged.
+        /// </summary>
+        internal object SubStateLocker;
 
         /// <summary>
         /// Zeigt an, ob gerade ein Tree-Refresh läuft.
@@ -1809,81 +1815,85 @@ namespace Vishnu.ViewModel
         /// <param name="state">Die geänderte Eigenschaft der Quelle.</param>
         protected virtual void subStateChanged(object sender, NodeState state)
         {
-            //if (LogicalNode.IsTreeFlushing || LogicalNode.IsTreePaused)
-            //{
-            //    this.IsTreePaused = true;
-            //}
-            //else
-            //{
-            //    this.IsTreePaused = false;
-            //}
+            lock (this.SubStateLocker)
+            {
 
-            //System.Diagnostics.StackTrace s = new System.Diagnostics.StackTrace(System.Threading.Thread.CurrentThread, true);
-            //string callingMethod = s.GetFrame(2).GetMethod().Name;
-            //InfoController.Say(String.Format("#SUB# LogicalNodeViewModel.subStateChanged {0} LogicalState: {1}, Caller: {2}"
-            //    , this.Id, this._myLogicalNode.LogicalState.ToString(), callingMethod));
-            if (this._myLogicalNode?.LogicalState == NodeLogicalState.Fault)
-            {
-                this.VisualState = VisualNodeState.Error;
-                // InfoController.Say("#SUB# subStateChanged " + this._myLogicalNode.Id + ": Error");
-            }
-            else
-            {
-                switch (state)
+                //if (LogicalNode.IsTreeFlushing || LogicalNode.IsTreePaused)
+                //{
+                //    this.IsTreePaused = true;
+                //}
+                //else
+                //{
+                //    this.IsTreePaused = false;
+                //}
+
+                //System.Diagnostics.StackTrace s = new System.Diagnostics.StackTrace(System.Threading.Thread.CurrentThread, true);
+                //string callingMethod = s.GetFrame(2).GetMethod().Name;
+                //InfoController.Say(String.Format("#SUB# LogicalNodeViewModel.subStateChanged {0} LogicalState: {1}, Caller: {2}"
+                //    , this.Id, this._myLogicalNode.LogicalState.ToString(), callingMethod));
+                if (this._myLogicalNode?.LogicalState == NodeLogicalState.Fault)
                 {
-                    case NodeState.Finished:
-                        if (this._myLogicalNode?.LogicalState == NodeLogicalState.UserAbort)
-                        {
-                            this.VisualState = VisualNodeState.Aborted;
-                        }
-                        else
-                        {
-                            this.VisualState = VisualNodeState.Done;
-                            // InfoController.Say("#SUB# subStateChanged " + this._myLogicalNode.Id + ": Done");
-                        }
-                        break;
-                    case NodeState.None:
-                        if (this._myLogicalNode?.LogicalState == NodeLogicalState.Done)
-                        {
-                            this.VisualState = VisualNodeState.Waiting;
-                        }
-                        else
-                        {
-                            this.VisualState = VisualNodeState.None;
-                        }
-                        break;
-                    case NodeState.Null:
-                        this.VisualState = VisualNodeState.None;
-                        break;
-                    case NodeState.Triggered:
-                        if (this._myLogicalNode?.LogicalState == NodeLogicalState.UserAbort)
-                        {
-                            this.VisualState = VisualNodeState.Aborted;
-                        }
-                        else
-                        {
-                            if (this._myLogicalNode?.Trigger != null && this._myLogicalNode?.Trigger is TriggerShell
-                              && (this._myLogicalNode?.Trigger as TriggerShell).HasTreeEventTrigger)
+                    this.VisualState = VisualNodeState.Error;
+                    // InfoController.Say("#SUB# subStateChanged " + this._myLogicalNode.Id + ": Error");
+                }
+                else
+                {
+                    switch (state)
+                    {
+                        case NodeState.Finished:
+                            if (this._myLogicalNode?.LogicalState == NodeLogicalState.UserAbort)
                             {
-                                this.VisualState = VisualNodeState.EventTriggered;
+                                this.VisualState = VisualNodeState.Aborted;
                             }
                             else
                             {
-                                this.VisualState = VisualNodeState.Scheduled;
+                                this.VisualState = VisualNodeState.Done;
+                                // InfoController.Say("#SUB# subStateChanged " + this._myLogicalNode.Id + ": Done");
                             }
-                        }
-                        break;
-                    case NodeState.Waiting:
-                        this.VisualState = VisualNodeState.Waiting;
-                        break;
-                    case NodeState.Working:
-                        this.VisualState = VisualNodeState.Working;
-                        break;
-                    case NodeState.InternalError:
-                        this.VisualState = VisualNodeState.InternalError;
-                        break;
-                    default:
-                        throw new ApplicationException("LogicalNodeViewModel.subStateChanged: unknown state '" + state + "'.");
+                            break;
+                        case NodeState.None:
+                            if (this._myLogicalNode?.LogicalState == NodeLogicalState.Done)
+                            {
+                                this.VisualState = VisualNodeState.Waiting;
+                            }
+                            else
+                            {
+                                this.VisualState = VisualNodeState.None;
+                            }
+                            break;
+                        case NodeState.Null:
+                            this.VisualState = VisualNodeState.None;
+                            break;
+                        case NodeState.Triggered:
+                            if (this._myLogicalNode?.LogicalState == NodeLogicalState.UserAbort)
+                            {
+                                this.VisualState = VisualNodeState.Aborted;
+                            }
+                            else
+                            {
+                                if (this._myLogicalNode?.Trigger != null && this._myLogicalNode?.Trigger is TriggerShell
+                                  && (this._myLogicalNode?.Trigger as TriggerShell).HasTreeEventTrigger)
+                                {
+                                    this.VisualState = VisualNodeState.EventTriggered;
+                                }
+                                else
+                                {
+                                    this.VisualState = VisualNodeState.Scheduled;
+                                }
+                            }
+                            break;
+                        case NodeState.Waiting:
+                            this.VisualState = VisualNodeState.Waiting;
+                            break;
+                        case NodeState.Working:
+                            this.VisualState = VisualNodeState.Working;
+                            break;
+                        case NodeState.InternalError:
+                            this.VisualState = VisualNodeState.InternalError;
+                            break;
+                        default:
+                            throw new ApplicationException("LogicalNodeViewModel.subStateChanged: unknown state '" + state + "'.");
+                    }
                 }
             }
         }
