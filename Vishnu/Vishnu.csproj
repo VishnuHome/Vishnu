@@ -8,7 +8,7 @@
     <AssemblyRoot Condition="'$(Vishnu_Assemblies)'!=''">$(Vishnu_Assemblies)</AssemblyRoot>
     <PublishUrl>\\localhost\Vishnu.Install\</PublishUrl>
     <Install>true</Install>
-    <InstallFrom>Unc</InstallFrom>
+    <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateMode>Foreground</UpdateMode>
     <UpdateInterval>7</UpdateInterval>
@@ -16,7 +16,8 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>true</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>\\localhost\Vishnu.Install\</InstallUrl>
+    <InstallUrl>https://neteti.de/Vishnu.Install/</InstallUrl>
+    <UpdateUrl>https://neteti.de/Vishnu.Install/</UpdateUrl>
     <SupportUrl>http://www.neteti.de</SupportUrl>
     <ErrorReportUrl>http://www.neteti.de</ErrorReportUrl>
     <ProductName>Vishnu</ProductName>
@@ -25,8 +26,8 @@
     <MinimumRequiredVersion>1.1.0.48</MinimumRequiredVersion>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>2</ApplicationRevision>
-    <ApplicationVersion>5.0.0.%2a</ApplicationVersion>
+    <ApplicationRevision>51</ApplicationRevision>
+    <ApplicationVersion>5.0.2.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -52,7 +53,7 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -78,14 +79,14 @@
     <ApplicationIcon>Vishnu_multi.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>2D952B82F0C74CCB2B8F6159E292F86931268AC7</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>E6579707360E6137088DCBFE1CE8EE02F7D5497B</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>
     </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <GenerateManifests>false</GenerateManifests>
+    <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
