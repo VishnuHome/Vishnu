@@ -863,6 +863,10 @@ ERLEDIGT: SubJobs ohne "PhysicalPath" oder nur mit auf "LogicalName" ohne ".xml"
           "PhysicalPath" laden.
 ERLEDIGT: Bugfixes und Vereinfachungen bei Konstanten mit Boolschem- oder Null-Wert;
           Farbiger Rand je nach logischem Wert einer Konstanten.
+ERLEDIGT: Fehler in Snapshots nach langer Laufzeit: 
+						System.ComponentModel.Win32Exception (0x80004005):
+							Für diesen Befehl ist nicht genügend Speicher verfügbar.
+          Ursache war ein Fehler in der PieControls-Library (ShowDiskSpace).
 -------------------------------------------------------------------------------------------------------------
 
 ###################
@@ -973,6 +977,7 @@ Zwei Probleme in UserChecker.dll: um 00:00 Uhr herum funktioniert die Logik nich
 		   "Flackern" des LogicalResult ignoriert wird. Die Wartezeit ist aber prinzipiell
 		   systemspezifisch, so dass dies nicht die optimale Lösung sein kann.
 		FOLGEAUFGABE: korrekte Lösung ohne Sleeps finden.
+		Was ist mit Escalator?
 Über Checker, die melden, wenn ein Ereignis ausbleibt, nachdenken.
 Kompletten Wiedereinstieg in einen Kontext nach Neustart von Vishnu ermöglichen (eigener Snapshot)
 Vishnu als verteilte Anwendung - Distribution und Snapshots
