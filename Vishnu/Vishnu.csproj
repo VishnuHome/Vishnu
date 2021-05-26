@@ -16,17 +16,17 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>true</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://neteti.de/Vishnu.Install/</InstallUrl>
-    <UpdateUrl>https://neteti.de/Vishnu.Install/</UpdateUrl>
-    <SupportUrl>http://www.neteti.de</SupportUrl>
-    <ErrorReportUrl>http://www.neteti.de</ErrorReportUrl>
+    <InstallUrl>https://github.com/ClubChaos/Setup/tree/master/Vishnu.bin/</InstallUrl>
+    <UpdateUrl>https://github.com/ClubChaos/Setup/tree/master/Vishnu.bin/</UpdateUrl>
+    <SupportUrl>https://neteti.de</SupportUrl>
+    <ErrorReportUrl>https://neteti.de</ErrorReportUrl>
     <ProductName>Vishnu</ProductName>
     <PublisherName>Erik Nagel</PublisherName>
     <SuiteName>NetEti</SuiteName>
     <MinimumRequiredVersion>1.1.0.48</MinimumRequiredVersion>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>51</ApplicationRevision>
+    <ApplicationRevision>53</ApplicationRevision>
     <ApplicationVersion>5.0.2.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
