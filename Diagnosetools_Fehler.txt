@@ -1,8 +1,0 @@
-Unerwarteter Fehler der Diagnosetools. Die Ausgabe der Diagnosehubs im Ausgabefenster enthält möglicherweise zusätzliche Informationen.
-The Diagnostic Tools failed unexpectedly. The Diagnostics Hub output in the Output Window may contain additional information.
-
-
-
-
-
-
