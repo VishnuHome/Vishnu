@@ -8,7 +8,7 @@ REM 03.07.2020 Auf neue Projektstruktur angepasst.
 REM SET devenv=...\Common7\IDE\devenv.exe
 SET devenv=%DEVENV%
 
-SET ROOTPATH=%VISHNUROOT%
+SET ROOTPATH=%Vishnu_Root%
 SET BUILDALLROOTPATH=%ROOTPATH%\VishnuHome\Documentation\Vishnu.doc
 SET ERRORLOGPATH=%BUILDALLROOTPATH%
 DEL "%ERRORLOGPATH%\devenvErrorLog.txt"
