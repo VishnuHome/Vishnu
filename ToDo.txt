@@ -866,7 +866,7 @@ ERLEDIGT: Bugfixes und Vereinfachungen bei Konstanten mit Boolschem- oder Null-W
 ERLEDIGT: Fehler in Snapshots nach langer Laufzeit: 
 						System.ComponentModel.Win32Exception (0x80004005):
 							Für diesen Befehl ist nicht genügend Speicher verfügbar.
-          Ursache war ein Fehler in der PieControls-Library (ShowDiskSpace).
+          Ursache waren Fehler in der PieControls-Library (CheckDiskSpace/ShowDiskSpace).
 -------------------------------------------------------------------------------------------------------------
 
 ###################
