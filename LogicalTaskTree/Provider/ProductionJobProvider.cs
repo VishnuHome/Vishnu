@@ -65,6 +65,7 @@ namespace LogicalTaskTree.Provider
         #endregion protected members
 
         #region private members
+
         private string _resolvedJobDir;
 
         private void createAndRememberZipRelativeDummyDirectory(string zipPath)
