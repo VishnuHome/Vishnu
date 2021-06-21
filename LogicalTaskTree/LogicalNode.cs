@@ -2384,7 +2384,9 @@ namespace LogicalTaskTree
             catch (Exception ex)
             {
                 sender.Logger = null;
-                this.OnExceptionRaised(this, ex);
+                // this.OnExceptionRaised(this, ex); // funktioniert an dieser Stelle nicht,
+                // deshalb direkte Fehlermeldung und ansonsten weiterarbeiten
+                System.Windows.MessageBox.Show(ex.Message);
             }
         }
 
