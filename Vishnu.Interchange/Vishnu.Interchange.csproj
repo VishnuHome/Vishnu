@@ -107,6 +107,7 @@
     <Compile Include="ThreadLocker.cs" />
     <Compile Include="TreeEvent.cs" />
     <Compile Include="TreeParameters.cs" />
+    <Compile Include="TriggerBase.cs" />
     <Compile Include="TriggerInfo.cs" />
     <Compile Include="VishnuAssemblyLoader.cs" />
     <Compile Include="WindowAspects.cs" />
