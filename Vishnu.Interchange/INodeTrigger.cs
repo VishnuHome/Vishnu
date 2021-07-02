@@ -3,7 +3,7 @@ namespace Vishnu.Interchange
 {
     /// <summary>
     /// Interface für eine Klasse, die einen Prozess mehrfach anstoßen kann,
-    /// i.d.R. TimerTrigger.
+    /// z.B. TimerTrigger oder FileWatcherTrigger.
     /// </summary>
     /// <remarks>
     /// File: INodeTrigger.cs

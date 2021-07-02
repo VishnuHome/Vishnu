@@ -193,7 +193,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Exe.</param>
         /// <param name="slaveParameters">Aufrufparameter der Exe als XML.</param>
-        /// <param name="transportByFile">Bei True werden die Parameter über eie XML-Datei übergeben, ansonsten über die Kommandozeile.</param>
+        /// <param name="transportByFile">Bei True werden die Parameter über eine XML-Datei übergeben, ansonsten über die Kommandozeile.</param>
         /// <param name="workerTrigger">Ein Trigger, der den Job wiederholt aufruft oder null.</param>
         public WorkerShell(string slavePathName, XElement slaveParameters, bool transportByFile, INodeTrigger workerTrigger)
         {
