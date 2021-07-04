@@ -950,6 +950,8 @@ Break Anforderung an Checker weiterleiten.
 Erledigt-Button für Meldungen (Checker?)
 CheckEscalator: bei Run auf den gesamten Tree und grün wird zur OK-Meldung auch noch
            die vorherige Fehlermeldung ausgegeben.
+Escalator: bestimmte Eskalationsstufen mit Timer-Trigger kombinieren
+            (wahlweise auf die Nerven gehen, wie bei normalen Workern mit TimerTrigger)           
 CheckWorkerErrorToOk: break auf den Checker lässt Fehlermeldungen (timer)
            weiter laufen. Nur Break auf den Tree stoppt diese auch.
 DefaultUserControls: Demo-Projekte einführen.
