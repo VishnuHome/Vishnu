@@ -816,7 +816,7 @@ ERLEDIGT: Alles in git-Repository überführen, Shellscripe zur Massenverarbeitung
           Remote-Repository auf eigenem Webspace einrichten.
 ERLEDIGT: ClickOnce-Publishing auf eigenem Webspace installieren.
 
-Stand: 04.07.2020 Version 4.9.0.0 (Repository und ClickOnce)
+Stand: 04.07.2020 Version 4.9.0.0
 
 ERLEDIGT: Fehler: UserJob läßt sich nicht neu starten (Sanduhr)
   TODO: nach bestimmter Zeit abschießen bzw. als ungültig markieren.
@@ -825,14 +825,12 @@ ERLEDIGT: Vishnu mit Company-Integration und produktiver Distribution.
 ERLEDIGT: PluginProjects bereinigen
 	ApplicationSettingsProvider: AppSettings raustrennen
 
-Stand: 05.08.2020 Version 4.9.0.1 (Company)
+Stand: 05.08.2020 Version 4.9.0.1 (Repository and Install)
 
 ERLEDIGT: Beim Laden von Jobs IsControlled entfernen
 ERLEDIGT: Parameterfiles (XML-Parameter) wieder aufräumen. Werden zwar nicht aufgeräumt, aber
           es entstehen nicht mehr so viele, da der Counter aus dem Dateinamen entfernt wurde.
 ERLEDIGT: Schreiben und Laden von Snapshots optimieren und absichern (muss neu)
-	mit ERLEDIGT: Fehler: ShowAll auf User-Server stand auf 5GB Arbeitsspeicher. Nach kurzer Zeit runter auf 66KB
-                Fehler: Viewer nach einiger Zeit reduzierter Tree (falsch) und Memory-Probleme
 ERLEDIGT: Ring Logger - Lösung über parametrisierbares Umbenennen und Löschen überzähliger Logfiles.
 ERLEDIGT: TreeParameters um Property "CheckerDllDirectory" erweitern.
 ERLEDIGT: WebDriver.dll hart in's Bin-Verzeichnis kopieren.
@@ -842,7 +840,7 @@ ERLEDIGT: Die maximale Öffnungszeit für ToolTips wurde auf 30 Sekunden hochgeset
 ERLEDIGT: BugFix: Direkter UserRun auf getriggerte Knoten führte zum doppelten Start der Knoten, da der
           zugeordnete Trigger auch sofort wieder auslöste.
 
-Stand: 01.12.2020 Version 4.9.3.1 ()
+Stand: 01.12.2020 Version 4.9.3.1
 
 ERLEDIGT: Environment-Parameter mit Vishnu_ Prefix versehen.
 ERLEDIGT: Vishnu-Splashscreen auf lizenzfreien Tree umstellen.
@@ -851,14 +849,12 @@ ERLEDIGT: Tree anhalten und weiterlaufen lassen (Context-Menü).
 ERLEDIGT: Tree oder Branch loggen (Context-Menü).
 ERLEDIGT: Fehler: JobSnapshots können kurzzeitige, unlogische Zwischenzustände einfrieren.
 ERLEDIGT: Dynamische Snapshots und Trees - TreeReload, HotPlug neu checken und erweitern (Context-Menü).
-
-Stand: 09.02.2021 Version 5.0.0.0 (HotPlug)
-
 ERLEDIGT: Diverse Bugfixes zum TreeReload.
 ERLEDIGT: KontextMenü: blinkender Button, solange eine Funktion läuft und Schließen des Menüs,
 					wenn eine Funktion abgeschlossen ist.
 
-Stand: 09.02.2021 Version 5.0.1.6
+Stand: 09.02.2021 Version 5.0.1.6 (HotPlug)
+
 ERLEDIGT: SubJobs ohne "PhysicalPath" oder nur mit auf "LogicalName" ohne ".xml" reduziertem
           "PhysicalPath" laden.
 ERLEDIGT: Bugfixes und Vereinfachungen bei Konstanten mit Boolschem- oder Null-Wert;
@@ -866,7 +862,10 @@ ERLEDIGT: Bugfixes und Vereinfachungen bei Konstanten mit Boolschem- oder Null-W
 ERLEDIGT: Fehler in Snapshots nach langer Laufzeit: 
 						System.ComponentModel.Win32Exception (0x80004005):
 							Für diesen Befehl ist nicht genügend Speicher verfügbar.
-          Ursache waren Fehler in der PieControls-Library (CheckDiskSpace/ShowDiskSpace).
+          Ursache waren Fehler in der PieControls-UserLibrary (CheckDiskSpace/ShowDiskSpace).
+ERLEDIGT: Deutliche Erweiterung der Vishnu-Hilfe.
+
+Stand: 05.07.2021 Version 5.0.2.6 (Documentation)
 -------------------------------------------------------------------------------------------------------------
 
 ###################
