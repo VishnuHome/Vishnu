@@ -54,8 +54,6 @@ namespace LogicalTaskTree
             {
                 if (this.Trigger != null)
                 {
-                    InfoController.Say(String.Format("#Escalator# {0}/{1} {2}: stopping Trigger (resetting)", nodeId,
-                        eventParameters.Name, System.Reflection.MethodBase.GetCurrentMethod().Name));
                     this.Trigger.Stop(this, this.Trigger_TriggerIt);
                 }
                 args.Predecessor = this._lastWorkerArguments;
@@ -82,16 +80,12 @@ namespace LogicalTaskTree
             this._cancellationToken = this._nodeCancellationTokenSource.Token;
             if (this.Trigger != null && !isResetting)
             {
-                InfoController.Say(String.Format("#Escalator# {0}/{1} {2}: starting Trigger", nodeId,
-                    eventParameters.Name, System.Reflection.MethodBase.GetCurrentMethod().Name));
                 this.Trigger.Start(this, null, this.Trigger_TriggerIt);
             }
             else
             {
                 // TODO: Diese Differenzierung durch eine elegantere Umsetzung überflüssig machen.
                 this._asyncWorkerTask = new Task(() => this.execAsync(eventParameters, false));
-                InfoController.Say(String.Format("#Escalator# {0}/{1} {2}: starting Thread", nodeId,
-                    eventParameters.Name, System.Reflection.MethodBase.GetCurrentMethod().Name));
                 this._asyncWorkerTask.Start();
             }
         }
@@ -135,8 +129,6 @@ namespace LogicalTaskTree
             if (this.Trigger != null)
             {
                 string slave = Path.GetFileName(this.SlavePathName ?? "");
-                InfoController.Say(String.Format("#Escalator# {0}: stopping Trigger {1}", 
-                    System.Reflection.MethodBase.GetCurrentMethod().Name, slave));
                 this.Trigger.Stop(this, this.Trigger_TriggerIt);
             }
             if (this._nodeCancellationTokenSource != null)
@@ -224,8 +216,6 @@ namespace LogicalTaskTree
                 this._lastWorkerArguments.CallCounter++;
                 this._workerArgumentsEventQueue.Enqueue(this._lastWorkerArguments);
             }
-            InfoController.Say(String.Format("#Escalator# {0}/{1} {2}: Trigger fired, executing", source.SourceId,
-                source.Logical.ToString(), System.Reflection.MethodBase.GetCurrentMethod().Name));
             this.execAsync(source, true);
         }
 

@@ -152,13 +152,9 @@ namespace Vishnu.WPF_UI
                 this.MinLeft = actScreenInfo.WorkingArea.Left;
                 this.MinTop = actScreenInfo.WorkingArea.Top;
             }
-            //InfoController.Say(String.Format("MaxWidth: {0}, MaxHeight: {1}, Width: {2}, Height: {3}, Left: {4}, Top: {5}",
-            //  this.MaxWidth, this.MaxHeight, this.ActualWidth, this.ActualHeight, this.Left, this.Top));
             if (this.WindowState == WindowState.Normal && this._contentRendered)
             {
                 double effectiveHeight = this.ActualHeight + SystemParameters.WindowCaptionHeight;
-                //InfoController.Say(String.Format("MaxWidth: {0}, MaxHeight: {1}, Width: {2}, Height: {3}, Left: {4}, Top: {5}",
-                //  this.MaxWidth, this.MaxHeight, this.ActualWidth, effectiveHeight, this.Left, this.Top));
                 if (this.SizeToContent == System.Windows.SizeToContent.WidthAndHeight)
                 {
                     double widthDiff = this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Width - this.ActualWidth;
@@ -175,8 +171,6 @@ namespace Vishnu.WPF_UI
                     {
                         rightBorderViolated = true;
                     }
-                    //InfoController.Say(String.Format("widthDiff: {0}, heightDiff: {1}, newLeft: {2}, newTop: {3}, RBV: {4}, BBV: {5}",
-                    //  widthDiff, heightDiff, newLeft, newTop, rightBorderViolated, bottomBorderViolated));
                     if (newLeft + this.ActualWidth > this.MaxWidth)
                     {
                         newLeft = this.MaxWidth - this.ActualWidth;

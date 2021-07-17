@@ -310,10 +310,6 @@ namespace Vishnu.ViewModel
                 return;
             }
 
-            InfoController.Say(String.Format($"#RELOAD# Transferring Node {shadowNodeVM.Path} from ShadowTree to Tree.")); // Thread.Sleep(10);
-            InfoController.Say("#RELOAD# ShadowNode >" + shadowNode.ToString() + "<");
-            InfoController.Say("#RELOAD# ActiveNode >" + activeNode.ToString() + "<");
-
             if (activeNode.Mother == null)
             {
                 // IBusinessLogicRoot xxx = activeNode.TreeParams.BusinessLogicRoot;
@@ -386,23 +382,15 @@ namespace Vishnu.ViewModel
                 */
                 shadowParent.ReleaseChildAt(nodeIndex);
 
-                //InfoController.Say(String.Format($"#RELOAD# vor shadowNode.Run:")); Thread.Sleep(10);
-                //LogTaskTree(shadowParentVM); Thread.Sleep(10);
-                LogTaskTree(shadowNodeVM, fromTop: true,
-                    header: "--- V I S H N U - T R E E  shadow ---------------------------------------------------------------------------------------------");
-                Thread.Sleep(10);
-
-                //InfoController.Say(String.Format($"#RELOAD# direkt vor shadowNode.Run")); Thread.Sleep(10);
+                //LogTaskTree(shadowNodeVM, fromTop: true,
+                //    header: "--- V I S H N U - T R E E  shadow ---------------------------------------------------------------------------------------------");
+                //Thread.Sleep(10);
 
                 shadowNode.Run(new TreeEvent("UserRun", shadowNode.Id, shadowNode.Id, shadowNode.Name, shadowNode.Path, null, NodeLogicalState.None, null, null));
-                // InfoController.Say(String.Format($"#RELOAD# shadowNode im activeTree started"));
 
                 Thread.Sleep(300); // Der Run braucht etwas, deshalb muss hier eine Wartezeit eingebaut werden.
 
-                //                LogicalNode.PauseTree();
-                // InfoController.Say(String.Format($"#RELOAD# nach PauseTree")); Thread.Sleep(10);
-
-                //// Werte vom shadowParent in den activeParent übernehmen, die sonst nur bei der Erstinitialisierung gesetzt werden (primär LastSingleNodes).
+                // Werte vom shadowParent in den activeParent übernehmen, die sonst nur bei der Erstinitialisierung gesetzt werden (primär LastSingleNodes).
                 activeParentVM.InitFromNode(shadowParentVM);
                 activeParentVM.Invalidate();
 
@@ -412,29 +400,6 @@ namespace Vishnu.ViewModel
                 // Deshalb müssen seine Verbindungen zu dem in den active-Tree wechselnden Knoten
                 // vorher gekappt werden (sonst würde dieser gleich wieder mit disposed).
                 // shadowParentVM.Children[nodeIndex].ReleaseBLNode(); // nicht erforderlich.
-
-                //InfoController.Say(String.Format($"#RELOAD# vor shadowParentVM.ReleaseBLNode()")); Thread.Sleep(10);
-
-                //shadowParentVM.ReleaseBLNode();
-                /*
-                if (shadowParentVM.Children.Count <= nodeIndex)
-                {
-                    LogTaskTree(activeParentVM.GetTopRootJobListViewModel(), true);
-                    Thread.Sleep(1005);
-                    LogTaskTree(shadowParentVM.GetTopRootJobListViewModel(), true);
-                    Thread.Sleep(1005);
-                }
-                */
-                //shadowParent.ReleaseChildAt(nodeIndex);
-
-                // Achtung: von ShadowParentVM und ShadowParent dürfen hier keine Knoten entfernt werden, da bei mehreren
-                //          unterschiedlichen Childs desselben Parents ansonsten bei dem/den nächsten Knoten der Index
-                //          im Shadow-Tree nicht mehr zum Index vom active-Tree passen würde.
-                //          Das Ergebnis wäre Index out of range!
-                // shadowParentVM.Children.RemoveAt(nodeIndex);
-                // shadowParent.Children.RemoveAt(nodeIndex);
-
-                //InfoController.Say(String.Format($"#RELOAD# nach shadowParent.ReleaseChildAt(nodeIndex)")); Thread.Sleep(10);
 
                 if (commonChildIndices != null)
                 {
@@ -878,8 +843,6 @@ namespace Vishnu.ViewModel
 
         private static void AddNewJobListGlobals(JobList shadowJobList, JobList activeJobList)
         {
-            // InfoController.Say(String.Format($"#RELOAD# Transferring Tree Globals from ShadowTree to Tree."));
-
             foreach (string key in shadowJobList.Job.EventTriggers.Keys)
             {
                 if (!activeJobList.Job.EventTriggers.ContainsKey(key))

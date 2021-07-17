@@ -121,7 +121,6 @@ namespace Vishnu.ViewModel
                   {
                     if (this._testAusgabeCount < this._maxTestAusgabeCount)
                     {
-                      //InfoController.Say(String.Format("#OO# {0}, {1}", this._testAusgabeCount, this._maxTestAusgabeCount));
                       this._uIDispatcher.Invoke(new Action(() =>
                       {
                         if (this._testAusgabeCount == 0)

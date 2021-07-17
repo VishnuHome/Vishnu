@@ -41,13 +41,6 @@ namespace Vishnu.WPF_UI.ValueConverter
                 return new SolidColorBrush(Colors.Orange); // sonst später Exception, da values[0] nur object ist; // TODO: hier die eigentliche Ursache ermitteln
             }
             FrameworkElement owner = values[1] as FrameworkElement;
-            // DEBUG 20210416+
-            //if (owner?.DataContext != null && owner.DataContext is LogicalNodeViewModel)
-            //{
-            //    string debugNodeInfos = (owner.DataContext as LogicalNodeViewModel).DebugNodeInfos;
-            //    InfoController.Say("#RELOAD# NullableBoolToBrush >" + debugNodeInfos + "<");
-            //}
-            // DEBUG 20210416-
             try
             {
                 if (!(owner is NetEti.CustomControls.CustomProgressBar))

@@ -42,8 +42,6 @@ namespace LogicalTaskTree
             {
                 lock (this.LastLogicalLocker)
                 {
-                    //InfoController.Say(String.Format($"#Logical# Id/Name: {this.Id}/{this.Name}, LastLogical: {this.LastLogical.ToString()}, IsResetting: {this.IsResetting.ToString()}"));
-
                     // 09.08.2018+ if (this.LastLogical != null /* 23.05.2018 Nagel Test || this.IsInSnapshot */ || this.IsResetting)
                     if (this.LastLogical != null || this.IsInSnapshot || this.IsResetting)
                     {
@@ -67,11 +65,6 @@ namespace LogicalTaskTree
                                 }
                                 else
                                 {
-                                    //if (this.Id == "SQL-Daten_local_Job") // 02.08.2018 TEST+
-                                    //{
-                                    //    InfoController.Say(String.Format($"#EXC# (1.) {this.Id}: countResults={countResults.ToString()}, countPositiveResults={countPositiveResults.ToString()}"));
-                                    //    //this.RootJobList.PublishAllTreeInfos();
-                                    //} // 02.08.2018 TEST-
                                     this.ThreadUpdateLastLogical(false);
                                 }
                             }
@@ -79,10 +72,6 @@ namespace LogicalTaskTree
                             {
                                 if (this.nOperands - countResults <= this.nPlus - countPositiveResults) // !!!
                                 {
-                                    //if (this.Id == "SQL-Daten_local_Job") // 02.08.2018 TEST+
-                                    //{
-                                    //    InfoController.Say(String.Format($"#EXC# (2.) {this.Id}: countResults={countResults.ToString()}, countPositiveResults={countPositiveResults.ToString()}"));
-                                    //}
                                     this.ThreadUpdateLastLogical(false);
                                 }
                             }
@@ -106,11 +95,6 @@ namespace LogicalTaskTree
                     } // if (countResults > 0)
                     if (this.LastLogical != this.LastReturnedLogical)
                     {
-                        //if (this.Id == "SQL-Daten_local_Job") // 02.08.2018 TEST+
-                        //{
-                        //    InfoController.Say(String.Format($"#EXC#. {this.Id}: LastLogical={this.LastLogical.ToString()}, LastReturnedLogical={this.LastReturnedLogical.ToString()}"));
-                        //    //this.RootJobList.PublishAllTreeInfos();
-                        //} // 02.08.2018 TEST-
                         this.ThreadUpdateLastReturnedLogical(this.LastLogical);
                         this.OnLastNotNullLogicalChanged(this, this.LastLogical, Guid.Empty);
                     }
@@ -444,12 +428,10 @@ namespace LogicalTaskTree
                         try
                         {
                             returnObject = this.LastExceptions.First().Value.Message;
-                            // InfoController.Say(String.Format($"#EXC# Id/Name: {this.Id}/{this.Name} - 1"));
                         }
                         catch (System.InvalidOperationException)
                         {
                             returnObject = this.LastLogical;
-                            // InfoController.Say(String.Format($"#EXC# Id/Name: {this.Id}/{this.Name} - 2"));
                         }
                     }
                     else
@@ -462,9 +444,7 @@ namespace LogicalTaskTree
                         {
                             returnObject = this.LastNotNullLogical; // sonst verschwindet bei UserBreak das Result (CheckTreeEventTriggerSnapshot)
                         } // 10.08.2018-
-                        // InfoController.Say(String.Format($"#EXC# Id/Name: {this.Id}/{this.Name} - 3"));
                     }
-                    // InfoController.Say(String.Format($"#EXC# Id/Name: {this.Id}/{this.Name} - LastResult({returnObject?? "null".ToString()})"));
                     return new Result()
                     {
                         Id = this.Id,

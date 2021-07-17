@@ -144,9 +144,6 @@
                             <TextBlock Name="OriginalPath"
                                        Text="{Binding ReferencedNodePath, StringFormat=Job:&#x09;{0}}"
                                        Padding="5,0,5,5"/>
-                            <!--TextBlock Name="OriginalPath"
-                                       Text="CheckEscalator: bei Run auf den gesamten Tree und grün wird zur OK-Meldung auch noch die vorherige Fehlermeldung ausgegeben."
-                                       Padding="5,0,5,5"/-->
                         </ScrollViewer>
                         <!--TextBlock Name="ShortResultText" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
                                        Text="{Binding ShortResult, StringFormat=Ergebnis:&#x09;{0}}" Padding="5,0,5,5"/-->

@@ -44,7 +44,7 @@ namespace LogicalTaskTree
 #if DEBUG
                 catch (System.InvalidOperationException)// ex)
                 {
-                    //InfoController.Say("SnapshotManager._taskWorker.RunTask: " + ex.Message);
+                    // InfoController.Say("SnapshotManager._taskWorker.RunTask: " + ex.Message);
                 }
 #else
                 catch (System.InvalidOperationException) { }
@@ -105,7 +105,6 @@ namespace LogicalTaskTree
                     {
                         LogicalNode.PauseTree(); // Jetzt den Tree selbst für die Dauer der Snapshot-Erzeugung anhalten.
                         treePausedByMe = true;
-                        // InfoController.Say(String.Format($"#RELOAD# Pausing Tree (SM)"));
                         SnapshotManager.saveSnapshot((LogicalNode)tree);
                     }
                 }
@@ -118,7 +117,6 @@ namespace LogicalTaskTree
                     if (treePausedByMe)
                     {
                         LogicalNode.ResumeTree();
-                        // InfoController.Say(String.Format($"#RELOAD# Continuing Tree (SM)"));
                     }
                 }
                 if (exception != null)

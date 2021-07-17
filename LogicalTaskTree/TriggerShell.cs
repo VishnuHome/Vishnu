@@ -76,20 +76,6 @@ namespace LogicalTaskTree
             {
                 lock (this._startTriggerLocker)
                 {
-                    // DEBUG+
-                    string caller;
-                    if (triggerController is WorkerShell)
-                    {
-                        caller = "WorkerShell";
-                    }
-                    else
-                    {
-                        caller = (triggerController as LogicalNode).Id;
-                    }
-#if DEBUG
-                    //InfoController.Say(String.Format("#A# {0}: this.Trigger.Start from {1}", this.GetType().Name, caller));
-#endif
-                    // DEBUG-
                     if (!this._triggerControllers.ContainsKey(triggerController))
                     {
                         if (this._triggerControllers.TryAdd(triggerController, triggerIt))
@@ -154,9 +140,6 @@ namespace LogicalTaskTree
                     else
                     {
                         // der Trigger läuft schon oder wartet noch auf fehlende Consumer.
-#if DEBUG
-                        //InfoController.Say(String.Format("{0}: this.Trigger from caller: {1}, started: {2}", this.GetType().Name, caller, this._isStarted));
-#endif
                         return false;
                     }
                 }
@@ -505,7 +488,6 @@ namespace LogicalTaskTree
         /// <param name="source">Das Auslösende TreeEvent.</param>
         private void SlaveTriggersIt(TreeEvent source)
         {
-            // InfoController.Say(String.Format($"#TRIGGER# SlaveTriggersIt"));
             if (this.TriggerIt != null)
             {
                 Delegate[] invocations = this.TriggerIt.GetInvocationList();
@@ -520,7 +502,6 @@ namespace LogicalTaskTree
                     invocationStrings[i] = nodeId;
                 }
                 Array.Sort(invocationStrings);
-                // InfoController.Say(String.Format($"#TRIGGER# 2 SlaveTriggersIt: {String.Join(",", invocationStrings)}"));
                 this.TriggerIt(source);
             }
         }

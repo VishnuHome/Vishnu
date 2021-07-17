@@ -155,7 +155,6 @@ namespace LogicalTaskTree
                         if (this.CheckerTrigger.TriggerShellReference.Contains("LogicalResultChanged"))
                         {
                             this.ReferencedNodeName = this.CheckerTrigger.ReferencedNodeName;
-                            // InfoController.Say(String.Format($"#MIRROR#02 CheckerShell.IsMirror Id/Name: {this.ReferencedNodeName ?? ""}"));
                         }
                     }
                 }
