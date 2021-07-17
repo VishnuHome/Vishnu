@@ -933,8 +933,6 @@ namespace Vishnu.ViewModel
         /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
         public override void ReloadTaskTreeExecute(object parameter)
         {
-            // InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.reloadTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
-
             this.ReloadTaskTree();
         }
 
@@ -965,8 +963,6 @@ namespace Vishnu.ViewModel
         /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
         public override void LogTaskTreeExecute(object parameter)
         {
-            // InfoController.Say(String.Format($"#RELOAD# LogicalNodeViewModel.logTaskTreeExecute Id/Name: {this.Path}, RootJobListViewModel: {(this.RootJobListViewModel ?? this).Name}"));
-
             this.LogTaskTree();
         }
 
@@ -1438,17 +1434,10 @@ namespace Vishnu.ViewModel
         {
             if (this._myLogicalNode != null && this._myLogicalNode.GetType() != node.GetType())
             {
-#if DEBUG
-                InfoController.Say(String.Format("#RELOAD# SetBLNode: this._myLogicalNode.GetType().Name: {0} not equal node.GetType().Name: {1}",
-                  this._myLogicalNode.GetType().Name, node.GetType().Name));
-#endif
                 return false;
             }
             if (!init && this._myLogicalNode == null)
             {
-#if DEBUG
-                InfoController.Say("#RELOAD# SetBLNode: this._myLogicalNode was null");
-#endif
                 return false;
             }
             this.UnsetBLNode();
@@ -1817,24 +1806,9 @@ namespace Vishnu.ViewModel
         {
             lock (this.SubStateLocker)
             {
-
-                //if (LogicalNode.IsTreeFlushing || LogicalNode.IsTreePaused)
-                //{
-                //    this.IsTreePaused = true;
-                //}
-                //else
-                //{
-                //    this.IsTreePaused = false;
-                //}
-
-                //System.Diagnostics.StackTrace s = new System.Diagnostics.StackTrace(System.Threading.Thread.CurrentThread, true);
-                //string callingMethod = s.GetFrame(2).GetMethod().Name;
-                //InfoController.Say(String.Format("#SUB# LogicalNodeViewModel.subStateChanged {0} LogicalState: {1}, Caller: {2}"
-                //    , this.Id, this._myLogicalNode.LogicalState.ToString(), callingMethod));
                 if (this._myLogicalNode?.LogicalState == NodeLogicalState.Fault)
                 {
                     this.VisualState = VisualNodeState.Error;
-                    // InfoController.Say("#SUB# subStateChanged " + this._myLogicalNode.Id + ": Error");
                 }
                 else
                 {
@@ -1848,7 +1822,6 @@ namespace Vishnu.ViewModel
                             else
                             {
                                 this.VisualState = VisualNodeState.Done;
-                                // InfoController.Say("#SUB# subStateChanged " + this._myLogicalNode.Id + ": Done");
                             }
                             break;
                         case NodeState.None:

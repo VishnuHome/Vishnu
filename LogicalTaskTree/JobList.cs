@@ -920,7 +920,6 @@ namespace LogicalTaskTree
         /// <param name="source">Bei abhängigen Checkern das auslösende TreeEvent.</param>
         protected override void DoRun(TreeEvent source)
         {
-            // InfoController.Say(String.Format($"#TRIGGER# 8 starting Id/Name: {this.IdInfo} JobList.DoRun({(source == null ? "null" : source.ToString())}"));
             this.RunTreeExternals();
             base.DoRun(source);
         }

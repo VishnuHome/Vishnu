@@ -759,7 +759,6 @@ namespace LogicalTaskTree
         {
             if (NodeStateChanged != null)
             {
-                //InfoController.Say("#SUB# LogicalNode.OnNodeStateChanged " + this.Id + ": State=" + this.State.ToString() + ", LogicalState=" + this.LogicalState.ToString());
                 NodeStateChanged(this, this.State);
             }
         }
@@ -793,16 +792,6 @@ namespace LogicalTaskTree
         {
             lock (this.ExceptionLocker)
             {
-                //if ((new List<string>()
-                //        {"#CheckTreeEventTriggerSnapshot",
-                //         "#ShowRefCheckTreeEventTriggerSnapshot",
-                //         "#ShowRefRefCheckTreeEventTriggerSnapshot",
-                //         "#ShowRefRefRefCheckTreeEventTriggerSnapshot"}
-                //    ).Contains(source.Id))
-                //{
-                //    InfoController.Say(String.Format($"#EXC# Id/Name: {this.Id}/{this.Name} - LogicalNode.OnExceptionRaised Start ({source.Id})"
-                //        + String.Format($": {this.LastExceptionsToString()}")));
-                //}
                 bool IsFirstException = this.LastExceptions.Count == 0;
                 if (this.LastExceptions.ContainsKey(source))
                 {
@@ -1095,7 +1084,6 @@ namespace LogicalTaskTree
                 TreeEventTrigger trigger = (this.Trigger as TriggerShell).GetTreeEventTrigger();
                 TreeEvent triggersLastTreeEvent = trigger.LastTreeEvent;
                 string treeEventString = triggersLastTreeEvent == null ? "" : triggersLastTreeEvent.ToString();
-                // InfoController.Say(String.Format($"#MIRROR#01 LogicalNode.GetlastEventSourceIfIsTreeEventTriggered Id/Name: {this.IdInfo}, TriggersLastTreeEvent: {treeEventString}"));
                 if (triggersLastTreeEvent != null) // prüft nur, ob der Trigger überhaupt schon mal gefeuert hat
                 {
                     // TODO: Eventliste komplettieren, elegantere Lösung suchen
@@ -1115,15 +1103,11 @@ namespace LogicalTaskTree
                         || (trigger.InternalEvents.Contains("LastNotNullLogicalChanged"))
                         || (trigger.InternalEvents.Contains("Breaked") && source?.LastLogicalState == NodeLogicalState.UserAbort))
                     {
-                        //string sourceLastNotNullLogical = source == null ? "NULL" : source.LastNotNullLogical.ToString();
-                        //InfoController.Say(String.Format($"#MIRROR#01.1 LogicalNode.GetlastEventSourceIfIsTreeEventTriggered Id/Name: {this.IdInfo}")
-                        //    + String.Format($", TriggersLastTreeEvent: {treeEventString}, trigger.InternalEvents: {trigger.InternalEvents} source.LastNotNullLogical: {sourceLastNotNullLogical}"));
                         this.Logical = source.Logical;
                         this.LastExecutingTreeEvent = triggersLastTreeEvent;
                     }
                     else
                     {
-                        //InfoController.Say(String.Format($"#MIRROR#01.2 LogicalNode.GetlastEventSourceIfIsTreeEventTriggered Id/Name: {this.IdInfo}, TriggersLastTreeEvent: {treeEventString}, trigger.InternalEvents: {trigger.InternalEvents}"));
                         this.LastExecutingTreeEvent = null;
                     }
                 }
@@ -1193,7 +1177,6 @@ namespace LogicalTaskTree
                 }
                 return true;
             }
-            // InfoController.Say(String.Format($"#MIRROR#03 CanControlledTreeStart Id/Name: {this.IdInfo}, HasTreeEventTrigger: {(this.Trigger as TriggerShell).HasTreeEventTrigger}"));
             return false;
         }
 
@@ -1503,7 +1486,7 @@ namespace LogicalTaskTree
         private JobList ReloadBranch()
         {
             JobList rootJobList = this.GetTopRootJobList();
-            // InfoController.Say(String.Format($"#RELOAD# LogicalNode.ReloadBranch Id/Name: {this.IdInfo}, RootJobList: {rootJobList.IdInfo}"));
+            InfoController.Say(String.Format($"#RELOAD# LogicalNode.ReloadBranch Id/Name: {this.IdInfo}, RootJobList: {rootJobList.IdInfo}"));
             TreeParameters shadowTreeParams = new TreeParameters(String.Format($"ShadowTree {LogicalTaskTree.TreeId++}"),
                 this.TreeParams.ParentView) { CheckerDllDirectory = this.TreeParams.CheckerDllDirectory };
 
@@ -2150,19 +2133,6 @@ namespace LogicalTaskTree
                 return;
             }
             LogicalNode.WaitWhileTreePausedOrFlushing();
-            /* DEBUG+
-            if (source == null)
-            {
-                // InfoController.Say(String.Format($"#TRIGGER# 3 RunAsyncAsync: source is NULL!"));
-            }
-            else
-            {
-                if ((new List<string>() { "SubJob1Value1", "SubJob1Value2", "SubJob1Value3", "SubJob1Value4" }).Contains(this.IdInfo))
-                {
-                    // InfoController.Say(String.Format($"#TRIGGER# 3 {this.IdInfo} RunAsyncAsync: {source.SourceId}, {source.Logical.ToString()}, {source.SenderId}"));
-                }
-            }
-            */ // DEBUG-
             lock (this._threadStartLocker)
             {
                 this.LastExecutingTreeEvent = source;
@@ -2177,13 +2147,11 @@ namespace LogicalTaskTree
                     }
                     this.Logical = this.LastExecutingTreeEvent.Logical;
                     this.OnNodeLogicalChanged();
-                    InfoController.Say(String.Format($"#RELOAD# 4 (lookup) Id/Name: {this.NameInfo} - {source.ToString()}  {this.LastExecutingTreeEvent.ToString()}"));
                 }
                 //14.08.2018- */
                 if ((this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
                   || (this.LastLogicalState == NodeLogicalState.UserAbort))
                 {
-                    InfoController.Say(String.Format($"#RELOAD# 4 {this.NameInfo} RunAsyncAsync-Aussprung: {source.SourceId}, {source.Logical.ToString()}, {source.SenderId}"));
                     return;
                 }
                 this.IsRunRequired = true;
@@ -2208,7 +2176,6 @@ namespace LogicalTaskTree
                     _starterThread.IsBackground = true;
                     try
                     {
-                        InfoController.Say(String.Format($"#RELOAD# 6 starting Id/Name: {this.NameInfo} - {(source == null ? "null" : source.ToString())}  State: {this.State.ToString()}, LogicalState: {this.LogicalState.ToString()}"));
                         _starterThread.Start(source);
                     }
                     catch (InvalidOperationException) { }
@@ -2219,7 +2186,6 @@ namespace LogicalTaskTree
                     {
                         this.ThreadUpdateLastState(NodeState.Null);
                         this.State = NodeState.Waiting;
-                        InfoController.Say(String.Format($"#RELOAD# waiting Id/Name: {this.NameInfo}, _starterThread.IsAlive: {this._starterThread.IsAlive.ToString()}, _starterThread.IsValid: {this.IsThreadValid(this._starterThread).ToString()} - {(source == null ? "null" : source.ToString())}"));
                         this.OnNodeStateChanged();
                     }
                 }
@@ -2282,14 +2248,6 @@ namespace LogicalTaskTree
         /// </summary>
         private void TryRunAsyncWhileIsRunRequired(TreeEvent source)
         {
-            if (source != null)
-            {
-                InfoController.Say(String.Format($"#RELOAD# {source.Name} Id/Name: {this.IdInfo}, State: {this.State}, LogicalState: {this.LogicalState}"));
-            }
-            else
-            {
-                InfoController.Say(String.Format($"#RELOAD# source==null Id/Name: {this.IdInfo}, State: {this.State}, LogicalState: {this.LogicalState}"));
-            }
             int waitingLoopCounter = 0;
             do
             {
@@ -2313,7 +2271,7 @@ namespace LogicalTaskTree
                     }
                     else
                     {
-                        // InfoController.Say(String.Format($"#TRIGGER# X InternalError Id/Name: {this.IdInfo}, State: {this.State}, LogicalState: {this.LogicalState}"));
+                        InfoController.Say(String.Format($"#TRIGGER# X InternalError Id/Name: {this.IdInfo}, State: {this.State}, LogicalState: {this.LogicalState}"));
                         this.State = NodeState.InternalError;
                     }
                 }
@@ -2359,7 +2317,6 @@ namespace LogicalTaskTree
                     this.AddEnvironment(source);
                 }
                 this.LastRun = DateTime.Now;
-                InfoController.Say(String.Format($"#TryRun# starting Id/Name: {this.IdInfo} this.DoRun({(source == null ? "null" : source.ToString())})  State: {this.State.ToString()}, LogicalState: {this.LogicalState.ToString()}"));
                 this.DoRun(source);
                 if ((this.LogicalState & NodeLogicalState.Start) > 0)
                 {
@@ -2472,14 +2429,6 @@ namespace LogicalTaskTree
         /// <param name="addInfo">Zusätzliche Information (Exception, Progress%, etc.).</param>
         private void ProcessSingleTreeEvent(LogicalNode sender, LogicalNode source, string eventName, object addInfo)
         {
-            //if (eventName == "LastNotNullLogicalChanged" && (source.Id == "ApplicationSettings" || source.Id == "Session" || source.Id == "SqlConnection"))
-            //{
-            //    InfoController.Say(String.Format($"#EXD# Trigger Id/Name: {this.Id}/{this.Name} - {eventName}"));
-            //}
-            //if (eventName == "LastNotNullLogicalToTrue" && (source.Id == "SqlConnection"))
-            //{
-            //    InfoController.Say(String.Format($"#EXD# Trigger Id/Name: {this.Id}/{this.Name} - {eventName}"));
-            //}
             if (this.TreeRootJobList.TriggerRelevantEventCache.Contains(eventName))
             {
                 foreach (TreeEventTrigger trigger in this.FindEventTriggers(eventName, sender.Id, source.Id))
@@ -2487,10 +2436,6 @@ namespace LogicalTaskTree
                     TreeEvent treeEvent = new TreeEvent(TreeEvent.GetUserEventNamesForInternalEventNames(eventName), source.Id,
                       sender.Id, this.Name, this.Path, source.LastNotNullLogical, source.LastLogicalState,
                       source.GetResultsFromResultList(), source.GetResultsFromEnvironment());
-                    //if (source.Id == "CheckReplications")
-                    //{
-                    InfoController.Say(String.Format($"#RELOAD#04 ProcessSingleTreeEvent Source: {source.NameInfo}, Event: {eventName}"));
-                    //}
                     TreeEventQueue.AddTreeEventTrigger(treeEvent, sender.Id, trigger);
                 }
             }
@@ -2584,10 +2529,7 @@ namespace LogicalTaskTree
                 {
                     if (sender.Logger.GetLogEvents().Contains(internalEventName))
                     {
-                        // InfoController.Say(String.Format($"#EXC# Logger Id/Name: {this.Id}/{this.Name} - {internalEventName}"));
                         Task asyncLoggerTask = new Task(() => this.LogAsync(sender, treeEvent, addInfo));
-                        //InfoController.Say(String.Format("{0}/{1} {2}: starting Thread", this.Id, this.Name,
-                        //  System.Reflection.MethodBase.GetCurrentMethod().Name));
                         asyncLoggerTask.Start(); // fire and forget
                     }
                 }

@@ -443,9 +443,6 @@ namespace LogicalTaskTree
             catch (IOException ex)
             {
                 xmlDoc = null;
-#if DEBUG
-                InfoController.Say(String.Format("{0}: Ladefehler ({1}) {2} - Snapshot.parse", this.Id, ex.Message, xmlFilePath));
-#endif
             }
             if (xmlDoc == null)
             {
@@ -459,11 +456,8 @@ namespace LogicalTaskTree
             // DEBUG 24.02.2020 Nagel-
             this.IsDefaultSnapshot = false;
             LogicalNode para = this;
-            // InfoController.Say(String.Format($"#EXC# Snapshot  vor buildTreeFromRemoteJob: {xmlFilePath}"));
             this.buildTreeFromRemoteJob(mother, this.Level, ref para, xmlDoc.Element("Snapshot"), isConstructor);
-            // InfoController.Say(String.Format($"#EXC# Snapshot nach buildTreeFromRemoteJob: {xmlFilePath}"));
             this._parsedNodeExceptions.Clear();
-            //xmlDoc = null;
         }
 
         /// <summary>
@@ -773,12 +767,10 @@ namespace LogicalTaskTree
                 {
                     if (this._parsedNodeExceptions.Count > 0)
                     {
-                        // InfoController.Say(String.Format($"#EXC# vor OnExceptionRaised: {this.NameId}"));
                         this.OnExceptionRaised(this, this._parsedNodeExceptions[0].Value);
                     }
                     else
                     {
-                        // InfoController.Say(String.Format($"#EXC# vor OnExceptionCleared: {this.NameId}"));
                         this.OnExceptionCleared(this);
                     }
                 }

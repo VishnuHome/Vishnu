@@ -46,7 +46,6 @@ namespace LogicalTaskTree
                     {
                         if (this.LastExceptions.Count > 0)
                         {
-                            // InfoController.Say(String.Format($"#EXC# Id/Name: {this.Id}/{this.Name} - SingleNode.Logical.Set calling OnExceptionCleared"));
                             this.OnExceptionCleared(this.LastExceptions.Keys.First());
                         }
                     }
@@ -514,7 +513,6 @@ namespace LogicalTaskTree
                     {
                         source.Results = resultDictionary;
                     }
-                    // InfoController.Say(String.Format($"#TRIGGER# Y this.Checker.Run Id/Name: {this.IdInfo}, State: {this.State}, LogicalState: {this.LogicalState}"));
                     logical = this.Checker.Run(null, this.TreeParams, source);
                     if (!this.IsThreadValid(Thread.CurrentThread) || (this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
                       || (this.LastLogicalState == NodeLogicalState.UserAbort))
@@ -608,10 +606,6 @@ namespace LogicalTaskTree
             }
             catch (Exception ex)
             {
-                if (ex is NullReferenceException)
-                {
-                    InfoController.Say(ex.Message);
-                }
                 runException = ex; // Achtung, keine direkte Referenz, sondern über new Exception entkoppeln.
                 if ((this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
                   || (this.LastLogicalState == NodeLogicalState.UserAbort))
@@ -624,7 +618,6 @@ namespace LogicalTaskTree
             }
             finally
             {
-                // InfoController.Say(String.Format($"#RELOAD# {Assembly.GetExecutingAssembly().GetName().Name}.DoRun - Node: {this.IdInfo}, TreeEvent: {source.Name}."));
                 if (!this.IsThreadValid(Thread.CurrentThread))
                 {
                     if (this.Trigger != null)

@@ -88,12 +88,6 @@ namespace LogicalTaskTree
                 ComposedQueueElement composedQueueElement = null;
                 if (TreeEventQueue._treeEventQueue.TryDequeue(out composedQueueElement))
                 {
-#if DEBUG
-                    if (composedQueueElement.Key.StartsWith("LogicalResultChanged: SubJob1/SubJob1"))
-                    {
-                        // InfoController.Say(String.Format($"#TRIGGER# 1 TreeEventQueue.processQueue        {composedQueueElement.Key} {composedQueueElement.Source.Logical}"));
-                    }
-#endif
                     composedQueueElement.Trigger.OnTriggerFired(composedQueueElement.Source);
                 }
             }

@@ -315,7 +315,6 @@ namespace LogicalTaskTree
         {
             lock (this.SubLastNotNullLogicalLocker)
             {
-                // InfoController.Say(String.Format($"#EXC# {this.Id}/{this.Name}: NodeParent.SubNodeLastNotNullLogicalChanged({sender.Id})"));
                 bool? tmpLogical = this.LastLogical;
                 this.LastLogical = null;
                 bool? newLogical = this.Logical;
