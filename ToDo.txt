@@ -865,7 +865,7 @@ ERLEDIGT: Fehler in Snapshots nach langer Laufzeit:
           Ursache waren Fehler in der PieControls-UserLibrary (CheckDiskSpace/ShowDiskSpace).
 ERLEDIGT: Deutliche Erweiterung der Vishnu-Hilfe.
 
-Stand: 05.07.2021 Version 5.0.2.6 (Documentation)
+Stand: 05.07.2021 Version 5.0.2.6 (Documented and tested)
 -------------------------------------------------------------------------------------------------------------
 
 ###################
