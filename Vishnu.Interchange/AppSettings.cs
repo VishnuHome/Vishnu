@@ -393,6 +393,7 @@ namespace Vishnu.Interchange
             this.AppEnvAccessor.RegisterKeyValue("SnapshotDirectory", this.SnapshotDirectory);
             this.LocalConfigurationDirectory = this.GetStringValue("LocalConfigurationDirectory", Path.GetDirectoryName(this.AppConfigUser));
             string rootJobPackageTmp = this.RootJobPackagePath ?? this.ApplicationRootPath;
+            this.AppEnvAccessor.RegisterKeyValue("JobDirectory", Path.GetFullPath(rootJobPackageTmp));
             if (this.SnapshotDirectory != null)
             {
                 if (!(this.SnapshotDirectory.Contains(":")

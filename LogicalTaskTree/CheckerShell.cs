@@ -44,7 +44,8 @@ namespace LogicalTaskTree
                 {
                     if (actCheckerParameters != this._checkerParameters)
                     {
-                        this._checkerParameters = GenericSingletonProvider.GetInstance<AppSettings>().ReplaceWildcards(actCheckerParameters.ToString());
+                        this._checkerParameters = GenericSingletonProvider.GetInstance<AppSettings>()
+                            .ReplaceWildcards(actCheckerParameters.ToString());
                     }
                     if (this.ThreadLocked)
                     {
@@ -440,7 +441,9 @@ namespace LogicalTaskTree
                     try
                     {
                         treeParameters.CheckerDllDirectory = Path.GetDirectoryName(this._slavePathName);
-                        rtn = this.Slave.Run(this._checkerParameters, treeParameters, source);
+                        string cp = this._checkerParameters == null ? "" : this._checkerParameters.ToString();
+                        rtn = this.Slave.Run(GenericSingletonProvider.GetInstance<AppSettings>()
+                            .ReplaceWildcards(cp), treeParameters, source);
                     }
                     finally
                     {
