@@ -157,7 +157,7 @@ namespace Vishnu.ViewModel
         /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
         public override void ReloadTaskTreeExecute(object parameter)
         {
-            this.GroupJobList.ReloadTaskTree();
+            _ = this.GroupJobList.ReloadTaskTree();
         }
 
         /// <summary>

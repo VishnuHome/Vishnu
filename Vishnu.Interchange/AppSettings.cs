@@ -458,12 +458,21 @@ namespace Vishnu.Interchange
                 AppDomain.CurrentDomain.BaseDirectory
             };
             this.AcceptNullResults = this.GetValue<bool>("AcceptNullResults", false);
-            this.UserAssemblyDirectory = this.GetStringValue("UserAssemblyDirectory", null);
-            this.UserParameterReaderPath = this.GetStringValue("UserParameterReaderPath", null);
-            if (!String.IsNullOrEmpty(this.UserAssemblyDirectory))
+            string lastUserAssemblyDirectoryDefault = "UserAssemblies";
+            string vishnu_root = this.GetStringValue("Vishnu_Root", null);
+            if (vishnu_root != null)
+            {
+                lastUserAssemblyDirectoryDefault = 
+                    Path.Combine(vishnu_root, "ReadyBin", "UserAssemblies");
+            }
+            this.UserAssemblyDirectory = this.GetStringValue("UserAssemblyDirectory",
+                this.GetStringValue("Vishnu_UserAssemblies", lastUserAssemblyDirectoryDefault));
+            if (!this.AssemblyDirectories.Contains(this.UserAssemblyDirectory))
             {
                 this.AssemblyDirectories.Insert(0, this.UserAssemblyDirectory);
+                this.AppEnvAccessor.RegisterKeyValue("UserAssemblyDirectory", this.UserAssemblyDirectory);
             }
+            this.UserParameterReaderPath = this.GetStringValue("UserParameterReaderPath", null);
             this.StartTreeOrientation = (TreeOrientation)Enum.Parse(typeof(TreeOrientation), this.GetStringValue("StartTreeOrientation", "AlternatingHorizontal"));
             string userCheckerArrayString = this.GetStringValue("UncachedCheckers", null);
             if (userCheckerArrayString != null)
@@ -558,7 +567,7 @@ namespace Vishnu.Interchange
             {
                 try
                 {
-                    this.LoadUserParameterReader(this.UserParameterReaderPath);
+                    this.LoadUserParameterReader(this.ReplaceWildcards(this.UserParameterReaderPath));
                 }
                 catch (Exception ex)
                 {
@@ -763,16 +772,6 @@ namespace Vishnu.Interchange
         private string GetVishnuProvider()
         {
             string vishnuProvider = this.GetStringValue("VishnuProvider", "NetEti");
-            //string vishnuProvider = "Krakauer";
-            //string[] activationData = null;
-            //if (AppDomain.CurrentDomain.SetupInformation.ActivationArguments != null)
-            //{
-            //    activationData = AppDomain.CurrentDomain.SetupInformation.ActivationArguments.ActivationData;
-            //}
-            //if (activationData?.Length > 1)
-            //{
-            //    vishnuProvider = activationData[0];
-            //}
             return vishnuProvider;
         }
 
