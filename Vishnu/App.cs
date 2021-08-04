@@ -433,7 +433,6 @@ namespace Vishnu
                 StringBuilder sb = new StringBuilder();
                 sb.Append(Environment.GetFolderPath(Environment.SpecialFolder.Programs));
                 sb.Append("\\");
-                // sb.Append("NetEti");
                 sb.Append(SingleInstanceApplication._appSettings.VishnuProvider);
                 sb.Append("\\");
                 sb.Append("ClickOnceStarter.exe");

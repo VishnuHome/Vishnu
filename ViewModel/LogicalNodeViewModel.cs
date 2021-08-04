@@ -933,7 +933,7 @@ namespace Vishnu.ViewModel
         /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
         public override void ReloadTaskTreeExecute(object parameter)
         {
-            this.ReloadTaskTree();
+            _ = this.ReloadTaskTree();
         }
 
         /// <summary>
@@ -944,7 +944,7 @@ namespace Vishnu.ViewModel
             this.JobInProgress = "ReloadTaskTree";
             await Task.Run(() => ReloadTaskTreeAsync());
             this.JobInProgress = "";
-            this.ResetContextMenu();
+            _ = this.ResetContextMenu();
         }
 
         /// <summary>
@@ -963,7 +963,7 @@ namespace Vishnu.ViewModel
         /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
         public override void LogTaskTreeExecute(object parameter)
         {
-            this.LogTaskTree();
+            _ = this.LogTaskTree();
         }
 
         /// <summary>
@@ -974,7 +974,7 @@ namespace Vishnu.ViewModel
             this.JobInProgress = "LogTaskTree";
             await Task.Run(() => LogicalTaskTreeManager.LogTaskTree(this, false));
             this.JobInProgress = "";
-            this.ResetContextMenu();
+            _ = this.ResetContextMenu();
         }
 
         #endregion context menu
@@ -1729,7 +1729,7 @@ namespace Vishnu.ViewModel
 
                     shadowTopRootJobListViewModel.Dispose();
 
-                    LogTaskTree();
+                    _ = this.LogTaskTree();
                     Thread.Sleep(10);
 
                 }

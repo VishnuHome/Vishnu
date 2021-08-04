@@ -440,7 +440,7 @@ namespace LogicalTaskTree
                 xmlDoc = XDocument.Load(xmlFilePath);
 
             }
-            catch (IOException ex)
+            catch (IOException)
             {
                 xmlDoc = null;
             }
