@@ -17,15 +17,15 @@
     <UpdateRequired>true</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <InstallUrl>\\localhost\Vishnu.Install\</InstallUrl>
-    <SupportUrl>https://neteti.de</SupportUrl>
-    <ErrorReportUrl>https://neteti.de</ErrorReportUrl>
+    <SupportUrl>https://neteti.de/vishnu.doc</SupportUrl>
+    <ErrorReportUrl>https://neteti.de/vishnu.doc</ErrorReportUrl>
     <ProductName>Vishnu</ProductName>
     <PublisherName>Erik Nagel</PublisherName>
     <SuiteName>NetEti</SuiteName>
     <MinimumRequiredVersion>1.1.0.48</MinimumRequiredVersion>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>75</ApplicationRevision>
+    <ApplicationRevision>76</ApplicationRevision>
     <ApplicationVersion>5.0.2.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -86,7 +86,7 @@
     </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <GenerateManifests>true</GenerateManifests>
+    <GenerateManifests>false</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
