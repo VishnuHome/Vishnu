@@ -20,12 +20,12 @@
     <SupportUrl>https://neteti.de/vishnu.doc</SupportUrl>
     <ErrorReportUrl>https://neteti.de/vishnu.doc</ErrorReportUrl>
     <ProductName>Vishnu</ProductName>
-    <PublisherName>Erik Nagel</PublisherName>
+    <PublisherName>NetEti</PublisherName>
     <SuiteName>NetEti</SuiteName>
     <MinimumRequiredVersion>1.1.0.48</MinimumRequiredVersion>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>76</ApplicationRevision>
+    <ApplicationRevision>78</ApplicationRevision>
     <ApplicationVersion>5.0.2.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -86,7 +86,7 @@
     </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <GenerateManifests>false</GenerateManifests>
+    <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
