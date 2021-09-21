@@ -926,6 +926,8 @@ MailTo-Parameter
 SMS
 WhatsApp
 Telegram
+Vishnu-App
+Vishnu as a Service
 UserParameter-Reader Parameter-Propagation nach Aktualisierung checken
 Doku: Job-Parameter ergänzen, bekannte Probleme, woher kommt der Name
 Vishnu Verwaltungsansicht, Uptime, Parameter, Referenzen, Tree, ProcessId, Aufrufparameter, etc.
