@@ -2376,6 +2376,8 @@ namespace LogicalTaskTree
         /// <param name="addInfo">Zusätzliche Information (Exception, Progress%, etc.).</param>
         private void ProcessTreeEvent(LogicalNode sender, LogicalNode source, string eventName, object addInfo)
         {
+            // InfoController.Say(String.Format($"#MIRROR# Id/Name: {this.IdInfo}, Event: {eventName}"));
+            // Statistics.Inc(String.Format($"#MIRROR# {this.Id}/{this.Name}: LogicalNode.ProcessTreeEvent"));
             lock (LogicalNode._eventLocker)
             {
                 if (!(source is NodeConnector))
