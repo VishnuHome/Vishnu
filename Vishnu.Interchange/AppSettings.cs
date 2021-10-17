@@ -4,6 +4,7 @@ using System.IO;
 using System;
 using NetEti.Globals;
 using System.Security;
+using System.Windows;
 
 namespace Vishnu.Interchange
 {
@@ -45,7 +46,10 @@ namespace Vishnu.Interchange
             }
             catch (Exception ex)
             {
-                this.FatalInitializationException = ex;
+                this.FatalInitializationException = new ApplicationException(
+                    "Ausnahme bei InitUserParameterReader, Parameter: "
+                    + this._userParameterReaderParameters ?? "???", ex);
+                // this.FatalInitializationException = ex;
             }
         }
 
@@ -565,13 +569,16 @@ namespace Vishnu.Interchange
             //this.DumpAppSettings = this.GetValue<bool>("DumpAppSettings", false);
             if (!String.IsNullOrEmpty(this.UserParameterReaderPath))
             {
+                string resolvedUserParameterReaderPath = "???";
                 try
                 {
-                    this.LoadUserParameterReader(this.ReplaceWildcards(this.UserParameterReaderPath));
+                    resolvedUserParameterReaderPath = this.ReplaceWildcards(this.UserParameterReaderPath);
+                    this.LoadUserParameterReader(resolvedUserParameterReaderPath);
                 }
                 catch (Exception ex)
                 {
-                    this.FatalInitializationException = ex;
+                    this.FatalInitializationException
+                        = new ApplicationException("Ausnahme bei " + resolvedUserParameterReaderPath, ex);
                 }
             }
             this.VishnuProvider = this.GetVishnuProvider();
