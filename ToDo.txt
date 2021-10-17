@@ -895,6 +895,15 @@ Hinweise:
 ###################
 
 --- TODO ----------------------------------------------------------------------------------------------------
+Fehler: übergeordneter Knoten bleibt manch mal auf Gelb (CheckTreeEventTriggerMinimal)
+        Nur, wenn kein Log aktiv ist und auch nicht im Debug.
+Neuer Parameter: Log-Flushtime
+CheckDependentNodeLogic: SubJobs testen
+Vishnu-Hilfe: Danksagung
+Vishnu-Softwarelizenz
+Reload von Checker-dlls testen; UncachedCheckers testen
+
+Reload auf Root-JobList geht noch nicht
 Context-Menü schließt nicht automatisch nach dem ersten Funktionsaufruf (Reload).
 In Listenansicht Shift-Expand und Ctrl-Expand einbauen
 Fehler: wenn im Snapshot ein Teilbaum mit Exception auf false (oder true?) - von Exception weg - geht,
@@ -911,7 +920,10 @@ Fehler: WPFDialogChecker starten immer im ersten Bildschirm, auch wenn Vishnu im
 Dynamische multiple logger ermöglichen.
 Veröffentlichungsparameter nach Company auslagern, wenn möglich
 CheckDiskSpace: Sql-Zugriffe nach Company auslagern, wenn möglich
+Vishnu-Checker: Parameteraktualisierung im Hintergrund checken
+Snapshots: Serialisierung von LastRun fehlt
 "Ist behoben" in vorgeschalteten Prozess?
+Framework-Assemblies in NuGet-Package (was ist mit pdb?)
 Masud
 	"Ist behoben" Link zur Dokumentation der Fehlerbehebung
 	XML laden in Excel Pivot Tabelle
