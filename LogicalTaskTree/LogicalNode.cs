@@ -2139,11 +2139,19 @@ namespace LogicalTaskTree
                 //* 14.08.2018+
                 if ((this is SingleNode) && (this as SingleNode).Checker != null && (this as SingleNode).Checker.IsMirror)
                 {
-                    LogicalNode lookupSource = this.GetlastEventSourceIfIsTreeEventTriggered();
-                    if (lookupSource != null)
+                    LogicalNode lookupSource = null;
+                    int i = 0;
+                    do
                     {
-                        this.LastExecutingTreeEvent = new TreeEvent(source.Name, lookupSource.Id, lookupSource.Id, lookupSource.Name,
-                          lookupSource.Path, lookupSource.LastNotNullLogical, lookupSource.LogicalState, lookupSource.GetResultsFromResultList(), null);
+                        lookupSource = this.GetlastEventSourceIfIsTreeEventTriggered();
+                        if (lookupSource == null)
+                        {
+                            Thread.Sleep(10);
+                        }
+                    } while (lookupSource == null && ++i < MAXWAITINGLOOPS); // 01.11.2021 Erik Nagel: Loop eingebaut.
+                    if (i >= MAXWAITINGLOOPS)
+                    {
+                        throw new ApplicationException("lookupSource MAXWAITINGLOOPS überschritten!");
                     }
                     this.Logical = this.LastExecutingTreeEvent.Logical;
                     this.OnNodeLogicalChanged();

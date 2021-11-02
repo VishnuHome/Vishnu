@@ -483,20 +483,28 @@ namespace LogicalTaskTree.Provider
                           _appSettings.AssemblyDirectories.ToArray()), paraString);
                     }
                 }
-                XElement item = jobChecker.Element("Parameters");
                 bool isMirror = false;
-                if (item != null && item.Value.ToString().ToUpper().Equals("ISMIRROR"))
-                {
-                    isMirror = true;
-                }
+                XElement item = jobChecker.Element("Parameters");
                 string parameters = item == null ? null : item.Value.ToString();
                 if (parameters != null)
                 {
                     parameters = replaceWildcardsNPathes(parameters, _appSettings.AssemblyDirectories.ToArray());
+                    if (parameters.ToUpper().Equals("ISMIRROR"))
+                    {
+                        isMirror = true;
+                    }
+                }
+                item = jobChecker.Elements("PhysicalPath").FirstOrDefault();
+                if (item == null)
+                {
+                    throw new ArgumentException("Ein Checker muss einen PhysicalPath zugeordnet bekommen!");
                 }
                 string physicalDllPath
-                  = replaceWildcardsNPathes(jobChecker.Element("PhysicalPath").Value,
-                    _appSettings.AssemblyDirectories.ToArray());
+                  = replaceWildcardsNPathes(item.Value, _appSettings.AssemblyDirectories.ToArray());
+                if (Path.GetFileNameWithoutExtension(physicalDllPath).ToUpper().Equals("TRIGGEREVENTMIRRORCHECKER"))
+                {
+                    isMirror = true;
+                }
                 bool alwaysReloadChecker = _appSettings.UncachedCheckers.Contains(
                     Path.GetFileNameWithoutExtension(physicalDllPath));
                 item = jobChecker.Elements("SingleNodeUserControlPath").FirstOrDefault();
