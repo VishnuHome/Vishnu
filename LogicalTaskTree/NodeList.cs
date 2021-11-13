@@ -54,6 +54,8 @@ namespace LogicalTaskTree
                         if (!this.IsResultDependant && this.Name != "XOR")
                         {
                             int countPositiveResults = this.CountPositiveResults;
+                            //this.LogWithDistinctTime(String.Format("#MIRROR# Id/Name: {0}, countPositiveResults: {1}",
+                            //    this.IdInfo, countPositiveResults));
                             if (countPositiveResults > this.nPlus)
                             {
                                 if (countPositiveResults < this.nMinus)

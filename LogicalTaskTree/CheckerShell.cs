@@ -3,7 +3,6 @@ using System.IO;
 using System.Diagnostics;
 using Vishnu.Interchange;
 using NetEti.Globals;
-// using NetEti.ApplicationControl; // #MIRROR#
 
 namespace LogicalTaskTree
 {

@@ -1078,6 +1078,8 @@ namespace LogicalTaskTree
         /// <returns>Feuernder Knoten oder null.</returns>
         public LogicalNode GetlastEventSourceIfIsTreeEventTriggered()
         {
+            //this.LogWithDistinctTime(String.Format("#MIRROR# GetlastEventSourceIfIsTreeEventTriggered Id/Name: {0}",
+            //    this.IdInfo));
             LogicalNode source = null;
             if (this.Trigger != null && (this.Trigger as TriggerShell).HasTreeEventTrigger)
             {
@@ -1150,7 +1152,10 @@ namespace LogicalTaskTree
                         {
                             foreach (KeyValuePair<string, Result> item in this.LastExecutingTreeEvent.Results)
                             {
-                                collectedEnvironment.Add(item.Key, item.Value);
+                                if (!collectedEnvironment.ContainsKey(item.Key))
+                                {
+                                    collectedEnvironment.Add(item.Key, item.Value);
+                                }
                             }
                         }
                     }
@@ -1345,6 +1350,20 @@ namespace LogicalTaskTree
         /// <param name="source">Auslösendes TreeEvent.</param>
         public virtual void Run(TreeEvent source)
         {
+            /* // TEST+
+            string sourceInfo = "NULL";
+            if (source != null)
+            {
+                sourceInfo = source.Name + "(" + source.SourceId + ")";
+            }
+            if (Id.Equals("TreeEventTriggerFlipFlopAbhaengig"))
+            // if (Id.Equals("flipflop"))
+            {
+                Thread.Sleep(15000);
+            }
+            this.LogWithDistinctTime(String.Format("#MIRROR# Run Id/Name: {0}, source: {1}",
+                this.IdInfo, sourceInfo));
+            */ // TEST-
             this.ProcessTreeEvent(source.Name, source);
             if (this.IsSnapshotDummy)
             {
@@ -2122,6 +2141,15 @@ namespace LogicalTaskTree
         // Knoten verweisen, vom run eines Knotens zu entkoppeln (gleichzeitige Ausführung mehrerer runs).
         private void RunAsyncAsync(TreeEvent source)
         {
+            // TEST+
+            //string sourceInfo = "NULL";
+            //if (source != null)
+            //{
+            //    sourceInfo = source.Name + "(" + source.SourceId + ")";
+            //}
+            //this.LogWithDistinctTime(String.Format("#MIRROR# RunAsyncAsync Id/Name: {0}, source: {1}",
+            //    this.IdInfo, sourceInfo));
+            // TEST-
             if (this.AppSettings.IsInSleepTime != this._isInSleepTime)
             {
                 this._isInSleepTime = this.AppSettings.IsInSleepTime;
@@ -2136,27 +2164,39 @@ namespace LogicalTaskTree
             lock (this._threadStartLocker)
             {
                 this.LastExecutingTreeEvent = source;
+                /* 11.11.2021+
                 //* 14.08.2018+
-                if ((this is SingleNode) && (this as SingleNode).Checker != null && (this as SingleNode).Checker.IsMirror)
+                if ((this is SingleNode) && (this as SingleNode).Checker != null)
                 {
-                    LogicalNode lookupSource = null;
-                    int i = 0;
-                    do
+                    if ((this as SingleNode).Checker.IsMirror)
                     {
-                        lookupSource = this.GetlastEventSourceIfIsTreeEventTriggered();
-                        if (lookupSource == null)
+                        LogicalNode lookupSource = null;
+                        int i = 0;
+                        do
                         {
-                            Thread.Sleep(10);
+                            lookupSource = this.GetlastEventSourceIfIsTreeEventTriggered();
+                            if (lookupSource == null)
+                            {
+                                Thread.Sleep(SLEEPMILLISECONDS);
+                            }
+                        } while (lookupSource == null && ++i < MAXWAITINGLOOPS); // 01.11.2021 Erik Nagel: Loop eingebaut.
+                        if (i >= MAXWAITINGLOOPS)
+                        {
+                            InfoController.Say("lookupSource MAXWAITINGLOOPS überschritten!");
                         }
-                    } while (lookupSource == null && ++i < MAXWAITINGLOOPS); // 01.11.2021 Erik Nagel: Loop eingebaut.
-                    if (i >= MAXWAITINGLOOPS)
-                    {
-                        throw new ApplicationException("lookupSource MAXWAITINGLOOPS überschritten!");
+                        this.Logical = this.LastExecutingTreeEvent.Logical;
+                        // hier entsteht durch das Logging eine Wartezeit.
+                        this.LogWithDistinctTime(String.Format("#MIRROR# RunAsyncAsync Id/Name: {0}, lookupSource: {1}, Logical: {2}",
+                            this.IdInfo, lookupSource.IdInfo, this.Logical == null ? "null" : this.Logical.ToString()));
+                        this.OnNodeLogicalChanged();
                     }
-                    this.Logical = this.LastExecutingTreeEvent.Logical;
-                    this.OnNodeLogicalChanged();
+                    //else
+                    //{
+                    //    Thread.Sleep(SLEEPMILLISECONDS);
+                    //}
                 }
-                //14.08.2018- */
+                //14.08.2018- //
+                11.11.2121- */ 
                 if ((this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
                   || (this.LastLogicalState == NodeLogicalState.UserAbort))
                 {
@@ -2356,6 +2396,18 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
+        /// Schreibt eine Nachricht mit kurzer Sleeptime vorher und nacher, um zeitnahe
+        /// Vorgänge später im Log in zeitlicher Folge sichtbar zu machen.
+        /// </summary>
+        /// <param name="message">Die zu loggende Nachricht.</param>
+        protected void LogWithDistinctTime(string message)
+        {
+            Thread.Sleep(1); // Thread.Sleep(0) reicht nicht.
+            InfoController.Say(message);
+            Thread.Sleep(1);
+        }
+
+        /// <summary>
         /// Informiert über den Abbruch der Verarbeitung in einem Teilbaum.
         /// </summary>
         private void CancelNotification()
@@ -2384,8 +2436,7 @@ namespace LogicalTaskTree
         /// <param name="addInfo">Zusätzliche Information (Exception, Progress%, etc.).</param>
         private void ProcessTreeEvent(LogicalNode sender, LogicalNode source, string eventName, object addInfo)
         {
-            // InfoController.Say(String.Format($"#MIRROR# Id/Name: {this.IdInfo}, Event: {eventName}"));
-            // Statistics.Inc(String.Format($"#MIRROR# {this.Id}/{this.Name}: LogicalNode.ProcessTreeEvent"));
+            // this.LogWithDistinctTime(String.Format($"#MIRROR# Id/Name: {this.IdInfo}, Event: {eventName}"));
             lock (LogicalNode._eventLocker)
             {
                 if (!(source is NodeConnector))
