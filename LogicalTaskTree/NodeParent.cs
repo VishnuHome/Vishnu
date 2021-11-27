@@ -279,7 +279,6 @@ namespace LogicalTaskTree
         {
             lock (this.SubNodeStateChangedLocker)
             {
-                // Statistics.Inc(String.Format("#SUB# {0}/{1}: NodeParent.SubNodeStateChanged", this.Id, this.Name));
                 NodeState tmpState = this.LastState;
                 this.LastState = NodeState.Null;
                 if (this.State != tmpState) // durch die Abfrage auf this.State wird this.State aktualisiert
@@ -299,8 +298,6 @@ namespace LogicalTaskTree
         /// <param name="logical">Logisches Ergebnis (null, false, true)</param>
         protected virtual void SubNodeLogicalChanged(LogicalNode sender, bool? logical)
         {
-            //this.LogWithDistinctTime(String.Format("#MIRROR# SubNodeLogicalChanged Id/Name: {0}, Sender: {1}, Logical: {2}",
-            //    this.IdInfo, sender.IdInfo, logical == null ? "null" : logical.ToString()));
             this.OnNodeLogicalChanged();
         }
 

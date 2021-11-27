@@ -474,7 +474,7 @@ namespace LogicalTaskTree
         /// <param name="source">Auslösendes TreeEvent oder null.</param>
         protected override void DoRun(TreeEvent source)
         {
-            if (source != null && source.Name != "UserRun")
+            if (source != null && source.Name != "UserRun" && this.TriggeredRunDelay > 0)
             {
                 Thread.Sleep(this.TriggeredRunDelay);
             }
@@ -525,7 +525,7 @@ namespace LogicalTaskTree
                         {
                             this.State = NodeState.Finished;
                         }
-                        //InfoController.Say(String.Format("#T# {0}/{1} {2}: unmarking Thread as invalid", this.Id, this.Name,
+                        // DEBUG: InfoController.Say(String.Format("#T# {0}/{1} {2}: unmarking Thread as invalid", this.Id, this.Name,
                         //  System.Reflection.MethodBase.GetCurrentMethod().Name));
                         this.UnMarkThreadAsInvalid(Thread.CurrentThread);
                         return;
@@ -628,7 +628,7 @@ namespace LogicalTaskTree
                     {
                         this.State = NodeState.Finished;
                     }
-                    //InfoController.Say(String.Format("#T# {0}/{1} {2}: unmarking Thread as invalid", this.Id, this.Name,
+                    // DEBUG: InfoController.Say(String.Format("#T# {0}/{1} {2}: unmarking Thread as invalid", this.Id, this.Name,
                     //  System.Reflection.MethodBase.GetCurrentMethod().Name));
                     this.UnMarkThreadAsInvalid(Thread.CurrentThread);
                 }

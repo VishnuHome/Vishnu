@@ -194,7 +194,6 @@ namespace LogicalTaskTree
                         if (!File.Exists(this._slavePathName) || (File.GetLastWriteTime(this._slavePathName) != this._lastDllWriteTime))
                         {
                             this._valueModifierSlave = null;
-                            //Thread.Sleep(10); DEBUG
                         }
                         if (this._valueModifierSlave == null)
                         {
@@ -209,7 +208,7 @@ namespace LogicalTaskTree
                             throw new ApplicationException(String.Format("Load failure on assembly '{0}'", this._slavePathName));
                         }
                     }
-                } // if (this._formatStringOrValueModifierPath != null)
+                }
                 try
                 {
                     if (this._valueModifierSlave != null)

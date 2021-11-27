@@ -54,8 +54,6 @@ namespace LogicalTaskTree
                         if (!this.IsResultDependant && this.Name != "XOR")
                         {
                             int countPositiveResults = this.CountPositiveResults;
-                            //this.LogWithDistinctTime(String.Format("#MIRROR# Id/Name: {0}, countPositiveResults: {1}",
-                            //    this.IdInfo, countPositiveResults));
                             if (countPositiveResults > this.nPlus)
                             {
                                 if (countPositiveResults < this.nMinus)
@@ -133,7 +131,7 @@ namespace LogicalTaskTree
                     {
                         //if (c == null)
                         //{
-                        //    InfoController.Say("#RELOAD# " + EmergencyDebug); // TEST 06.02.2021 Erik Nagel
+                        //    InfoController.Say("#RELOAD# " + EmergencyDebug); // RELOAD-TEST 06.02.2021 Erik Nagel
                         //    InfoController.FlushAll();
                         //}
                         return (c.State & NodeState.Busy) > 0;

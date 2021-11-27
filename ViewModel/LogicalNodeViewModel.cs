@@ -1387,7 +1387,6 @@ namespace Vishnu.ViewModel
                     }
                 }
                 this.IsRefreshing = false;
-                // Thread.Sleep(100); DEBUG
             }
             return rtn;
         }
@@ -1418,9 +1417,7 @@ namespace Vishnu.ViewModel
                         shadowTree[0].Dispose();
                     }
                     shadowTree.Clear();
-                    //Thread.Sleep(100); DEBUG
                     this.IsRefreshing = false;
-                    //Thread.Sleep(100); DEBUG
                 }
             }
         }

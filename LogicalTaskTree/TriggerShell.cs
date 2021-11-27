@@ -84,7 +84,7 @@ namespace LogicalTaskTree
                             Interlocked.Increment(ref this._registeredHandlersCounter);
                         }
                     }
-                    // Thread.Sleep(50); // TEST verstärkt den Fehler
+                    // Thread.Sleep(50); // DEBUG Fehler provozieren
                     if (!this._isStarted && (this._registeredHandlersCounter >= this.RegisteredMayBeTriggeredNodePathes.Count))
                     {
                         StringBuilder info = new StringBuilder();

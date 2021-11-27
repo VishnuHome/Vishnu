@@ -158,7 +158,11 @@ namespace Vishnu.Interchange
             int emergencyHalt = 0;
             while (this.ActualWidth + this.ActualHeight == 0)
             {
+                Thread.Sleep(1);               
+                InfoController.Say("DynamicUserControlBase.waitForContentRendered(1)");
+
                 Thread.Sleep(10);
+
                 if (emergencyHalt++ > 1000)
                 {
                     string msg = String.Format("Vishnu: möglicher Endlosloop in DynamicUserControlBase.waitForContentRendered(1)."
@@ -181,6 +185,10 @@ namespace Vishnu.Interchange
             {
                 width = this.ActualWidth;
                 height = this.ActualHeight;
+
+                InfoController.Say("DynamicUserControlBase.waitForContentRendered(2)");
+                Thread.Sleep(10);
+
                 Thread.Sleep(10);
                 if (emergencyHalt++ > 1000)
                 {

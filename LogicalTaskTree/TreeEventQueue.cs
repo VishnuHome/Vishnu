@@ -28,13 +28,7 @@ namespace LogicalTaskTree
         public static void AddTreeEventTrigger(TreeEvent treeEvent, string nodeId, TreeEventTrigger treeEventTrigger)
         {
             string eventNode = treeEvent + ":" + nodeId;
-            // Thread.Sleep(200); // DEBUG: steuert die Fehlerhäufigkeit
-#if DEBUG
-            //if (treeEvent.Name == "LogicalResultChanged" && treeEvent.SourceId == "SubJob1")
-            //{
-            //    InfoController.GetInfoPublisher().Publish(nodeId, String.Format($"TreeEventQueue.AddTreeEventTrigger {eventNode}"), InfoType.NoRegex);
-            //}
-#endif
+            // Thread.Sleep(200); // DEBUG: Fehler provozieren
             int counter = 1;
             bool done = false;
             while (!done)

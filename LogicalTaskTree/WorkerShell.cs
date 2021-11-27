@@ -262,6 +262,9 @@ namespace LogicalTaskTree
                     WorkerArguments workerArguments;
                     while (!this._workerArgumentsEventQueue.TryDequeue(out workerArguments))
                     {
+                        Thread.Sleep(1);
+                        InfoController.Say("WorkerShell.ExecAsync");
+
                         Thread.Sleep(10);
                     }
                     if (workerArguments.Predecessor != null)
