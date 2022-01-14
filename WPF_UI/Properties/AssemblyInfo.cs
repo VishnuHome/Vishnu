@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("NetEti")]
 [assembly: AssemblyProduct("WPF_UI")]
-[assembly: AssemblyCopyright("Copyright © Erik Nagel, NetEti 2012-2020")]
+[assembly: AssemblyCopyright("Copyright © Erik Nagel, NetEti 2012-2022")]
 [assembly: AssemblyTrademark("Direct Response")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // Sie können alle Werte angeben oder die standardmäßigen Build- und Revisionsnummern 
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("5.0.3.4")]
-[assembly: AssemblyFileVersion("5.0.3.4")]
+[assembly: AssemblyVersion("5.0.3.5")]
+[assembly: AssemblyFileVersion("5.0.3.5")]

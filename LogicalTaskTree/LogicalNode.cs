@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using NetEti.MVVMini;
 using LogicalTaskTree.Provider;
 using System.Text;
+using System.Windows;
 // using System.Windows.Threading;
 
 namespace LogicalTaskTree
@@ -921,7 +922,18 @@ namespace LogicalTaskTree
                 this.ProcessTreeEvent("Finished", null);
                 if (NodeProgressFinished != null)
                 {
-                    NodeProgressFinished(null, new CommonProgressChangedEventArgs(itemsName, countAll, countSucceeded, itemsType, null));
+                    try
+                    {
+                        NodeProgressFinished(null, new CommonProgressChangedEventArgs(itemsName, countAll, countSucceeded, itemsType, null));
+                    }
+                    catch (Exception ex)
+                    {
+                        string info = "LogicalNode.OnNodeProgressFinished: " + ex.Message;
+                        InfoController.Say(info);
+                        MessageBox.Show(info);
+                        this.LastResult = null;
+                        // throw;
+                    }
                 }
             }
             this.UnMarkThreadAsInvalid(Thread.CurrentThread);

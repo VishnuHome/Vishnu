@@ -79,7 +79,7 @@
     <ApplicationIcon>Vishnu_multi.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>3089580D1D0A79BF0C011EA8B5FF0B99A39F6E19</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>B2C5A7BE2493E62D24861061A6BDEAD27EC62A79</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>
@@ -89,7 +89,7 @@
     <GenerateManifests>false</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>false</SignManifests>
+    <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <TargetZone>Internet</TargetZone>

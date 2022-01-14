@@ -144,7 +144,15 @@ namespace Vishnu.Interchange
             {
                 (this.DataContext as IVishnuViewModel).ParentView = this;
             }
-            this.RaiseEvent(new RoutedEventArgs(DynamicUserControlBase.DynamicUserControl_ContentRenderedEvent));
+            try
+            {
+                this.RaiseEvent(new RoutedEventArgs(DynamicUserControlBase.DynamicUserControl_ContentRenderedEvent));
+            }
+            catch
+            {
+                // Hier keine Exception im UI-Thread zulassen, da die Fehlermeldung sofort wieder verschwinden würde.
+                // Die Exception wird später in LogicalNode.OnNodeProgressFinished sowieso gemeldet.
+            }
         }
 
         private void contentControl_Loaded(object sender, RoutedEventArgs e)
