@@ -71,7 +71,7 @@ Prosa:
 			eines neu instanziierten Snapshots selbst.
 				Im Snapshot-Konstruktor: Aufruf von RefreshSnapshot, dort Aufruf von Parse.
 				  Parse lädt das zugehörige XML-File und ruft buildTreeFromRemoteJob.
-				  	buildTreeFromRemoteJob ist für den Snapsot das, was buildParallelTree für die Root-JobList is.
+				  	buildTreeFromRemoteJob ist für den Snapsot das, was buildParallelTree für die Root-JobList ist.
 				  	Hier werden rekursiv alle Snapshot-Unterelemente (als SnapshotDummies) instanziiert.
 				  	Beim ersten Aufruf werden die Snapshot-Elemente noch nicht mit den Laufzeit-Werten des
 				  	remote-Trees gefüllt, da der gesamte Vishnu-Tree zu diesem Zeitpunkt noch nicht gestartet ist.
@@ -83,14 +83,14 @@ Prosa:
 		der BusinessLogic.
 			JoblistViewModel(über LogicalNodeViewModel) übernimmt die Root-JobList als seinen BusinessLogic-Knoten
 			und baut rekursiv über LoadChildren für alle Unterknoten der Root-Joblist die ViewModels.
-			Jedes einzelne ViewModel hängt sich dabei in die Events Des zugehörigen BusinessLogic-Knoten ein.
+			Jedes einzelne ViewModel hängt sich dabei in die Events des zugehörigen BusinessLogic-Knoten ein.
 	
 	Run des Trees (Benutzerinteraktion oder Parametereinstellung).
 		Hierbei werden alle Knoten und auch alle Trigger gestartet.	Unter anderem auch eventuell vorher (s.o.)
 		instanziierte FileWatcherTrigger auf Snapshots.
 		Sofern solche mit dem Zusatzparameter 'InitialFire' eingerichtet wurden (ist der Default), springen
 		sie direkt in die Routine DoRun des Snapshots, welche ihrerseits RefreshSnapshot aufruft.
-			Wie oben ruft RefreshSnapshot, Parse, Parse lädt das XML und ruft dann buildTreeFromRemoteJob.
+			Wie oben ruft RefreshSnapshot, Parse; Parse lädt das XML und ruft dann buildTreeFromRemoteJob.
 				Dort werden jetzt allerdings die Laufzeitwerte des remote-Trees übernommen.
 			Danach springt Parse die Routine OnSnapshotRefreshed an, welche über das Event SnapshotRefreshed
 			die Methode SnapshotViewModel_SnapshotRefreshed im zugehörigen ViewModel aufruft.
