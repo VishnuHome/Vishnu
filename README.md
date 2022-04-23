@@ -7,15 +7,15 @@ Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
     	Eine Umgebungsvariable "Vishnu_Root" auf den Pfad zu diesem Verzeichnis setzen, z.B.: Vishnu_Root=c:\Users\<user>\Documents\MyVishnu.
   - Installation:
     	https://github.com/VishnuHome/Setup/raw/master/Vishnu.bin/init.zip herunterladen und in das Basisverzeichnis entpacken.
+
+Es entsteht dann folgende Struktur:
       
-    	Es entsteht dann folgende Struktur:
-      
-    	- ...\MyVishnu\
-    	-- ReadyBin\
-    	--- Assemblies\
-    	--- UserAssemblies\
-    	--- Vishnu.bin\
-    	-- VishnuHome\
+...\MyVishnu\
+- ReadyBin\
+- Assemblies\
+- UserAssemblies\
+- Vishnu.bin\
+- VishnuHome\
 
 Siehe folgende Quellen:
  - Documentation
