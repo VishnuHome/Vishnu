@@ -11,11 +11,11 @@ Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
 Es entsteht dann folgende Struktur:
       
 ...\MyVishnu\
-- ReadyBin\
-- Assemblies\
-- UserAssemblies\
-- Vishnu.bin\
-- VishnuHome\
+  ReadyBin\
+    Assemblies\*
+    UserAssemblies\*
+    Vishnu.bin\*
+  VishnuHome\
 
 Siehe folgende Quellen:
  - Documentation
