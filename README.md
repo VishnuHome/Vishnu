@@ -12,13 +12,16 @@ Es entsteht dann folgende Struktur:
       
 ![Verzeichnisse nach Installation](./struct.png?raw=true "Verzeichnisstruktur")
 
-Siehe folgende Quellen:
- - Documentation
- - DemoJobs
- - Tests/TestJobs
+###### Vishnu-Demo:
 
-Hier ein Screenshot:
+- Im Verzeichnis ReadyBin/Vishnu.bin das Script **Vishnu_Demo.bat** starten.
+
+So sieht Vishnu nach dem Start ungefähr aus:
 ![Vishnu-Hilfe Startseite](./FirstView.png?raw=true "Vishnu-Hilfe")
 
+Siehe auch folgende Quellen:
+ - Documentation
+ - DemoJobs
+
 Das Vishnu C#-Projekt kann z.B. mit dem Debug-Parameter '-job=..\..\..\..\Documentation\DemoJobs\Simple\CheckAll'
-in Visual Studio debugged werden.
+in Visual Studio getestet werden.
