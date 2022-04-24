@@ -20,8 +20,8 @@ So sieht Vishnu nach dem Start ungefähr aus:
 ![Vishnu-Hilfe Startseite](./FirstView.png?raw=true "Vishnu-Hilfe")
 
 Siehe auch folgende Quellen:
- - Documentation
- - DemoJobs
+ - Documentation (Vishnu_doc.de.chm)
+ - DemoJobs (ReadyBin/Vishnu.bin/DemoJobs)
 
 Das Vishnu C#-Projekt kann z.B. mit dem Debug-Parameter '-job=..\..\..\..\Documentation\DemoJobs\Simple\CheckAll'
 in Visual Studio getestet werden.
