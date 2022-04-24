@@ -10,17 +10,7 @@ Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
 
 Es entsteht dann folgende Struktur:
       
-.../MyVishnu/
-
-&nbsp;&nbsp;ReadyBin
-
-&nbsp;&nbsp;&nbsp;&nbsp;Assemblies/*
-
-&nbsp;&nbsp;&nbsp;&nbsp;UserAssemblies/*
-
-&nbsp;&nbsp;&nbsp;&nbsp;Vishnu.bin/*
-
-&nbsp;&nbsp;VishnuHome/
+![Verzeichnisse nach Installation](./Struktur.png?raw=true "Verzeichnisstruktur")
 
 Siehe folgende Quellen:
  - Documentation
