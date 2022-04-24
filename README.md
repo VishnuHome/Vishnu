@@ -10,7 +10,7 @@ Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
 
 Es entsteht dann folgende Struktur:
       
-![Verzeichnisse nach Installation](./Struktur.png?raw=true "Verzeichnisstruktur")
+![Verzeichnisse nach Installation](./struct.png?raw=true "Verzeichnisstruktur")
 
 Siehe folgende Quellen:
  - Documentation
