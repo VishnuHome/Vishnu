@@ -2318,6 +2318,20 @@ namespace LogicalTaskTree
                     this.AddEnvironment(source);
                 }
                 this.LastRun = DateTime.Now;
+                // 11.07.2022 Nagel+ Wenn die Results oder das Environment des TreeEvents(source) nicht
+                // gesetzt sind, schnell noch die Results und das Environment der Tree-Root mitgeben.
+                if (source != null)
+                {
+                    if (source.Environment == null)
+                    {
+                        source.Environment = this.TreeRootJobList.GetEnvironment();
+                    }
+                    if (source.Results == null)
+                    {
+                        source.Results = this.TreeRootJobList.GetResults();
+                    }
+                }
+                // 11.07.2022 Nagel-
                 this.DoRun(source);
                 if ((this.LogicalState & NodeLogicalState.Start) > 0)
                 {
