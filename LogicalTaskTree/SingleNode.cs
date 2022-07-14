@@ -499,6 +499,25 @@ namespace LogicalTaskTree
                 this.OnNodeProgressStarted(this, new CommonProgressChangedEventArgs(this.Id, 100, 0, ItemsTypes.itemParts, null));
                 if (this.Checker != null)
                 {
+                    // 14.07.2022 Nagel+ Wenn die Results oder das Environment des TreeEvents(source) nicht
+                    // gesetzt sind, schnell noch die Results und das Environment der Tree-Root mitgeben.
+                    if (source == null)
+                    {
+                        source = new TreeEvent("PseudoTreeEvent", this.Id, this.Id, this.Name, this.Path, null, NodeLogicalState.None,
+                            null, null);
+                    }
+                    if (source.Environment == null || source.Environment.Count == 0)
+                    {
+                        source.Environment = this.TreeRootJobList.GetEnvironment();
+                    }
+                    if (source.Results == null || source.Results.Count == 0)
+                    {
+                        source.Results = this.TreeRootJobList.GetResults();
+                    }
+                    // 14.07.2022 Nagel-
+
+                    // 14.07.2022 Nagel+
+                    /*
                     ResultDictionary resultDictionary = null;
                     if (this.LastResult != null && (source == null || source.NodePath == this.Path))
                     {
@@ -513,6 +532,9 @@ namespace LogicalTaskTree
                     {
                         source.Results = resultDictionary;
                     }
+                    */
+                    // 14.07.2022 Nagel-
+
                     logical = this.Checker.Run(null, this.TreeParams, source);
                     if (!this.IsThreadValid(Thread.CurrentThread) || (this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
                       || (this.LastLogicalState == NodeLogicalState.UserAbort))
