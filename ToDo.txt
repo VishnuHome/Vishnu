@@ -866,6 +866,15 @@ ERLEDIGT: Fehler in Snapshots nach langer Laufzeit:
 ERLEDIGT: Deutliche Erweiterung der Vishnu-Hilfe.
 
 Stand: 05.07.2021 Version 5.0.2.6 (Documented and tested)
+
+ERLEDIGT: Bugfixes bei der Übergabe des Environments und der Results an aufgerufene Checker.
+          Wesentliche Verbesserung im FileWatcherTrigger: Der Sleep zum Abwarten von Doppel-Events
+          wurde vor den Aufruf des Trigger-Events gezogen. 
+          Dadurch ergaben sich weitreichende Verbesserungen bei Snapshots:
+						multiple Snapshots und SubSnapshots refreshen jetzt korrekt (SnapshotTest/ShowRef...)
+
+Stand: 15.07.2022 Version 5.0.5.0 (Peace and Sanity)
+
 -------------------------------------------------------------------------------------------------------------
 
 ###################
