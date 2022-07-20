@@ -947,6 +947,7 @@ MailTo-Parameter
 SMS
 WhatsApp
 Telegram
+eigene User-Events
 Vishnu-App
 Vishnu as a Service
 UserParameter-Reader Parameter-Propagation nach Aktualisierung checken
