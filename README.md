@@ -28,6 +28,8 @@ Im Unterverzeichnis **DemoJobs** findest du die Job-Definitionen einer Reihe von
 ## Dokumentation
 Die ausführliche Dokumentation findest du unter
 [Vishnu.Doc](https://github.com/https://github.com/VishnuHome/Vishnu/releases/latest/download/Vishnu_doc.de.chm)
+<br/><span style="font-size:14px;">(Hinweis: Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte, sieh bitte [hier](CHM_HowTo.md) nach.)</span>
+
 oder online unter
 [Vishnu online Dokumentation](https://neteti.de/Vishnu.Doc/)
 
@@ -56,7 +58,7 @@ Es gibt grundsätzlich zwei unabhängige Vorgehensweisen:
 	- c) über "Download ZIP" kommst du zwar auch an den Quellcode von Vishnu, 
 	     hast dann aber keine Anbindung an dein geforktes Repository auf github.
 	
-   ![clone](Git_Clone.png)
+   ![clone](Git_Clone_small.png)
 	
 
 ## Quellcode und Entwicklung fuer Team-Mitglieder
@@ -72,6 +74,9 @@ Bitte prüfe aber vorher, ob ein passendes Thema nicht vielleicht schon existier
 **Wichtig:** Mach möglichst keine Änderungen, Korrekturen oder Erweiterungen
 am master-branch des Vishnu-Quellcodes, sondern lege zuerst einen neuen **feature-branch** an. 
 Nur so kannst du später deine Verbesserungen auch dem Vishnu-Team zurückliefern.
+
+#### Änderungen am Vishnu-Quellcode in das Original-Repository zurückspielen
+
 
 
 ### Viel Spass mit Vishnu!

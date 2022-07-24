@@ -16,6 +16,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Vishnu.WPF_UI;component/Assets/LogicalTaskTreeControlStaticResourceDictionary.xaml" />
+                <ResourceDictionary Source="/Vishnu.WPF_UI;component/Assets/LogicalTaskTreeControlResourceDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <convert:NullableBoolToBrush x:Key="nullableBoolToBrush" />
             <convert:ChildOrientationToExpandDirection x:Key="childOrientationToExpandDirection" />
@@ -34,7 +35,7 @@
             <DataTemplate DataType="{x:Type vm:JobConnectorViewModel}">
                 <Border Name="ItemBorder" Background="Transparent" MouseDown="ItemBorder_MouseDown" Visibility="{Binding Visibility}">
                     <Grid Name="MainGrid" ToolTip="{Binding LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400"
-                          ContextMenu="{DynamicResource cmContextMenu}">
+                          ContextMenu="{StaticResource cmContextMenu}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -85,8 +86,8 @@
                                 </Button>
                             </Grid>
                             <Ellipse Name="ColorRing" Grid.Row="0" Grid.Column="1" Margin="3"
-                                 Width="{DynamicResource ColorRing.Width}"
-                                 Height="{DynamicResource ColorRing.Width}">
+                                 Width="{StaticResource ColorRing.Width}"
+                                 Height="{StaticResource ColorRing.Width}">
                                 <Ellipse.Fill>
                                     <MultiBinding Converter="{StaticResource nullableBoolToBrush, diag:PresentationTraceSources.TraceLevel=High}">
                                         <Binding Path="Logical" />
@@ -95,8 +96,8 @@
                                 </Ellipse.Fill>
                             </Ellipse>
                             <Ellipse Name="ColorPoint" Grid.Row="0" Grid.Column="1" Margin="3"
-                                 Width="{DynamicResource ColorPoint.Width}"
-                                 Height="{DynamicResource ColorPoint.Width}">
+                                 Width="{StaticResource ColorPoint.Width}"
+                                 Height="{StaticResource ColorPoint.Width}">
                                 <Ellipse.Fill>
                                     <MultiBinding Converter="{StaticResource nullableBoolToBrush, diag:PresentationTraceSources.TraceLevel=High}">
                                         <Binding Path="LastNotNullLogical" />

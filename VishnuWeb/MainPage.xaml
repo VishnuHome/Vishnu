@@ -63,10 +63,10 @@
         <TabControl Grid.Row="1" Margin="8" Name="MainTabControl" SelectionChanged="MainTabControl_SelectionChanged">
             <TabControl.Style >
                 <Style TargetType="{x:Type TabControl}">
-                    <Setter Property="Background" Value="{DynamicResource WindowBGBrush}"/>
+                    <Setter Property="Background" Value="{StaticResource WindowBGBrush}"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding TreeVM.IsInSleepTime}" Value="true">
-                            <Setter Property="Background" Value="{DynamicResource WindowBGBrushSleepMode}"/>
+                            <Setter Property="Background" Value="{StaticResource WindowBGBrushSleepMode}"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>

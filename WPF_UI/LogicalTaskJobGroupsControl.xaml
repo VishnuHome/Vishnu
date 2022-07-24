@@ -36,7 +36,7 @@
                         </MultiBinding>
                     </Border.BorderBrush>
                     <Grid Name="MainGrid" HorizontalAlignment="Stretch" ToolTip="{Binding GroupJobList.LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400"
-                          ContextMenu="{DynamicResource cmContextMenu}">
+                          ContextMenu="{StaticResource cmContextMenu}">
                         <Grid.RowDefinitions>
                             <RowDefinition />
                         </Grid.RowDefinitions>
@@ -166,7 +166,7 @@
                                                     Value="{StaticResource SelectedItemBorderBrush}" />
                                     <Setter
                                                     Property="TextElement.Foreground"                   
-                                                    Value="{DynamicResource {x:Static SystemColors.ControlLightBrush}}" />
+                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" />
                                     <Setter
                                                     Property="BitmapEffect"                  
                                                     Value="{StaticResource DropShadowEffect}" />
@@ -232,7 +232,7 @@
                                                     Value="{StaticResource SelectedItemBorderBrush}" />
                                     <Setter
                                                     Property="TextElement.Foreground"                   
-                                                    Value="{DynamicResource {x:Static SystemColors.ControlLightBrush}}" />
+                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" />
                                     <Setter
                                                     Property="BitmapEffect"                  
                                                     Value="{StaticResource DropShadowEffect}" />

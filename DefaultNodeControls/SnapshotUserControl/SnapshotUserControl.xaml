@@ -15,6 +15,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Vishnu.WPF_UI;component/Assets/LogicalTaskTreeControlStaticResourceDictionary.xaml" />
+                <ResourceDictionary Source="/Vishnu.WPF_UI;component/Assets/LogicalTaskTreeControlResourceDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <convert:NullableBoolToBrush x:Key="nullableBoolToBrush" />
             <convert:ChildOrientationToExpandDirection x:Key="childOrientationToExpandDirection" />
@@ -53,8 +54,8 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Ellipse Name="ColorRing" Grid.Row="0" Grid.Column="0" Margin="3"
-                                 Width="{DynamicResource ColorRing.Width}"
-                                 Height="{DynamicResource ColorRing.Width}">
+                                 Width="{StaticResource ColorRing.Width}"
+                                 Height="{StaticResource ColorRing.Width}">
                             <Ellipse.Fill>
                                 <MultiBinding Converter="{StaticResource nullableBoolToBrush, diag:PresentationTraceSources.TraceLevel=High}">
                                     <Binding Path="Logical" />
@@ -63,8 +64,8 @@
                             </Ellipse.Fill>
                         </Ellipse>
                         <Ellipse Name="ColorPoint" Grid.Row="0" Grid.Column="0" Margin="3"
-                                 Width="{DynamicResource ColorPoint.Width}"
-                                 Height="{DynamicResource ColorPoint.Width}">
+                                 Width="{StaticResource ColorPoint.Width}"
+                                 Height="{StaticResource ColorPoint.Width}">
                             <Ellipse.Fill>
                                 <MultiBinding Converter="{StaticResource nullableBoolToBrush, diag:PresentationTraceSources.TraceLevel=High}">
                                     <Binding Path="LastNotNullLogical" />

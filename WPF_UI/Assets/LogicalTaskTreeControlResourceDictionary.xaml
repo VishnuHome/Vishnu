@@ -136,7 +136,7 @@
                                                 <!--Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="TextElement.Foreground"                   
-                                                    Value="{DynamicResource {x:Static SystemColors.ControlLightBrush}}" /-->
+                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" /-->
                                                 <Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="Border.BitmapEffect"                  
@@ -283,7 +283,7 @@
                                                 <!--Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="TextElement.Foreground"                   
-                                                    Value="{DynamicResource {x:Static SystemColors.ControlLightBrush}}" /-->
+                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" /-->
                                                 <Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="Border.BitmapEffect"                  
@@ -404,7 +404,7 @@
                                                 <!--Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="TextElement.Foreground"                   
-                                                    Value="{DynamicResource {x:Static SystemColors.ControlLightBrush}}" /-->
+                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" /-->
                                                 <Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="Border.BitmapEffect"                  
@@ -524,7 +524,7 @@
                                                 <!--Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="TextElement.Foreground"                   
-                                                    Value="{DynamicResource {x:Static SystemColors.ControlLightBrush}}" /-->
+                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" /-->
                                                 <Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="Border.BitmapEffect"                  
@@ -630,7 +630,7 @@
                                                 <!--Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="TextElement.Foreground"                   
-                                                    Value="{DynamicResource {x:Static SystemColors.ControlLightBrush}}" /-->
+                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" /-->
                                                 <Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="Border.BitmapEffect"                  
@@ -645,7 +645,7 @@
                 </Setter>
             </Trigger>
             <Trigger Property="UIElement.IsEnabled" Value="False">
-                <Setter Property="Control.Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                <Setter Property="Control.Foreground" Value="{StaticResource {x:Static SystemColors.GrayTextBrushKey}}" />
             </Trigger>
             <!--<DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}}, Path=(attached:AttachedPropertiesContainer.ParentChildOrientation)}" Value="Horizontal">
                 <Setter Property="Padding" TargetName="CompleteItemBorder" Value="10,0,0,0" />

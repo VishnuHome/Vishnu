@@ -17,6 +17,9 @@ namespace Vishnu.WPF_UI.ValueConverter
     /// Autor: Erik Nagel
     ///
     /// 05.10.2014 Erik Nagel: erstellt
+    /// 23.07.2022 Erik Nagel: Im DesignMode wird jetzt ein definierter Wert (Horizontal) zurückgegeben.
+    ///                        Visual Studio 2022 zeigte vorher den Fehler "XDG0062 Die angegebene Umwandlung ist ungültig."
+    ///                        auf dem besitzenden DataTemplate.
     /// </remarks>
     [ValueConversion(typeof(Orientation), typeof(ExpandDirection))]
     public class OrientationModifier : IMultiValueConverter
@@ -33,6 +36,10 @@ namespace Vishnu.WPF_UI.ValueConverter
         /// <returns>ExpandDirection (Down, Right)</returns>
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
+            if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+            {
+                return Orientation.Horizontal;
+            }
             if (values != null)
             {
                 if (values.Count() > 0)

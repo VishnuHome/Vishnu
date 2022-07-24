@@ -16,6 +16,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Vishnu.WPF_UI;component/Assets/LogicalTaskTreeControlStaticResourceDictionary.xaml" />
+                <ResourceDictionary Source="/Vishnu.WPF_UI;component/Assets/LogicalTaskTreeControlResourceDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <convert:NullableBoolToBrush x:Key="nullableBoolToBrush" />
             <convert:NotEmptyToTrue x:Key="notEmptyToTrue" />
@@ -27,7 +28,7 @@
                             <Binding RelativeSource="{RelativeSource Self}" />
                         </MultiBinding>
                     </Border.BorderBrush>
-                    <Grid Name="MainGrid" ContextMenu="{DynamicResource cmContextMenu}">
+                    <Grid Name="MainGrid" ContextMenu="{StaticResource cmContextMenu}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
