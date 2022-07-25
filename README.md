@@ -38,7 +38,7 @@ oder online unter
 Es gibt grundsätzlich zwei unabhängige Vorgehensweisen:
   - Wenn du kein Team-Mitglied der Organisation **VishnuHome** bist (das ist der Normalfall),
     dann lies einfach hier weiter.
-  - Team-Mitglieder lesen bitte den Abschnitt [Quellcode und Entwickung für Team-Mitglieder](/##Quellcode-und-Entwicklung-fuer-Team-Mitglieder)
+  - Team-Mitglieder lesen bitte den Abschnitt [Quellcode und Entwickung für Team-Mitglieder](#Quellcode-und-Entwicklung-fuer-Team-Mitglieder)
 
 ---
 
