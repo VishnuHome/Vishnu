@@ -66,7 +66,7 @@ Es gibt grundsätzlich zwei unabhängige Vorgehensweisen:
 Wechsle bitte in das Repository [Setup](https://github.com/VishnuHome/Setup) und folge den Anweisungen im dortigen README.md.
 
 ## Mitmachen (Contributing)
-Wenn du Fehler entdeckst oder Verbesserungsvorschläge einbringen willst, eröffnest du am besten ein neues Diskusionsthema ("New issue").<br/>
+Wenn du Fehler entdeckst oder Verbesserungsvorschläge einbringen willst, eröffne bitte zuerst ein neues Diskusionsthema ("New issue").<br/>
 Bitte prüfe aber vorher, ob ein passendes Thema nicht vielleicht schon existiert.
 
 #### Änderungen und Debugging am Vishnu-Quellcode
@@ -77,6 +77,8 @@ Nur so kannst du später deine Verbesserungen auch dem Vishnu-Team zurückliefer
 
 #### Änderungen am Vishnu-Quellcode in das Original-Repository zurückspielen
 
-
+Wenn du Änderungen am Vishnu-Quellcode vorgenommen und ausführlich getestet hast, kannst du deinen **feature-branch** an das Vishnu-Team über einen **"pull request"** zurückliefern. Das Vishnu-Team begutachtet und testet dann diesen Branch und übernimmt diesen bei Erfolg in Vishnu-master.
+Bitte versuche nicht, einen direkt geänderten master-branch zurückzumelden - wir würden das zurückweisen.
+**Ein Hinweis in eigener Sache: das Vishnu-Team ist aktuell (Juli 2022) noch sehr klein, weshalb die Bearbeitung deiner Anfragen und Änderungen länger dauern kann!
 
 ### Viel Spass mit Vishnu!
