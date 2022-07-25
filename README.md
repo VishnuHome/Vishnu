@@ -79,6 +79,7 @@ Nur so kannst du später deine Verbesserungen auch dem Vishnu-Team zurückliefer
 
 Wenn du Änderungen am Vishnu-Quellcode vorgenommen und ausführlich getestet hast, kannst du deinen **feature-branch** an das Vishnu-Team über einen **"pull request"** zurückliefern. Das Vishnu-Team begutachtet und testet dann diesen Branch und übernimmt diesen bei Erfolg in Vishnu-master.
 Bitte versuche nicht, einen direkt geänderten master-branch zurückzumelden - wir würden das zurückweisen.
+
 **Ein Hinweis in eigener Sache: das Vishnu-Team ist aktuell (Juli 2022) noch sehr klein, weshalb die Bearbeitung deiner Anfragen und Änderungen länger dauern kann!**
 
 ### Viel Spass mit Vishnu!
