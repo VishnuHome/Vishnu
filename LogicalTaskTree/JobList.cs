@@ -1146,7 +1146,8 @@ namespace LogicalTaskTree
         /// </summary>
         private void parse()
         {
-            this.syntaxTree = new LogicalParser().Parse(this.LogicalExpression);
+            // this.syntaxTree = new LogicalParser().Parse(this.LogicalExpression);
+            this.syntaxTree = new TresholdParser().Parse(this.LogicalExpression);
             this.buildParallelTree(this, this.syntaxTree);
             foreach (string nodeName in this.TreeExternalCheckers.Keys)
             {
@@ -1569,6 +1570,20 @@ namespace LogicalTaskTree
                                 mother.nPlus = mother.nOperands - 1;
                                 mother.nMinus = mother.nOperands + 1;
                                 mother.IsResultDependant = true;
+                                break;
+                            case "TR10":
+                            case "TR20":
+                            case "TR30":
+                            case "TR40":
+                            case "TR50":
+                            case "TR60":
+                            case "TR70":
+                            case "TR80":
+                            case "TR90":
+                                double factor = Int32.Parse(child.NodeName.Substring(2)) / 100.0;                                
+                                // mother.nPlus = mother.nOperands - 1;
+                                mother.nPlus = (int)(mother.nOperands * factor + 0.9999) - 1;
+                                mother.nMinus = mother.nOperands + 1;
                                 break;
                             default:
                                 break;
