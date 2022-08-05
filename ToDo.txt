@@ -875,6 +875,10 @@ ERLEDIGT: Bugfixes bei der Übergabe des Environments und der Results an aufgeruf
 
 Stand: 15.07.2022 Version 5.0.5.0 (Peace and Sanity)
 
+ERLEDIGT: Ableitung von LogicalParser zur Schwellenwert-Analyse, Arbeitstitel "TresholdParser"
+
+Stand: 04.08.2022 Version 5.1.0.0 (Treshold)
+
 -------------------------------------------------------------------------------------------------------------
 
 ###################
@@ -1112,7 +1116,6 @@ Fehler: JobControllerTest\JobControllerLoop geht nicht
 -------------------------------------------------------------------------------------------------------------
 Allgemeinere Ideen, etc.
 -------------------------------------------------------------------------------------------------------------
-Ableitung von LogicalParser zur Schwellenwert-Analyse, Arbeitstitel "TresholdParser"
 -------------------------------------------------------------------------------------------------------------
 Integration Tests über asynchrones Logging und KI-Logauswertung
 	Grad der Ähnlichkeiten ermitteln (grün, gelb, rot)
