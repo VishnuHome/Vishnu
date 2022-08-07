@@ -119,7 +119,7 @@ und [Nate Lowry](http://blog.dontpaniclabs.com/post/2013/11/14/Dynamic-Splash-Sc
 Dank an Jason Tyler.
 
 [Mindest-Informationen über einen Screen](http://stackoverflow.com/questions/1927540/how-to-get-the-size-of-the-current-screen-in-wpf)<br/>
-Danke an Nils auf StackOverflow
+Danke an Nils Andresen auf StackOverflow
 
 [ZIP-Routinen für ZIPs > 4GB mit Passwörtern](http://www.eggheadcafe.com/tutorials/aspnet/9ce6c242-c14c-4969-9251-af95e4cf320f/zip--unzip-folders-and-f.aspx)<br/>
 Danke Peter Bromberg.
