@@ -28,7 +28,7 @@ Im Unterverzeichnis **DemoJobs** findest du die Job-Definitionen einer Reihe von
 ## Dokumentation
 Die ausführliche Dokumentation findest du unter
 [Vishnu.Doc](https://github.com/https://github.com/VishnuHome/Vishnu/releases/latest/download/Vishnu_doc.de.chm)
-<br/><span style="font-size:14px;">(Hinweis: Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte, sieh bitte [hier](CHM_HowTo.md) nach.)</span>
+<br/><span style="font-size:14px;">(Hinweis: Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte, sieh bitte im [CHM-HowTo](CHM_HowTo.md) nach.)</span>
 
 oder online unter
 [Vishnu online Dokumentation](https://neteti.de/Vishnu.Doc/)
@@ -98,5 +98,46 @@ Wenn du Änderungen am Plugin- oder Vishnu-Quellcode vorgenommen und ausführlic
 Bitte versuche nicht, einen direkt geänderten master-branch zurückzumelden - wir würden das zurückweisen.
 
 **Ein Hinweis in eigener Sache: das Vishnu-Team ist aktuell (Juli 2022) noch sehr klein, weshalb die Bearbeitung deiner Anfragen und Änderungen länger dauern kann!**
+
+## Fremde Software, fremde Ideen
+
+[Sandcastle Help File Builder (SHFB)](https://github.com/EWSoftware/SHFB)<br/>
+Vielen Dank an Eric Woodruff, EWSoftware.
+Ohne den Sandcastle Help File Builder wäre die Vishnu-Dokumentation nicht denkbar.
+
+[Visual Commander](https://marketplace.visualstudio.com/items?itemName=SergeyVlasov.VisualCommander)<br/>
+Danke auch an Sergey Vlasov für seine hilfreiche Visual Studio Automatisierung.
+
+[Newtonsoft.Json](https://www.newtonsoft.com/json)<br/>
+Json ohne die Software von James Newton-King? Undenkbar!
+
+Demo-Logik für SplashWindow<br/>
+[Dank an Amr Azab](http://www.codeproject.com/Articles/116875/WPF-Loading-Splash-Screen)
+und [Nate Lowry](http://blog.dontpaniclabs.com/post/2013/11/14/Dynamic-Splash-Screens-in-WPF).
+
+[Zwei Properties vergleichen](https://stackoverflow.com/questions/37302270/comparing-two-dynamic-values-in-datatrigger)<br/>
+Dank an Jason Tyler.
+
+[Mindest-Informationen über einen Screen](http://stackoverflow.com/questions/1927540/how-to-get-the-size-of-the-current-screen-in-wpf)<br/>
+Danke an Nils auf StackOverflow
+
+[ZIP-Routinen für ZIPs > 4GB mit Passwörtern](http://www.eggheadcafe.com/tutorials/aspnet/9ce6c242-c14c-4969-9251-af95e4cf320f/zip--unzip-folders-and-f.aspx)<br/>
+Danke Peter Bromberg.
+
+[Basisklasse für ViewModels, kapselt INotifyPropertyChanged](https://github.com/poma/SshConnect/blob/master/SshConnect/MvvmFoundation/ObservableObject.cs)<br/>
+Vielen Dank an Roman Semenov (poma) für diese Starthilfe.
+
+[Monphasen Berechnung](https://www.codeproject.com/script/Membership/View.aspx?mid=1961229)<br/>
+Dank an Mostafa Kaisoun.
+
+[WPF-Tortendiagrammme](https://www.codeproject.com/Articles/442506/Simple-and-Easy-to-Use-Pie-Chart-Controls-in-WPF)</br>
+Vielen Dank an Kashif Imran auf Code Project.
+
+Dank auch an die vielen weiteren Software-Entwickler/innen, die ihr Wissen mit uns allen geteilt haben.<br/>
+Beispielhaft für viele:<br/>
+[Thomas Claudius Huber](https://www.thomasclaudiushuber.com/)<br/>
+und [Scott Hanselman](https://www.hanselman.com/)
+
+Last but not least geht mein Dank an Microsoft für ihre "Community Edition"s.
 
 ### Viel Spass mit Vishnu!
