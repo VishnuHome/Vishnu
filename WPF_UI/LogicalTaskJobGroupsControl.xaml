@@ -164,9 +164,15 @@
                                     <Setter
                                                     Property="BorderBrush"                     
                                                     Value="{StaticResource SelectedItemBorderBrush}" />
-                                    <Setter
+                                    <!-- Ist der nachfolgende Setter aktiv, führt das zum Programmabsturz mit System.InvalidOperationException:
+                                    	 "{DependencyProperty.UnsetValue}" ist kein gültiger Wert für die Eigenschaft "Foreground".} -->
+                                    <!--Setter
                                                     Property="TextElement.Foreground"                   
-                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" />
+                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" /-->
+                                    <!-- Der Nachfolgende Setter funktioniert, sieht aber scheiße aus -->
+                                    <!--Setter
+                                                    Property="TextElement.Foreground"                   
+                                                    Value="{x:Static SystemColors.ControlLightBrush}" /-->
                                     <Setter
                                                     Property="BitmapEffect"                  
                                                     Value="{StaticResource DropShadowEffect}" />
@@ -235,6 +241,10 @@
                                     <!--Setter
                                                     Property="TextElement.Foreground"                   
                                                     Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" /-->
+                                    <!-- Der Nachfolgende Setter funktioniert, sieht aber scheiße aus -->
+                                    <!--Setter
+                                                    Property="TextElement.Foreground"                   
+                                                    Value="{x:Static SystemColors.ControlLightBrush}" /-->
                                     <Setter
                                                     Property="BitmapEffect"                  
                                                     Value="{StaticResource DropShadowEffect}" />

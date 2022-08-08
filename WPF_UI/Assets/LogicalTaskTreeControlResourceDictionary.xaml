@@ -133,10 +133,10 @@
                                                     TargetName="ToggleButtonBorder"
                                                     Property="Border.BorderBrush"                     
                                                     Value="{StaticResource SelectedItemBorderBrush}" />
-                                                <!--Setter
+                                                <Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="TextElement.Foreground"                   
-                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" /-->
+                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" />
                                                 <Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="Border.BitmapEffect"                  
@@ -280,10 +280,10 @@
                                                     TargetName="ToggleButtonBorder"
                                                     Property="Border.BorderBrush"                     
                                                     Value="{StaticResource SelectedItemBorderBrush}" />
-                                                <!--Setter
+                                                <Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="TextElement.Foreground"                   
-                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" /-->
+                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" />
                                                 <Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="Border.BitmapEffect"                  
@@ -401,10 +401,10 @@
                                                     TargetName="ToggleButtonBorder"
                                                     Property="Border.BorderBrush"                     
                                                     Value="{StaticResource SelectedItemBorderBrush}" />
-                                                <!--Setter
+                                                <Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="TextElement.Foreground"                   
-                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" /-->
+                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" />
                                                 <Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="Border.BitmapEffect"                  
@@ -521,10 +521,10 @@
                                                     TargetName="ToggleButtonBorder"
                                                     Property="Border.BorderBrush"                     
                                                     Value="{StaticResource SelectedItemBorderBrush}" />
-                                                <!--Setter
+                                                <Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="TextElement.Foreground"                   
-                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" /-->
+                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" />
                                                 <Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="Border.BitmapEffect"                  
@@ -627,10 +627,10 @@
                                                     TargetName="ToggleButtonBorder"
                                                     Property="Border.BorderBrush"                     
                                                     Value="{StaticResource SelectedItemBorderBrush}" />
-                                                <!--Setter
+                                                <Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="TextElement.Foreground"                   
-                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" /-->
+                                                    Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" />
                                                 <Setter
                                                     TargetName="ToggleButtonBorder"
                                                     Property="Border.BitmapEffect"                  

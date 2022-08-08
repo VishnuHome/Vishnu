@@ -203,7 +203,7 @@
                                                     Value="{StaticResource SelectedItemBorderBrush}" />
                                                 <Setter
                                                     TargetName="ToggleButtonBorder"
-                                                    Property="TextElement.Foreground"                   
+                                                    Property="TextElement.Foreground"  
                                                     Value="{StaticResource {x:Static SystemColors.ControlLightBrush}}" />
                                                 <Setter
                                                     TargetName="ToggleButtonBorder"
