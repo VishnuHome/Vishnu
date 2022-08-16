@@ -939,6 +939,7 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Lädt den gesamten Tree inklusive JobDescription.xml asynchron neu. 
         /// </summary>
+        /// <returns>Task.</returns>
         public async Task ReloadTaskTree()
         {
             this.JobInProgress = "ReloadTaskTree";
@@ -969,6 +970,7 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Lädt den gesamten Tree inklusive JobDescription.xml asynchron neu. 
         /// </summary>
+        /// <returns>Task.</returns>
         public async Task LogTaskTree()
         {
             this.JobInProgress = "LogTaskTree";

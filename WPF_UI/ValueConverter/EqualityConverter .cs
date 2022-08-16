@@ -22,7 +22,7 @@ namespace Vishnu.WPF_UI.ValueConverter
         /// <param name="targetType">Object.</param>
         /// <param name="parameter">Optional convert-parameters, null here.</param>
         /// <param name="culture">Globalization.CultureInfo.</param>
-        /// <returns></returns>
+        /// <returns>Object of type 'targetType'.</returns>
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             if (values.Length < 2)
@@ -35,11 +35,11 @@ namespace Vishnu.WPF_UI.ValueConverter
         /// <summary>
         /// There is no way back => not implemented.
         /// </summary>
-        /// <param name="value"></param>
-        /// <param name="targetTypes"></param>
-        /// <param name="parameter"></param>
-        /// <param name="culture"></param>
-        /// <returns></returns>
+        /// <param name="value">Object.</param>
+        /// <param name="targetTypes">Array of two Property-values.</param>
+        /// <param name="parameter">Optional convert-parameters.</param>
+        /// <param name="culture">Globalization.CultureInfo.</param>
+        /// <returns>Not implemented.</returns>
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
