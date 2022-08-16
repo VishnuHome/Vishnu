@@ -4,6 +4,11 @@ Vishnu ist eine Monitoring- und Prozesssteuerungssoftware mit integrierter Verar
 ![Vishnu-Hilfe Startseite](./FirstView.png?raw=true "Vishnu-Hilfe")
 *So sieht Vishnu nach dem Start mit dem ersten Demo-Job ungefähr aus*.
 
+## Voraussetzungen
+
+  - Läuft auf Windows-Systemen ab Version 7.
+  - Entwicklung und Umwandlung mit Visual Studio 2019 oder höher.
+
 ## Schnellstart
 
 Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
