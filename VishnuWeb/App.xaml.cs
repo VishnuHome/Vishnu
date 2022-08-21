@@ -170,6 +170,8 @@ namespace VishnuWeb
 
         private void PrepareStart()
         {
+            this.SetupLogging();
+
             if (!this.checkCanRun())
             {
                 throw new ApplicationException("Vishnu ist vorübergehend gesperrt worden."
@@ -180,6 +182,7 @@ namespace VishnuWeb
                 Directory.CreateDirectory(App._appSettings.WorkingDirectory);
                 App._appSettings.WorkingDirectoryCreated = true;
             }
+            this.CopyJobsIfNecessary();
             if (App._appSettings.MainJobName == null)
             {
                 if (!App._appSettings.AppConfigUserLoaded)
@@ -197,6 +200,110 @@ namespace VishnuWeb
                 {
                     string msg = "Es wurde keine Job-Definition angegeben.";
                     throw new ArgumentException(msg);
+                }
+            }
+        }
+
+        private void SetupLogging()
+        {
+            // Globales Logging installieren:
+            // Beispiele - der Suchbegriff steht jeweils zwischen ":" und ")":
+            //     string loggingRegexFilter = @"(?:loadChildren)";
+            //     string loggingRegexFilter = @"(?:Waiting)";
+            //     string loggingRegexFilter = ""; // Alles wird geloggt (ist der Default).
+            //     string loggingRegexFilter = @"(?:_NOPPES_)"; // Nichts wird geloggt, bzw. nur Zeilen, die "_NOPPES_" enthalten.
+            // analog: Statistics.RegexFilter.
+            App._appSettings.AppEnvAccessor.UnregisterKey("DebugFile");
+            string logFilePathName = App._appSettings.ReplaceWildcards(App._appSettings.DebugFile);
+            App._appSettings.AppEnvAccessor.RegisterKeyValue("DebugFile", logFilePathName);
+            App._logger = new Logger(logFilePathName, _appSettings.DebugFileRegexFilter, false);
+            App._logger.DebugArchivingInterval = App._appSettings.DebugArchivingInterval;
+            App._logger.DebugArchiveMaxCount = App._appSettings.DebugArchiveMaxCount;
+            App._logger.LoggingTriggerCounter = 120000; // Default ist 5000 Zählvorgänge oder Millisekunden.
+            InfoController.GetInfoSource().RegisterInfoReceiver(App._logger, InfoTypes.Collection2InfoTypeArray(InfoTypes.All));
+            Statistics.IsTimerTriggered = true; // LoggingTriggerCounter gibt die Anzahl Zählvorgänge vor, nach der die Ausgabe erfolgt.
+            Statistics.LoggingTriggerCounter = 10000; // Default ist 5000 Zählvorgänge oder Millisekunden.
+            string statisticsFilePathName = App._appSettings.ReplaceWildcards(App._appSettings.StatisticsFile);
+
+            Statistics.RegexFilter = App._appSettings.StatisticsFileRegexFilter;
+            App._statisticsLogger = new Logger(statisticsFilePathName);
+            App._statisticsLogger.MaxBufferLineCount = 1; // Statistics puffert selber
+            InfoController.GetInfoSource().RegisterInfoReceiver(App._statisticsLogger, new InfoType[] { InfoType.Statistics });
+
+            if (App._appSettings.FatalInitializationException != null)
+            {
+                throw App._appSettings.FatalInitializationException;
+            }
+        }
+
+        private void CopyJobsIfNecessary()
+        {
+            try
+            {
+                InfoController.GetInfoPublisher().Publish(this,
+                    String.Format($"IsClickOnce: {App._appSettings.IsClickOnce}"), InfoType.NoRegex);
+                string clickOnceDataDirectoryString = App._appSettings.ClickOnceDataDirectory == null ?
+                    "null" : App._appSettings.ClickOnceDataDirectory;
+                InfoController.GetInfoPublisher().Publish(this,
+                    String.Format($"ClickOnceDataDirectory: {clickOnceDataDirectoryString}"), InfoType.NoRegex);
+                InfoController.GetInfoPublisher().Publish(this,
+                    String.Format($"NewDeployment.xml: {File.Exists(Path.Combine(App._appSettings.ApplicationRootPath, "NewDeployment.xml"))}")
+                    , InfoType.NoRegex);
+                // MessageBox.Show(String.Format($"Vor ClickOnceAktionen auf {clickOnceDataDirectoryString}"));
+                if (App._appSettings.IsClickOnce
+                    && Directory.Exists(clickOnceDataDirectoryString)
+                    && File.Exists(Path.Combine(App._appSettings.ApplicationRootPath, "NewDeployment.xml")))
+                {
+                    this.DirectoryCopy(clickOnceDataDirectoryString,
+                        App._appSettings.ApplicationRootPath, true);
+                    File.Delete(Path.Combine(App._appSettings.ApplicationRootPath, "NewDeployment.xml"));
+                    InfoController.GetInfoPublisher().Publish(this,
+                        String.Format($"Jobs Copied and {Path.Combine(clickOnceDataDirectoryString, "NewDeployment.xml")} deleted.")
+                        , InfoType.NoRegex);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Fehler bei CopyJobsIfNecessary: " + ex.Message);
+                // throw;
+            }
+        }
+
+        private void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            // Get the subdirectories for the specified directory.
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+            DirectoryInfo[] dirs = dir.GetDirectories();
+
+            if (!dir.Exists)
+            {
+                throw new DirectoryNotFoundException(
+                    "Source directory does not exist or could not be found: "
+                    + sourceDirName);
+            }
+
+            // If the destination directory doesn't exist, create it.
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+
+            // Get the files in the directory and copy them to the new location.
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string temppath = Path.Combine(destDirName, file.Name);
+                file.CopyTo(temppath, true);
+            }
+
+            // If copying subdirectories, copy them and their contents to new location.
+            if (copySubDirs)
+            {
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    string temppath = Path.Combine(destDirName, subdir.Name);
+                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
                 }
             }
         }
@@ -244,6 +351,7 @@ namespace VishnuWeb
 
         private static AppSettings _appSettings;
         private static Logger _logger;
+        private static Logger _statisticsLogger;
         private static LogicalTaskTree.LogicalTaskTree _businessLogic;
         private SplashWindow _splashWindow;
         private ViewerAsWrapper _splashScreenMessageReceiver;
