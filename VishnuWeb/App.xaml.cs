@@ -240,16 +240,11 @@ namespace VishnuWeb
         {
             try
             {
-                InfoController.GetInfoPublisher().Publish(this,
-                    String.Format($"IsClickOnce: {App._appSettings.IsClickOnce}"), InfoType.NoRegex);
+                this.Publish(String.Format($"IsClickOnce: {App._appSettings.IsClickOnce}"));
                 string clickOnceDataDirectoryString = App._appSettings.ClickOnceDataDirectory == null ?
                     "null" : App._appSettings.ClickOnceDataDirectory;
-                InfoController.GetInfoPublisher().Publish(this,
-                    String.Format($"ClickOnceDataDirectory: {clickOnceDataDirectoryString}"), InfoType.NoRegex);
-                InfoController.GetInfoPublisher().Publish(this,
-                    String.Format($"NewDeployment.xml: {File.Exists(Path.Combine(App._appSettings.ApplicationRootPath, "NewDeployment.xml"))}")
-                    , InfoType.NoRegex);
-                // MessageBox.Show(String.Format($"Vor ClickOnceAktionen auf {clickOnceDataDirectoryString}"));
+                this.Publish(String.Format($"ClickOnceDataDirectory: {clickOnceDataDirectoryString}"));
+                this.Publish(String.Format($"NewDeployment.xml: {File.Exists(Path.Combine(App._appSettings.ApplicationRootPath, "NewDeployment.xml"))}"));
                 if (App._appSettings.IsClickOnce
                     && Directory.Exists(clickOnceDataDirectoryString)
                     && File.Exists(Path.Combine(App._appSettings.ApplicationRootPath, "NewDeployment.xml")))
@@ -257,15 +252,13 @@ namespace VishnuWeb
                     this.DirectoryCopy(clickOnceDataDirectoryString,
                         App._appSettings.ApplicationRootPath, true);
                     File.Delete(Path.Combine(App._appSettings.ApplicationRootPath, "NewDeployment.xml"));
-                    InfoController.GetInfoPublisher().Publish(this,
-                        String.Format($"Jobs Copied and {Path.Combine(clickOnceDataDirectoryString, "NewDeployment.xml")} deleted.")
-                        , InfoType.NoRegex);
+                    this.Publish(String.Format($"Jobs Copied and {Path.Combine(clickOnceDataDirectoryString, "NewDeployment.xml")} deleted."));
                 }
 
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Fehler bei CopyJobsIfNecessary: " + ex.Message);
+                this.Publish("Fehler bei CopyJobsIfNecessary: " + ex.Message);
                 // throw;
             }
         }
@@ -306,6 +299,12 @@ namespace VishnuWeb
                     DirectoryCopy(subdir.FullName, temppath, copySubDirs);
                 }
             }
+        }
+
+        private void Publish(string message)
+        {
+            // InfoController.GetInfoPublisher().Publish(this, message, , InfoType.NoRegex);
+            // MessageBox.Show(message);
         }
 
         private bool checkCanRun()
