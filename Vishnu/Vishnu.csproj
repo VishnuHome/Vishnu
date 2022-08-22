@@ -80,14 +80,14 @@
     <ApplicationIcon>Vishnu_multi.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>512259BF96C1C784B78C58F177F04787332DEB93</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>FA2D4B814D7E650C4207A799E48196C50C42C38A</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>
     </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <GenerateManifests>true</GenerateManifests>
+    <GenerateManifests>false</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
