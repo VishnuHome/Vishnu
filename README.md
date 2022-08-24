@@ -17,7 +17,7 @@ Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
 	* #### Wichtig: Eine Umgebungsvariable "Vishnu_Root" auf den Pfad zu diesem Verzeichnis setzen, z.B.: Vishnu_Root=c:\Users\<user>\Documents\MyVishnu.
 
   - ### Installation:
-	* https://github.com/VishnuHome/Setup/raw/master/Vishnu.bin/init.zip herunterladen und in das Basisverzeichnis entpacken.
+	* [init.zip](https://github.com/VishnuHome/Setup/raw/master/Vishnu.bin/init.zip) herunterladen und in das Basisverzeichnis entpacken.
 
 	Es entsteht dann folgende Struktur:
       
@@ -31,12 +31,9 @@ Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
 Im Unterverzeichnis **DemoJobs** findest du die Job-Definitionen einer Reihe von interessanten Demonstrations-Jobs.
 
 ## Dokumentation
-Die ausführliche Dokumentation findest du unter
-[Vishnu.Doc](https://github.com/https://github.com/VishnuHome/Vishnu/releases/latest/download/Vishnu_doc.de.chm)
-<br/><span style="font-size:14px;">(Hinweis: Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte, sieh bitte im [CHM-HowTo](CHM_HowTo.md) nach.)</span>
-
-oder online unter
-[Vishnu online Dokumentation](https://neteti.de/Vishnu.Doc/)
+Die ausführliche Dokumentation findest du im mit entpackten **Vishnu_doc.de.chm** oder
+online unter [Vishnu online Dokumentation](https://neteti.de/Vishnu.Doc/)
+<br/><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-size:14px;">(Hinweis: Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte, sieh bitte im [CHM-HowTo](CHM_HowTo.md) nach.)</span>
 
 ## Quellcode und Entwicklung
 
@@ -48,6 +45,7 @@ Es gibt grundsätzlich zwei unabhängige Vorgehensweisen:
 ---
 
 1. Forken des Repositories **Vishnu** über den Button Fork
+<br/>(Repository https://github.com/VishnuHome/Vishnu)
 
    ![Fork](Fork_Button.png)
 2. Clonen des geforkten Repositories **Vishnu** in das existierende Unterverzeichnis
@@ -71,6 +69,7 @@ Es gibt grundsätzlich zwei unabhängige Vorgehensweisen:
 Wechsle bitte in das Repository [Setup](https://github.com/VishnuHome/Setup) und folge den Anweisungen im dortigen README.md.
 
 ## Die Vishnu-Plugins
+
 Vishnu ist nur die Logik-Maschine, die eigentliche Arbeit machen die Vishnu-Plugins.
 Vishnu-Plugins sind kleine Programmteile (DLLs), die von Vishnu zur Laufzeit geladen werden.
 Zu den Vishnu-Plugins gehören neben anderen die Checker. 
@@ -81,6 +80,13 @@ Vishnu liefert schon eine Reihe von Checkern mit. Diese findest du unter [InPlug
 
 Vishnu-Plugins kannst du genauso forken und clonen wie unter [Quellcode und Entwickung](#Quellcode-und-Entwicklung) schon beschrieben,
 nur dass dein lokales Root-Verzeichnis **InPlug** sein sollte.
+<br/>(Quellen: https://github.com/InPlug)
+
+## Das Basis-Framework
+Vishnu arbeitet mit einigen allgemeingültigen DLLs, dem Basis-Framework.
+Für den Fall, dass man sich die Quellen davon anschauen will oder dorthinein debuggen muss,
+kann man sich die zugehörigen Quellen in den dafür vorgesehenen Ordner **WorkFrame** clonen.
+<br/>(Quellen: https://github.com/WorkFrame)
 
 ## Mitmachen (Contributing)
 Wenn du Fehler entdeckst oder Verbesserungsvorschläge einbringen willst, eröffne bitte zuerst ein neues Diskusionsthema ("New issue").<br/>
