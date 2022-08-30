@@ -206,9 +206,6 @@
     <Content Include="ClickOnceStarter.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="WebDriver.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="NewDeployment.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
