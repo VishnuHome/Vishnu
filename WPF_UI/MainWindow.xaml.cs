@@ -50,6 +50,11 @@ namespace Vishnu.WPF_UI
         public double MinTop { get; set; }
 
         /// <summary>
+        /// Bei True wird mit der Job-Ansicht gestartet, ansonsten mit der Tree-Ansicht (default: false).
+        /// </summary>
+        public bool StartWithJobs { get; set; }
+
+        /// <summary>
         /// Wesentlichen Darstellungsmerkmale des Vishnu-MainWindows.
         /// Werden beim Start der Anwendung aus den AppSettings gefüllt.
         /// </summary>
@@ -346,7 +351,7 @@ namespace Vishnu.WPF_UI
                     this.Width = this.MainWindowStartAspects.WindowWidth;
                     this.Height = this.MainWindowStartAspects.WindowHeight;
                 }
-                if (this.MainWindowStartAspects.ActTabControlTab == 0)
+                if (this.MainWindowStartAspects.ActTabControlTab == 0 && !this.StartWithJobs)
                 {
                     this.SetTreeAspects(true);
                 }
@@ -365,6 +370,11 @@ namespace Vishnu.WPF_UI
             }
             else
             {
+                if (this.StartWithJobs)
+                {
+                    this.MainTabControl.SelectedIndex = 1;
+                    this.SetJobGroupAspects(false);
+                }
                 this.RecalculateWindowMeasures();
             }
             //this.SizeToContent = SizeToContent.WidthAndHeight;

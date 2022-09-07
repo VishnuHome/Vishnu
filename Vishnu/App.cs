@@ -239,6 +239,7 @@ namespace Vishnu
                                                                                      // bei mehreren Bildschirmen.
             this._mainWindow.MainWindowStartAspects = _appSettings.VishnuWindowAspects; // Vorher gespeicherte Darstellungseigenschaften des
                                                                                         // Vishnu-MainWindow oder Defaults.
+            this._mainWindow.StartWithJobs = _appSettings.StartWithJobs; // Bei true wird mit der Job-Ansicht gestartet, ansonsten mit der Tree-Ansicht.
             this._mainWindow.Closed += mainWindow_Closed;
             // Das LogicalTaskTree-ViewModel
             LogicalTaskTreeViewModel logicalTaskTreeViewModel = new LogicalTaskTreeViewModel(
@@ -316,7 +317,7 @@ namespace Vishnu
             SingleInstanceApplication._logger = new Logger(logFilePathName, _appSettings.DebugFileRegexFilter, false);
             SingleInstanceApplication._logger.DebugArchivingInterval = SingleInstanceApplication._appSettings.DebugArchivingInterval;
             SingleInstanceApplication._logger.DebugArchiveMaxCount = SingleInstanceApplication._appSettings.DebugArchiveMaxCount;
-            SingleInstanceApplication._logger.LoggingTriggerCounter = 120000; // Default ist 5000 Zählvorgänge oder Millisekunden.
+            SingleInstanceApplication._logger.LoggingTriggerCounter = 15000; // Default ist 5000 Zählvorgänge oder Millisekunden.
             InfoController.GetInfoSource().RegisterInfoReceiver(SingleInstanceApplication._logger, InfoTypes.Collection2InfoTypeArray(InfoTypes.All));
             Statistics.IsTimerTriggered = true; // LoggingTriggerCounter gibt die Anzahl Zählvorgänge vor, nach der die Ausgabe erfolgt.
             Statistics.LoggingTriggerCounter = 10000; // Default ist 5000 Zählvorgänge oder Millisekunden.

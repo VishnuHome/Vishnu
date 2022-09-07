@@ -277,6 +277,11 @@ namespace Vishnu.Interchange
         public TreeOrientation StartTreeOrientation { get; set; }
 
         /// <summary>
+        /// Bei True wird mit der Job-Ansicht gestartet, ansonsten mit der Tree-Ansicht (default: false).
+        /// </summary>
+        public bool StartWithJobs { get; set; }
+
+        /// <summary>
         /// Parameter zur Steuerung des Startverhaltens von getriggerten Knoten
         /// beim Start durch den Anwender (UserRun):
         ///   None = kein direkter Start,
@@ -478,6 +483,7 @@ namespace Vishnu.Interchange
             }
             this.UserParameterReaderPath = this.GetStringValue("UserParameterReaderPath", null);
             this.StartTreeOrientation = (TreeOrientation)Enum.Parse(typeof(TreeOrientation), this.GetStringValue("StartTreeOrientation", "AlternatingHorizontal"));
+            this.StartWithJobs = this.GetValue<bool>("StartWithJobs", false);
             string userCheckerArrayString = this.GetStringValue("UncachedCheckers", null);
             if (userCheckerArrayString != null)
             {
