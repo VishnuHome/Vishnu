@@ -422,7 +422,7 @@ namespace Vishnu.WPF_UI
             // this._treeZoomBox = UIHelper.FindFirstLogicalChildOfTypeAndName<ZoomBox>(this, "ZoomBox1");
             // this._treeZoomBox = UIHelper.FindFirstLogicalChildOfTypeAndName<ZoomBox>(this, "ZoomBox2");
 
-            // this.EvalMainWindowStartAspects();
+            this.EvalMainWindowStartAspects();
             this.ActivateMainWindowStartAspects();
 
             //this.SizeToContent = SizeToContent.WidthAndHeight;
