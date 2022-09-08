@@ -57,7 +57,7 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <TabControl Grid.Row="1" Margin="8" Name="MainTabControl" SelectionChanged="MainTabControl_SelectionChanged">
+        <TabControl Grid.Row="1" Margin="8" x:Name="MainTabControl" SelectedIndex="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=FirstSelectedIndex}">
             <TabControl.Style >
                 <Style TargetType="{x:Type TabControl}">
                     <Setter Property="Background" Value="{StaticResource WindowBGBrush}"/>

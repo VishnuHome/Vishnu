@@ -234,12 +234,7 @@ namespace Vishnu
             SingleInstanceApplication._businessLogic = new LogicalTaskTree.LogicalTaskTree(treeParameters, new ProductionJobProvider());
 
             // Das Main-Window
-            this._mainWindow = new WPF_UI.MainWindow();
-            this._mainWindow.SizeOnVirtualScreen = _appSettings.SizeOnVirtualScreen; // Übergabe des Applikationsparameters für die Skalierung
-                                                                                     // bei mehreren Bildschirmen.
-            this._mainWindow.MainWindowStartAspects = _appSettings.VishnuWindowAspects; // Vorher gespeicherte Darstellungseigenschaften des
-                                                                                        // Vishnu-MainWindow oder Defaults.
-            this._mainWindow.StartWithJobs = _appSettings.StartWithJobs; // Bei true wird mit der Job-Ansicht gestartet, ansonsten mit der Tree-Ansicht.
+            this._mainWindow = new WPF_UI.MainWindow(_appSettings.StartWithJobs, _appSettings.SizeOnVirtualScreen, _appSettings.VishnuWindowAspects);
             this._mainWindow.Closed += mainWindow_Closed;
             // Das LogicalTaskTree-ViewModel
             LogicalTaskTreeViewModel logicalTaskTreeViewModel = new LogicalTaskTreeViewModel(

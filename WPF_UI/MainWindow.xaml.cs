@@ -9,6 +9,7 @@ using Vishnu.Interchange;
 using NetEti.CustomControls;
 using System.Windows.Media;
 using System.Collections.Generic;
+using System.Windows.Media.TextFormatting;
 
 namespace Vishnu.WPF_UI
 {
@@ -50,15 +51,22 @@ namespace Vishnu.WPF_UI
         public double MinTop { get; set; }
 
         /// <summary>
-        /// Bei True wird mit der Job-Ansicht gestartet, ansonsten mit der Tree-Ansicht (default: false).
+        /// Bei 1 mit der Job-Ansicht gestartet, ansonsten mit der Tree-Ansicht (default: 0).
         /// </summary>
-        public bool StartWithJobs { get; set; }
+        public int FirstSelectedIndex
+        {
+            get
+            {
+                return this._firstSelectedIndex;
+            }
+            set { this._firstSelectedIndex = value; }
+        }
 
         /// <summary>
         /// Wesentlichen Darstellungsmerkmale des Vishnu-MainWindows.
         /// Werden beim Start der Anwendung aus den AppSettings gefüllt.
         /// </summary>
-        public WindowAspects MainWindowStartAspects
+        public WindowAspects MainWindowAspects
         {
             get
             {
@@ -69,7 +77,10 @@ namespace Vishnu.WPF_UI
                 if (this._mainWindowStartAspects != value)
                 {
                     this._mainWindowStartAspects = value;
-                    this.MainTabControl.SelectedIndex = this._mainWindowStartAspects.ActTabControlTab;
+                    if (this.MainTabControl != null)
+                    {
+                        this.MainTabControl.SelectedIndex = this._mainWindowStartAspects.ActTabControlTab;
+                    }
                 }
             }
         }
@@ -77,17 +88,33 @@ namespace Vishnu.WPF_UI
         /// <summary>
         /// Konstruktor des Haupt-Fensters.
         /// </summary>
-        public MainWindow()
+        /// <param name="startWithJobs">Bei true wird mit der Jobs-Ansicht gestartet, ansonsten mit der Tree-Ansicht (default: false).</param>
+        /// <param name="sizeOnVirtualScreen">Bei true wird über mehrere Bildschirme hinweg skaliert, ansonsten auf einen Bildschirm (default: false).</param>
+        /// <param name="mainWindowStartAspects">Eventuell vorher gespeicherte Darstellungseigenschaften des Vishnu-MainWindow oder Defaults.</param>
+        public MainWindow(bool startWithJobs, bool sizeOnVirtualScreen, WindowAspects mainWindowStartAspects) : base()
         {
+            this.SizeOnVirtualScreen = sizeOnVirtualScreen;
+            this.MainWindowAspects = mainWindowStartAspects;
+
+            this.DataContext = this;
+            this.FirstSelectedIndex = startWithJobs ? 1 : 0;
+
+            this.EvalMainWindowStartAspects();
+
             InitializeComponent();
+
+            this._tabManualSize = new bool[this.MainTabControl.Items.Count];
+
             this.MaxWidth = System.Windows.SystemParameters.PrimaryScreenWidth;
             this.MaxHeight = System.Windows.SystemParameters.PrimaryScreenHeight;
             this.MinLeft = 0;
             this.MinTop = 0;
             this._contentRendered = false;
             this._handleResizeEvents = true;
-            this._tabManualSize = new bool[this.MainTabControl.Items.Count];
             this._lastWindowMeasures = new Rect[this.MainTabControl.Items.Count];
+
+            this.MainTabControl.SelectionChanged += MainTabControl_SelectionChanged;
+
             // Registrieren des the Bubble Event Handlers 
             //      this.AddHandler(CustomControls.ZoomTreeView.TreeElementStateChangedEvent,
             // new RoutedEventHandler(TreeElementStateChangedEventHandler));
@@ -223,6 +250,60 @@ namespace Vishnu.WPF_UI
         private ZoomBox _treeZoomBox;
         private ZoomBox _jobGroupZoomBox;
         private WindowAspects _mainWindowStartAspects;
+        private int _firstSelectedIndex;
+
+        /// <summary>
+        /// Trifft Vorbelegungen für das aktuelle Window nach vorher gespeicherten Bildschirmeinstellungen (Strg-s).
+        /// Diese Routine wird im Konstruktor von MainWindow noch vor InitializeComponent aufgerufen.
+        /// </summary>
+        private void EvalMainWindowStartAspects()
+        {
+            if (this.MainWindowAspects != null)
+            {
+                this.WindowStartupLocation = WindowStartupLocation.Manual;
+                this.Left = this.MainWindowAspects.WindowLeft;
+                this.Top = this.MainWindowAspects.WindowTop;
+                if (this.MainWindowAspects.WindowWidth > 0 && this.MainWindowAspects.WindowHeight > 0)
+                {
+                    this.SizeToContent = SizeToContent.Manual;
+                    this.Width = this.MainWindowAspects.WindowWidth;
+                    this.Height = this.MainWindowAspects.WindowHeight;
+                }
+                this.FirstSelectedIndex = this.MainWindowAspects.ActTabControlTab;
+            }
+        }
+
+        /// <summary>
+        /// Aktiviert Vorbelegungen für das aktuelle Window nach vorher gespeicherten Bildschirmeinstellungen (Strg-s).
+        /// Diese Routine kann erst im Eventhandler window_ContentRendered aufgerufen werden, wenn alle Controls schon
+        /// vorhanden sind.
+        /// </summary>
+        private void ActivateMainWindowStartAspects()
+        {
+            if (this.MainWindowAspects != null)
+            {
+                if (this.MainWindowAspects.ActTabControlTab == 0)
+                {
+                    this.SetTreeAspects(true);
+                }
+                else
+                {
+                    this.SetJobGroupAspects(true);
+                }
+                if (!this.MainWindowAspects.IsScrollbarVisible)
+                {
+                    this.ForceRecalculateWindowMeasures(null);
+                }
+                else
+                {
+                    this.RecalculateWindowMeasures();
+                }
+            }
+            else
+            {
+                this.RecalculateWindowMeasures();
+            }
+        }
 
         // Wenn das Window einige Zeit minimiert war und dann wieder hervorgeholt wird,
         // wird ein Teil grafisch nicht wiederhergestellt, es bleibt ein schwarzer Streifen.
@@ -340,43 +421,10 @@ namespace Vishnu.WPF_UI
             // this._jobGroupZoomBox = UIHelper.FindFirstVisualChildOfTypeAndNameOrAttachedName<ZoomBox>(this, "ZoomBox2");
             // this._treeZoomBox = UIHelper.FindFirstLogicalChildOfTypeAndName<ZoomBox>(this, "ZoomBox1");
             // this._treeZoomBox = UIHelper.FindFirstLogicalChildOfTypeAndName<ZoomBox>(this, "ZoomBox2");
-            if (this.MainWindowStartAspects != null)
-            {
-                this.WindowStartupLocation = WindowStartupLocation.Manual;
-                this.Left = this.MainWindowStartAspects.WindowLeft;
-                this.Top = this.MainWindowStartAspects.WindowTop;
-                if (this.MainWindowStartAspects.WindowWidth > 0 && this.MainWindowStartAspects.WindowHeight > 0)
-                {
-                    this.SizeToContent = SizeToContent.Manual;
-                    this.Width = this.MainWindowStartAspects.WindowWidth;
-                    this.Height = this.MainWindowStartAspects.WindowHeight;
-                }
-                if (this.MainWindowStartAspects.ActTabControlTab == 0 && !this.StartWithJobs)
-                {
-                    this.SetTreeAspects(true);
-                }
-                else
-                {
-                    this.SetJobGroupAspects(true);
-                }
-                if (!this.MainWindowStartAspects.IsScrollbarVisible)
-                {
-                    this.ForceRecalculateWindowMeasures(null);
-                }
-                else
-                {
-                    this.RecalculateWindowMeasures();
-                }
-            }
-            else
-            {
-                if (this.StartWithJobs)
-                {
-                    this.MainTabControl.SelectedIndex = 1;
-                    this.SetJobGroupAspects(false);
-                }
-                this.RecalculateWindowMeasures();
-            }
+
+            // this.EvalMainWindowStartAspects();
+            this.ActivateMainWindowStartAspects();
+
             //this.SizeToContent = SizeToContent.WidthAndHeight;
         }
 
@@ -386,9 +434,9 @@ namespace Vishnu.WPF_UI
             {
                 if (fromLoadedSettings)
                 {
-                    this._treeZoomBox.SetScale(this.MainWindowStartAspects.WindowZoom, this.MainWindowStartAspects.WindowZoom);
-                    this._treeZoomBox.HorizontalScroll = this.MainWindowStartAspects.WindowScrollLeft;
-                    this._treeZoomBox.VerticalScroll = this.MainWindowStartAspects.WindowScrollTop;
+                    this._treeZoomBox.SetScale(this.MainWindowAspects.WindowZoom, this.MainWindowAspects.WindowZoom);
+                    this._treeZoomBox.HorizontalScroll = this.MainWindowAspects.WindowScrollLeft;
+                    this._treeZoomBox.VerticalScroll = this.MainWindowAspects.WindowScrollTop;
                 }
                 else
                 {
@@ -403,9 +451,9 @@ namespace Vishnu.WPF_UI
             {
                 if (fromLoadedSettings)
                 {
-                    this._jobGroupZoomBox.SetScale(this.MainWindowStartAspects.WindowZoom, this.MainWindowStartAspects.WindowZoom);
-                    this._jobGroupZoomBox.HorizontalScroll = this.MainWindowStartAspects.WindowScrollLeft;
-                    this._jobGroupZoomBox.VerticalScroll = this.MainWindowStartAspects.WindowScrollTop;
+                    this._jobGroupZoomBox.SetScale(this.MainWindowAspects.WindowZoom, this.MainWindowAspects.WindowZoom);
+                    this._jobGroupZoomBox.HorizontalScroll = this.MainWindowAspects.WindowScrollLeft;
+                    this._jobGroupZoomBox.VerticalScroll = this.MainWindowAspects.WindowScrollTop;
                 }
                 else
                 {

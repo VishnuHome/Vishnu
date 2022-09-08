@@ -54,7 +54,7 @@
         public bool IsScrollbarVisible { get; set; }
 
         /// <summary>
-        /// True wenn mindestens ein Scrollbar sichtbar ist.
+        /// 0: Tree-Ansicht, 1: Jobs-Ansicht.
         /// </summary>
         public int ActTabControlTab { get; set; }
     }
