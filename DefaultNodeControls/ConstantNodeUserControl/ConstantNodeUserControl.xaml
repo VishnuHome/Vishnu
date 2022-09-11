@@ -28,7 +28,7 @@
                             <Binding RelativeSource="{RelativeSource Self}" />
                         </MultiBinding>
                     </Border.BorderBrush>
-                    <Grid Name="MainGrid" ContextMenu="{StaticResource cmContextMenu}">
+                    <Grid Name="MainGrid">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                         </Grid.ColumnDefinitions>

@@ -5,6 +5,7 @@ using NetEti.ApplicationControl;
 using System.Threading;
 using NetEti.Globals;
 using NetEti.MultiScreen;
+using System.Windows.Input;
 
 namespace Vishnu.Interchange
 {
@@ -16,9 +17,10 @@ namespace Vishnu.Interchange
     /// File: DynamicUserControlBase
     /// Autor: Erik Nagel
     ///
-    /// 01.08.2014 Erik Nagel: erstellt
+    /// 01.08.2014 Erik Nagel: erstellt.
+    /// 11.09.2022 Erik Nagel: Behandlung des ContextMenu implementiert.
     /// </remarks>
-    public class DynamicUserControlBase : UserControl
+    public class DynamicUserControlBase : UserControl, IDisposable
     {
         /// <summary>
         /// Wird ausgelöst, wenn das dynamisch geladene Control vollständig gezeichnet wurde.
@@ -83,7 +85,54 @@ namespace Vishnu.Interchange
             this.Loaded += new System.Windows.RoutedEventHandler(this.contentControl_Loaded);
             // Ist ein absoluter Performance-Killer, deshalb deaktiviert!
             // this.LayoutUpdated += DynamicUserControlBase_LayoutUpdated;
+
+            // Die nachfolgenden zwei Zeilen sorgen dafür, dass beim Drücken der rechten Maustaste
+            // nicht automatisch das Context-Menü öffnet, sondern vorher noch geprüft werden kann,
+            // ob gleichzeitig Umschalt oder Strg gedrückt wurde und somit gar nicht das Context-Menü
+            // gemeint war, sondern eine der Vishnu-Layoutfunktionen.
+            this.MouseRightButtonUp += DynamicUserControlBase_MouseRightButtonUp;
+            ContextMenuService.SetIsEnabled(this, false);
         }
+
+        #region IDisposable Implementation
+
+        private bool _disposed; // = false wird vom System vorbelegt;
+
+        /// <summary>
+        /// Öffentliche Methode zum Aufräumen.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Hier wird aufgeräumt: ruft für alle User-Elemente, die Disposable sind, Dispose() auf.;
+        /// </summary>
+        /// <param name="disposing">Bei true wurde diese Methode von der öffentlichen Dispose-Methode
+        /// aufgerufen; bei false vom internen Destruktor.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this._disposed)
+            {
+                if (disposing)
+                {
+                    this.MouseRightButtonUp -= DynamicUserControlBase_MouseRightButtonUp;
+                }
+                this._disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// Finalizer: wird vom GarbageCollector aufgerufen.
+        /// </summary>
+        ~DynamicUserControlBase()
+        {
+            this.Dispose(false);
+        }
+
+        #endregion IDisposable Implementation
 
         /// <summary>
         /// Absolute Bildschirmposition der Mitte des beinhaltenden Controls.
@@ -142,7 +191,10 @@ namespace Vishnu.Interchange
         {
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(new DependencyObject()))
             {
-                (this.DataContext as IVishnuViewModel).ParentView = this;
+                if (this.DataContext is IVishnuViewModel)
+                {
+                    (this.DataContext as IVishnuViewModel).ParentView = this;
+                }
             }
             try
             {
@@ -157,8 +209,21 @@ namespace Vishnu.Interchange
 
         private void contentControl_Loaded(object sender, RoutedEventArgs e)
         {
+            this.Loaded -= contentControl_Loaded;
+
             Dispatcher.BeginInvoke(new Action<ContentControl>(this.waitForContentRendered)
               , System.Windows.Threading.DispatcherPriority.ApplicationIdle, new object[] { e.Source as ContentControl });
+        }
+
+        // Die nachfolgende Routine prüft, ob beim Drücken der rechten Maustaste das Context-Menü
+        // geöffnet werden soll oder ob gleichzeitig Umschalt oder Strg gedrückt wurde und somit
+        // gar nicht das Context-Menü gemeint war, sondern eine der Vishnu-Layoutfunktionen.
+        private void DynamicUserControlBase_MouseRightButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Control) == 0 && (Keyboard.Modifiers & ModifierKeys.Shift) == 0)
+            {
+                this.ContextMenu.IsOpen = true;
+            }
         }
 
         private void waitForContentRendered(ContentControl contentControl)
@@ -212,6 +277,8 @@ namespace Vishnu.Interchange
                     }
                 }
             } while (this.ActualWidth != width || this.ActualHeight != height);
+
+            this.ContextMenu = (ContextMenu)this.Resources["cmContextMenu"];
 
             this.OnDynamicUserControl_ContentRendered();
         }

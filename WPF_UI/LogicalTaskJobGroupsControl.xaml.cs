@@ -1,4 +1,7 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using Vishnu.Interchange;
 
 namespace Vishnu.WPF_UI
 {
@@ -11,7 +14,7 @@ namespace Vishnu.WPF_UI
     ///
     /// 01.10.2014 Erik Nagel: erstellt
     /// </remarks>
-    public partial class LogicalTaskJobGroupsControl : UserControl
+    public partial class LogicalTaskJobGroupsControl : DynamicUserControlBase
     {
         /// <summary>
         /// Konstruktor: erzeugt eine Instanz von LogicalTaskTreeViewModel
@@ -20,8 +23,6 @@ namespace Vishnu.WPF_UI
         public LogicalTaskJobGroupsControl()
         {
             InitializeComponent();
-            //this.ScreenBorder.MaxWidth = System.Windows.SystemParameters.PrimaryScreenWidth;
         }
-
     }
 }

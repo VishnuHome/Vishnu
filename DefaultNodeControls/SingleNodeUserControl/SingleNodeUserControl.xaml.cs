@@ -1,7 +1,4 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Controls;
-using Vishnu.Interchange;
+﻿using Vishnu.Interchange;
 
 namespace Vishnu.UserControls
 {
@@ -18,6 +15,5 @@ namespace Vishnu.UserControls
             // ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(DependencyObject), new FrameworkPropertyMetadata(Int32.MaxValue));
             InitializeComponent();
         }
-
     }
 }
