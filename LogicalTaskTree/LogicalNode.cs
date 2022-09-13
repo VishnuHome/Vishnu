@@ -546,7 +546,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Das Parent-Control, in dem dieser Knoten dargestellt wird.
         /// </summary>
-        public DynamicUserControlBase ParentView { get; set; }
+        public FrameworkElement ParentView { get; set; }
 
         /// <summary>
         /// Der Pfad zum Knoten bestehend aus einer durch '/' getrennte Kette von NameIds:
@@ -1698,7 +1698,7 @@ namespace LogicalTaskTree
         /// Setzt für diesen Knoten von außen die Instanz der Basisklasse für SingleNodeViewModels.
         /// </summary>
         /// <param name="parentView"></param>
-        internal void ThreadUpdateParentView(DynamicUserControlBase parentView)
+        internal void ThreadUpdateParentView(FrameworkElement parentView)
         {
             lock (this._parentViewLocker)
             {

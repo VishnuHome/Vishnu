@@ -6,8 +6,9 @@ using System.Threading;
 using NetEti.Globals;
 using NetEti.MultiScreen;
 using System.Windows.Input;
+using Vishnu.Interchange;
 
-namespace Vishnu.Interchange
+namespace Vishnu.ViewModel
 {
     /// <summary>
     /// Basisklasse für die dynamische Einbindung von UserControls
@@ -18,10 +19,18 @@ namespace Vishnu.Interchange
     /// Autor: Erik Nagel
     ///
     /// 01.08.2014 Erik Nagel: erstellt.
-    /// 11.09.2022 Erik Nagel: Behandlung des ContextMenu implementiert.
+    /// 11.09.2022 Erik Nagel: Behandlung des ContextMenu implementiert;
+    ///                        virtuelle Methode GetUserResultViewModel eingebaut, abstract geht nicht wegen Path2UserControlBase.
     /// </remarks>
     public class DynamicUserControlBase : UserControl, IDisposable
     {
+        /// <summary>
+        /// Abstrakte Definition von GetUserResultViewModel: muss für konkrete Anwendung überschrieben werden.
+        /// </summary>
+        /// <param name="vishnuViewModel"></param>
+        /// <returns></returns>
+        protected virtual DynamicUserControlViewModelBase GetUserResultViewModel(IVishnuViewModel vishnuViewModel) { return null; }
+
         /// <summary>
         /// Wird ausgelöst, wenn das dynamisch geladene Control vollständig gezeichnet wurde.
         /// Hier wird das User-Event deklariert und registriert.
@@ -78,6 +87,11 @@ namespace Vishnu.Interchange
         }
 
         /// <summary>
+        /// Übernimmt den aktuellen, spezifischen DataContext für Vishnu als IVishnuViewModel.
+        /// </summary>
+        public DynamicUserControlViewModelBase UserResultViewModel { get; set; }
+
+        /// <summary>
         /// Konstruktor - hängt sich in das LoadedEvent ein.
         /// </summary>
         public DynamicUserControlBase()
@@ -108,7 +122,7 @@ namespace Vishnu.Interchange
         }
 
         /// <summary>
-        /// Hier wird aufgeräumt: ruft für alle User-Elemente, die Disposable sind, Dispose() auf.;
+        /// Hier wird aufgeräumt: ruft für alle User-Elemente, die Disposable sind, Dispose() auf.
         /// </summary>
         /// <param name="disposing">Bei true wurde diese Methode von der öffentlichen Dispose-Methode
         /// aufgerufen; bei false vom internen Destruktor.</param>
@@ -210,6 +224,12 @@ namespace Vishnu.Interchange
         private void contentControl_Loaded(object sender, RoutedEventArgs e)
         {
             this.Loaded -= contentControl_Loaded;
+
+            if (this.DataContext != null)
+            {
+                this.UserResultViewModel = GetUserResultViewModel((IVishnuViewModel)this.DataContext);
+                ((IVishnuViewModel)this.DataContext).UserDataContext = this.UserResultViewModel;
+            }
 
             Dispatcher.BeginInvoke(new Action<ContentControl>(this.waitForContentRendered)
               , System.Windows.Threading.DispatcherPriority.ApplicationIdle, new object[] { e.Source as ContentControl });

@@ -879,6 +879,16 @@ ERLEDIGT: Ableitung von LogicalParser zur Schwellenwert-Analyse, Arbeitstitel "T
 
 Stand: 04.08.2022 Version 5.1.0.0 (Treshold)
 
+ERLEDIGT: Parameter StartWithJobs eingeführt.
+ERLEDIGT: Beschleunigung der Aufbereitung und Positionierung nach Parameter StartWithJobs und
+          gespeicherten Anzeigeeinstellungen.
+ERLEDIGT: Fehler: WPFDialogChecker starten immer im ersten Bildschirm, auch wenn Vishnu im zweiten Bildschirm läuft.
+ERLEDIGT: Context-Menü öffnet auch, wenn Strg oder Umschalt zusammen mit der rechten Maustaste gedrückt wurde.
+ERLEDIGT: Test-Jobs mit 100, 200, 500 und 1000 Checkern erstellt und ausgeführt (...\TestJobs\Tests\HeavyDuty\).
+
+Stand: 04.08.2022 Version 5.1.2.1 (Heavy Duty)
+
+
 -------------------------------------------------------------------------------------------------------------
 
 ###################
@@ -929,7 +939,6 @@ Liste von Snapshots mit letzter Ladezeit verfügbar und prüfbar machen
 	oder Events mit ihren Zeiten?
 	Andere Variante: SnapshotTrigger mit zusätzlichem Timer und Error-TreeEvent
 '#' bei Snapshots überdenken und ggf. abschaffen
-Fehler: WPFDialogChecker starten immer im ersten Bildschirm, auch wenn Vishnu im zweiten Bildschirm läuft.
 Dynamische multiple logger ermöglichen.
 Veröffentlichungsparameter nach Company auslagern, wenn möglich
 CheckDiskSpace: Sql-Zugriffe nach Company auslagern, wenn möglich

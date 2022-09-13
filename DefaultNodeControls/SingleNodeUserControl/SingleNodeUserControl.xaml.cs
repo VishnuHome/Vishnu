@@ -1,4 +1,4 @@
-﻿using Vishnu.Interchange;
+﻿using Vishnu.ViewModel;
 
 namespace Vishnu.UserControls
 {

@@ -27,17 +27,37 @@ namespace Vishnu.Interchange
         /// <summary>
         /// Das Parent-Control.
         /// </summary>
-        public DynamicUserControlBase ParentView { get; set; }
+        public FrameworkElement ParentView { get; set; }
+
+        /*
+        /// <summary>
+        /// Absolute Bildschirmposition des beinhaltenden Controls.
+        /// </summary>
+        /// <returns>Absolute Bildschirmposition der linken oberen Ecke des Parent-Controls.</returns>
+        public virtual Point GetParentViewAbsoluteScreenPosition()
+        {
+            if (this.ParentView != null)
+            {
+                return this.ParentView.GetParentViewAbsoluteScreenPosition();
+            }
+            else
+            {
+                return new Point(System.Windows.SystemParameters.PrimaryScreenWidth / 2.0 - 150,
+                  System.Windows.SystemParameters.PrimaryScreenHeight / 2.0 - 75);
+            }
+        }
+        */
 
         /// <summary>
         /// Absolute Bildschirmposition des beinhaltenden Controls.
         /// </summary>
         /// <returns>Absolute Bildschirmposition der linken oberen Ecke des Parent-Controls.</returns>
-        public Point GetParentViewAbsoluteScreenPosition()
+        public virtual Point GetParentViewAbsoluteScreenPosition()
         {
             if (this.ParentView != null)
             {
-                return this.ParentView.GetParentViewAbsoluteScreenPosition();
+                Rect rect = this.ParentView.GetAbsolutePlacement();
+                return new Point(rect.Left, rect.Top);
             }
             else
             {
@@ -51,7 +71,7 @@ namespace Vishnu.Interchange
         /// </summary>
         /// <param name="name">Der logische Name des Trees.</param>
         /// <param name="parentView">Das Parent-Control.</param>
-        public TreeParameters(string name, DynamicUserControlBase parentView)
+        public TreeParameters(string name, FrameworkElement parentView)
         {
             this.Name = name;
             this.ParentView = parentView;

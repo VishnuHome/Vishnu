@@ -86,7 +86,7 @@
   <ItemGroup>
     <Compile Include="AppSettings.cs" />
     <Compile Include="Definitions.cs" />
-    <Compile Include="DynamicUserControlBase.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="IBusinessLogicRoot.cs" />
     <Compile Include="ICanRun.cs" />
     <Compile Include="IExpandableNode.cs" />

@@ -1,6 +1,7 @@
 ﻿using LogicalTaskTree;
 using NetEti.MVVMini;
 using System;
+using System.Windows;
 using System.Windows.Input;
 using Vishnu.Interchange;
 
@@ -56,7 +57,7 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Das Parent-Control.
         /// </summary>
-        public DynamicUserControlBase ParentView
+        public FrameworkElement ParentView
         {
             get
             {
@@ -238,16 +239,14 @@ namespace Vishnu.ViewModel
         /// in der Geschäftslogik zu speichern.
         /// </summary>
         /// <param name="parentView">Das Parent-Control.</param>
-        protected virtual void ParentViewToBL(DynamicUserControlBase parentView)
-        {
-        }
+        protected virtual void ParentViewToBL(FrameworkElement parentView) { }
 
         private RelayCommand _btnReloadTaskTreeRelayCommand;
         private RelayCommand _btnLogTaskTreeRelayCommand;
         private RelayCommand _btnPauseResumeTaskTreeRelayCommand;
         private Result _result;
         private object _userDataContext;
-        private DynamicUserControlBase _parentView;
+        private FrameworkElement _parentView;
         private string _visualTreeCacheBreaker;
     }
 }

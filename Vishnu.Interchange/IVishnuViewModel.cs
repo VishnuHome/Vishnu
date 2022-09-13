@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Windows;
 using Vishnu.Interchange;
 
 namespace Vishnu.Interchange
@@ -21,7 +22,7 @@ namespace Vishnu.Interchange
         /// <summary>
         /// Das Parent-Control.
         /// </summary>
-        DynamicUserControlBase ParentView { get; set; }
+        FrameworkElement ParentView { get; set; }
 
         /// <summary>
         /// Bindung an ein optionales, spezifisches User-ViewModel.

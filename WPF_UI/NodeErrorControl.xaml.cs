@@ -25,12 +25,22 @@ namespace Vishnu.WPF_UI
         /// <summary>
         /// ViewModel für einen Ladefehler-Knoten.
         /// </summary>
-        public NodeErrorViewModel UserResultViewModel { get; set; }
+        public NodeErrorViewModel NodeErrorUserResultViewModel { get; set; }
 
-        private void ContentControl_Loaded(object sender, RoutedEventArgs e)
+        //private void ContentControl_Loaded(object sender, RoutedEventArgs e)
+        //{
+        //    this.NodeErrorUserResultViewModel = new NodeErrorViewModel((IVishnuViewModel)this.DataContext, this.DllPath);
+        //    ((IVishnuViewModel)this.DataContext).UserDataContext = this.NodeErrorUserResultViewModel;
+        //}
+
+        /// <summary>
+        /// Konkrete Überschreibung von GetUserResultViewModel, returnt ein spezifisches ResultViewModel.
+        /// </summary>
+        /// <param name="vishnuViewModel">Der DataContext als IVishnuViewModel.</param>
+        /// <returns>Ein NodeErrorViewModel.</returns>
+        protected override DynamicUserControlViewModelBase GetUserResultViewModel(IVishnuViewModel vishnuViewModel)
         {
-            this.UserResultViewModel = new NodeErrorViewModel((IVishnuViewModel)this.DataContext, this.DllPath);
-            ((IVishnuViewModel)this.DataContext).UserDataContext = this.UserResultViewModel;
+            return new NodeErrorViewModel((IVishnuViewModel)this.DataContext, this.DllPath);
         }
 
     }

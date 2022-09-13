@@ -1755,7 +1755,7 @@ namespace Vishnu.ViewModel
         /// Controls in der Geschäftslogik.
         /// </summary>
         /// <param name="parentView">Das zugehörige Control.</param>
-        protected override void ParentViewToBL(DynamicUserControlBase parentView)
+        protected override void ParentViewToBL(FrameworkElement parentView)
         {
             this._myLogicalNode.ParentView = this.ParentView;
         }

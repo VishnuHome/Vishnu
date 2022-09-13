@@ -1,4 +1,4 @@
-﻿<base:DynamicUserControlBase x:Class="Vishnu.WPF_UI.LogicalTaskJobGroupsControl"
+﻿<UserControl x:Class="Vishnu.WPF_UI.LogicalTaskJobGroupsControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -15,7 +15,7 @@
              xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
              mc:Ignorable="d" 
              x:Name="LogicalTaskJobGroupsControl1">
-    <base:DynamicUserControlBase.Resources>
+    <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Assets/LogicalTaskJobGroupsControlResourceDictionary.xaml" />
@@ -266,7 +266,7 @@
                 </Border>
             </DataTemplate>
         </ResourceDictionary>
-    </base:DynamicUserControlBase.Resources>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -299,4 +299,4 @@
             <Button Grid.Column="1" Name="btnBreakJobGroups" Command="{Binding BreakJobGroups, diag:PresentationTraceSources.TraceLevel=High}">Break</Button>
         </Grid>
     </Grid>
-</base:DynamicUserControlBase>
+</UserControl>

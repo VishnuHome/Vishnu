@@ -5,6 +5,7 @@ using System.Windows.Data;
 using Vishnu.Interchange;
 using System.Windows;
 using System.Collections.Concurrent;
+using Vishnu.ViewModel;
 
 namespace Vishnu.WPF_UI.ValueConverter
 {
@@ -92,10 +93,10 @@ namespace Vishnu.WPF_UI.ValueConverter
         {
             throw new NotImplementedException();
         }
-        private static ConcurrentDictionary<KeyValuePair<string, object>, DynamicUserControlBase> loadedControls;
+        private static ConcurrentDictionary<KeyValuePair<string, object>, object> loadedControls;
         static Path2UserControlBase()
         {
-            loadedControls = new ConcurrentDictionary<KeyValuePair<string, object>, DynamicUserControlBase>();
+            loadedControls = new ConcurrentDictionary<KeyValuePair<string, object>, object>();
         }
     }
 }
