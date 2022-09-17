@@ -7,6 +7,7 @@ using NetEti.Globals;
 using NetEti.MultiScreen;
 using System.Windows.Input;
 using Vishnu.Interchange;
+using System.Windows.Media;
 
 namespace Vishnu.ViewModel
 {
@@ -106,11 +107,13 @@ namespace Vishnu.ViewModel
             // gemeint war, sondern eine der Vishnu-Layoutfunktionen.
             this.MouseRightButtonUp += DynamicUserControlBase_MouseRightButtonUp;
             ContextMenuService.SetIsEnabled(this, false);
+            //this.ContextMenu = (ContextMenu)this.Resources["cmContextMenu"];
         }
 
         #region IDisposable Implementation
 
         private bool _disposed; // = false wird vom System vorbelegt;
+        private Border _contextMenuBorder;
 
         /// <summary>
         /// Öffentliche Methode zum Aufräumen.
@@ -132,6 +135,10 @@ namespace Vishnu.ViewModel
             {
                 if (disposing)
                 {
+                    if (this._contextMenuBorder != null)
+                    {
+                        this._contextMenuBorder.MouseLeave -= Border_MouseLeave;
+                    }
                     this.MouseRightButtonUp -= DynamicUserControlBase_MouseRightButtonUp;
                 }
                 this._disposed = true;
@@ -231,8 +238,31 @@ namespace Vishnu.ViewModel
                 ((IVishnuViewModel)this.DataContext).UserDataContext = this.UserResultViewModel;
             }
 
+            ContextMenu contextMenu = (ContextMenu)this.Resources["cmContextMenu"];
+            contextMenu.Loaded += ContextMenu_Loaded;
+            contextMenu.DataContext = this.DataContext;
+            this.ContextMenu = contextMenu;
+
             Dispatcher.BeginInvoke(new Action<ContentControl>(this.waitForContentRendered)
               , System.Windows.Threading.DispatcherPriority.ApplicationIdle, new object[] { e.Source as ContentControl });
+        }
+
+        private void ContextMenu_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.ContextMenu.Loaded -= ContextMenu_Loaded;
+            this._contextMenuBorder = UIHelper.FindFirstVisualChildOfTypeAndName<Border>(this.ContextMenu, null);
+            if (this._contextMenuBorder != null)
+            {
+                this._contextMenuBorder.MouseLeave += Border_MouseLeave;
+            }
+        }
+
+        private void Border_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (this.ContextMenu != null)
+            {
+                this.ContextMenu.IsOpen = false;
+            }
         }
 
         // Die nachfolgende Routine prüft, ob beim Drücken der rechten Maustaste das Context-Menü
@@ -242,7 +272,10 @@ namespace Vishnu.ViewModel
         {
             if ((Keyboard.Modifiers & ModifierKeys.Control) == 0 && (Keyboard.Modifiers & ModifierKeys.Shift) == 0)
             {
-                this.ContextMenu.IsOpen = true;
+                if (this.ContextMenu != null)
+                {
+                    this.ContextMenu.IsOpen = true;
+                }
             }
         }
 
@@ -298,7 +331,7 @@ namespace Vishnu.ViewModel
                 }
             } while (this.ActualWidth != width || this.ActualHeight != height);
 
-            this.ContextMenu = (ContextMenu)this.Resources["cmContextMenu"];
+            // this.ContextMenu = (ContextMenu)this.Resources["cmContextMenu"];
 
             this.OnDynamicUserControl_ContentRendered();
         }
