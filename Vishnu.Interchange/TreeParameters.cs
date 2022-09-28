@@ -29,25 +29,6 @@ namespace Vishnu.Interchange
         /// </summary>
         public FrameworkElement ParentView { get; set; }
 
-        /*
-        /// <summary>
-        /// Absolute Bildschirmposition des beinhaltenden Controls.
-        /// </summary>
-        /// <returns>Absolute Bildschirmposition der linken oberen Ecke des Parent-Controls.</returns>
-        public virtual Point GetParentViewAbsoluteScreenPosition()
-        {
-            if (this.ParentView != null)
-            {
-                return this.ParentView.GetParentViewAbsoluteScreenPosition();
-            }
-            else
-            {
-                return new Point(System.Windows.SystemParameters.PrimaryScreenWidth / 2.0 - 150,
-                  System.Windows.SystemParameters.PrimaryScreenHeight / 2.0 - 75);
-            }
-        }
-        */
-
         /// <summary>
         /// Absolute Bildschirmposition des beinhaltenden Controls.
         /// </summary>

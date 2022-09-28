@@ -29,21 +29,27 @@ namespace Vishnu.ViewModel
         /// </summary>
         /// <typeparam name="T">Typ der gesuchten Property.</typeparam>
         /// <param name="requiredReturnObjectType">Typ des ReturnObjects des besitzenden Knoten.</param>
-        /// <param name="propertyName">Name der gesuchten Property.</param>
+        /// <param name="propertyName">Name der gesuchten Property oder null. Bei null wird das ReturnObject selbst zurückgegeben.</param>
         /// <returns>Property aus dem ReturnObject des besitzenden Vishnu-Knotens.</returns>
         protected T GetResultProperty<T>(Type requiredReturnObjectType, string propertyName)
         {
-            if (this.ParentViewModel != null && this.ParentViewModel.Result != null && this.ParentViewModel.Result.ReturnObject != null
-                // && this._parentViewModel.Result.ReturnObject is ...) // geht nicht!
-                && this.ParentViewModel.Result.ReturnObject.GetType().Name.Equals(requiredReturnObjectType.Name))
+            if (this.ParentViewModel != null && this.ParentViewModel.Result != null && this.ParentViewModel.Result.ReturnObject != null)
             {
-                return Vishnu.Interchange.GenericPropertyGetter.GetProperty<T>(this.ParentViewModel.Result.ReturnObject, propertyName);
-                //return new Vishnu.Interchange.GenericPropertyGetter().GetProperty<T>(this.ParentViewModel.Result.ReturnObject, propertyName);
+                if (!String.IsNullOrEmpty(propertyName))
+                {
+                    // && this._parentViewModel.Result.ReturnObject is ...) // geht nicht!
+                    if (this.ParentViewModel.Result.ReturnObject.GetType().Name.Equals(requiredReturnObjectType.Name))
+                    {
+                        return Vishnu.Interchange.GenericPropertyGetter.GetProperty<T>(this.ParentViewModel.Result.ReturnObject, propertyName);
+                        //return new Vishnu.Interchange.GenericPropertyGetter().GetProperty<T>(this.ParentViewModel.Result.ReturnObject, propertyName);
+                    }
+                }
+                else
+                {
+                    return (T)this.ParentViewModel.Result.ReturnObject;
+                }
             }
-            else
-            {
-                return default(T);
-            }
+            return default(T);
         }
 
     }
