@@ -211,10 +211,10 @@ namespace Vishnu.WPF_UI
                     {
                         newTop = this.MaxHeight - effectiveHeight;
                     }
-                    if (bottomBorderViolated)
-                    {
+                    //if (bottomBorderViolated)
+                    //{
                         this.Top = newTop >= this.MinTop ? newTop : this.MinTop;
-                    }
+                    //}
                     if (rightBorderViolated)
                     {
                         this.Left = newLeft >= this.MinLeft ? newLeft : this.MinLeft;
