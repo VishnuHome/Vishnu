@@ -193,12 +193,12 @@ namespace Vishnu.WPF_UI
                     double heightDiff = this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Height - effectiveHeight;
                     double newLeft = this.Left + (widthDiff / 2.0);
                     double newTop = this.Top + (heightDiff / 2.0);
-                    bool bottomBorderViolated = false;
+                    //bool bottomBorderViolated = false;
+                    //if (this.Top + this.ActualHeight > this.MaxHeight)
+                    //{
+                    //    bottomBorderViolated = true;
+                    //}
                     bool rightBorderViolated = false;
-                    if (this.Top + this.ActualHeight > this.MaxHeight)
-                    {
-                        bottomBorderViolated = true;
-                    }
                     if (this.Left + this.ActualWidth > this.MaxWidth)
                     {
                         rightBorderViolated = true;

@@ -96,6 +96,7 @@
     <Compile Include="Behaviours\ExpanderBehaviour.cs" />
     <Compile Include="DependencyProperties\AttachedPropertiesContainer.cs" />
     <Compile Include="DependencyProperties\BinaryModificationSwitch.cs" />
+    <Compile Include="DependencyProperties\GridHelpers.cs" />
     <Compile Include="LogicalTaskJobGroupsControl.xaml.cs">
       <DependentUpon>LogicalTaskJobGroupsControl.xaml</DependentUpon>
     </Compile>

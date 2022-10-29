@@ -11,7 +11,7 @@ namespace Vishnu.Interchange
     /// Wird bei eigenen Klassen benötigt, die innerhalb eines Vishnu-Trees
     /// als ReturnObject verwendet werden sollen und über das Environment
     /// von anderen Knoten als dem Erzeuger genutzt werden sollen.
-    /// Tritt auf, wenn Assemblies einerseits dynamisch geladen werden,
+    /// Tritt auf, wenn Assemblies einerseits deserialisiert geladen werden,
     /// andererseits aber in dynamisch geladenen Assemblies zu deren
     /// Compilezeit referenziert wurden.
     /// </summary>

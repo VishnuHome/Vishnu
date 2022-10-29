@@ -1,7 +1,6 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Windows;
-using System.Windows.Threading;
+using System.Windows.Media;
 
 namespace Vishnu.Interchange
 {
@@ -23,14 +22,21 @@ namespace Vishnu.Interchange
                     new object[] { element, relativeToScreen });
             }
 
-            var absolutePos = element.PointToScreen(new System.Windows.Point(0, 0));
-            if (relativeToScreen)
+            try
             {
+                var absolutePos = element.PointToScreen(new System.Windows.Point(0, 0));
+                if (relativeToScreen)
+                {
+                    return new Rect(absolutePos.X, absolutePos.Y, element.ActualWidth, element.ActualHeight);
+                }
+                var posMW = Application.Current.MainWindow.PointToScreen(new System.Windows.Point(0, 0));
+                absolutePos = new System.Windows.Point(absolutePos.X - posMW.X, absolutePos.Y - posMW.Y);
                 return new Rect(absolutePos.X, absolutePos.Y, element.ActualWidth, element.ActualHeight);
             }
-            var posMW = Application.Current.MainWindow.PointToScreen(new System.Windows.Point(0, 0));
-            absolutePos = new System.Windows.Point(absolutePos.X - posMW.X, absolutePos.Y - posMW.Y);
-            return new Rect(absolutePos.X, absolutePos.Y, element.ActualWidth, element.ActualHeight);
+            catch (Exception ex) when (ex is System.Reflection.TargetInvocationException || ex is System.InvalidOperationException)
+            {
+                return VisualTreeHelper.GetContentBounds(element);
+            }
         }
 
     }

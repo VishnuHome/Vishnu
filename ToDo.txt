@@ -789,7 +789,28 @@ ERLEDIGT: Bessere Responsibility bei manuell gestarteten ThreadLocked-Checkern e
           Lösung: Durch ein differenzierteres Handling bei UserParameterReadern und Tree-interner Weitergabe
           von ConnectionStrings anstelle geöffneter Connections konnte die Notwendigkeit von ThreadLocks
           deutlich verringert werden.
-          
+ERLEDIGT: Escalator: bestimmte Eskalationsstufen mit Timer-Trigger kombinieren
+          (wahlweise auf die Nerven gehen, wie bei normalen Workern mit TimerTrigger)           
+ERLEDIGT: Zwei Probleme in UserChecker.dll: um 00:00 Uhr herum funktioniert die Logik nicht und
+					ab und zu wird statt einer korrekten "Es konnten keine Verbindungsparameter..."
+					die Exception "...ist nicht aktuell." gemeldet - dadurch wechselt für Vishnu der Exception-Typ
+					und er löst korrekterweise neu aus.
+					Alles in allem kein Vishnu-Problem sondern in UserChecker zu lösen (dort aber noch offen).
+					Ist doch ein Vishnu-Problem: durch die sich gegenseitig ausschließenden >< Beziehungen
+					entsteht eine XOR-Situation aus Sicht der übergeordneten NodeList.
+					Entsprechend auch bei einer echten XOR-Verknüpfung: dadurch, dass mindestens zwei Knoten
+					in einer NodeList direkt voneinander abhängig sind (NodeConnectoren, ValueModifier oder
+					TreeEventTrigger), diese aber naturgemäß nicht hundertprozentig zeitgleich auslösen,
+					wechselt die übergeordnete NodeList kurzzeitig ihr LogicalResult. Sind dieser NodeList, bzw.
+					der nächsten übergeordneten JobList Worker zugeordnet, lösen diese aus, obwohl aus
+					sachlogischer Sicht für die XOR Verknüpfung nichts passiert ist.
+					1. Woraround: über LogicalChangedDelay werden Änderungen von LogicalResults in Unterknoten
+					   von JobLists etwas verzögert angenommen, sodass ein kurzes, technisch bedingtes
+					   "Flackern" des LogicalResult ignoriert wird. Die Wartezeit ist aber prinzipiell
+					   systemspezifisch, so dass dies nicht die optimale Lösung sein kann.
+					FOLGEAUFGABE: korrekte Lösung ohne Sleeps finden.
+					Was ist mit Escalator? Workaround über Escalator ist gefunden, Problem wird als erledigt
+					markiert.
 ERLEDIGT: Default-WorkingDirectory bei IsSingleInstance=true ohne ProcessId.
 
 Stand: 24.01.2020 Version 4.7.2.1 (Direct Response) am 22.01.2020 in Saas Fee released
@@ -864,6 +885,9 @@ ERLEDIGT: Fehler in Snapshots nach langer Laufzeit:
 							Für diesen Befehl ist nicht genügend Speicher verfügbar.
           Ursache waren Fehler in der PieControls-UserLibrary (CheckDiskSpace/ShowDiskSpace).
 ERLEDIGT: Deutliche Erweiterung der Vishnu-Hilfe.
+ERLEDIGT: Doku: Job-Parameter ergänzen, bekannte Probleme, woher kommt der Name
+ERLEDIGT: Vishnu-Hilfe: Danksagung
+ERLEDIGT: Vishnu-Softwarelizenz
 
 Stand: 05.07.2021 Version 5.0.2.6 (Documented and tested)
 
@@ -876,17 +900,25 @@ ERLEDIGT: Bugfixes bei der Übergabe des Environments und der Results an aufgeruf
 Stand: 15.07.2022 Version 5.0.5.0 (Peace and Sanity)
 
 ERLEDIGT: Ableitung von LogicalParser zur Schwellenwert-Analyse, Arbeitstitel "TresholdParser"
+ERLEDIGT: Umschalten in die Job-Ansicht und Maus über einzelne Checker bewegen führte zum Programmabsturz.
 
 Stand: 04.08.2022 Version 5.1.0.0 (Treshold)
 
+ERLEDIGT: Prüfen: Historie für einen Knoten oder User-Aufgabe? vielleicht Teil-Historie?
+          Lösung: CheckerHistoryLogger.
 ERLEDIGT: Parameter StartWithJobs eingeführt.
 ERLEDIGT: Beschleunigung der Aufbereitung und Positionierung nach Parameter StartWithJobs und
           gespeicherten Anzeigeeinstellungen.
 ERLEDIGT: Fehler: WPFDialogChecker starten immer im ersten Bildschirm, auch wenn Vishnu im zweiten Bildschirm läuft.
-ERLEDIGT: Context-Menü öffnet auch, wenn Strg oder Umschalt zusammen mit der rechten Maustaste gedrückt wurde.
+ERLEDIGT: Context-Menü öffnete auch, wenn Strg oder Umschalt zusammen mit der rechten Maustaste gedrückt wurde.
+ERLEDIGT: Context-Menü schließt jetzt, wenn die Maus den Menübereich verlässt.
 ERLEDIGT: Test-Jobs mit 100, 200, 500 und 1000 Checkern erstellt und ausgeführt (...\TestJobs\Tests\HeavyDuty\).
+ERLEDIGT: JobList-Ansicht: Jobs werden jetzt in dynamischen Grids mit quadratischem Zuschnitt angezeigt.
+          Dadurch wurde eine bessere Bildschirmaufteilung und ein besseres Handling bei Größenänderung erreicht.
+ERLEDIGT: ZoomBox Mouse-wheel: Scroll-Events werden jetzt nicht mehr auf e.Handled=true gesetzt. Dadurch können
+          sie auch noch durch weitere Controls genutzt werden.
 
-Stand: 04.08.2022 Version 5.1.2.1 (Heavy Duty)
+Stand: 29.10.2022 Version 5.2.0.0 (Heavy Duty)
 
 
 -------------------------------------------------------------------------------------------------------------
@@ -922,8 +954,6 @@ Fehler: übergeordneter Knoten bleibt manch mal auf Gelb (CheckTreeEventTriggerMi
         Nur, wenn kein Log aktiv ist und auch nicht im Debug.
 Neuer Parameter: Log-Flushtime
 CheckDependentNodeLogic: SubJobs testen
-Vishnu-Hilfe: Danksagung
-Vishnu-Softwarelizenz
 Reload von Checker-dlls testen; UncachedCheckers testen
 
 Reload auf Root-JobList geht noch nicht
@@ -931,6 +961,8 @@ Context-Menü schließt nicht automatisch nach dem ersten Funktionsaufruf (Reload)
 In Listenansicht Shift-Expand und Ctrl-Expand einbauen
 Fehler: wenn im Snapshot ein Teilbaum mit Exception auf false (oder true?) - von Exception weg - geht,
         werden der früheren Exception übergeordnete Strukturknoten (NodeList) nicht von gelb auf Farbe gesetzt.
+Der ProductionJobProvider ist noch Spaghetti-Code - strukturieren und dabei Json-JobDescriptions als
+    zusätzliche Option implementieren.
 Event "SnapshotRefreshed" einführen.
 Kette von SubSnapshots auf korrekte Refreshes der übergeordneten Jobs testen.
 Snapshot: vernünftige Fehlermeldung, wenn Job versehentlich sich selbst als Snapshot referenziert.		
@@ -964,7 +996,6 @@ eigene User-Events
 Vishnu-App
 Vishnu as a Service
 UserParameter-Reader Parameter-Propagation nach Aktualisierung checken
-Doku: Job-Parameter ergänzen, bekannte Probleme, woher kommt der Name
 Vishnu Verwaltungsansicht, Uptime, Parameter, Referenzen, Tree, ProcessId, Aufrufparameter, etc.
 VishnuViewer Verzeichniszugriff optional durch WebApi ersetzen
 Fehler: Vishnu Viewer "Das Verzeichnis UserDirectory\Vishnu\Logs ist ungültig", danach komplett beendet.
@@ -986,8 +1017,6 @@ Break Anforderung an Checker weiterleiten.
 Erledigt-Button für Meldungen (Checker?)
 CheckEscalator: bei Run auf den gesamten Tree und grün wird zur OK-Meldung auch noch
            die vorherige Fehlermeldung ausgegeben.
-Escalator: bestimmte Eskalationsstufen mit Timer-Trigger kombinieren
-            (wahlweise auf die Nerven gehen, wie bei normalen Workern mit TimerTrigger)           
 CheckWorkerErrorToOk: break auf den Checker lässt Fehlermeldungen (TimerTrigger)
            weiter laufen. Nur Break auf den Tree stoppt diese auch.
 DefaultUserControls: Demo-Projekte einführen.
@@ -997,25 +1026,6 @@ Positionierung von UserDialogen ist noch unsauber (verschwindet rechts unten)
 		CheckCanRun, CheckDateDialog
 TreeExternals gar nicht erst anlegen, wenn sie nicht referenziert werden.
 geschützte Namen (auch mit Leerzeichen)
-Zwei Probleme in UserChecker.dll: um 00:00 Uhr herum funktioniert die Logik nicht und
-		ab und zu wird statt einer korrekten "Es konnten keine Verbindungsparameter..."
-		die Exception "...ist nicht aktuell." gemeldet - dadurch wechselt für Vishnu der Exception-Typ
-		und er löst korrekterweise neu aus.
-		Alles in allem kein Vishnu-Problem sondern in UserChecker zu lösen (dort aber noch offen).
-		Ist doch ein Vishnu-Problem: durch die sich gegenseitig ausschließenden >< Beziehungen
-		entsteht eine XOR-Situation aus Sicht der übergeordneten NodeList.
-		Entsprechend auch bei einer echten XOR-Verknüpfung: dadurch, dass mindestens zwei Knoten
-		in einer NodeList direkt voneinander abhängig sind (NodeConnectoren, ValueModifier oder
-		TreeEventTrigger), diese aber naturgemäß nicht hundertprozentig zeitgleich auslösen,
-		wechselt die übergeordnete NodeList kurzzeitig ihr LogicalResult. Sind dieser NodeList, bzw.
-		der nächsten übergeordneten JobList Worker zugeordnet, lösen diese aus, obwohl aus
-		sachlogischer Sicht für die XOR Verknüpfung nichts passiert ist.
-		1. Woraround: über LogicalChangedDelay werden Änderungen von LogicalResults in Unterknoten
-		   von JobLists etwas verzögert angenommen, sodass ein kurzes, technisch bedingtes
-		   "Flackern" des LogicalResult ignoriert wird. Die Wartezeit ist aber prinzipiell
-		   systemspezifisch, so dass dies nicht die optimale Lösung sein kann.
-		FOLGEAUFGABE: korrekte Lösung ohne Sleeps finden.
-		Was ist mit Escalator?
 Über Checker, die melden, wenn ein Ereignis ausbleibt, nachdenken.
 Kompletten Wiedereinstieg in einen Kontext nach Neustart von Vishnu ermöglichen (eigener Snapshot)
 Vishnu als verteilte Anwendung - Distribution und Snapshots
@@ -1058,9 +1068,7 @@ Anzeige von Worker-Details bei Hover
 Kombinierte Anzeige für Exception+Running (ChangingTreeExceptions)
 Vishnu auf HTML5 portieren
 Adaptive Trigger (feedback mit Checkern/TreeEvents)
-Schnickscnack: Countdown-Funktion für NextRun (sollte über externen Parameter geschaltet werden können)
-Prüfen: Historie für einen Knoten oder User-Aufgabe?
-	vielleicht Teil-Historie (letzte 3 Läufe)?
+Schnickschnack: Countdown-Funktion für NextRun (sollte über externen Parameter geschaltet werden können)
 UserBreak setzt Exceptions nicht zurück (keine neuen Messages), ok so?
 		Evtl. auf Parameter und Knoten-spezifisch?
 Result null setzt letzten und nächsten Lauf nicht

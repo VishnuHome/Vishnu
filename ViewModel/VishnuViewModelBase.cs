@@ -18,7 +18,7 @@ namespace Vishnu.ViewModel
     ///
     /// 22.05.2015 Erik Nagel: erstellt
     /// </remarks>
-    public class VishnuViewModelBase : ObservableObject, IVishnuViewModel
+    public abstract class VishnuViewModelBase : ObservableObject, IVishnuViewModel
     {
         /// <summary>
         /// Command für das ContextMenuItem "Reload" im ContextMenu für das "MainGrid" des Controls.
@@ -119,6 +119,88 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Liefert oder setzt die Zeilenanzahl für das enthaltende Grid.
+        /// </summary>
+        /// <returns>die Zeilenanzahl des enthaltenden Grids.</returns>
+        public int GridRowCount
+        {
+            get
+            {
+                return this._gridRowCount;
+            }
+            set
+            {
+                if (this._gridRowCount != value)
+                {
+                    this._gridRowCount = value;
+                }
+                this.RaisePropertyChanged("GridRowCount");
+            }
+        }
+
+        /// <summary>
+        /// Liefert oder setzt die Zeilenanzahl für das enthaltende Grid.
+        /// </summary>
+        /// <returns>die Zeilenanzahl des enthaltenden Grids.</returns>
+        public int GridColumnCount
+        {
+            get
+            {
+                return this._gridColumnCount;
+            }
+            set
+            {
+                if (this._gridColumnCount != value)
+                {
+                    this._gridColumnCount = value;
+                }
+                this.RaisePropertyChanged("GridColumnCount");
+            }
+        }
+
+        /// <summary>
+        /// Liefert die Zeile im enthaltenden Grid für das aktuelle Element.
+        /// </summary>
+        /// <returns>die Zeile im enthaltenden Grid.</returns>
+        public int GridRow
+        {
+            get
+            {
+                return this._gridRow;
+            }
+            set
+            {
+                if (this._gridRow != value)
+                {
+                    this._gridRow = value;
+                }
+                this.RaisePropertyChanged("GridRow");
+            }
+        }
+
+        /// <summary>
+        /// Liefert oder setzt die Zeilenanzahl für das enthaltende Grid.
+        /// </summary>
+        /// <returns>die Zeilenanzahl des enthaltenden Grids.</returns>
+        public int GridColumn
+        {
+            get
+            {
+                return this._gridColumn;
+            }
+            set
+            {
+                if (this._gridColumn != value)
+                {
+                    this._gridColumn = value;
+                    // Random rnd = new Random(); // 07.10.2022 Test+
+                    // this._gridColumn = rnd.Next(3); // 07.10.2022 Test-
+                }
+                this.RaisePropertyChanged("GridColumn");
+            }
+        }
+
+        /// <summary>
         /// Vergibt einen neuen GlobalUniqueIdentifier für den VisualTreeCacheBreaker.
         /// </summary>
         public virtual void Invalidate()
@@ -208,6 +290,10 @@ namespace Vishnu.ViewModel
             this._btnLogTaskTreeRelayCommand = new RelayCommand(LogTaskTreeExecute, CanLogTaskTreeExecute);
             this._btnPauseResumeTaskTreeRelayCommand = new RelayCommand(PauseResumeTaskTreeExecute, CanPauseResumeTaskTreeExecute);
             this._visualTreeCacheBreaker = Guid.NewGuid().ToString();
+            this.GridRowCount = 1;
+            this.GridColumnCount = 1;
+            this.GridColumn = 0;
+            this.GridRow = 0;
         }
 
         /// <summary>
@@ -240,6 +326,10 @@ namespace Vishnu.ViewModel
         /// </summary>
         /// <param name="parentView">Das Parent-Control.</param>
         protected virtual void ParentViewToBL(FrameworkElement parentView) { }
+        private int _gridRowCount;
+        private int _gridColumnCount;
+        private int _gridRow;
+        private int _gridColumn;
 
         private RelayCommand _btnReloadTaskTreeRelayCommand;
         private RelayCommand _btnLogTaskTreeRelayCommand;

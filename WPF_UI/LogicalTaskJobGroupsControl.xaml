@@ -112,11 +112,22 @@
                                     </Image>
                                 </Grid>
                             </Expander.Header>
-                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                                 <ItemsControl ItemsSource="{Binding FlatNodeViewModelList}" Name="listView1">
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="{x:Type ContentPresenter}">
+                                            <Setter Property="Grid.Row" Value="{Binding GridRow, diag:PresentationTraceSources.TraceLevel=High}" />
+                                            <Setter Property="Grid.Column" Value="{Binding GridColumn, diag:PresentationTraceSources.TraceLevel=High}" />
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <WrapPanel />
+                                            <!-- Hier spielt die Musik -->
+                                            <!--WrapPanel /-->
+                                            <Grid IsItemsHost="True" attached:GridHelpers.RowCount="{Binding GridRowCount, diag:PresentationTraceSources.TraceLevel=High}"
+                                                  attached:GridHelpers.ColumnCount="{Binding GridColumnCount, diag:PresentationTraceSources.TraceLevel=High}"
+                                                  ShowGridLines="False">
+                                            </Grid>
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                 </ItemsControl>
@@ -150,10 +161,7 @@
                     </MultiDataTrigger>
                 </DataTemplate.Triggers>
             </HierarchicalDataTemplate>
-            <HierarchicalDataTemplate
-                        DataType="{x:Type vm:JobListViewModel}" 
-                        ItemsSource="{Binding Children}"
-                    >
+            <HierarchicalDataTemplate DataType="{x:Type vm:JobListViewModel}" ItemsSource="{Binding Children}">
                 <Border BorderBrush="Gray" BorderThickness="1" Margin="1">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
@@ -182,51 +190,53 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <ContentControl>
-                        <ContentControl.Content>
-                            <MultiBinding Converter="{StaticResource path2UserControlBase, diag:PresentationTraceSources.TraceLevel=High}">
-                                <Binding Path="UserControlPath" FallbackValue="Design Mode" />
-                                <Binding />
-                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:LogicalTaskJobGroupsControl}}" Path="Name" />
-                            </MultiBinding>
-                        </ContentControl.Content>
-                    </ContentControl>
+                    <Grid>
+                        <ContentControl>
+                            <ContentControl.Content>
+                                <MultiBinding Converter="{StaticResource path2UserControlBase, diag:PresentationTraceSources.TraceLevel=High}">
+                                    <Binding Path="UserControlPath" FallbackValue="Design Mode" />
+                                    <Binding />
+                                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:LogicalTaskJobGroupsControl}}" Path="Name" />
+                                </MultiBinding>
+                            </ContentControl.Content>
+                        </ContentControl>
+                    </Grid>
                 </Border>
             </HierarchicalDataTemplate>
-            <HierarchicalDataTemplate
-                        DataType="{x:Type vm:SnapshotViewModel}" 
-                        ItemsSource="{Binding Children}"
-                    >
+            <HierarchicalDataTemplate DataType="{x:Type vm:SnapshotViewModel}" ItemsSource="{Binding Children}">
                 <Border BorderBrush="Gray" BorderThickness="1" Margin="1">
-                    <ContentControl>
-                        <ContentControl.Content>
-                            <MultiBinding Converter="{StaticResource path2UserControlBase, diag:PresentationTraceSources.TraceLevel=High}">
-                                <Binding Path="UserControlPath" FallbackValue="Design Mode" />
-                                <Binding />
-                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:LogicalTaskJobGroupsControl}}" Path="Name" />
-                            </MultiBinding>
-                        </ContentControl.Content>
-                    </ContentControl>
+                    <Grid>
+                        <ContentControl>
+                            <ContentControl.Content>
+                                <MultiBinding Converter="{StaticResource path2UserControlBase, diag:PresentationTraceSources.TraceLevel=High}">
+                                    <Binding Path="UserControlPath" FallbackValue="Design Mode" />
+                                    <Binding />
+                                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:LogicalTaskJobGroupsControl}}" Path="Name" />
+                                </MultiBinding>
+                            </ContentControl.Content>
+                        </ContentControl>
+                    </Grid>
                 </Border>
             </HierarchicalDataTemplate>
-            <HierarchicalDataTemplate 
-                        DataType="{x:Type vm:NodeListViewModel}" 
-                        ItemsSource="{Binding Children}"
-                        >
+            <HierarchicalDataTemplate DataType="{x:Type vm:NodeListViewModel}" ItemsSource="{Binding Children}">
                 <Border BorderBrush="Gray" BorderThickness="1" Margin="1">
-                    <ContentControl>
-                        <ContentControl.Content>
-                            <MultiBinding Converter="{StaticResource path2UserControlBase, diag:PresentationTraceSources.TraceLevel=High}">
-                                <Binding Path="UserControlPath" FallbackValue="Design Mode" />
-                                <Binding />
-                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:LogicalTaskJobGroupsControl}}" Path="Name" />
-                            </MultiBinding>
-                        </ContentControl.Content>
-                    </ContentControl>
+                    <Grid>
+                        <ContentControl>
+                            <ContentControl.Content>
+                                <MultiBinding Converter="{StaticResource path2UserControlBase, diag:PresentationTraceSources.TraceLevel=High}">
+                                    <Binding Path="UserControlPath" FallbackValue="Design Mode" />
+                                    <Binding />
+                                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:LogicalTaskJobGroupsControl}}" Path="Name" />
+                                </MultiBinding>
+                            </ContentControl.Content>
+                        </ContentControl>
+                    </Grid>
                 </Border>
             </HierarchicalDataTemplate>
             <DataTemplate DataType="{x:Type vm:VishnuViewModelBase}">
-                <Border BorderBrush="Gray" BorderThickness="1" Margin="1" Name="ContentControlBorder1">
+                <Border BorderBrush="Gray" BorderThickness="1" Margin="1" Name="ContentControlBorder1"
+                        Grid.Column="2"
+                        Grid.Row="3">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="{StaticResource ItemAreaBrush}"/>
@@ -275,14 +285,25 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <zoom:ZoomBox x:Name="ZoomBox2" Grid.Row="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <zoom:ZoomBox x:Name="ZoomBox2" Grid.Row="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
             <Border x:Name="ScreenBorder" Background="{StaticResource PlaygroundColorBrush}">
                 <ItemsControl ItemsSource="{Binding JobGroupsVM}" Grid.Column="2" Name="itemsControl1"
                   VirtualizingStackPanel.IsVirtualizing="False"
                   VirtualizingStackPanel.VirtualizationMode="Standard">
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="{x:Type ContentPresenter}">
+                            <Setter Property="Grid.Row" Value="{Binding GridRow, diag:PresentationTraceSources.TraceLevel=High}" />
+                            <Setter Property="Grid.Column" Value="{Binding GridColumn, diag:PresentationTraceSources.TraceLevel=High}" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel />
+                            <!-- Hier spielt die Musik -->
+                            <!--WrapPanel /-->
+                            <Grid IsItemsHost="True" attached:GridHelpers.RowCount="{Binding GridRowCount, diag:PresentationTraceSources.TraceLevel=High}"
+                                                  attached:GridHelpers.ColumnCount="{Binding GridColumnCount, diag:PresentationTraceSources.TraceLevel=High}"
+                                                  ShowGridLines="False">
+                            </Grid>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>

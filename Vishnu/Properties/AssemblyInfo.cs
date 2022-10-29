@@ -13,7 +13,7 @@ using System.Windows;
 [assembly: AssemblyCompany("NetEti")]
 [assembly: AssemblyProduct("Vishnu")]
 [assembly: AssemblyCopyright("Copyright © Erik Nagel, NetEti 2012-2022")]
-[assembly: AssemblyTrademark("Direct Response")]
+[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Durch Festlegen von ComVisible auf "false" werden die Typen in dieser Assembly unsichtbar 
@@ -51,6 +51,6 @@ using System.Windows;
 // Sie können alle Werte angeben oder die standardmäßigen Build- und Revisionsnummern 
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("5.1.2.1")]
-[assembly: AssemblyFileVersion("5.1.2.1")]
+[assembly: AssemblyVersion("5.2.0.0")]
+[assembly: AssemblyFileVersion("5.2.0.0")]
 [assembly: GuidAttribute("B1270AEA-A8A7-4BF3-A3FE-4CFD7AADB72E")]

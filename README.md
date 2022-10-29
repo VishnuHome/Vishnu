@@ -139,10 +139,13 @@ Danke Peter Bromberg.
 Vielen Dank an Roman Semenov (poma) für diese Starthilfe.
 
 [Monphasen Berechnung](https://www.codeproject.com/script/Membership/View.aspx?mid=1961229)<br/>
-Danke Mostafa Kaisoun.
+Danke Mostafa Kaisoun für seine Berechnungslogik.
+
+[Wettervorhersagen und Wetter-Icons](http://www.7timer.info)<br/>
+Vielen Dank an Chenzhou Cui und seine Freunde, die diese wunderbare, freie Seite für Wettervorhersagen betreiben.
 
 [WPF-Tortendiagrammme](https://www.codeproject.com/Articles/442506/Simple-and-Easy-to-Use-Pie-Chart-Controls-in-WPF)</br>
-Dank an Kashif Imran auf Code Project.
+Vielen Dank an Kashif Imran auf Code Project.
 
 [Equality Converter](https://stackoverflow.com/questions/37302270/comparing-two-dynamic-values-in-datatrigger)</br>
 Dank an Jason Tyler auf stackoverflow.

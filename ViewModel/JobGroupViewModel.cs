@@ -1,6 +1,7 @@
 ﻿using LogicalTaskTree;
 using System;
 using System.Collections.ObjectModel;
+using System.Windows.Controls;
 using Vishnu.Interchange;
 
 namespace Vishnu.ViewModel
@@ -143,6 +144,19 @@ namespace Vishnu.ViewModel
             this.GroupJobList = rootJobListViewModel;
             this._flatNodeListFilter = flatNodeListFilter;
             this.FlatNodeViewModelList = LogicalTaskTreeViewModel.FlattenTree(this.GroupJobList, new ObservableCollection<LogicalNodeViewModel>(), this._flatNodeListFilter, false);
+            int columns = (int)(Math.Sqrt(this.FlatNodeViewModelList.Count));
+            int rows = (int)((1.0 * this.FlatNodeViewModelList.Count / columns) + 0.999999);
+            this.GridColumnCount = columns;
+            this.GridRowCount = rows;
+            for (int i = 0; i < this.FlatNodeViewModelList.Count; i++)
+            {
+                // Zeile und Spalte für das aktuelle Element berechnen (null-basiert):
+                int rowNumber = i / columns;
+                int columnNumber = i - rowNumber * columns;
+
+                this.FlatNodeViewModelList[i].GridRow = rowNumber;
+                this.FlatNodeViewModelList[i].GridColumn = columnNumber;
+            }
             this.RaisePropertyChanged("FlatNodeViewModelList");
             this.RaisePropertyChanged("DebugMode");
             this.RaisePropertyChanged("DebugNodeInfos");
@@ -205,6 +219,5 @@ namespace Vishnu.ViewModel
         private ObservableCollection<LogicalNodeViewModel> _flatNodeViewModelList;
         private NodeTypes _flatNodeListFilter;
         private volatile bool _isTreePaused;
-
     }
 }
