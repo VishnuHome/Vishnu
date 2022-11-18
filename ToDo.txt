@@ -991,6 +991,7 @@ Job.EventTriggers.Values Key ist nur die KnotenId, nicht der Pfad
 MailTo-Parameter
 SMS
 WhatsApp
+Dark Mode und weitere Designs.
 Telegram
 eigene User-Events
 Vishnu-App

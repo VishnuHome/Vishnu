@@ -7,7 +7,7 @@ using NetEti.Globals;
 using NetEti.MultiScreen;
 using System.Windows.Input;
 using Vishnu.Interchange;
-using System.Windows.Media;
+using System.Diagnostics;
 
 namespace Vishnu.ViewModel
 {
@@ -212,9 +212,21 @@ namespace Vishnu.ViewModel
         {
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(new DependencyObject()))
             {
-                if (this.DataContext is IVishnuViewModel)
+                object dataContext = this.DataContext;
+                if (dataContext is IVishnuViewModel)
                 {
-                    (this.DataContext as IVishnuViewModel).ParentView = this;
+                    (dataContext as IVishnuViewModel).ParentView = this;
+                }
+                else
+                {
+                    if (dataContext is MainWindowViewModel)
+                    {
+                        dataContext = ((MainWindowViewModel)dataContext).JobGroupsVM[0];
+                    }
+                }
+                if (dataContext is IVishnuRenderWatcher)
+                {
+                    (dataContext as IVishnuRenderWatcher).UserControlContentRendered(this);
                 }
             }
             try
@@ -232,10 +244,17 @@ namespace Vishnu.ViewModel
         {
             this.Loaded -= contentControl_Loaded;
 
-            if (this.DataContext != null)
+            if (this.DataContext != null && !(this.DataContext is Vishnu.ViewModel.MainWindowViewModel))
             {
                 this.UserResultViewModel = GetUserResultViewModel((IVishnuViewModel)this.DataContext);
                 ((IVishnuViewModel)this.DataContext).UserDataContext = this.UserResultViewModel;
+
+                // 18.11.2022+
+                // Zwingt die Controls nochmal zur Neuberechnung ihrer maximalen Größe. Ohne diese Neuberechnung
+                // werden einzelne Zeilen des umgebenden, dynamischen Grids nicht dargestellt.
+                this.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                // InfoController.Say(String.Format($"#JOBGROUP# DynamicUserControlBase - Name: {((LogicalNodeViewModel)this.DataContext).Id}, Width: {this.DesiredSize.Width}, Height: {this.DesiredSize.Height}"));
+                // 18.11.2022-
             }
 
             ContextMenu contextMenu = (ContextMenu)this.Resources["cmContextMenu"];
@@ -243,8 +262,8 @@ namespace Vishnu.ViewModel
             contextMenu.DataContext = this.DataContext;
             this.ContextMenu = contextMenu;
 
-            Dispatcher.BeginInvoke(new Action<ContentControl>(this.waitForContentRendered)
-              , System.Windows.Threading.DispatcherPriority.ApplicationIdle, new object[] { e.Source as ContentControl });
+            Dispatcher.BeginInvoke(new Action<ContentControl>(this.waitForContentRendered),
+                System.Windows.Threading.DispatcherPriority.ApplicationIdle, new object[] { e.Source as ContentControl });
         }
 
         private void ContextMenu_Loaded(object sender, RoutedEventArgs e)

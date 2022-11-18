@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Windows;
-using Vishnu.Interchange;
 
 namespace Vishnu.Interchange
 {
@@ -28,5 +27,6 @@ namespace Vishnu.Interchange
         /// Bindung an ein optionales, spezifisches User-ViewModel.
         /// </summary>
         object UserDataContext { get; set; }
+
     }
 }

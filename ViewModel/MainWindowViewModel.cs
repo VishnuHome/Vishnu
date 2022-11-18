@@ -79,46 +79,6 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
-        /// Liefert oder setzt die Zeilenanzahl für das enthaltende Grid.
-        /// </summary>
-        /// <returns>die Zeilenanzahl des enthaltenden Grids.</returns>
-        public int GridRowCount
-        {
-            get
-            {
-                return this._gridRowCount;
-            }
-            set
-            {
-                if (this._gridRowCount != value)
-                {
-                    this._gridRowCount = value;
-                }
-                this.RaisePropertyChanged("GridRowCount");
-            }
-        }
-
-        /// <summary>
-        /// Liefert oder setzt die Zeilenanzahl für das enthaltende Grid.
-        /// </summary>
-        /// <returns>die Zeilenanzahl des enthaltenden Grids.</returns>
-        public int GridColumnCount
-        {
-            get
-            {
-                return this._gridColumnCount;
-            }
-            set
-            {
-                if (this._gridColumnCount != value)
-                {
-                    this._gridColumnCount = value;
-                }
-                this.RaisePropertyChanged("GridColumnCount");
-            }
-        }
-
-        /// <summary>
         /// Zusätzliche Parameter, die für den gesamten Tree Gültigkeit haben oder null.
         /// </summary>
         public TreeParameters TreeParams { get; private set; }
@@ -184,20 +144,6 @@ namespace Vishnu.ViewModel
             treeParams.ViewModelRoot = this;
             this.TreeParams = treeParams;
             this.JobGroupsVM = this.SelectJobGroups(null);
-
-            int columns = (int)(Math.Sqrt(this.JobGroupsVM.Count));
-            int rows = (int)((1.0 * this.JobGroupsVM.Count / columns) + 0.999999);
-            this.GridColumnCount = columns;
-            this.GridRowCount = rows;
-            for (int i = 0; i < this.JobGroupsVM.Count; i++)
-            {
-                // Zeile und Spalte für das aktuelle Element berechnen (null-basiert):
-                int rowNumber = i / columns;
-                int columnNumber = i - rowNumber * columns;
-
-                this.JobGroupsVM[i].GridRow = rowNumber;
-                this.JobGroupsVM[i].GridColumn = columnNumber;
-            }
 
             this.WindowTitle = "Vishnu Logical Process Monitor"
                 + " - " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()

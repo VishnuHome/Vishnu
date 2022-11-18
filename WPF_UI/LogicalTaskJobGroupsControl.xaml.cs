@@ -13,7 +13,7 @@ namespace Vishnu.WPF_UI
     ///
     /// 01.10.2014 Erik Nagel: erstellt
     /// </remarks>
-    public partial class LogicalTaskJobGroupsControl : UserControl
+    public partial class LogicalTaskJobGroupsControl : DynamicUserControlBase
     {
         /// <summary>
         /// Konstruktor: erzeugt eine Instanz von LogicalTaskTreeViewModel

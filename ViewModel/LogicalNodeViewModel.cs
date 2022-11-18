@@ -1024,27 +1024,6 @@ namespace Vishnu.ViewModel
             this.CollapsedEventCommand = new RelayCommand(this.HandleExpanderCollapsedEvent);
             this.SizeChangedEventCommand = new RelayCommand(this.HandleExpanderSizeChangedEvent);
             this.RaisePropertyChanged("RootJobListViewModel");
-            if (this.Children.Count > 0)
-            {
-                int columns = (int)(Math.Sqrt(this.Children.Count) + 0.5);
-                int rows = this.Children.Count / columns;
-                this.GridColumnCount = columns;
-                this.GridRowCount = rows;
-                for (int i = 0; i < this.Children.Count; i++)
-                {
-                    // Zeile und Spalte für das aktuelle Element berechnen (null-basiert):
-                    int rowNumber = i / columns;
-                    int columnNumber = i - rowNumber * columns;
-                    this.Children[i].GridRow = rowNumber;
-                    this.Children[i].GridColumn = columnNumber;
-                }
-
-            }
-            else
-            {
-                this.GridColumnCount = 1;
-                this.GridRowCount = 1;
-            }
         }
 
         /// <summary>

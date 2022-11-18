@@ -1,7 +1,14 @@
 ﻿using LogicalTaskTree;
+using NetEti.ApplicationControl;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using Vishnu.Interchange;
 
 namespace Vishnu.ViewModel
@@ -44,6 +51,14 @@ namespace Vishnu.ViewModel
                 {
                     // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
                     LogicalNode.AllNodesStateChanged -= this.LogicalNode_AllNodesStateChanged;
+                    if (this.FlatNodeViewModelList != null)
+                    {
+                        for (int i = 0; i < this.FlatNodeViewModelList.Count; i++)
+                        {
+                            this.FlatNodeViewModelList[i].PropertyChanged -= JobGroupViewModel_PropertyChanged;
+                        }
+
+                    }
                 }
                 // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
                 // TODO: Große Felder auf NULL setzen
@@ -125,12 +140,79 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Liefert oder setzt die Zeilenanzahl für das enthaltende Grid.
+        /// </summary>
+        /// <returns>die Zeilenanzahl des enthaltenden Grids.</returns>
+        public int GridRowCount
+        {
+            get
+            {
+                return this._gridRowCount;
+            }
+            set
+            {
+                if (this._gridRowCount != value)
+                {
+                    this._gridRowCount = value;
+                }
+                this.RaisePropertyChanged("GridRowCount");
+            }
+        }
+
+        /// <summary>
+        /// Liefert oder setzt die Zeilenanzahl für das enthaltende Grid.
+        /// </summary>
+        /// <returns>die Zeilenanzahl des enthaltenden Grids.</returns>
+        public int GridColumnCount
+        {
+            get
+            {
+                return this._gridColumnCount;
+            }
+            set
+            {
+                if (this._gridColumnCount != value)
+                {
+                    this._gridColumnCount = value;
+                }
+                this.RaisePropertyChanged("GridColumnCount");
+            }
+        }
+
+        /// <summary>
+        /// Liefert oder setzt die Zeilenanzahl einer quadratischen Matrix.
+        /// Dieser Wert wird zu einem geeigneten Zeitpunkt in die Property GridRowCount geschoben,
+        /// um die WPF-GUI zu informieren.
+        /// </summary>
+        /// <returns>Die Zeilenanzahl einer quadratischen Matrix.</returns>
+        public int RowCount;
+
+        /// <summary>
+        /// Liefert oder setzt die Spaltenanzahl einer quadratischen Matrix.
+        /// Dieser Wert wird zu einem geeigneten Zeitpunkt in die Property GridColumnCount geschoben,
+        /// um die WPF-GUI zu informieren.
+        /// </summary>
+        /// <returns>Die Spaltenanzahl einer quadratischen Matrix.</returns>
+        public int ColumnCount;
+
+        /// <summary>
         /// Liefert einen string für Debug-Zwecke.
         /// </summary>
         /// <returns>Ein String für Debug-Zwecke.</returns>
         public override string GetDebugNodeInfos()
         {
             return this.GroupJobList.GetDebugNodeInfos();
+        }
+
+        /// <summary>
+        /// Wird von DynamicUserControlBase angesprungen, wenn das UserControl vollständig gerendered wurde.
+        /// </summary>
+        /// <param name="dynamicUserControl">Das aufrufende DynamicUserControlBase als Object.</param>
+        public override void UserControlContentRendered(object dynamicUserControl)
+        {
+            // nein: base.UserControlContentRendered(dynamicUserControl);
+            // Thread.Sleep(15000);
+            // Dispatcher.BeginInvoke(new Action(() => { SetGridMeasures(); }), DispatcherPriority.ApplicationIdle);
         }
 
         /// <summary>
@@ -144,23 +226,85 @@ namespace Vishnu.ViewModel
             this.GroupJobList = rootJobListViewModel;
             this._flatNodeListFilter = flatNodeListFilter;
             this.FlatNodeViewModelList = LogicalTaskTreeViewModel.FlattenTree(this.GroupJobList, new ObservableCollection<LogicalNodeViewModel>(), this._flatNodeListFilter, false);
+            this._renderedControls = new ConcurrentBag<string>();
+            this.PresetGridProperties(this.FlatNodeViewModelList);
+
+            this.RaisePropertyChanged("FlatNodeViewModelList");
+            this.RaisePropertyChanged("DebugMode");
+            this.RaisePropertyChanged("DebugNodeInfos");
+            LogicalNode.AllNodesStateChanged += this.LogicalNode_AllNodesStateChanged;
+        }
+
+        /// <summary>
+        /// Berechnet die Anzahl Zeilen und Spalten für ein möglichst quadratisches Grid
+        /// abhängig von der Gesamtanzahl darzustellender Controls bzw. deren ViewModels.
+        /// Weist außerdem jedem ViewModel eines einzelnen Controls seine Zeilen- und Spaltennummer zu.
+        /// Alle Zuweisungen werden hier zwar gespeichert, aber erst zu einem späteren Zeitpunkt in die
+        /// Properties geschoben, welche über INotifyPropertyChanged die WPF-GUI informieren.
+        /// </summary>
+        /// <param name="FlatNodeViewModelList"></param>
+        private void PresetGridProperties(ObservableCollection<LogicalNodeViewModel> FlatNodeViewModelList)
+        {
             int columns = (int)(Math.Sqrt(this.FlatNodeViewModelList.Count));
             int rows = (int)((1.0 * this.FlatNodeViewModelList.Count / columns) + 0.999999);
-            this.GridColumnCount = columns;
-            this.GridRowCount = rows;
+            this.ColumnCount = columns;
+            this.RowCount = rows;
+
+            // 18.11.2022 Test+
+            this.SetGridMeasures();
+            // 18.11.2022 Test-
+
+            InfoController.Say(String.Format($"#JOBGROUP# JobGroupViewModel - gesamt: {this.FlatNodeViewModelList.Count}, ColumnCount: {this.ColumnCount}, RowCount: {this.RowCount}"));
             for (int i = 0; i < this.FlatNodeViewModelList.Count; i++)
             {
                 // Zeile und Spalte für das aktuelle Element berechnen (null-basiert):
                 int rowNumber = i / columns;
                 int columnNumber = i - rowNumber * columns;
 
+                this.FlatNodeViewModelList[i].RowNumber = rowNumber;
+                this.FlatNodeViewModelList[i].ColumnNumber = columnNumber;
+
+                // 18.11.2022 Test+
                 this.FlatNodeViewModelList[i].GridRow = rowNumber;
                 this.FlatNodeViewModelList[i].GridColumn = columnNumber;
+                // 18.11.2022 Test-
+
+                this.FlatNodeViewModelList[i].PropertyChanged += JobGroupViewModel_PropertyChanged;
+
             }
-            this.RaisePropertyChanged("FlatNodeViewModelList");
-            this.RaisePropertyChanged("DebugMode");
-            this.RaisePropertyChanged("DebugNodeInfos");
-            LogicalNode.AllNodesStateChanged += this.LogicalNode_AllNodesStateChanged;
+        }
+
+        private void SetGridMeasures()
+        {
+            this.GridColumnCount = this.ColumnCount;
+            this.GridRowCount = this.RowCount;
+            InfoController.Say(String.Format($"#JOBGROUP# JobGroupViewModel - RowCount: {this.RowCount,3:d}, ColumnCount: {this.ColumnCount,2:d}"));
+        }
+
+        private void JobGroupViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("IsRendered"))
+            {
+                if (sender is VishnuViewModelBase)
+                {
+                    VishnuViewModelBase typedSender = (sender as VishnuViewModelBase);
+                    if (typedSender != null && typedSender.IsRendered)
+                    {
+                        if (!this._renderedControls.Contains(typedSender.VisualTreeCacheBreaker))
+                        {
+                            this._renderedControls.Add(typedSender.VisualTreeCacheBreaker);
+                            if (this._renderedControls.Count >= this.FlatNodeViewModelList.Count)
+                            {
+                                // this.SetGridMeasures();
+
+                                // this.Invalidate();
+                                // this.ParentView?.InvalidateVisual();
+                                // Dispatcher.BeginInvoke(new Action(() => { this.SetGridMeasures(); }), DispatcherPriority.Background);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         #region context menu
@@ -203,6 +347,10 @@ namespace Vishnu.ViewModel
         }
 
         #endregion context menu
+
+        private int _gridRowCount;
+        private int _gridColumnCount;
+        private ConcurrentBag<string> _renderedControls;
 
         private void LogicalNode_AllNodesStateChanged()
         {

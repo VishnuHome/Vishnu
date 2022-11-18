@@ -1,4 +1,5 @@
 ﻿using LogicalTaskTree;
+using NetEti.ApplicationControl;
 using NetEti.MVVMini;
 using System;
 using System.Windows;
@@ -18,7 +19,7 @@ namespace Vishnu.ViewModel
     ///
     /// 22.05.2015 Erik Nagel: erstellt
     /// </remarks>
-    public abstract class VishnuViewModelBase : ObservableObject, IVishnuViewModel
+    public abstract class VishnuViewModelBase : ObservableObject, IVishnuViewModel, IVishnuRenderWatcher
     {
         /// <summary>
         /// Command für das ContextMenuItem "Reload" im ContextMenu für das "MainGrid" des Controls.
@@ -34,6 +35,8 @@ namespace Vishnu.ViewModel
         /// Command für das ContextMenuItem "Pause Tree" im ContextMenu für das "MainGrid" des Controls.
         /// </summary>
         public ICommand PauseResumeLogicalTaskTree { get { return this._btnPauseResumeTaskTreeRelayCommand; } }
+
+        #region IVishnuViewModel
 
         /// <summary>
         /// Das ReturnObject der zugeordneten LogicalNode.
@@ -93,6 +96,8 @@ namespace Vishnu.ViewModel
             }
         }
 
+        #endregion IVishnuViewModel
+
         /// <summary>
         /// Eindeutiger GlobalUniqueIdentifier.
         /// Wird im Konstruktor vergeben und fließt in die überschriebene Equals-Methode ein.
@@ -119,47 +124,7 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
-        /// Liefert oder setzt die Zeilenanzahl für das enthaltende Grid.
-        /// </summary>
-        /// <returns>die Zeilenanzahl des enthaltenden Grids.</returns>
-        public int GridRowCount
-        {
-            get
-            {
-                return this._gridRowCount;
-            }
-            set
-            {
-                if (this._gridRowCount != value)
-                {
-                    this._gridRowCount = value;
-                }
-                this.RaisePropertyChanged("GridRowCount");
-            }
-        }
-
-        /// <summary>
-        /// Liefert oder setzt die Zeilenanzahl für das enthaltende Grid.
-        /// </summary>
-        /// <returns>die Zeilenanzahl des enthaltenden Grids.</returns>
-        public int GridColumnCount
-        {
-            get
-            {
-                return this._gridColumnCount;
-            }
-            set
-            {
-                if (this._gridColumnCount != value)
-                {
-                    this._gridColumnCount = value;
-                }
-                this.RaisePropertyChanged("GridColumnCount");
-            }
-        }
-
-        /// <summary>
-        /// Liefert die Zeile im enthaltenden Grid für das aktuelle Element.
+        /// Liefert oder setzt die Zeile im enthaltenden Grid für das aktuelle Element.
         /// </summary>
         /// <returns>die Zeile im enthaltenden Grid.</returns>
         public int GridRow
@@ -173,15 +138,15 @@ namespace Vishnu.ViewModel
                 if (this._gridRow != value)
                 {
                     this._gridRow = value;
+                    this.RaisePropertyChanged("GridRow");
                 }
-                this.RaisePropertyChanged("GridRow");
             }
         }
 
         /// <summary>
-        /// Liefert oder setzt die Zeilenanzahl für das enthaltende Grid.
+        /// Liefert oder setzt die Spalte im enthaltenden Grid für das aktuelle Element.
         /// </summary>
-        /// <returns>die Zeilenanzahl des enthaltenden Grids.</returns>
+        /// <returns>die Spalte im enthaltenden Grid.</returns>
         public int GridColumn
         {
             get
@@ -193,12 +158,48 @@ namespace Vishnu.ViewModel
                 if (this._gridColumn != value)
                 {
                     this._gridColumn = value;
-                    // Random rnd = new Random(); // 07.10.2022 Test+
-                    // this._gridColumn = rnd.Next(3); // 07.10.2022 Test-
+                    this.RaisePropertyChanged("GridColumn");
                 }
-                this.RaisePropertyChanged("GridColumn");
             }
         }
+
+        /// <summary>
+        /// Zeigt an, ob das zugehörige Control vollständig gezeichnet wurde.
+        /// </summary>
+        public bool IsRendered
+        {
+            get
+            {
+                return this._isRendered;
+            }
+            private set
+            {
+                if (this._isRendered != value)
+                {
+                    this._isRendered = value;
+                    this.RaisePropertyChanged("IsRendered");
+                }
+            }
+        }
+
+
+    /// <summary>
+    /// Liefert oder setzt die Zeilennnummer des zugehörigen Controls
+    /// in einer quadratischen Matrix.
+    /// Dieser Wert wird zu einem geeigneten Zeitpunkt in die Property GridRow geschoben,
+    /// um die WPF-GUI zu informieren.
+    /// </summary>
+    /// <returns>Die Zeilennummer des zugehörigen Controls in einer quadratischen Matrix.</returns>
+    public int RowNumber;
+
+        /// <summary>
+        /// Liefert oder setzt die Spaltennummer des zugehörigen Controls
+        /// in einer quadratischen Matrix.
+        /// Dieser Wert wird zu einem geeigneten Zeitpunkt in die Property GridColumn geschoben,
+        /// um die WPF-GUI zu informieren.
+        /// </summary>
+        /// <returns>Die Spaltennummer des zugehörigen Controls in einer quadratischen Matrix.</returns>
+        public int ColumnNumber;
 
         /// <summary>
         /// Vergibt einen neuen GlobalUniqueIdentifier für den VisualTreeCacheBreaker.
@@ -216,6 +217,22 @@ namespace Vishnu.ViewModel
         {
             return this.VisualTreeCacheBreaker;
         }
+
+        #region IVishnuRenderWatcher Implementation
+
+        /// <summary>
+        /// Wird von DynamicUserControlBase angesprungen, wenn das UserControl vollständig gerendered wurde.
+        /// </summary>
+        /// <param name="dynamicUserControl">Das aufrufende DynamicUserControlBase als Object.</param>
+        public virtual void UserControlContentRendered(object dynamicUserControl)
+        {
+            this.GridColumn = this.ColumnNumber;
+            this.GridRow = this.RowNumber;
+            InfoController.Say(String.Format($"#JOBGROUP# VishnuViewModelBase - RowNumber: {this.RowNumber,3:d}, ColumnNumber: {this.ColumnNumber,2:d}"));
+            this.IsRendered = true;
+        }
+
+        #endregion IVishnuRenderWatcher Implementation
 
         #region context menu
 
@@ -290,10 +307,7 @@ namespace Vishnu.ViewModel
             this._btnLogTaskTreeRelayCommand = new RelayCommand(LogTaskTreeExecute, CanLogTaskTreeExecute);
             this._btnPauseResumeTaskTreeRelayCommand = new RelayCommand(PauseResumeTaskTreeExecute, CanPauseResumeTaskTreeExecute);
             this._visualTreeCacheBreaker = Guid.NewGuid().ToString();
-            this.GridRowCount = 1;
-            this.GridColumnCount = 1;
-            this.GridColumn = 0;
-            this.GridRow = 0;
+            this.IsRendered = false;
         }
 
         /// <summary>
@@ -326,10 +340,6 @@ namespace Vishnu.ViewModel
         /// </summary>
         /// <param name="parentView">Das Parent-Control.</param>
         protected virtual void ParentViewToBL(FrameworkElement parentView) { }
-        private int _gridRowCount;
-        private int _gridColumnCount;
-        private int _gridRow;
-        private int _gridColumn;
 
         private RelayCommand _btnReloadTaskTreeRelayCommand;
         private RelayCommand _btnLogTaskTreeRelayCommand;
@@ -338,5 +348,8 @@ namespace Vishnu.ViewModel
         private object _userDataContext;
         private FrameworkElement _parentView;
         private string _visualTreeCacheBreaker;
+        private int _gridRow;
+        private int _gridColumn;
+        private bool _isRendered;
     }
 }

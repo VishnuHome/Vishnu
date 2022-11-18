@@ -87,6 +87,7 @@
     <Compile Include="DummyLogicalTaskTreeViewModel.cs" />
     <Compile Include="DynamicUserControlBase.cs" />
     <Compile Include="DynamicUserControlViewModelBase.cs" />
+    <Compile Include="IVishnuRenderWatcher.cs" />
     <Compile Include="JobConnectorViewModel.cs" />
     <Compile Include="JobGroupViewModel.cs" />
     <Compile Include="JobListViewModel.cs" />
