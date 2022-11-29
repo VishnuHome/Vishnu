@@ -143,6 +143,7 @@
                                                       behaviour:ExpanderBehaviour.SizeChangedCommand="{Binding SizeChangedEventCommand}"
                                                       attached:AttachedPropertiesContainer.HasParent="{Binding HasParent}"
                                                       attached:AttachedPropertiesContainer.ParentChildOrientation="{Binding Parent.ChildOrientation, diag:PresentationTraceSources.TraceLevel=High}"
+                                                      attached:AttachedPropertiesContainer.LastNotNullLogical="{Binding LastNotNullLogical, diag:PresentationTraceSources.TraceLevel=High}"
                                               >
                                             <Expander.Header>
                                                 <!-- Der 'ContentPresenter' zeigt den Inhalt des TreeViewItems an. -->
@@ -152,7 +153,7 @@
                                                             VerticalAlignment="Center" />
                                             </Expander.Header>
                                             <!-- 'ItemsPresenter' zeigt die Kinder des TreeViewItems an. -->
-                                            <StackPanel IsItemsHost="True" Orientation="{Binding ChildOrientation}" />
+                                            <StackPanel x:Name="stpItemsHost" IsItemsHost="True" Orientation="{Binding ChildOrientation}" />
                                             <!-- ItemsPresenter / -->
                                         </Expander>
                                     </Grid>

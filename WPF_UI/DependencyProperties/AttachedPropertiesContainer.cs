@@ -1,5 +1,8 @@
-﻿using System.Windows;
+﻿using NetEti.ApplicationControl;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using Vishnu.ViewModel;
 
 namespace Vishnu.WPF_UI.DependencyProperties
 {
@@ -11,9 +14,88 @@ namespace Vishnu.WPF_UI.DependencyProperties
     /// Autor: Erik Nagel
     ///
     /// 22.07.2013 Erik Nagel: erstellt
+    /// 28.11.2022 Erik Nagel: LastNotNullLogicalProperty.
     /// </remarks>
     public static class AttachedPropertiesContainer
     {
+        static AttachedPropertiesContainer()
+        {
+            LastNotNullLogicalProperty = ConstructLastNotNullLogicalProperty();
+        }
+
+        #region LastNotNullLogical
+
+        /// <summary>
+        /// Attached Property für einen nullable Boolean zur Weitergabe des logischen Zustands
+        /// des dem Control zugeordneten Checkers (wird z.B. zur abhängigen Farbgebung
+        /// (false=rot, true=grün) einer übergeordneten Border in einem ControlTemplate genutzt):
+        /// Nach diversen Fehlversuchen hat sich als einzige gangbare Lösung folgende Vorgehensweise
+        /// herauskristallisiert: einem dem ControlTemplate übergeordneten Control oder
+        /// DataTemplate wird die AttachedPropery "LastNotNullLogical" zugeordnet:
+        ///     &lt;Expander Name="Exp" Template="{StaticResource ExpanderStyleHeaderCentered}"
+        ///                   ...
+        ///                   attached:AttachedPropertiesContainer.LastNotNullLogical="{Binding LastNotNullLogical, diag:PresentationTraceSources.TraceLevel=High}"
+        ///     &gt;
+        /// Die AttachedPropery "LastNotNullLogical" wird dabei direkt an "LastNotNullLogical" aus
+        /// dem DataContext, hier "LogicalNodeViewModel" gebunden.
+        /// Im untergeordneten ControlTemplate, hier &lt;ControlTemplate TargetType="ToggleButton"&gt;
+        /// in LogicalTaskTreeControlStaticResourceDictionary.xaml werden DataTrigger an das übergeornete
+        /// Control mit Path auf die AttachedPropery "LastNotNullLogical" gebunden:
+        ///    &lt;DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
+        ///                    Path=(attached:AttachedPropertiesContainer.LastNotNullLogical)}" Value="True"&gt;
+        ///        &lt;Setter Property = "Border.BorderBrush" TargetName="ToggleButtonBorder" Value="{StaticResource ItemBorderBrushGreen}" /&gt;
+        ///    &lt;/DataTrigger&gt;
+        ///    &lt;DataTrigger Binding = "{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
+        ///                    Path=(attached:AttachedPropertiesContainer.LastNotNullLogical)}" Value="False"&gt;
+        ///        &lt;Setter Property = "Border.BorderBrush" TargetName = "ToggleButtonBorder" Value = "{StaticResource ItemBorderBrushRed}" /&gt;
+        ///    &lt;/ DataTrigger&gt;
+        ///    
+        ///    Wichtiger Hinweis: andere Lösungsansätze scheiterten spätestens bei Umschaltung der Tree-Orientierung.
+        /// </summary>
+        public static readonly DependencyProperty LastNotNullLogicalProperty;
+
+        private static FrameworkPropertyMetadata _lastNotNullLogicalMetadata;
+
+        private static DependencyProperty ConstructLastNotNullLogicalProperty()
+        {
+            _lastNotNullLogicalMetadata = new FrameworkPropertyMetadata();
+            _lastNotNullLogicalMetadata.AffectsRender = true;
+            _lastNotNullLogicalMetadata.PropertyChangedCallback = new PropertyChangedCallback(
+                (sender, eventargs) =>
+                {
+                    if (sender is FrameworkElement)
+                    {
+                        // InfoController.Say(string.Format($"{(sender as FrameworkElement).Name} LastNotNullLogicalProperty changed."));
+                    }
+                }
+            );
+            return DependencyProperty.RegisterAttached("LastNotNullLogical", typeof(bool?), typeof(AttachedPropertiesContainer), _lastNotNullLogicalMetadata);
+        }
+
+        /// <summary>
+        /// WPF-Setter für die LastNotNullLogicalProperty.
+        /// </summary>
+        /// <param name="obj">Das besitzende Control.</param>
+        /// <param name="val">Ein nullable Boolean, der dem letzten logischen Zustand des Controls entspricht.</param>
+        public static void SetLastNotNullLogical(DependencyObject obj, bool? val)
+        {
+            obj.SetValue(LastNotNullLogicalProperty, val);
+        }
+
+        /// <summary>
+        /// WPF-Getter für die LastNotNullLogicalProperty.
+        /// </summary>
+        /// <param name="obj">Das besitzende Control.</param>
+        /// <returns>Ein nullable Boolean, der dem letzten logischen Zustand des Controls entspricht.</returns>
+        public static bool? GetLastNotNullLogical(DependencyObject obj)
+        {
+            return (bool?)obj.GetValue(LastNotNullLogicalProperty);
+        }
+
+        #endregion LastNotNullLogical
+
+        #region HasParentProperty
+
         /// <summary>
         /// Bei True hat der Knoten einen Eltern-Knoten,
         /// bei False ist er die Root.
@@ -72,6 +154,10 @@ namespace Vishnu.WPF_UI.DependencyProperties
             }
         }
 
+        #endregion HasParentProperty
+
+        #region ParentChildOrientationProperty
+
         /// <summary>
         /// Ausrichtung der Kind-Knoten, horizontal oder vertikal.
         /// </summary>
@@ -128,5 +214,8 @@ namespace Vishnu.WPF_UI.DependencyProperties
                 // args.NewValue as TargetPropertyType);
             }
         }
+
+        #endregion ParentChildOrientationProperty
+
     }
 }

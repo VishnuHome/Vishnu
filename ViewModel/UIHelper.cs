@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
-using Vishnu.Interchange;
 
 namespace Vishnu.ViewModel
 {
@@ -19,6 +16,8 @@ namespace Vishnu.ViewModel
     /// </remarks>
     public static class UIHelper
     {
+        #region find childs
+
         /// <summary>
         /// Sucht im LogicalTree vom FrameworkElement element
         /// nach dem ersten Kindelement vom Typ T.
@@ -44,7 +43,9 @@ namespace Vishnu.ViewModel
             foreach (object child in LogicalTreeHelper.GetChildren(element))
             {
                 if ((child is T) && (String.IsNullOrEmpty(name) || (child as FrameworkElement).Name == name))
+                {
                     return child as T;
+                }
 
                 if (child is FrameworkElement)
                 {
@@ -123,6 +124,71 @@ namespace Vishnu.ViewModel
 
             return null;
         }
+
+        #endregion find childs
+
+        #region find parents
+
+        /// <summary>
+        /// Sucht im VisualTree vom FrameworkElement element
+        /// aufwärts nach dem ersten Elternelement vom Typ T.
+        /// </summary>
+        /// <typeparam name="T">Typ des gesuchten Elternelements.</typeparam>
+        /// <param name="element">FrameworkElement, dessen VisualTree durchsucht werden soll.</param>
+        /// <returns>Elternelement vom Typ T oder null.</returns>
+        public static T FindFirstVisualParentOfType<T>(FrameworkElement element) where T : FrameworkElement
+        {
+            return FindFirstVisualParentOfTypeAndName<T>(element, null);
+        }
+
+        /// <summary>
+        /// Sucht im VisualTree vom FrameworkElement element aufwärts
+        /// nach dem ersten Elternelement vom Typ T mit Name == name.
+        /// </summary>
+        /// <typeparam name="T">Typ des gesuchten Elternelements.</typeparam>
+        /// <param name="element">FrameworkElement, dessen VisualTree durchsucht werden soll.</param>
+        /// <param name="name">Name des gesuchten Elternelements oder null.</param>
+        /// <returns>Elternelement vom Typ T (und wenn angegeben, mit Name == name) oder null.</returns>
+        public static T FindFirstVisualParentOfTypeAndName<T>(FrameworkElement element, string name) where T : FrameworkElement
+        {
+            FrameworkElement parent = (FrameworkElement)GetNearestParent(element);
+            while (parent != null)
+            {
+                if (parent is T)
+                {
+                    string attachedName = (string)parent.GetValue(DynamicUserControlBase.AttachedNameProperty);
+                    string parentName = String.IsNullOrEmpty(attachedName) ? parent.Name : attachedName;
+                    if (String.IsNullOrEmpty(name) || parentName == name)
+                    {
+                        return (T)parent;
+                    }
+                }
+                parent = (FrameworkElement)GetNearestParent(parent);
+            }
+
+            return null;
+        }
+
+        private static DependencyObject GetNearestParent(FrameworkElement child)
+        {
+            // Folgende Ansätze sind nicht ausreichend, da sie entweder an der DLL-Grenze
+            // beim Übergang aus dynamisch geladenen UserControls zum übergeordneten Control
+            // stoppen, oder aber in Resourcen-Templates definierte Stufen überspringen:
+            //     DependencyObject parent = child.Parent;
+            //     DependencyObject logicalParent = LogicalTreeHelper.GetParent(child);
+            //     DependencyObject templateParent = child.TemplatedParent;
+
+            // Das geht auch nicht, VisualParent ist protected:
+            //     parentCandidate = parent.VisualParent;
+            
+            // Das ist endlich erfolgreich:
+            PropertyInfo propertyInfo = child.GetType().GetProperty("VisualParent",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+            );
+            return propertyInfo.GetValue(child) as DependencyObject;
+        }
+
+        #endregion find parents
 
     }
 }

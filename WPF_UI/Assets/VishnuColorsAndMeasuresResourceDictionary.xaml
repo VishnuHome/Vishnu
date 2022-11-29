@@ -34,6 +34,14 @@
         <GradientStop Color="LightGray" Offset="0" />
         <GradientStop Color="Gray" Offset="1" />
     </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ItemBorderBrushGreen" StartPoint="0.5, 0" EndPoint="0.5, 1">
+        <GradientStop Color="#FFAAFFAA" Offset="0" />
+        <GradientStop Color="#FF009900" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ItemBorderBrushRed" StartPoint="0.5, 0" EndPoint="0.5, 1">
+        <GradientStop Color="#FFFFAAAA" Offset="0" />
+        <GradientStop Color="#FF990000" Offset="1" />
+    </LinearGradientBrush>
     <LinearGradientBrush x:Key="SelectedItemAreaBrush" StartPoint="0.5, 0" EndPoint="0.5, 1">
         <!--<GradientStop Color="#44333366" Offset="0" />
         <GradientStop Color="#116666FF" Offset="1" />-->

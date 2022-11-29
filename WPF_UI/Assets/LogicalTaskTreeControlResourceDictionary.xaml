@@ -65,7 +65,7 @@
                                                     Height="{Binding Source={StaticResource NodeConnectorHeight}, Path=Top}"
                                                     VerticalAlignment="Center">
                                             </Rectangle>
-                                            <Border Name="ToggleButtonBorder" Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch"
+                                            <Border x:Name="ToggleButtonBorder" Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch"
                                                         Background="{StaticResource VerticalItemAreaBrush}"
                                                         BorderBrush="{StaticResource ItemBorderBrush}" 
                                                         BorderThickness="{StaticResource ItemBorder.BorderThickness}" 
@@ -84,7 +84,7 @@
                                                             HorizontalAlignment="Center" VerticalAlignment="Center" SnapsToDevicePixels="False"
                                                             Stroke="{StaticResource ToggleButtonArrow.Brush}"
                                                             StrokeThickness="{StaticResource ToggleButtonArrow.StrokeThickness}" />
-                                                    <ContentPresenter Content="{TemplateBinding ContentControl.Content}" ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}"
+                                                    <ContentPresenter x:Name="cp1" Content="{TemplateBinding ContentControl.Content}" ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}"
                                                                   ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}" Grid.Column="1"
                                                                   HorizontalAlignment="Stretch"
                                                                   Margin="0,0,0,0" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Center">
@@ -93,6 +93,14 @@
                                             </Border>
                                         </Grid>
                                         <ControlTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
+                                                Path=(attached:AttachedPropertiesContainer.LastNotNullLogical)}" Value="True">
+                                                <Setter Property="Border.BorderBrush" TargetName="ToggleButtonBorder" Value="{StaticResource ItemBorderBrushGreen}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
+                                                Path=(attached:AttachedPropertiesContainer.LastNotNullLogical)}" Value="False">
+                                                <Setter Property="Border.BorderBrush" TargetName="ToggleButtonBorder" Value="{StaticResource ItemBorderBrushRed}" />
+                                            </DataTrigger>
                                             <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
                                                 Path=(attached:AttachedPropertiesContainer.ParentChildOrientation)}" Value="Horizontal">
                                                 <Setter Property="Width" TargetName="TopNodeConnector" Value="{Binding Source={StaticResource NodeConnectorHeight}, Path=Top}" />
@@ -190,7 +198,7 @@
                             <Setter Property="Control.Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="ToggleButton">
-                                        <Grid>
+                                        <Grid x:Name="grdOuter">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                                                 <ColumnDefinition Width="*"></ColumnDefinition>
@@ -211,18 +219,18 @@
                                                     Height="{Binding Source={StaticResource NodeConnectorHeight}, Path=Top}"
                                                     VerticalAlignment="Center">
                                             </Rectangle>
-                                            <Border Name="ToggleButtonBorder" Grid.Row="1" Grid.Column="1"
+                                            <Border x:Name="ToggleButtonBorder" Grid.Row="1" Grid.Column="1"
                                                         Background="{StaticResource ItemAreaBrush}"
                                                         BorderBrush="{StaticResource ItemBorderBrush}" 
                                                         BorderThickness="{StaticResource ItemBorder.BorderThickness}" 
                                                         CornerRadius="{StaticResource ItemBorder.CornerRadius}"
                                                         Padding="5">
-                                                <Grid Background="Transparent" SnapsToDevicePixels="False">
+                                                <Grid x:Name="grd1" Background="Transparent" SnapsToDevicePixels="False">
                                                     <Grid.RowDefinitions>
                                                         <RowDefinition Height="Auto" />
                                                         <RowDefinition Height="*" />
                                                     </Grid.RowDefinitions>
-                                                    <Grid>
+                                                    <Grid x:Name="grd2">
                                                         <Grid.LayoutTransform>
                                                             <TransformGroup>
                                                                 <RotateTransform Angle="-90" />
@@ -246,6 +254,14 @@
                                             </Border>
                                         </Grid>
                                         <ControlTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
+                                                Path=(attached:AttachedPropertiesContainer.LastNotNullLogical)}" Value="True">
+                                                <Setter Property="Border.BorderBrush" TargetName="ToggleButtonBorder" Value="{StaticResource ItemBorderBrushGreen}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
+                                                Path=(attached:AttachedPropertiesContainer.LastNotNullLogical)}" Value="False">
+                                                <Setter Property="Border.BorderBrush" TargetName="ToggleButtonBorder" Value="{StaticResource ItemBorderBrushRed}" />
+                                            </DataTrigger>
                                             <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}}, Path=(attached:AttachedPropertiesContainer.ParentChildOrientation)}" Value="Horizontal">
                                                 <Setter Property="Width" TargetName="TopNodeConnector" Value="{Binding Source={StaticResource NodeConnectorHeight}, Path=Top}" />
                                                 <Setter Property="Height" TargetName="TopNodeConnector" Value="{Binding Source={StaticResource NodeConnectorWidth}, Path=Left}" />
@@ -348,7 +364,7 @@
                                                     Fill="{StaticResource NodeConnectorBrush}"
                                                     Height="0" Width="0" VerticalAlignment="Center">
                                             </Rectangle>
-                                            <Border Name="ToggleButtonBorder" Grid.Row="1" Grid.Column="1"
+                                            <Border x:Name="ToggleButtonBorder" Grid.Row="1" Grid.Column="1"
                                                         Background="{StaticResource ItemAreaBrush}"
                                                         BorderBrush="{StaticResource ItemBorderBrush}" 
                                                         BorderThickness="{StaticResource ItemBorder.BorderThickness}" 
@@ -382,6 +398,14 @@
                                             </Border>
                                         </Grid>
                                         <ControlTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
+                                                Path=(attached:AttachedPropertiesContainer.LastNotNullLogical)}" Value="True">
+                                                <Setter Property="Border.BorderBrush" TargetName="ToggleButtonBorder" Value="{StaticResource ItemBorderBrushGreen}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
+                                                Path=(attached:AttachedPropertiesContainer.LastNotNullLogical)}" Value="False">
+                                                <Setter Property="Border.BorderBrush" TargetName="ToggleButtonBorder" Value="{StaticResource ItemBorderBrushRed}" />
+                                            </DataTrigger>
                                             <Trigger Property="ToggleButton.IsChecked" Value="True">
                                                 <Setter Property="Path.Data" TargetName="arrow" Value="M1,4.5L4.5,1 8,4.5" />
                                                 <Setter Property="Shape.Stroke" TargetName="arrow" Value="{StaticResource ToggleButtonArrowChecked.Brush}" />
@@ -391,7 +415,6 @@
                                                 <Setter Property="Shape.Width" TargetName="circle" Value="19" />
                                                 <Setter Property="Shape.Height" TargetName="circle" Value="19" />
                                             </Trigger>
-
                                             <Trigger Property="UIElement.IsMouseOver" Value="True">
                                                 <Setter
                                                     TargetName="ToggleButtonBorder"
@@ -469,7 +492,7 @@
                                                     Fill="{StaticResource NodeConnectorBrush}"
                                                     Height="0" Width="0" VerticalAlignment="Center">
                                             </Rectangle>
-                                            <Border Name="ToggleButtonBorder" Grid.Row="1" Grid.Column="1"
+                                            <Border x:Name="ToggleButtonBorder" Grid.Row="1" Grid.Column="1"
                                                         Background="{StaticResource ItemAreaBrush}"
                                                         BorderBrush="{StaticResource ItemBorderBrush}" 
                                                         BorderThickness="{StaticResource ItemBorder.BorderThickness}" 
@@ -503,6 +526,14 @@
                                             </Border>
                                         </Grid>
                                         <ControlTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
+                                                Path=(attached:AttachedPropertiesContainer.LastNotNullLogical)}" Value="True">
+                                                <Setter Property="Border.BorderBrush" TargetName="ToggleButtonBorder" Value="{StaticResource ItemBorderBrushGreen}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
+                                                Path=(attached:AttachedPropertiesContainer.LastNotNullLogical)}" Value="False">
+                                                <Setter Property="Border.BorderBrush" TargetName="ToggleButtonBorder" Value="{StaticResource ItemBorderBrushRed}" />
+                                            </DataTrigger>
                                             <Trigger Property="ToggleButton.IsChecked" Value="True">
                                                 <Setter Property="Path.Data" TargetName="arrow" Value="M1,4.5L4.5,1 8,4.5" />
                                                 <Setter Property="Shape.Stroke" TargetName="arrow" Value="{StaticResource ToggleButtonArrowChecked.Brush}" />
@@ -588,7 +619,7 @@
                                                     Height="{Binding Source={StaticResource NodeConnectorHeight}, Path=Top}"
                                                     VerticalAlignment="Center">
                                             </Rectangle>
-                                            <Border Name="ToggleButtonBorder" Grid.Row="1" Grid.Column="1"
+                                            <Border x:Name="ToggleButtonBorder" Grid.Row="1" Grid.Column="1"
                                                         Background="{StaticResource ItemAreaBrush}"
                                                         BorderBrush="{StaticResource ItemBorderBrush}" 
                                                         BorderThickness="{StaticResource ItemBorder.BorderThickness}" 
@@ -600,6 +631,14 @@
                                             </Border>
                                         </Grid>
                                         <ControlTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
+                                                Path=(attached:AttachedPropertiesContainer.LastNotNullLogical)}" Value="True">
+                                                <Setter Property="Border.BorderBrush" TargetName="ToggleButtonBorder" Value="{StaticResource ItemBorderBrushGreen}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
+                                                Path=(attached:AttachedPropertiesContainer.LastNotNullLogical)}" Value="False">
+                                                <Setter Property="Border.BorderBrush" TargetName="ToggleButtonBorder" Value="{StaticResource ItemBorderBrushRed}" />
+                                            </DataTrigger>
                                             <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
                                                 Path=(attached:AttachedPropertiesContainer.ParentChildOrientation)}" Value="Horizontal">
                                                 <Setter Property="Width" TargetName="TopNodeConnector" Value="{Binding Source={StaticResource NodeConnectorHeight}, Path=Top}" />

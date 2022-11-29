@@ -12,7 +12,8 @@
              xmlns:attached="clr-namespace:Vishnu.WPF_UI.DependencyProperties;assembly=Vishnu.WPF_UI"
              xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300"
+             x:Name="JobListUserControl_xaml">
     <vm:DynamicUserControlBase.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -35,9 +36,10 @@
                                 ]]>
             </x:Code>
             <DataTemplate DataType="{x:Type vm:JobListViewModel}">
-                <Border Name="ItemBorder" HorizontalAlignment="Stretch" Padding="5" Background="Transparent" BorderThickness="3"
+                <Border Name="ItemBorder" HorizontalAlignment="Stretch" Padding="5" Background="Transparent" BorderThickness="3" BorderBrush="Transparent"
                         CornerRadius="6" MouseDown="ItemBorder_MouseDown" Visibility="{Binding Visibility}">
-                    <Grid Name="MainGrid" HorizontalAlignment="Stretch" ToolTip="{Binding LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400">
+                    <Grid Name="MainGrid" HorizontalAlignment="Stretch" ToolTip="{Binding LastExceptions}"
+                          ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -69,7 +71,7 @@
                                     </MultiBinding>
                                 </ctrl:CustomProgressBar.Foreground>
                             </ctrl:CustomProgressBar>
-                            <Grid Margin="4,7,4,7" Grid.Row="0" Grid.Column="0">
+                            <Grid x:Name="ToggleButtonBorderLogicalChild" Margin="4,7,4,7" Grid.Row="0" Grid.Column="0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
@@ -247,5 +249,5 @@
             </DataTemplate>
         </ResourceDictionary>
     </vm:DynamicUserControlBase.Resources>
-    <ContentControl Content="{Binding}" />
+    <ContentControl x:Name="MainContentPresenter" Content="{Binding}" />
 </vm:DynamicUserControlBase>

@@ -170,8 +170,6 @@ namespace Vishnu.ViewModel
         private RelayCommand _initSizeRelayCommand;
         private NodeTypes _flatNodeListFilter;
         private string _windowTitle;
-        private int _gridRowCount;
-        private int _gridColumnCount;
 
         delegate ObservableCollection<JobGroupViewModel> SelectJobGroupsDelegate(ObservableCollection<JobGroupViewModel> selectedJobGroups);
         private ObservableCollection<JobGroupViewModel> SelectJobGroups(ObservableCollection<JobGroupViewModel> selectedJobGroups)
