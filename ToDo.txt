@@ -918,7 +918,7 @@ ERLEDIGT: JobList-Ansicht: Jobs werden jetzt in dynamischen Grids mit quadratisc
 ERLEDIGT: ZoomBox Mouse-wheel: Scroll-Events werden jetzt nicht mehr auf e.Handled=true gesetzt. Dadurch können
           sie auch noch durch weitere Controls genutzt werden.
 
-Stand: 29.10.2022 Version 5.2.0.0 (Heavy Duty)
+Stand: 08.12.2022 Version 5.3.0.1 (Heavy Duty)
 
 
 -------------------------------------------------------------------------------------------------------------
@@ -950,7 +950,7 @@ Hinweise:
 ###################
 
 --- TODO ----------------------------------------------------------------------------------------------------
-Fehler: übergeordneter Knoten bleibt manch mal auf Gelb (CheckTreeEventTriggerMinimal)
+Fehler: übergeordneter Knoten bleibt manchmal auf Gelb (CheckTreeEventTriggerMinimal)
         Nur, wenn kein Log aktiv ist und auch nicht im Debug.
 Neuer Parameter: Log-Flushtime
 CheckDependentNodeLogic: SubJobs testen

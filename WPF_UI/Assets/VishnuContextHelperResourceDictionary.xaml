@@ -13,16 +13,15 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border CornerRadius="5" Background="{TemplateBinding Background, diag:PresentationTraceSources.TraceLevel=High}" BorderThickness="3">
-                        <ContentPresenter Margin="3" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        </ContentPresenter>
+                    <Border CornerRadius="5" Background="{TemplateBinding Background, diag:PresentationTraceSources.TraceLevel=High}" BorderThickness="3" Margin="3">
+                        <ContentPresenter Margin="10,2,10,2" HorizontalAlignment="Left" VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="RenderTransformOrigin" Value="0.5, 0.5"/>
                             <Setter Property="RenderTransform">
                                 <Setter.Value>
-                                    <ScaleTransform ScaleX="1.07" ScaleY="1.25"/>
+                                    <ScaleTransform ScaleX="1.05" ScaleY="1.05"/>
                                 </Setter.Value>
                             </Setter>
                         </Trigger>
@@ -80,7 +79,7 @@
                         Command="{Binding SwitchTaskTreeView, diag:PresentationTraceSources.TraceLevel=High}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="../Media/yin_yang.png" Width="15" Height="15" Margin="0,0,5,0"/>
+                            <Image Source="../Media/yin_yang.png" Width="15" Height="15" Margin="0,0,5,0" />
                             <TextBlock Text="Change Tree-Orientation" />
                         </StackPanel>
                     </Button.Content>
@@ -92,9 +91,10 @@
                 <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
                         Command="{Binding ReloadLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
                     <Button.Content>
-                        <StackPanel Name="ButtonPanel" Orientation="Horizontal">
-                            <Image Source="../Media/reloadTree.png" Width="15" Height="15" Margin="0,0,5,0"/>
-                            <TextBlock Text="Reload Tree" />
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../Media/reloadTree.png" Width="15" Height="15" Margin="0,0,5,0"
+                                   Grid.Column="0" Grid.Row="0" />
+                            <TextBlock Text="Reload Tree" Grid.Column="1" Grid.Row="0" />
                         </StackPanel>
                     </Button.Content>
                 </Button>

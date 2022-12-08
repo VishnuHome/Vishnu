@@ -249,7 +249,6 @@ namespace Vishnu.ViewModel
             this.SetGridMeasures();
             // 18.11.2022 Test-
 
-            InfoController.Say(String.Format($"#JOBGROUP# JobGroupViewModel - gesamt: {this.FlatNodeViewModelList.Count}, ColumnCount: {this.ColumnCount}, RowCount: {this.RowCount}"));
             for (int i = 0; i < this.FlatNodeViewModelList.Count; i++)
             {
                 // Zeile und Spalte für das aktuelle Element berechnen (null-basiert):
@@ -273,7 +272,6 @@ namespace Vishnu.ViewModel
         {
             this.GridColumnCount = this.ColumnCount;
             this.GridRowCount = this.RowCount;
-            InfoController.Say(String.Format($"#JOBGROUP# JobGroupViewModel - RowCount: {this.RowCount,3:d}, ColumnCount: {this.ColumnCount,2:d}"));
         }
 
         private void JobGroupViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -288,14 +286,6 @@ namespace Vishnu.ViewModel
                         if (!this._renderedControls.Contains(typedSender.VisualTreeCacheBreaker))
                         {
                             this._renderedControls.Add(typedSender.VisualTreeCacheBreaker);
-                            if (this._renderedControls.Count >= this.FlatNodeViewModelList.Count)
-                            {
-                                // this.SetGridMeasures();
-
-                                // this.Invalidate();
-                                // this.ParentView?.InvalidateVisual();
-                                // Dispatcher.BeginInvoke(new Action(() => { this.SetGridMeasures(); }), DispatcherPriority.Background);
-                            }
                         }
                     }
                 }

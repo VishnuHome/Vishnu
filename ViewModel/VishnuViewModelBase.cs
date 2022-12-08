@@ -228,7 +228,6 @@ namespace Vishnu.ViewModel
         {
             this.GridColumn = this.ColumnNumber;
             this.GridRow = this.RowNumber;
-            InfoController.Say(String.Format($"#JOBGROUP# VishnuViewModelBase - RowNumber: {this.RowNumber,3:d}, ColumnNumber: {this.ColumnNumber,2:d}"));
             this.IsRendered = true;
         }
 

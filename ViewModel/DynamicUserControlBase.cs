@@ -249,12 +249,9 @@ namespace Vishnu.ViewModel
                 this.UserResultViewModel = GetUserResultViewModel((IVishnuViewModel)this.DataContext);
                 ((IVishnuViewModel)this.DataContext).UserDataContext = this.UserResultViewModel;
 
-                // 18.11.2022+
                 // Zwingt die Controls nochmal zur Neuberechnung ihrer maximalen Größe. Ohne diese Neuberechnung
                 // werden einzelne Zeilen des umgebenden, dynamischen Grids nicht dargestellt.
                 this.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                // InfoController.Say(String.Format($"#JOBGROUP# DynamicUserControlBase - Name: {((LogicalNodeViewModel)this.DataContext).Id}, Width: {this.DesiredSize.Width}, Height: {this.DesiredSize.Height}"));
-                // 18.11.2022-
             }
 
             ContextMenu contextMenu = (ContextMenu)this.Resources["cmContextMenu"];
@@ -300,6 +297,10 @@ namespace Vishnu.ViewModel
 
         private void waitForContentRendered(ContentControl contentControl)
         {
+            if (!this.IsVisible)
+            {
+                return;
+            }
             int emergencyHalt = 0;
             while (this.ActualWidth + this.ActualHeight == 0)
             {

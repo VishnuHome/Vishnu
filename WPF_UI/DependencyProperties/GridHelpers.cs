@@ -63,9 +63,6 @@ namespace Vishnu.WPF_UI.DependencyProperties
 
             Grid grid = (Grid)obj;
             grid.RowDefinitions.Clear();
-
-            InfoController.Say(String.Format($"#JOBGROUP# GridHelper.RowCountChanged - GridRowCount: {(int)e.NewValue}"));
-
             for (int i = 0; i < (int)e.NewValue; i++)
             {
                 grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto, MinHeight = 10 });
@@ -120,9 +117,6 @@ namespace Vishnu.WPF_UI.DependencyProperties
 
             Grid grid = (Grid)obj;
             grid.ColumnDefinitions.Clear();
-
-            InfoController.Say(String.Format($"#JOBGROUP# GridHelper.ColumnCountChanged - GridColumnCount: {(int)e.NewValue}"));
-
             for (int i = 0; i < (int)e.NewValue; i++)
             {
                 grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto, MinWidth = 50 });
@@ -242,7 +236,6 @@ namespace Vishnu.WPF_UI.DependencyProperties
             if (string.IsNullOrWhiteSpace(GetColumnsProperties(grid)))
             {
                 starColumns = new string[grid.ColumnDefinitions.Count];
-                InfoController.Say(String.Format($"#JOBGROUP# GridHelper.SetColumnsProperties - starColumns(1): {starColumns}"));
                 for (var i = 0; i < grid.ColumnDefinitions.Count; i++)
                 {
                     starColumns[i] = i.ToString();
@@ -251,10 +244,8 @@ namespace Vishnu.WPF_UI.DependencyProperties
             else
             {
                 starColumns = GetColumnsProperties(grid).Split(',');
-                InfoController.Say(String.Format($"#JOBGROUP# GridHelper.SetColumnsProperties - starColumns(2): {starColumns}"));
             }
 
-            InfoController.Say(String.Format($"#JOBGROUP# GridHelper.SetColumnsProperties - grid.ColumnDefinitionsCount: {grid.ColumnDefinitions.Count}"));
             for (int i = 0; i < grid.ColumnDefinitions.Count; i++)
             {
                 if (starColumns.Contains(i.ToString()))
@@ -271,7 +262,6 @@ namespace Vishnu.WPF_UI.DependencyProperties
             if (string.IsNullOrWhiteSpace(GetRowsProperties(grid)))
             {
                 starRows = new string[grid.RowDefinitions.Count];
-                InfoController.Say(String.Format($"#JOBGROUP# GridHelper.SetRowsProperties - starRows(1): {starRows}"));
                 for (var i = 0; i < grid.RowDefinitions.Count; i++)
                 {
                     starRows[i] = i.ToString();
@@ -280,10 +270,8 @@ namespace Vishnu.WPF_UI.DependencyProperties
             else
             {
                 starRows = GetRowsProperties(grid).Split(',');
-                InfoController.Say(String.Format($"#JOBGROUP# GridHelper.SetRowsProperties - starRows(1): {starRows}"));
             }
 
-            InfoController.Say(String.Format($"#JOBGROUP# GridHelper.SetRowsProperties - grid.RowDefinitionsCount: {grid.RowDefinitions.Count}"));
             for (int i = 0; i < grid.RowDefinitions.Count; i++)
             {
                 if (starRows.Contains(i.ToString()))

@@ -7,7 +7,6 @@ using System.Xml.Linq;
 using Vishnu.Interchange;
 using System.Collections.Generic;
 using NetEti.ObjectSerializer;
-using System.Threading;
 
 namespace LogicalTaskTree
 {
@@ -159,7 +158,6 @@ namespace LogicalTaskTree
                 {
                     xmlDoc.Save(xmlStream);
                 }
-                //Thread.Sleep(101); // 15.07.2022 Nagel+-
                 File.WriteAllText(snapshotInfoPath, snapshotPath);
             }
             catch (IOException)

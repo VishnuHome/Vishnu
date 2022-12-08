@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using System.Windows.Threading;
+using System.Xml.Linq;
 
 namespace Vishnu.Interchange
 {
@@ -35,9 +38,21 @@ namespace Vishnu.Interchange
         /// <returns>Absolute Bildschirmposition der linken oberen Ecke des Parent-Controls.</returns>
         public virtual Point GetParentViewAbsoluteScreenPosition()
         {
-            if (this.ParentView != null)
+            if (this.ParentView == null)
             {
-                Rect rect = this.ParentView.GetAbsolutePlacement();
+                return new Point(System.Windows.SystemParameters.PrimaryScreenWidth / 2.0 - 150,
+                  System.Windows.SystemParameters.PrimaryScreenHeight / 2.0 - 75);
+            }
+            if (!this.ParentView.Dispatcher.CheckAccess())
+            {
+                return (Point)this.ParentView.Dispatcher.Invoke(new Func<Point>(GetParentViewAbsoluteScreenPosition), DispatcherPriority.Normal);
+            }
+            Rect rect = this.ParentView.GetAbsolutePlacement();
+            if (!rect.IsEmpty)
+            {
+                // kann vorkommen: -job=%Vishnu_Root%/VishnuHome/Tests/TestJobs/HeavyDuty/check_Treshold_50_100 --StartWithJobs=true
+                //                 dann sofort ins 'Logical Task Tree'-Fenster umschalten und z.B. Node2 neu starten.
+                // Zusatzhinweis:  die DispatcherPriority bei this.ParentView.Dispatcher.Invoke zu ändern, bringt nichts!
                 return new Point(rect.Left, rect.Top);
             }
             else
