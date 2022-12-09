@@ -28,8 +28,8 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Abstrakte Definition von GetUserResultViewModel: muss für konkrete Anwendung überschrieben werden.
         /// </summary>
-        /// <param name="vishnuViewModel"></param>
-        /// <returns></returns>
+        /// <param name="vishnuViewModel">Interface für die ViewModels von dynamischen User-Controls.</param>
+        /// <returns>Hier: null, muss überschrieben werden.</returns>
         protected virtual DynamicUserControlViewModelBase GetUserResultViewModel(IVishnuViewModel vishnuViewModel) { return null; }
 
         /// <summary>
