@@ -135,14 +135,22 @@ namespace Vishnu.ViewModel
             {
                 if (disposing)
                 {
-                    if (this._contextMenuBorder != null)
-                    {
-                        this._contextMenuBorder.MouseLeave -= Border_MouseLeave;
-                    }
-                    this.MouseRightButtonUp -= DynamicUserControlBase_MouseRightButtonUp;
+                    this.DoDispose();
                 }
                 this._disposed = true;
             }
+        }
+
+        /// <summary>
+        /// Hier werden die beim disposing notwendigen Aktionen durchgeführt.
+        /// </summary>
+        protected virtual void DoDispose()
+        {
+            if (this._contextMenuBorder != null)
+            {
+                this._contextMenuBorder.MouseLeave -= Border_MouseLeave;
+            }
+            this.MouseRightButtonUp -= DynamicUserControlBase_MouseRightButtonUp;
         }
 
         /// <summary>
@@ -250,7 +258,7 @@ namespace Vishnu.ViewModel
                 ((IVishnuViewModel)this.DataContext).UserDataContext = this.UserResultViewModel;
 
                 // Zwingt die Controls nochmal zur Neuberechnung ihrer maximalen Größe. Ohne diese Neuberechnung
-                // werden einzelne Zeilen des umgebenden, dynamischen Grids nicht dargestellt.
+                // werden unter Umständen einzelne Zeilen des umgebenden, dynamischen Grids nicht dargestellt.
                 this.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             }
 
@@ -260,7 +268,7 @@ namespace Vishnu.ViewModel
             this.ContextMenu = contextMenu;
 
             Dispatcher.BeginInvoke(new Action<ContentControl>(this.waitForContentRendered),
-                System.Windows.Threading.DispatcherPriority.ApplicationIdle, new object[] { e.Source as ContentControl });
+                System.Windows.Threading.DispatcherPriority.Background /* geht nicht: Normal, ApplicationIdle */, new object[] { e.Source as ContentControl });
         }
 
         private void ContextMenu_Loaded(object sender, RoutedEventArgs e)

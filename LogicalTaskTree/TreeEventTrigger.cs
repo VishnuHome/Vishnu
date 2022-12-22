@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetEti.ApplicationControl;
+using System;
 using System.Text.RegularExpressions;
 using System.Timers;
 using Vishnu.Interchange;
@@ -190,7 +191,15 @@ namespace LogicalTaskTree
             {
                 this._lastTimerStart = DateTime.Now;
                 this._nextTimerStart = this._lastTimerStart.AddMilliseconds(this._timerInterval);
-                this._eventTimer.Start();
+                try
+                {
+                    this._eventTimer.Start();
+                }
+                catch (NullReferenceException ex)
+                {
+                    InfoController.GetInfoPublisher().Publish(source, String.Format($"TreeEventTrigger.OnTriggerFired: {ex.Message}"), InfoType.Exception);
+                    // Trat bisher nur im Debugger (und selten) auf, TODO: genaue Analyse und endgültige Lösung.
+                }
             }
         }
 

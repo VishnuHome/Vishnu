@@ -138,7 +138,7 @@
                     </Style>
                 </ToggleButton.Style>
             </ToggleButton>
-            <ContentPresenter Name="ExpandSite" DockPanel.Dock="Bottom"
+            <ContentPresenter Name="ExpandedSite" DockPanel.Dock="Bottom"
                                   Content="{TemplateBinding ContentControl.Content}" ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}" 
                                   ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}" Focusable="False" 
                                   HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}" Margin="0"
@@ -146,7 +146,7 @@
         </DockPanel>
         <ControlTemplate.Triggers>
             <Trigger Property="Expander.IsExpanded" Value="True">
-                <Setter Property="UIElement.Visibility" TargetName="ExpandSite" Value="Visible" />
+                <Setter Property="UIElement.Visibility" TargetName="ExpandedSite" Value="Visible" />
             </Trigger>
             <Trigger Property="Expander.Tag" Value="NoChilds">
                 <!-- Stellt einen Endknoten ohne Kindelemente und ohne Toggle-Knopf dar -->
@@ -173,7 +173,7 @@
                                                         BorderThickness="{StaticResource ItemBorder.BorderThickness}" 
                                                         CornerRadius="{StaticResource ItemBorder.CornerRadius}"
                                                         Padding="0">
-                                                <ContentPresenter Content="{TemplateBinding ContentControl.Content}" ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}"
+                                                <ContentPresenter Name="ExpandedSingleNode" Content="{TemplateBinding ContentControl.Content}" ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}"
                                                                   ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}" Grid.Row="1"
                                                                   HorizontalAlignment="Center" Margin="0,0,0,0" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Top" />
                                             </Border>

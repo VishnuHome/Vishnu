@@ -275,11 +275,17 @@ namespace LogicalTaskTree
                 try
                 {
                     XElement lastExceptions = new XElement("LastExceptions");
+                    // 18.12.2022 Nagel+
                     // 06.07.2016 Nagel+ foreach (LogicalNode source in node.LastExceptions.Keys)
-                    foreach (LogicalNode source in node.LastExceptions.Keys.ToList()) // 06.07.2016 Nagel-
+                    //foreach (LogicalNode source in node.LastExceptions.Keys.ToList()) // 06.07.2016 Nagel-
+                    //{
+                    //    lastExceptions.Add(new XElement(node.LastExceptions[source].GetType().Name, new XAttribute("Message", node.LastExceptions[source].Message)));
+                    //}
+                    foreach (Exception exception in node.LastExceptions.Values.ToList())
                     {
-                        lastExceptions.Add(new XElement(node.LastExceptions[source].GetType().Name, new XAttribute("Message", node.LastExceptions[source].Message)));
+                        lastExceptions.Add(new XElement(exception.GetType().Name, new XAttribute("Message", exception.Message)));
                     }
+                    // 18.12.2022 Nagel-
                     nodeXML.Add(lastExceptions);
                 }
                 catch (Exception ex)

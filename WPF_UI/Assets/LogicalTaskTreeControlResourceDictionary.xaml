@@ -178,7 +178,7 @@
                         </Style>
                     </ToggleButton.Style>
                 </ToggleButton>
-                <ContentPresenter Name="ExpandSite" DockPanel.Dock="Bottom"
+                <ContentPresenter Name="ExpandedSite" DockPanel.Dock="Bottom"
                                   Content="{TemplateBinding ContentControl.Content}" ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}" 
                                   ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}" Focusable="False" 
                                   HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}" Margin="0"
@@ -187,10 +187,10 @@
         </Border>
         <ControlTemplate.Triggers>
             <Trigger Property="Expander.IsExpanded" Value="True">
-                <Setter Property="UIElement.Visibility" TargetName="ExpandSite" Value="Visible" />
+                <Setter Property="UIElement.Visibility" TargetName="ExpandedSite" Value="Visible" />
             </Trigger>
             <Trigger Property="Expander.ExpandDirection" Value="Right">
-                <Setter Property="DockPanel.Dock" TargetName="ExpandSite" Value="Right" />
+                <Setter Property="DockPanel.Dock" TargetName="ExpandedSite" Value="Right" />
                 <Setter Property="DockPanel.Dock" TargetName="HeaderSite" Value="Left" />
                 <Setter Property="FrameworkElement.Style" TargetName="HeaderSite">
                     <Setter.Value>
@@ -335,7 +335,7 @@
                 </Setter>
             </Trigger>
             <Trigger Property="Expander.ExpandDirection" Value="Up">
-                <Setter Property="DockPanel.Dock" TargetName="ExpandSite" Value="Top" />
+                <Setter Property="DockPanel.Dock" TargetName="ExpandedSite" Value="Top" />
                 <Setter Property="DockPanel.Dock" TargetName="HeaderSite" Value="Bottom" />
                 <Setter Property="FrameworkElement.Style" TargetName="HeaderSite">
                     <Setter.Value>
@@ -463,7 +463,7 @@
                 </Setter>
             </Trigger>
             <Trigger Property="Expander.ExpandDirection" Value="Left">
-                <Setter Property="DockPanel.Dock" TargetName="ExpandSite" Value="Left" />
+                <Setter Property="DockPanel.Dock" TargetName="ExpandedSite" Value="Left" />
                 <Setter Property="DockPanel.Dock" TargetName="HeaderSite" Value="Right" />
                 <Setter Property="FrameworkElement.Style" TargetName="HeaderSite">
                     <Setter.Value>

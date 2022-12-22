@@ -240,8 +240,8 @@ namespace Vishnu.ViewModel
         /// <param name="FlatNodeViewModelList"></param>
         private void PresetGridProperties(ObservableCollection<LogicalNodeViewModel> FlatNodeViewModelList)
         {
-            int columns = (int)(Math.Sqrt(this.FlatNodeViewModelList.Count));
-            int rows = (int)((1.0 * this.FlatNodeViewModelList.Count / columns) + 0.999999);
+            int rows = (int)(Math.Sqrt(this.FlatNodeViewModelList.Count));
+            int columns = (int)((1.0 * this.FlatNodeViewModelList.Count / rows) + 0.999999);
             this.ColumnCount = columns;
             this.RowCount = rows;
 

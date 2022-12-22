@@ -1,8 +1,10 @@
-﻿using System;
+﻿using NetEti.ApplicationControl;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
+using System.Xml.Linq;
 
 namespace Vishnu.ViewModel
 {
@@ -51,7 +53,9 @@ namespace Vishnu.ViewModel
                 {
                     T childFound = FindFirstLogicalChildOfTypeAndName<T>(child as FrameworkElement, name);
                     if (childFound != null)
+                    {
                         return childFound;
+                    }
                 }
             }
             return null;
@@ -82,6 +86,26 @@ namespace Vishnu.ViewModel
             return findFirstChild<T>(element, name, new List<FrameworkElement>());
         }
 
+        /// <summary>
+        /// Sucht im VisualTree vom FrameworkElement element nach dem ersten Kindeskind-Element vom Typ T,
+        /// welches auf ein Kindelement vom Typ 'predecessorType' mit dem Namen 'predecessorName' folgt.
+        /// </summary>
+        /// <typeparam name="T">Typ des gesuchten Kindeskind-Elements.</typeparam>
+        /// <typeparam name="U">Typ des Kindelements, dessen Kind gesucht wird.</typeparam>
+        /// <param name="element">FrameworkElement, dessen VisualTree durchsucht werden soll.</param>
+        /// <param name="predecessorName">Name des dem gesuchten Elements vorausgehenden Elementes.</param>
+        /// <returns></returns>
+        public static T FindFirstVisualChildOfTypeAfterVisualChildOfTypeAndName<T, U>(FrameworkElement element, string predecessorName) where T : FrameworkElement where U : FrameworkElement
+        {
+
+            FrameworkElement predecessor = FindFirstVisualChildOfTypeAndName<U>(element, predecessorName);
+            if (predecessor != null)
+            {
+                return FindFirstVisualChildOfType<T>(predecessor);
+            }
+            return null;
+        }
+
         private static T findFirstChild<T>(FrameworkElement element, string name, List<FrameworkElement> alreadyFound) where T : FrameworkElement
         {
             int childrenCount = VisualTreeHelper.GetChildrenCount(element);
@@ -92,13 +116,14 @@ namespace Vishnu.ViewModel
                 FrameworkElement child = VisualTreeHelper.GetChild(element, i) as FrameworkElement;
                 if (child != null)
                 {
+                    // InfoController.Say(String.Format($"#TreeHelper# {child.GetType()}, '{child.Name??""}'"));
                     if (!alreadyFound.Contains(child))
                     {
                         alreadyFound.Add(child);
                     }
                     else
                     {
-                        return null; // Rekursion
+                        return null;
                     }
                     children[i] = child;
                     if (child is T)
@@ -115,13 +140,16 @@ namespace Vishnu.ViewModel
             }
 
             for (int i = 0; i < childrenCount; i++)
+            {
                 if (children[i] != null)
                 {
-                    T subChild = findFirstChild<T>(children[i], name, alreadyFound);
+                    T subChild = findFirstChild<T>(children[i], name, alreadyFound); // Rekursion
                     if (subChild != null)
+                    {
                         return subChild;
+                    }
                 }
-
+            }
             return null;
         }
 
