@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("NetEti")]
 [assembly: AssemblyProduct("NodeListUserControl")]
-[assembly: AssemblyCopyright("Copyright © Erik Nagel, NetEti 2014-2019")]
+[assembly: AssemblyCopyright("Copyright © 2014-2022 Erik Nagel")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

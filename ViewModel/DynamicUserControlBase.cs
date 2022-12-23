@@ -146,6 +146,7 @@ namespace Vishnu.ViewModel
         /// </summary>
         protected virtual void DoDispose()
         {
+            this.IsVisibleChanged -= DynamicUserControlBase_IsVisibleChanged;
             if (this._contextMenuBorder != null)
             {
                 this._contextMenuBorder.MouseLeave -= Border_MouseLeave;
@@ -307,14 +308,13 @@ namespace Vishnu.ViewModel
         {
             if (!this.IsVisible)
             {
+                // Die ganze Aktion auf später verschieben...
+                this.IsVisibleChanged += DynamicUserControlBase_IsVisibleChanged;
                 return;
             }
             int emergencyHalt = 0;
             while (this.ActualWidth + this.ActualHeight == 0)
             {
-                Thread.Sleep(1);               
-                InfoController.Say("DynamicUserControlBase.waitForContentRendered(1)");
-
                 Thread.Sleep(10);
 
                 if (emergencyHalt++ > 1000)
@@ -327,7 +327,7 @@ namespace Vishnu.ViewModel
                     }
                     else
                     {
-                        InfoController.Say(msg);
+                        InfoController.GetInfoPublisher().Publish(this, msg, InfoType.Exception);
                         break;
                     }
                 }
@@ -340,9 +340,6 @@ namespace Vishnu.ViewModel
                 width = this.ActualWidth;
                 height = this.ActualHeight;
 
-                InfoController.Say("DynamicUserControlBase.waitForContentRendered(2)");
-                Thread.Sleep(10);
-
                 Thread.Sleep(10);
                 if (emergencyHalt++ > 1000)
                 {
@@ -353,7 +350,7 @@ namespace Vishnu.ViewModel
                     }
                     else
                     {
-                        InfoController.Say(msg);
+                        InfoController.GetInfoPublisher().Publish(this, msg, InfoType.Exception);
                         break;
                     }
                 }
@@ -363,5 +360,16 @@ namespace Vishnu.ViewModel
 
             this.OnDynamicUserControl_ContentRendered();
         }
+        private void DynamicUserControlBase_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            this.IsVisibleChanged -= DynamicUserControlBase_IsVisibleChanged;
+
+            if (sender is ContentControl)
+            {
+                Dispatcher.BeginInvoke(new Action<ContentControl>(this.waitForContentRendered),
+                    System.Windows.Threading.DispatcherPriority.Background /* geht nicht: Normal, ApplicationIdle */, new object[] { sender as ContentControl });
+            }
+        }
+
     }
 }

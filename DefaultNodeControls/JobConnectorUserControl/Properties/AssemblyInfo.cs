@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("NetEti")]
 [assembly: AssemblyProduct("JobConnectorUserControl")]
-[assembly: AssemblyCopyright("Copyright © Erik Nagel, NetEti 2015-2019")]
+[assembly: AssemblyCopyright("Copyright © 2015-2022 Erik Nagel")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

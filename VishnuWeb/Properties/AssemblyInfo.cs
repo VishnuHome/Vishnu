@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("NetEti")]
 [assembly: AssemblyProduct("VishnuWeb")]
-[assembly: AssemblyCopyright("Copyright © Erik Nagel, NetEti 2018-2020")]
+[assembly: AssemblyCopyright("Copyright © 2018-2022 Erik Nagel")]
 [assembly: AssemblyTrademark("Direct Response")]
 [assembly: AssemblyCulture("")]
 
@@ -51,5 +51,5 @@ using System.Windows;
 // Sie können alle Werte angeben oder Standardwerte für die Build- und Revisionsnummern verwenden,
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("5.3.0.1")]
-[assembly: AssemblyFileVersion("5.3.0.1")]
+[assembly: AssemblyVersion("5.3.0.3")]
+[assembly: AssemblyFileVersion("5.3.0.3")]

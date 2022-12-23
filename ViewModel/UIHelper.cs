@@ -94,7 +94,7 @@ namespace Vishnu.ViewModel
         /// <typeparam name="U">Typ des Kindelements, dessen Kind gesucht wird.</typeparam>
         /// <param name="element">FrameworkElement, dessen VisualTree durchsucht werden soll.</param>
         /// <param name="predecessorName">Name des dem gesuchten Elements vorausgehenden Elementes.</param>
-        /// <returns></returns>
+        /// <returns>Kindeskindelement vom Typ T.</returns>
         public static T FindFirstVisualChildOfTypeAfterVisualChildOfTypeAndName<T, U>(FrameworkElement element, string predecessorName) where T : FrameworkElement where U : FrameworkElement
         {
 

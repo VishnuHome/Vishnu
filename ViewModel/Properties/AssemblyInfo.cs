@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("NetEti")]
 [assembly: AssemblyProduct("Vishnu.ViewModel")]
-[assembly: AssemblyCopyright("Copyright © Erik Nagel, NetEti 2012-2019")]
+[assembly: AssemblyCopyright("Copyright © 2012-2022 Erik Nagel")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

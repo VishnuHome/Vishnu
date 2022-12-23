@@ -918,7 +918,7 @@ ERLEDIGT: JobList-Ansicht: Jobs werden jetzt in dynamischen Grids mit quadratisc
 ERLEDIGT: ZoomBox Mouse-wheel: Scroll-Events werden jetzt nicht mehr auf e.Handled=true gesetzt. Dadurch können
           sie auch noch durch weitere Controls genutzt werden.
 
-Stand: 16.12.2022 Version 5.3.0.2 (Heavy Duty)
+Stand: 23.12.2022 Version 5.3.0.3 (Heavy Duty)
 
 
 -------------------------------------------------------------------------------------------------------------
@@ -993,6 +993,9 @@ SMS
 WhatsApp
 Dark Mode und weitere Designs.
 Telegram
+Die dynamischen Grids mit quadratischem Zuschnitt aus der Jobs-Ansicht auch in der Tree-Ansicht für mehrere
+	mit AND verknüpfte Knoten unterhalb einer Joblist oder NodeList nutzen. Dadurch würde auch für die Tree-Ansicht
+	bei Gruppen mit vielen AND-Verknüpfungen eine deutlich bessere Bildschirmaufteilung erreicht.
 eigene User-Events
 Vishnu-App
 Vishnu as a Service
