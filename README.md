@@ -150,6 +150,9 @@ Vielen Dank an Kashif Imran auf Code Project.
 [Equality Converter](https://stackoverflow.com/questions/37302270/comparing-two-dynamic-values-in-datatrigger)</br>
 Dank an Jason Tyler auf stackoverflow.
 
+[Variable Grids](https://rachel53461.wordpress.com/2011/09/17/wpf-grids-rowcolumn-count-properties/)</br>
+Herzlichen Dank an Rachel Lim für ihren fantastischen Blog.
+
 Dank auch an die vielen weiteren Software-Entwickler/innen, die ihr Wissen mit uns allen geteilt haben.<br/>
 Beispielhaft für viele:<br/>
 [Thomas Claudius Huber](https://www.thomasclaudiushuber.com/)<br/>
