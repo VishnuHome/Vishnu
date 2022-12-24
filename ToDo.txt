@@ -1631,7 +1631,7 @@ HotPlug
 		///		        internal Workers Workers { get; private set; }
 		///		        	private Dictionary<string, Dictionary<string, WorkerShell[]>> _workers { get; set; }
 		///		        											|										|
-		///		        											|										+-> Quelle-Id, z.B. any SQLServer queryingJob
+		///		        											|										+-> Quelle-Id, z.B. SQLDB_Job
 		///		        											|
 		///		        											+-> einzelnes Event, z.B. "AnyException" oder "LastNotNullLogicalChanged"
 		///		        	

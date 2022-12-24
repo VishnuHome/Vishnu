@@ -121,7 +121,7 @@ namespace Vishnu.ViewModel
         ///           public Workers Workers { get; private set; }
         ///             public Dictionary«string, Dictionary«string, WorkerShell[]»» WorkersDictionary { get; set; }
         ///                                |                  |
-        ///                                |                  +-> Quelle, z.B. any SQLServer queryingJob
+        ///                                |                  +-> Quelle, z.B. SQLSERVER_Job
         ///                                |
         ///                                +-> einzelnes Event, z.B. "AnyException" oder "LastNotNullLogicalChanged"
         ///             Workers werden nicht nach oben in die TopRootJobList propagiert,

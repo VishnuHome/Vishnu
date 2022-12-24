@@ -1,0 +1,289 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FileChecker</name>
+    </assembly>
+    <members>
+        <member name="T:FileChecker.FileChecker">
+             <summary>
+             Prüft, ob bestimmte Dateien in einem Pfad existieren
+             und ggf. wie alt sie sind. Listet diese Dateien und ihre
+             File-Infos in einem SubResultListContainer in ReturnObject.
+             </summary>
+             <remarks>
+             File: FileChecker.cs
+             Autor: Erik Nagel
+            
+             05.04.2014 Erik Nagel: erstellt
+             </remarks>
+        </member>
+        <member name="E:FileChecker.FileChecker.NodeProgressChanged">
+            <summary>
+            Kann aufgerufen werden, wenn sich der Verarbeitungs-Fortschritt
+            des Checkers geändert hat, muss aber zumindest aber einmal zum
+            Schluss der Verarbeitung aufgerufen werden.
+            </summary>
+        </member>
+        <member name="P:FileChecker.FileChecker.ReturnObject">
+            <summary>
+            Rückgabe-Objekt des Checkers
+            </summary>
+        </member>
+        <member name="M:FileChecker.FileChecker.Run(System.Object,Vishnu.Interchange.TreeParameters,Vishnu.Interchange.TreeEvent)">
+            <summary>
+            Hier wird der (normalerweise externe) Arbeitsprozess ausgeführt (oder beobachtet).
+            </summary>
+            <param name="checkerParameters">Modus: SIZE=Dateigröße, COUNT=Datei-Anzahl, AGE=Zeit seit letzter Änderung, TRACE=Zeit der Überwachung<br></br>
+            Dateipfad als regulärer Ausdruck|&lt; oder &gt;|kritische Anzahl oder kritisches Alter<br></br>
+            Format von Alter: Einheit + ':' + ganzzahliger Wert; Einheit: S=Sekunden, M=Minuten, H=Stunden, D=Tage.</param>
+            <param name="treeParameters">Für den gesamten Tree gültige Parameter oder null.</param>
+            <param name="source">Auslösendes TreeEvent oder null.</param>
+            <returns>True, False oder null</returns>
+        </member>
+        <member name="M:FileChecker.FileChecker.#ctor">
+            <summary>
+            Standard Konstruktor.
+            </summary>
+        </member>
+        <member name="M:FileChecker.FileChecker.evaluateParameters(System.String,System.Object,Vishnu.Interchange.TreeEvent)">
+            <summary>
+            Wertet die übergebenen Parameter aus und speichert sie in _fileCheckerReturnObject.
+            </summary>
+            <param name="checkerParameters">Dateipfad mit Wildcards|&lt; oder &gt;|maximal erlaubte(s) Anzahl oder Alter<br></br>
+            Format von Alter: Einheit + ':' + ganzzahliger Wert; Einheit: S=Sekunden, M=Minuten, H=Stunden, D=Tage."</param>
+            <param name="treeParameters">Für den gesamten Tree gültige Parameter oder null.</param>
+            <param name="source">Auslösendes TreeEvent oder null.</param>
+        </member>
+        <member name="T:FileChecker.FileCheckerReturnObject">
+             <summary>
+             ReturnObject für Ergebnisse von File-Checkern.
+             </summary>
+             <remarks>
+             File: FileCheckerReturnObject.cs
+             Autor: Erik Nagel, NetEti
+            
+             16.05.2015 Erik Nagel: erstellt
+             </remarks>
+        </member>
+        <member name="T:FileChecker.FileCheckerReturnObject.SubResultListContainer">
+            <summary>
+            Wrapper-Klasse um List&lt;SubResult&gt; SubResults.
+            </summary>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.SubResultListContainer.SubResults">
+            <summary>
+            Bis zu drei KeyValue-Paare mit jeweils DetailName (i.d.R "Anzahl"),
+            und einem KeyValue-Paar bestehend aus DetailValue (i.d.R eine int-Anzahl)
+            und einem Detail-Ergebnis (bool?).
+            </summary>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.SubResultListContainer.#ctor">
+            <summary>
+            Standard Konstruktor.
+            </summary>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.SubResultListContainer.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Deserialisierungs-Konstruktor.
+            </summary>
+            <param name="info">Property-Container.</param>
+            <param name="context">Übertragungs-Kontext.</param>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.SubResultListContainer.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Serialisierungs-Hilfsroutine: holt die Objekt-Properties in den Property-Container.
+            </summary>
+            <param name="info">Property-Container.</param>
+            <param name="context">Serialisierungs-Kontext.</param>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.SubResultListContainer.ToString">
+            <summary>
+            Überschriebene ToString()-Methode.
+            </summary>
+            <returns>Dieses Objekt.ToString()</returns>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.SubResultListContainer.Equals(System.Object)">
+            <summary>
+            Vergleicht dieses Objekt mit einem übergebenen Objekt nach Inhalt.
+            </summary>
+            <param name="obj"></param>
+            <returns>True, wenn der übergebene SubResultListContainer inhaltlich gleich diesem SubResultListContainer ist.</returns>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.SubResultListContainer.GetHashCode">
+            <summary>
+            Erzeugt einen eindeutigen Hashcode für dieses Objekt.
+            </summary>
+            <returns>Hashcode (int).</returns>
+        </member>
+        <member name="T:FileChecker.FileCheckerReturnObject.SubResult">
+            <summary>
+            Klasse für ein Teilergebnis.
+            </summary>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.SubResult.LogicalResult">
+            <summary>
+            Das logische Einzelergebnis eines Unterergebnisses.
+            true, false oder null.
+            </summary>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.SubResult.FileName">
+            <summary>
+            Der Name einer gelisteten Datei.
+            (i.d.R "Anzahl").
+            </summary>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.SubResult.FileSize">
+            <summary>
+            Die Größe einer Detei.
+             </summary>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.SubResult.FileAge">
+            <summary>
+            Die Zeitspanne seit der letzten Änderung einer Detei oder
+            die Dauer der Überwachung dieser Datei (Trace = true).
+             </summary>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.SubResult.#ctor">
+            <summary>
+            Standard Konstruktor.
+            </summary>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.SubResult.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Deserialisierungs-Konstruktor.
+            </summary>
+            <param name="info">Property-Container.</param>
+            <param name="context">Übertragungs-Kontext.</param>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.SubResult.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Serialisierungs-Hilfsroutine: holt die Objekt-Properties in den Property-Container.
+            </summary>
+            <param name="info">Property-Container.</param>
+            <param name="context">Serialisierungs-Kontext.</param>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.SubResult.ToString">
+            <summary>
+            Überschriebene ToString()-Methode.
+            </summary>
+            <returns>Dieses Objekt.ToString()</returns>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.SubResult.Equals(System.Object)">
+            <summary>
+            Vergleicht dieses Objekt mit einem übergebenen Objekt nach Inhalt.
+            </summary>
+            <param name="obj">Das zu vergleichende SubResult.</param>
+            <returns>True, wenn das übergebene SubResult inhaltlich gleich diesem SubResult ist.</returns>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.SubResult.GetHashCode">
+            <summary>
+            Erzeugt einen eindeutigen Hashcode für dieses Objekt.
+            </summary>
+            <returns>Hashcode (int).</returns>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.SubResults">
+            <summary>
+            Wrapper-Klasse um List&lt;SubResult&gt; SubResults.
+            </summary>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.LogicalResult">
+            <summary>
+            Das logische Gesamtergebnis eines Prüfprozesses:
+            true, false oder null.
+            </summary>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.Mode">
+            <summary>
+            Arbeits-Modus:
+            SIZE=Dateigröße, COUNT=Datei-Anzahl, AGE=Zeit seit letzter Änderung, TRACE=Zeit der Überwachung.
+            </summary>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.CountFiles">
+            <summary>
+            Die Anzahl der Dateien, die das
+            Prüfkriterium erfüllen.
+            </summary>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.SearchDir">
+            <summary>
+            Das Verzeichnis aus dem übergebenen Suchpfad. 
+             </summary>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.FileMask">
+            <summary>
+            Der Dateiname aus dem übergebenen Suchpfad. 
+            Der Dateiname kann ein regulärer Ausdruck sein.
+             </summary>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.Comparer">
+            <summary>
+            Übergebener Vergleichsoperator (&lt; oder &gt;).
+            </summary>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.CriticalFileSizeOrCount">
+            <summary>
+            Größe einer Datei oder Anzahl Dateien, bei deren Überschreitung
+            oder Unterschreitung (je nach Comparer) das Ergebnis der Routine
+            auf false geht.
+            </summary>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.CriticalFileAge">
+            <summary>
+            Maximales oder minimales Alter der gefundenen Dateien
+            (je nach Comparer) bei dem das Ergebnis der Routine auf false geht.
+             </summary>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.FailIfNotFound">
+            <summary>
+            Bei true wird, wenn die zu untersuchende(n) Datei(en) nicht gefunden wurden,
+            als Ergebnis der Prüfung immer false zurückgegeben, auch wenn der Modus
+            "AGE" oder "SIZE" und der Vergleichsoperator "&lt;" ist.
+            </summary>
+        </member>
+        <member name="P:FileChecker.FileCheckerReturnObject.Comment">
+            <summary>
+            Klartext-Informationen zur Prüfroutine
+            (was die Routine prüft).
+             </summary>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.#ctor">
+            <summary>
+            Standard Konstruktor.
+            </summary>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Deserialisierungs-Konstruktor.
+            </summary>
+            <param name="info">Property-Container.</param>
+            <param name="context">Übertragungs-Kontext.</param>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Serialisierungs-Hilfsroutine: holt die Objekt-Properties in den Property-Container.
+            </summary>
+            <param name="info">Property-Container.</param>
+            <param name="context">Serialisierungs-Kontext.</param>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.ToString">
+            <summary>
+            Überschriebene ToString()-Methode - stellt alle öffentlichen Properties
+            als einen (mehrzeiligen) aufbereiteten String zur Verfügung.
+            </summary>
+            <returns>Alle öffentlichen Properties als ein String aufbereitet.</returns>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.Equals(System.Object)">
+            <summary>
+            Vergleicht dieses Objekt mit einem übergebenen Objekt nach Inhalt.
+            </summary>
+            <param name="obj">Das zu vergleichende FileCheckerReturnObject.</param>
+            <returns>True, wenn das übergebene FileCheckerReturnObject inhaltlich gleich diesem FileCheckerReturnObject ist.</returns>
+        </member>
+        <member name="M:FileChecker.FileCheckerReturnObject.GetHashCode">
+            <summary>
+            Erzeugt einen eindeutigen Hashcode für dieses Objekt.
+            </summary>
+            <returns>Hashcode (int).</returns>
+        </member>
+    </members>
+</doc>

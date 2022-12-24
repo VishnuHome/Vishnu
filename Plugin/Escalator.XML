@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Escalator</name>
+    </assembly>
+    <members>
+        <member name="T:Escalator.Program">
+             <summary>
+             Ruft weitere Worker (Exen) mit Kommandozeilen-Parametern auf.
+             Berücksichtigt je nach Aufruf-Zähler unterschiedliche Worker
+             (Eskalationsstufen), z.B. ConsoleMessageBox, MicroMailer, ...
+             </summary>
+             <remarks>
+             File: Program.cs
+             Autor: Erik Nagel
+            
+             16.04.2016 Erik Nagel: Erstellt.
+             03.07.2021 Erik Nagel: Parameter "#quiet#" implementiert.
+             </remarks>
+        </member>
+        <member name="M:Escalator.Program.exec(System.String,System.Int32,System.String,System.String,System.String,System.Boolean,System.String)">
+            <summary>
+            Hier wird der externe Arbeitsprozess ausgeführt.
+            In den TreeParameters oder SlaveParameters (beim Konstruktor übergeben)
+            enthaltene Pipes ('|') werden beim Aufruf des Workers als Leerzeichen zwischen
+            mehreren Kommandozeilenparametern interpretiert.
+            </summary>
+            <param name="workerPath">Dateipfad der auszuführenden Exe.</param>
+            <param name="callCounter">Aufrufzähler (1-n oder x*-1). Bei negativem Wert wird der Worker resettet (Fehler behoben). Der Absolutwert zeigt die letzte Eskalationsstufe.</param>
+            <param name="treeInfo">Für den gesamten Tree gültige Parameter oder null.</param>
+            <param name="nodeId">Id des Knotens, der diesen Worker besitzt.</param>
+            <param name="para">String mit Übergabeparametern für den Worker</param>
+            <param name="transportByFile">Bei True werden die Parameter über eie XML-Datei übergeben, ansonsten über die Kommandozeile.</param>
+            <param name="parameterFile">Dateipfad der XML-Datei mit den ursprünglich an den Executor übergebenen Parametern.</param>
+        </member>
+    </members>
+</doc>

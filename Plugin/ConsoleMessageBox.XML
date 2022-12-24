@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ConsoleMessageBox</name>
+    </assembly>
+    <members>
+        <member name="T:ConsoleMessageBox.Program">
+             <summary>
+             Gibt alle Kommandozeilenparameter durch NewLine getrennt
+             in einer MessageBox aus. Bei mehr als einem Kommandozeilenparameter
+             wird der letzte übergebene Parameter für die Überschrift der
+             MessageBox verwendet.
+             </summary>
+             <remarks>
+             File: Program.cs
+             Autor: Erik Nagel
+            
+             20.03.2013 Erik Nagel: erstellt
+             </remarks>
+        </member>
+    </members>
+</doc>
