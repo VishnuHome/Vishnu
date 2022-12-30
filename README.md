@@ -14,7 +14,7 @@ Vishnu ist eine Monitoring- und Prozesssteuerungssoftware mit integrierter Verar
 Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
   - ### Vorbereitung:
 	* Ein lokales Basisverzeichnis für alle weiteren Vishnu- und Hilfs-Verzeichnisse anlegen, zum Beispiel c:\Users\<user>\Documents\MyVishnu
-	* #### Wichtig: Eine Umgebungsvariable "Vishnu_Root" auf den Pfad zu diesem Verzeichnis setzen, z.B.: Vishnu_Root=c:\Users\<user>\Documents\MyVishnu.
+	* ### Wichtig: Eine Umgebungsvariable "Vishnu_Root" auf den Pfad zu diesem Verzeichnis setzen, z.B.: Vishnu_Root=c:\Users\<user>\Documents\MyVishnu.
 
   - ### Installation:
 	* [init.zip](https://github.com/VishnuHome/Setup/raw/master/Vishnu.bin/init.zip) herunterladen und in das Basisverzeichnis entpacken.
@@ -25,7 +25,7 @@ Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
 
 	### Vishnu-Demo:
 
-	- Im Verzeichnis ReadyBin/Vishnu.bin das Script **Vishnu_Demo.bat** starten.
+	- Im Verzeichnis ReadyBin/Vishnu.bin das Script **_Vishnu_Demo.bat** starten.
 
 ## Demos
 Im Unterverzeichnis **DemoJobs** findest du die Job-Definitionen einer Reihe von interessanten Demonstrations-Jobs.
@@ -37,13 +37,6 @@ online unter [Vishnu online Dokumentation](https://neteti.de/Vishnu.Doc/)
 
 ## Quellcode und Entwicklung
 
-Es gibt grundsätzlich zwei unabhängige Vorgehensweisen:
-  - Wenn du kein Team-Mitglied der Organisation **VishnuHome** bist (das ist der Normalfall),
-    dann lies einfach hier weiter.
-  - Team-Mitglieder lesen bitte den Abschnitt [Quellcode und Entwickung für Team-Mitglieder](#Quellcode-und-Entwicklung-fuer-Team-Mitglieder)
-
----
-
 1. Forken des Repositories **Vishnu** über den Button Fork
 <br/>(Repository https://github.com/VishnuHome/Vishnu)
 
@@ -51,22 +44,18 @@ Es gibt grundsätzlich zwei unabhängige Vorgehensweisen:
 2. Clonen des geforkten Repositories **Vishnu** in das existierende Unterverzeichnis
 	.../MyVishnu/**VishnuHome**
 	
-	- a) in der git-bash über git clone:
+	-  in der git-bash über git clone:
 
 		  cd VishnuHome
 		  git clone git@github.com:VishnuHome/Vishnu.git
 
-	- b) über "Open with GitHub Desktop", wenn du die Desktop-Anwendung bevorzugst
+	-  oder über "Open with GitHub Desktop", wenn du die Desktop-Anwendung bevorzugst
 	
-	- c) über "Download ZIP" kommst du zwar auch an den Quellcode von Vishnu, 
-	     hast dann aber keine Anbindung an dein geforktes Repository auf github.
+	-  nicht empfohlen: über "Download ZIP" kommst du zwar auch an den Quellcode von Vishnu, 
+	   hast dann aber keine Anbindung an dein geforktes Repository auf github.
 	
    ![clone](Git_Clone_small.png)
 	
-
-## Quellcode und Entwicklung fuer Team-Mitglieder
-
-Wechsle bitte in das Repository [Setup](https://github.com/VishnuHome/Setup) und folge den Anweisungen im dortigen README.md.
 
 ## Die Vishnu-Plugins
 
@@ -79,14 +68,16 @@ und [eigene Checker](https://neteti.de/Vishnu.Doc/html/a3f9771a-ac24-46c0-97df-d
 Vishnu liefert schon eine Reihe von Checkern mit. Diese findest du unter [InPlug](https://github.com/InPlug).
 
 Vishnu-Plugins kannst du genauso forken und clonen wie unter [Quellcode und Entwickung](#Quellcode-und-Entwicklung) schon beschrieben,
-nur dass dein lokales Root-Verzeichnis **InPlug** sein sollte.
+nur dass dein lokales Unterverzeichnis das schon vorgesehene **InPlug** sein sollte.
 <br/>(Quellen: https://github.com/InPlug)
 
 ## Das Basis-Framework
 Vishnu arbeitet mit einigen allgemeingültigen DLLs, dem Basis-Framework.
-Für den Fall, dass man sich die Quellen davon anschauen will oder dorthinein debuggen muss,
-kann man sich die zugehörigen Quellen in den dafür vorgesehenen Ordner **WorkFrame** clonen.
+Für den Fall, dass du dir die Quellen davon anschauen willst oder dorthinein debuggen musst,
+kannst du dir die zugehörigen Quellen in den dafür vorgesehenen Ordner **WorkFrame** clonen.
 <br/>(Quellen: https://github.com/WorkFrame)
+
+---
 
 ## Mitmachen (Contributing)
 Wenn du Fehler entdeckst oder Verbesserungsvorschläge einbringen willst, eröffne bitte zuerst ein neues Diskusionsthema ("New issue").<br/>
@@ -95,20 +86,24 @@ Bitte prüfe aber vorher, ob ein passendes Thema nicht vielleicht schon existier
 #### Änderungen und Debugging am Plugin- oder Vishnu-Quellcode
 
 **Wichtig:** Mach möglichst keine Änderungen, Korrekturen oder Erweiterungen
-am master-branch des Quellcodes, sondern lege zuerst einen neuen **feature-branch** an. 
-Nur so kannst du später deine Verbesserungen auch dem Vishnu-Team zurückliefern.
+am master-branch des Quellcodes, sondern lege zuerst einen eigenen **neuen branch** an. 
+Nur so kannst du später deine Verbesserungen auch zurückliefern (**pull-request**).
 
 Da der Vishnu-Kernel besonders hohen Anforderungen an Korrektheit, Stabilität und Performance unterliegt,
 solltest du vielleicht mit Korrekturen, Erweiterungen an - oder Neuerstellung von - Vishnu-Plugins beginnen.
-Der Vishnu-Kernel ist darüber hinaus sehr testaufwendig, weshalb Reaktionen des noch sehr kleinen Teams länger
+Der Vishnu-Kernel ist darüber hinaus sehr testaufwendig, weshalb Reaktionen möglicherweise länger
 auf sich warten lassen können.
 
 #### Änderungen am Quellcode in das Original-Repository zurückspielen
 
-Wenn du Änderungen am Plugin- oder Vishnu-Quellcode vorgenommen und ausführlich getestet hast, kannst du deinen **feature-branch** an das Vishnu-Team über einen **"pull request"** zurückliefern. Das Vishnu-Team begutachtet und testet dann diesen Branch und übernimmt diesen bei Erfolg in Vishnu-master.
-Bitte versuche nicht, einen direkt geänderten master-branch zurückzumelden - wir würden das zurückweisen.
+Wenn du Änderungen am Plugin- oder Vishnu-Quellcode vorgenommen und ausführlich getestet hast,
+kannst du deinen eigenen **branch** an Vishnu über einen **"pull request"** zurückliefern. 
+Dein Branch wird dann begutachtet und bei Erfolg in Vishnu-master übernommen.
+Bitte versuche nicht, einen direkt geänderten master-branch zurückzumelden - das würde nicht angenommen.
 
-**Ein Hinweis in eigener Sache: das Vishnu-Team ist aktuell (Juli 2022) noch sehr klein, weshalb die Bearbeitung deiner Anfragen und Änderungen länger dauern kann!**
+**Ein Hinweis in eigener Sache: ich (Erik) entwickle Vishnu aktuell (Dezember 2022) noch allein, weshalb die Bearbeitung deiner Anfragen und Änderungen länger dauern kann!**
+
+---
 
 ## Fremde Software, fremde Ideen
 
@@ -120,23 +115,17 @@ Ohne den Sandcastle Help File Builder wäre die Vishnu-Dokumentation nicht denkb
 Danke auch an Sergey Vlasov für seine hilfreiche Visual Studio Automatisierung.
 
 [Newtonsoft.Json](https://www.newtonsoft.com/json)<br/>
-Json ohne die Software von James Newton-King? Undenkbar!
+Dank auch an James Newton-King für seine unverzichtbare Software.
 
 Demo-Logik für SplashWindow<br/>
 [Dank an Amr Azab](http://www.codeproject.com/Articles/116875/WPF-Loading-Splash-Screen)
 und [Nate Lowry](http://blog.dontpaniclabs.com/post/2013/11/14/Dynamic-Splash-Screens-in-WPF).
 
-[Zwei Properties vergleichen](https://stackoverflow.com/questions/37302270/comparing-two-dynamic-values-in-datatrigger)<br/>
-Dank an Jason Tyler.
+[WPF-Tortendiagrammme](https://www.codeproject.com/Articles/442506/Simple-and-Easy-to-Use-Pie-Chart-Controls-in-WPF)</br>
+Vielen Dank an Kashif Imran auf Code Project.
 
-[Mindest-Informationen über einen Screen](http://stackoverflow.com/questions/1927540/how-to-get-the-size-of-the-current-screen-in-wpf)<br/>
-Danke an Nils Andresen auf StackOverflow
-
-[ZIP-Routinen für ZIPs > 4GB mit Passwörtern](http://www.eggheadcafe.com/tutorials/aspnet/9ce6c242-c14c-4969-9251-af95e4cf320f/zip--unzip-folders-and-f.aspx)<br/>
-Danke Peter Bromberg.
-
-[Basisklasse für ViewModels, kapselt INotifyPropertyChanged](https://github.com/poma/SshConnect/blob/master/SshConnect/MvvmFoundation/ObservableObject.cs)<br/>
-Vielen Dank an Roman Semenov (poma) für diese Starthilfe.
+[Variable Grids](https://rachel53461.wordpress.com/2011/09/17/wpf-grids-rowcolumn-count-properties/)</br>
+Herzlichen Dank an Rachel Lim für ihren fantastischen Blog.
 
 [Monphasen Berechnung](https://www.codeproject.com/script/Membership/View.aspx?mid=1961229)<br/>
 Danke Mostafa Kaisoun für seine Berechnungslogik.
@@ -144,20 +133,24 @@ Danke Mostafa Kaisoun für seine Berechnungslogik.
 [Wettervorhersagen und Wetter-Icons](http://www.7timer.info)<br/>
 Vielen Dank an Chenzhou Cui und seine Freunde, die diese wunderbare, freie Seite für Wettervorhersagen betreiben.
 
-[WPF-Tortendiagrammme](https://www.codeproject.com/Articles/442506/Simple-and-Easy-to-Use-Pie-Chart-Controls-in-WPF)</br>
-Vielen Dank an Kashif Imran auf Code Project.
+[Mindest-Informationen über einen Screen](http://stackoverflow.com/questions/1927540/how-to-get-the-size-of-the-current-screen-in-wpf)<br/>
+Danke an Nils Andresen auf StackOverflow
+
+[Basisklassen für ViewModels](https://github.com/poma/SshConnect/blob/master/SshConnect/MvvmFoundation/ObservableObject.cs)<br/>
+Vielen Dank an Roman Semenov (poma) für diese Starthilfe.
+
+[ZIP-Routinen für ZIPs > 4GB mit Passwörtern](http://www.eggheadcafe.com/tutorials/aspnet/9ce6c242-c14c-4969-9251-af95e4cf320f/zip--unzip-folders-and-f.aspx)<br/>
+Danke Peter Bromberg.
 
 [Equality Converter](https://stackoverflow.com/questions/37302270/comparing-two-dynamic-values-in-datatrigger)</br>
 Dank an Jason Tyler auf stackoverflow.
-
-[Variable Grids](https://rachel53461.wordpress.com/2011/09/17/wpf-grids-rowcolumn-count-properties/)</br>
-Herzlichen Dank an Rachel Lim für ihren fantastischen Blog.
 
 Dank auch an die vielen weiteren Software-Entwickler/innen, die ihr Wissen mit uns allen geteilt haben.<br/>
 Beispielhaft für viele:<br/>
 [Thomas Claudius Huber](https://www.thomasclaudiushuber.com/)<br/>
 und [Scott Hanselman](https://www.hanselman.com/)
 
-Last but not least geht mein Dank an Microsoft für ihre "Community Edition"s.
+Last but not least geht mein Dank an die Teams von Microsoft für ihre Express- und Community-Editions.
 
 ### Viel Spass mit Vishnu!
+Erik Nagel

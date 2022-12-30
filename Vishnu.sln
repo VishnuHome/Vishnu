@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31424.327
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vishnu", "Vishnu\Vishnu.csproj", "{D0E1EAC9-794A-474B-8A1B-287AAFEDFB28}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -34,16 +34,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConstantNodeUserControl", "DefaultNodeControls\ConstantNodeUserControl\ConstantNodeUserControl.csproj", "{469B3F7D-72E3-4226-9E05-D4A2D6FF075A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobConnectorUserControl", "DefaultNodeControls\JobConnectorUserControl\JobConnectorUserControl.csproj", "{6037CF20-8389-47E8-8264-98D80AFE7F22}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VishnuWeb", "VishnuWeb\VishnuWeb.csproj", "{022735DE-8257-4350-AC9F-171DF29D7CCE}"
-	ProjectSection(ProjectDependencies) = postProject
-		{6037CF20-8389-47E8-8264-98D80AFE7F22} = {6037CF20-8389-47E8-8264-98D80AFE7F22}
-		{6F97924D-0F3C-426D-BBD6-2D661B7F5E37} = {6F97924D-0F3C-426D-BBD6-2D661B7F5E37}
-		{3FA04F4E-350A-4948-995E-70ABB8D4E2E6} = {3FA04F4E-350A-4948-995E-70ABB8D4E2E6}
-		{4E564470-C6C4-4066-9505-00BF7BCC79D4} = {4E564470-C6C4-4066-9505-00BF7BCC79D4}
-		{469B3F7D-72E3-4226-9E05-D4A2D6FF075A} = {469B3F7D-72E3-4226-9E05-D4A2D6FF075A}
-		{B00EC9FC-EAB5-4A17-A25B-761DC8B65A3A} = {B00EC9FC-EAB5-4A17-A25B-761DC8B65A3A}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,10 +85,6 @@ Global
 		{6037CF20-8389-47E8-8264-98D80AFE7F22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6037CF20-8389-47E8-8264-98D80AFE7F22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6037CF20-8389-47E8-8264-98D80AFE7F22}.Release|Any CPU.Build.0 = Release|Any CPU
-		{022735DE-8257-4350-AC9F-171DF29D7CCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{022735DE-8257-4350-AC9F-171DF29D7CCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{022735DE-8257-4350-AC9F-171DF29D7CCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{022735DE-8257-4350-AC9F-171DF29D7CCE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
