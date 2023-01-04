@@ -1756,12 +1756,3 @@ HotPlug
 		///		        #endregion tree globals
 
 
-
-«»
-
-VishnuProvider
-UserAssemblyDirectory
-	Vishnu-Debugging
-	ReadyBin/Vishnu.bin
-	Vishnu-Installation
-	
