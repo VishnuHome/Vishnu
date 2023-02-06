@@ -32,5 +32,10 @@ using System.Runtime.InteropServices;
 // Sie können alle Werte angeben oder die standardmäßigen Build- und Revisionsnummern 
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
+<<<<<<< HEAD
 [assembly: AssemblyVersion("5.3.1.0")]
 [assembly: AssemblyFileVersion("5.3.1.0")]
+=======
+[assembly: AssemblyVersion("5.3.0.4")]
+[assembly: AssemblyFileVersion("5.3.0.4")]
+>>>>>>> 44a09e1 (Version 5.3.0.4 dotnet-framework-final.)
