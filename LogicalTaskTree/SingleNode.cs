@@ -431,16 +431,31 @@ namespace LogicalTaskTree
             else
             {
                 this.LastResult = new Result(this.Id, this.LastLogical, this.LastState, this.LogicalState, this._returnObject);
-                hasChanged = true;
+                //if (this.IsSnapshotDummy) // 17.02.2023 Nagel - TODO: Snapshots testen
+                //{
+                //    hasChanged = true;
+                //}
             }
             this.RootJobList.RegisterResult(this.LastResult);
             this.OnNodeStateChanged(); // damit geänderte Results auch über OnLogicalStateChanged abgegriffen werden können.
             if (hasChanged)
             {
+                Guid tmpGuid = Guid.NewGuid();
                 this.ProcessTreeEvent("LastResultChanged", null);
-                this.OnNodeResultChanged(); // Führt bei NodeList zur Neuberechnung des logischen Ergebnisses;
-                                            // bei Vergleichen wichtig.
+                this.RaiseNodeLastResultChangedWithTreeEvent(this, this.LastNotNullLogical, tmpGuid);
             }
+        }
+
+        /// <summary>
+        /// Triggert das TreeEvent "AnyResultHasChanged" und ruft "OnNodeResultChanged".
+        /// </summary>
+        /// <param name="source">Die ursprüngliche Quelle der Events.</param>
+        /// <param name="lastNotNullLogical">Der logische Wert des Senders.</param>
+        /// <param name="eventId">Eine optionale Guid zur eindeutigen Identifizierung des Events.</param>
+        protected void RaiseNodeLastResultChangedWithTreeEvent(LogicalNode source, bool? lastNotNullLogical, Guid eventId)
+        {
+            this.ProcessTreeEvent("AnyResultHasChanged", source);
+            this.OnNodeResultChanged(); // Führt bei NodeList zur Neuberechnung des logischen Ergebnisses; bei Vergleichen wichtig.
         }
 
         /// <summary>
@@ -510,10 +525,10 @@ namespace LogicalTaskTree
                     {
                         source.Environment = this.TreeRootJobList.GetEnvironment();
                     }
-                    if (source.Results == null || source.Results.Count == 0)
-                    {
+                    //  18.02.2023 Nagel+- auskommentiert: if (source.Results == null || source.Results.Count == 0)
+                    //{
                         source.Results = this.TreeRootJobList.GetResults();
-                    }
+                    //}
                     // 14.07.2022 Nagel-
 
                     // 14.07.2022 Nagel+
@@ -665,11 +680,25 @@ namespace LogicalTaskTree
             }
             this.ThreadUpdateLastLogicalState(this.LogicalState);
             this.Logical = logical;
+            /* 17.02.2023 Nagel+ auskommentiert
             if (runException != null && !(runException is OperationCanceledException))
             {
                 this._returnObject = runException;
                 this.OnExceptionRaised(this, runException);
             }
+            17.02.2023 Nagel- */
+            if (runException != null) // 17.02.2023 Nagel+
+            {
+                if (!(runException is OperationCanceledException))
+                {
+                    this._returnObject = runException;
+                    this.OnExceptionRaised(this, runException);
+                }
+            }
+            else
+            {
+                this.SetLastResult();
+            } // 17.02.2023 Nagel-
             this.OnNodeProgressChanged(this.Id + "." + this.Name, 100, this._lastSucceeded, ItemsTypes.items);
             this.OnNodeProgressFinished(this.Id + "." + this.Name, 100, this._lastSucceeded, ItemsTypes.items);
         }

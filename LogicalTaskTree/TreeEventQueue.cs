@@ -42,6 +42,7 @@ namespace LogicalTaskTree
                 if (!TreeEventQueue._treeEventQueue.Contains(queueElement, new ComposedQueueElementCompare()))
                 {
                     TreeEventQueue._treeEventQueue.Enqueue(queueElement);
+                    // InfoController.GetInfoPublisher().Publish(nodeId, String.Format($"TreeEventQueue.AddTreeEventTrigger {eventNode} - enqueued({counter.ToString()})!"), InfoType.NoRegex);
                     if (!TreeEventQueue._isWorking)
                     {
                         TreeEventQueue._taskWorker.RunTask(new Action<TaskWorker>(TreeEventQueue.processQueue));

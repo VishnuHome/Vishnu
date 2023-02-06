@@ -1,5 +1,6 @@
 ﻿using NetEti.ApplicationControl;
 using System;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Timers;
 using Vishnu.Interchange;
@@ -186,6 +187,7 @@ namespace LogicalTaskTree
             if (this.IsActive && this.TriggerIt != null)
             {
                 this.TriggerIt(source);
+                // InfoController.GetInfoPublisher().Publish(this, String.Format($"TreeEventTrigger.OnTriggerFired {source.SourceId}/{source.SenderId} ({source.Name})"), InfoType.NoRegex);
             }
             if (this._eventTimer != null)
             {

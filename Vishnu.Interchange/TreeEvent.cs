@@ -273,6 +273,7 @@ namespace Vishnu.Interchange
               = new Dictionary<string, string>() {
         {"LOGICALCHANGED", "LastLogicalChanged"},
         {"RESULTCHANGED", "LastResultChanged"},
+        {"ANYRESULTCHANGED", "AnyResultHasChanged"},
         {"LOGICALRESULTCHANGED", "LastNotNullLogicalChanged"},
         {"TRUE", "LastNotNullLogicalToTrue"},
         {"FALSE", "LastNotNullLogicalToFalse"},
@@ -292,6 +293,7 @@ namespace Vishnu.Interchange
           = new Dictionary<string, string>() {
         {"LASTLOGICALCHANGED", "LogicalChanged"},
         {"LASTRESULTCHANGED", "ResultChanged"},
+        {"ANYRESULTHASCHANGED", "AnyResultChanged"},
         {"LASTNOTNULLLOGICALCHANGED", "LogicalResultChanged"},
         {"LASTNOTNULLLOGICALTOTRUE", "True"},
         {"LASTNOTNULLLOGICALTOFALSE", "False"},

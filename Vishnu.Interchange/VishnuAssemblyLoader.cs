@@ -133,12 +133,16 @@ namespace Vishnu.Interchange
             {
                 ThreadLocker.UnlockNameGlobal("AssemblyLoader");
             }
-            String msg = lastException.Message;
-            if (lastException.InnerException != null)
+            if (lastException != null)
             {
-                msg += Environment.NewLine + lastException.InnerException.Message;
+                String msg = lastException.Message;
+                if (lastException.InnerException != null)
+                {
+                    msg += Environment.NewLine + lastException.InnerException.Message;
+                }
+                throw new TypeLoadException(msg);
             }
-            throw new TypeLoadException(msg);
+            return null;
         }
 
         #endregion public members

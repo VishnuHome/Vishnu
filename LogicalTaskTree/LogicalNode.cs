@@ -995,7 +995,7 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
-        /// Triggert das TreeEvent "AnyLastNotNullLogicalHasChanged" und ruft "RaiseNodeLastNotNullLogicalChanged".
+        /// Triggert das TreeEvent "AnyLastNotNullLogicalHasChanged" und ruft "OnNodeLastNotNullLogicalChanged".
         /// </summary>
         /// <param name="source">Die ursprüngliche Quelle der Events.</param>
         /// <param name="lastNotNullLogical">Der logische Wert des Senders.</param>
@@ -2150,6 +2150,7 @@ namespace LogicalTaskTree
         // Knoten verweisen, vom run eines Knotens zu entkoppeln (gleichzeitige Ausführung mehrerer runs).
         private void RunAsyncAsync(TreeEvent source)
         {
+            // InfoController.GetInfoPublisher().Publish(this, String.Format($"1. {this.NameId}.RunAsyncAsync {source.SourceId}/{source.SenderId} ({source.Name})"), InfoType.NoRegex);
             if (this.AppSettings.IsInSleepTime != this._isInSleepTime)
             {
                 this._isInSleepTime = this.AppSettings.IsInSleepTime;
@@ -2161,6 +2162,7 @@ namespace LogicalTaskTree
                 return;
             }
             LogicalNode.WaitWhileTreePausedOrFlushing();
+            // InfoController.GetInfoPublisher().Publish(this, String.Format($"2. {this.NameId}.RunAsyncAsync {source.SourceId}/{source.SenderId} ({source.Name})"), InfoType.NoRegex);
             lock (this._threadStartLocker)
             {
                 this.LastExecutingTreeEvent = source;
@@ -2170,6 +2172,7 @@ namespace LogicalTaskTree
                     return;
                 }
                 this.IsRunRequired = true;
+                // InfoController.GetInfoPublisher().Publish(this, String.Format($"3. {this.NameId}.RunAsyncAsync {source.SourceId}/{source.SenderId} ({source.Name})"), InfoType.NoRegex);
                 if (this._starterThread == null || !(this._starterThread.IsAlive && this.IsThreadValid(this._starterThread)))
                 {
                     // this.asyncCheckerTask = new Task(() => this.runAsync(source));
@@ -2183,6 +2186,7 @@ namespace LogicalTaskTree
                     this._starterThread = new Thread((te) =>
                     {
                         Thread.CurrentThread.Name = "tryRunAsyncWhileIsRunRequired";
+                        // InfoController.GetInfoPublisher().Publish(this, String.Format($"4. {this.NameId}.RunAsyncAsync {source.SourceId}/{source.SenderId} ({source.Name})"), InfoType.NoRegex);
                         this.TryRunAsyncWhileIsRunRequired(te as TreeEvent);
                     });
                     _starterThread.SetApartmentState(ApartmentState.STA); // Ist wegen WPF-Checkern erforderlich.
@@ -2246,6 +2250,7 @@ namespace LogicalTaskTree
         /// </summary>
         private void TryRunAsyncWhileIsRunRequired(TreeEvent source)
         {
+            // InfoController.GetInfoPublisher().Publish(this, String.Format($"LogicalNode.TryRunAsyncWhileIsRunRequired {source.SourceId}/{source.SenderId} ({source.Name})"), InfoType.NoRegex);
             int waitingLoopCounter = 0;
             do
             {

@@ -1,11 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
- 	<PropertyGroup>
-   	<VishnuRoot>$(ProjectDir)../../..</VishnuRoot>
-   	<AssemblyRoot>$(VishnuRoot)/ReadyBin/Assemblies</AssemblyRoot>
-	</PropertyGroup>
-	<Import Project="$(ProjectDir)../../AddOn/proj/*" Condition="exists('$(ProjectDir)../../AddOn/proj')" />
   <PropertyGroup>
+    <VishnuRoot>$(ProjectDir)../../..</VishnuRoot>
+    <AssemblyRoot>$(VishnuRoot)/ReadyBin/Assemblies</AssemblyRoot>
     <PublishUrl>\\localhost\Vishnu.Install\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Unc</InstallFrom>
@@ -34,6 +31,8 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <BootstrapperComponentsUrl>C:\Users\micro\Documents\private4\WPF\Eti\VishnuHome\Install\ClickOnce Bootstrapper</BootstrapperComponentsUrl>
   </PropertyGroup>
+  <Import Project="$(ProjectDir)../../AddOn/proj/*" Condition="exists('$(ProjectDir)../../AddOn/proj')" />
+  <PropertyGroup />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>

@@ -333,15 +333,15 @@ namespace Vishnu
         {
             try
             {
-                InfoController.GetInfoPublisher().Publish(this,
-                    String.Format($"IsClickOnce: {SingleInstanceApplication._appSettings.IsClickOnce}"), InfoType.NoRegex);
+                //InfoController.GetInfoPublisher().Publish(this,
+                //    String.Format($"IsClickOnce: {SingleInstanceApplication._appSettings.IsClickOnce}"), InfoType.NoRegex);
                 string clickOnceDataDirectoryString = SingleInstanceApplication._appSettings.ClickOnceDataDirectory == null ?
                     "null" : SingleInstanceApplication._appSettings.ClickOnceDataDirectory;
-                InfoController.GetInfoPublisher().Publish(this,
-                    String.Format($"ClickOnceDataDirectory: {clickOnceDataDirectoryString}"), InfoType.NoRegex);
-                InfoController.GetInfoPublisher().Publish(this,
-                    String.Format($"NewDeployment.xml: {File.Exists(Path.Combine(SingleInstanceApplication._appSettings.ApplicationRootPath, "NewDeployment.xml"))}")
-                    , InfoType.NoRegex);
+                //InfoController.GetInfoPublisher().Publish(this,
+                //    String.Format($"ClickOnceDataDirectory: {clickOnceDataDirectoryString}"), InfoType.NoRegex);
+                //InfoController.GetInfoPublisher().Publish(this,
+                //    String.Format($"NewDeployment.xml: {File.Exists(Path.Combine(SingleInstanceApplication._appSettings.ApplicationRootPath, "NewDeployment.xml"))}")
+                //    , InfoType.NoRegex);
                 // MessageBox.Show(String.Format($"Vor ClickOnceAktionen auf {clickOnceDataDirectoryString}"));
                 if (SingleInstanceApplication._appSettings.IsClickOnce
                     && Directory.Exists(clickOnceDataDirectoryString)
