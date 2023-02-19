@@ -51,10 +51,6 @@ using System.Windows;
 // Sie können alle Werte angeben oder die standardmäßigen Build- und Revisionsnummern 
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("5.3.0.4")]
-[assembly: AssemblyFileVersion("5.3.0.4")]
-<<<<<<< HEAD
->>>>>>> 44a09e1 (Version 5.3.0.4 dotnet-framework-final.)
-=======
->>>>>>> 61f462a (Mergekonflikt bei AssemblyInfo aufgeloest.)
+[assembly: AssemblyVersion("5.3.1.0")]
+[assembly: AssemblyFileVersion("5.3.1.0")]
 [assembly: GuidAttribute("B1270AEA-A8A7-4BF3-A3FE-4CFD7AADB72E")]
