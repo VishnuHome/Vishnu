@@ -33,9 +33,9 @@ namespace Vishnu.Interchange
         /// <param name="instance">Instanz der Klasse, bei der ein direkter Typecast fehlschlägt.</param>
         /// <param name="name">Name der auszulesenden Property.</param>
         /// <returns>Gewünschte Property des Typs T.</returns>
-        public static T GetProperty<T>(object instance, string name)
+        public static T? GetProperty<T>(object instance, string name)
         {
-            object propertyValue = null;
+            object? propertyValue = null;
             bool found = false;
             Type type = instance.GetType();
             PropertyInfo[] propertyInfos = type.GetProperties();
@@ -50,22 +50,22 @@ namespace Vishnu.Interchange
             }
             if (!found)
             {
-                throw new TypeLoadException(String.Format("Die Property {0} wurde nicht gefunden!", name));
+                throw new TypeLoadException(String.Format("Die Property {0} wurde nicht gefunden.", name));
             }
-            object obj = null;
+            object? obj = null;
             if (propertyValue != null)
             {
                 try
                 {
-                    string encoded = XMLSerializationUtility.SerializeObject(Encoding.Default, propertyValue);
-                    obj = XMLSerializationUtility.DeserializeObject(Encoding.Default, encoded);
+                    string encoded = SerializationUtility.SerializeObjectToBase64(propertyValue);
+                    obj = SerializationUtility.DeserializeObjectFromBase64<T>(encoded);
                 }
                 catch (Exception)
                 {
-                    throw new TypeLoadException(String.Format("Die Property {0} ist nicht vom erwarteten Typ!", name));
+                    throw new TypeLoadException(String.Format("Die Property {0} ist nicht vom erwarteten Typ.", name));
                 }
             }
-            return (T)obj;
+            return (T?)obj;
         }
     }
 }

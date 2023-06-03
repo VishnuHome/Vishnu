@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Vishnu.DemoApplications</RootNamespace>
+    <Title>$(AssemblyName) - Demoprogramm</Title>
+    <Authors>Erik Nagel</Authors>
+    <Company>NetEti</Company>
+    <Description>$(AssemblyName) - Demoprogramm</Description>
+    <Copyright>Copyright © $(Authors) 2023-2023</Copyright>
+    <AssemblyVersion>7.0.0.0</AssemblyVersion>
+    <FileVersion>7.0.0.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SingleNodeUserControl\SingleNodeUserControl.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="NetEti.CustomProgressBar">
+      <HintPath>..\..\..\..\..\ReadyBin\Assemblies\NetEti.CustomProgressBar.dll</HintPath>
+    </Reference>
+    <Reference Include="NetEti.Global">
+      <HintPath>..\..\..\..\..\ReadyBin\Assemblies\NetEti.Global.dll</HintPath>
+    </Reference>
+    <Reference Include="NetEti.InfoController">
+      <HintPath>..\..\..\..\..\ReadyBin\Assemblies\NetEti.InfoController.dll</HintPath>
+    </Reference>
+    <Reference Include="NetEti.MVVMini">
+      <HintPath>..\..\..\..\..\ReadyBin\Assemblies\NetEti.MVVMini.dll</HintPath>
+    </Reference>
+    <Reference Include="Vishnu.Interchange">
+      <HintPath>..\..\..\..\..\ReadyBin\Assemblies\Vishnu.Interchange.dll</HintPath>
+    </Reference>
+    <Reference Include="Vishnu.ViewModel">
+      <HintPath>..\..\..\..\..\ReadyBin\Assemblies\Vishnu.ViewModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Vishnu.WPF_UI">
+      <HintPath>..\..\..\..\..\ReadyBin\Assemblies\Vishnu.WPF_UI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

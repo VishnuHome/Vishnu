@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Text;
 using NetEti.Globals;
 using Vishnu.Interchange;
@@ -32,7 +33,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                return this._node.Logical;
+                return this._node?.Logical;
             }
             set
             {
@@ -47,7 +48,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                return this._node.State;
+                return this._node?.State ?? NodeState.None;
             }
             set
             {
@@ -63,7 +64,7 @@ namespace LogicalTaskTree
             get
             {
                 SleepIfNecessary();
-                return this._node.LogicalState;
+                return this._node?.LogicalState ?? NodeLogicalState.None;
             }
             set
             {
@@ -81,7 +82,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                return this._node.SingleNodes;
+                return this._node?.SingleNodes ?? 0;
             }
         }
 
@@ -92,7 +93,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                return this._node.SingleNodesFinished;
+                return this._node?.SingleNodesFinished ?? 0;
             }
         }
 
@@ -115,13 +116,13 @@ namespace LogicalTaskTree
         /// Der Arbeitsprozess - hier wird mit der Welt kommuniziert,
         /// externe Prozesse gestartet oder beobachtet.
         /// </summary>
-        public NodeCheckerBase Checker
+        public NodeCheckerBase? Checker
         {
             get
             {
                 if (this._node is SingleNode)
                 {
-                    return (this._node as SingleNode).Checker;
+                    return ((SingleNode)this._node).Checker;
                 }
                 else
                 {
@@ -136,7 +137,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Das letzte Verarbeitungsergebnis für diesen Knoten.
         /// </summary>
-        public override Result LastResult
+        public override Result? LastResult
         {
             get
             {
@@ -195,7 +196,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Info-Text über den nächsten Start des Knotens (wenn bekannt) oder null.
         /// </summary>
-        public override string NextRunInfo
+        public override string? NextRunInfo
         {
             get
             {
@@ -213,17 +214,17 @@ namespace LogicalTaskTree
         /// <summary>
         /// Name eines ursprünglich referenzierten Knotens oder null.
         /// </summary>
-        public override string ReferencedNodeName
+        public override string? ReferencedNodeName
         {
             get
             {
-                if ((this._node.NodeType == NodeTypes.NodeConnector || this._node.NodeType == NodeTypes.JobConnector) && !this._node.IsSnapshotDummy)
+                if ((this._node?.NodeType == NodeTypes.NodeConnector || this._node?.NodeType == NodeTypes.JobConnector) && !this._node.IsSnapshotDummy)
                 {
-                    return (this._node as NodeConnector).ReferencedNodeName;
+                    return ((NodeConnector)this._node).ReferencedNodeName;
                 }
                 else
                 {
-                    return this._node.Name;
+                    return this._node?.Name;
                 }
             }
         }
@@ -231,17 +232,17 @@ namespace LogicalTaskTree
         /// <summary>
         /// Id des ursprünglich referenzierten Knotens.
         /// </summary>
-        public override string ReferencedNodeId
+        public override string? ReferencedNodeId
         {
             get
             {
-                if ((this._node.NodeType == NodeTypes.NodeConnector || this._node.NodeType == NodeTypes.JobConnector) && !this._node.IsSnapshotDummy)
+                if ((this._node?.NodeType == NodeTypes.NodeConnector || this._node?.NodeType == NodeTypes.JobConnector) && !this._node.IsSnapshotDummy)
                 {
-                    return (this._node as NodeConnector).ReferencedNodeId;
+                    return ((NodeConnector)this._node).ReferencedNodeId;
                 }
                 else
                 {
-                    return this._node.Id;
+                    return this._node?.Id;
                 }
             }
         }
@@ -249,17 +250,17 @@ namespace LogicalTaskTree
         /// <summary>
         /// Pfad des ursprünglich referenzierten Knotens.
         /// </summary>
-        public override string ReferencedNodePath
+        public override string? ReferencedNodePath
         {
             get
             {
                 if (this._node is NodeConnector)
                 {
-                    return (this._node as NodeConnector).ReferencedNodePath;
+                    return ((NodeConnector)this._node).ReferencedNodePath;
                 }
                 else
                 {
-                    return this._node.Path;
+                    return this._node?.Path;
                 }
             }
         }
@@ -271,7 +272,10 @@ namespace LogicalTaskTree
         /// <param name="mother">Der Eltern-Knoten</param>
         /// <param name="rootJobList">Die Root-JobList</param>
         /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
-        public NodeConnector(LogicalNode mother, JobList rootJobList, TreeParameters treeParams) : base(mother, rootJobList, treeParams) { }
+        public NodeConnector(LogicalNode mother, JobList rootJobList, TreeParameters treeParams) : base(mother, rootJobList, treeParams)
+        {
+            this._userControlPath = String.Empty;
+        }
 
         /// <summary>
         /// Konstruktor
@@ -282,7 +286,7 @@ namespace LogicalTaskTree
         /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
         /// <param name="node">Die LogicalNode, zu der sich dieser NodeConnector verbinden soll.</param>
         /// <param name="valueModifier">Ein optionaler ValueModifier oder null.</param>
-        public NodeConnector(string id, LogicalNode mother, JobList rootJoblist, TreeParameters treeParams, LogicalNode node, NodeCheckerBase valueModifier)
+        public NodeConnector(string id, LogicalNode mother, JobList rootJoblist, TreeParameters treeParams, LogicalNode? node, NodeCheckerBase? valueModifier)
           : base(id, mother, rootJoblist, treeParams)
         {
             if (node != null)
@@ -290,6 +294,7 @@ namespace LogicalTaskTree
                 this.InitReferencedNode(node);
             }
             this._valueModifier = valueModifier;
+            this._userControlPath = String.Empty;
         }
 
         /// <summary>
@@ -308,17 +313,20 @@ namespace LogicalTaskTree
         /// <returns>True, wenn gestartet wurde.</returns>
         public override void UserRun()
         {
-            this.ThreadUpdateParentView(this.ParentView); // temporär auf die ParentView des aktuellen NodeConnectors umschießen.
+            if (this.ParentView != null)
+            {
+                this.ThreadUpdateParentView(this.ParentView); // temporär auf die ParentView des aktuellen NodeConnectors umschießen.
+            }
             if (!(this._node is NodeConnector))
             {
-                if (this._node.LastResult != null)
+                if (this._node?.LastResult != null)
                 {
                     this._node.Run(new TreeEvent("UserRun", this.Id, this.Id, this.Name, this.Path, null, NodeLogicalState.None,
                       new ResultDictionary() { { String.IsNullOrEmpty(this.Name) ? this.Id : this.Name, this._node.LastResult } }, null));
                 }
                 else
                 {
-                    this._node.Run(new TreeEvent("UserRun", this.Id, this.Id, this.Name, this.Path, null, NodeLogicalState.None, null, null));
+                    this._node?.Run(new TreeEvent("UserRun", this.Id, this.Id, this.Name, this.Path, null, NodeLogicalState.None, null, null));
                 }
             }
             else
@@ -334,7 +342,7 @@ namespace LogicalTaskTree
         {
             if (!(this._node is NodeConnector))
             {
-                this._node.Break(true);
+                this._node?.Break(true);
             }
             else
             {
@@ -346,7 +354,7 @@ namespace LogicalTaskTree
         /// Lädt den Zweig oder Knoten neu.
         /// </summary>
         /// <returns>Die RootJobList des neu geladenen Jobs.</returns>
-        public override JobList Reload()
+        public override JobList? Reload()
         {
             if (this._node != null)
             {
@@ -370,7 +378,7 @@ namespace LogicalTaskTree
         /// Diese Routine läuft asynchron.
         /// </summary>
         /// <param name="source">Auslösendes TreeEvent oder null.</param>
-        protected override void DoRun(TreeEvent source)
+        protected override void DoRun(TreeEvent? source)
         {
             // hier keine Funktion - nur in der referenzierten SingleNode.
         }
@@ -394,20 +402,20 @@ namespace LogicalTaskTree
             StringBuilder stringBuilder = new StringBuilder(base.ToString());
             string slavePathName = "";
             string referencedNodeName = "";
-            string checkerParameters = "";
+            string? checkerParameters = "";
 
             if (this.Checker != null)
             {
                 if (this.Checker is CheckerShell)
                 {
-                    slavePathName = (this.Checker as CheckerShell).SlavePathName ?? "";
-                    checkerParameters = ((this.Checker as CheckerShell).OriginalCheckerParameters ?? "").ToString();
-                    referencedNodeName = (this.Checker as CheckerShell).ReferencedNodeName ?? "";
+                    slavePathName = ((CheckerShell)this.Checker).SlavePathName ?? "";
+                    checkerParameters = (((CheckerShell)this.Checker).OriginalCheckerParameters ?? "").ToString();
+                    referencedNodeName = ((CheckerShell)this.Checker).ReferencedNodeName ?? "";
                 }
                 else
                 {
-                    slavePathName = (this.Checker as ValueModifier<object>).SlavePathName ?? "";
-                    referencedNodeName = (this.Checker as ValueModifier<object>).ReferencedNodeName ?? "";
+                    slavePathName = ((ValueModifier<object>)this.Checker).SlavePathName ?? "";
+                    referencedNodeName = ((ValueModifier<object>)this.Checker).ReferencedNodeName ?? "";
                 }
             }
             if (!String.IsNullOrEmpty(slavePathName))
@@ -431,7 +439,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="obj">Der NodeConnector zum Vergleich.</param>
         /// <returns>True, wenn der übergebene NodeConnector inhaltlich gleich diesem ist.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (!base.Equals(obj))
             {
@@ -441,7 +449,7 @@ namespace LogicalTaskTree
             {
                 return true;
             }
-            return this.ToString() == (obj as NodeConnector).ToString();
+            return this.ToString() == ((NodeConnector)obj).ToString();
         }
 
         /// <summary>
@@ -470,7 +478,7 @@ namespace LogicalTaskTree
                 }
                 else
                 {
-                    return null;
+                    return new ResultList();
                 }
             }
             set
@@ -490,12 +498,12 @@ namespace LogicalTaskTree
         /// <summary>
         /// Der Knoten, auf den dieser NodeConnector verweist.
         /// </summary>
-        protected LogicalNode _node; // protected ist erforderlich.
+        protected LogicalNode? _node; // protected ist erforderlich.
 
         /// <summary>
         /// Das letzte Verarbeitungsergebnis für diesen Knoten (internes Feld).
         /// </summary>
-        protected Result _lastResult;
+        protected Result? _lastResult;
 
         /// <summary>
         /// Der Pfad zum aktuell dynamisch zu ladenden UserControl (internes Feld).
@@ -510,7 +518,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="sender">Der referenzierte Originalknoten (LogicalNode).</param>
         /// <param name="args">Informationen zum Verarbeitungsfortschritt.</param>
-        protected override void SubNodeProgressFinished(object sender, CommonProgressChangedEventArgs args)
+        protected override void SubNodeProgressFinished(object? sender, ProgressChangedEventArgs args)
         {
             base.SubNodeProgressFinished(sender, args);
             this.LastResult = this._node?.LastResult;
@@ -522,7 +530,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="sender">Der Kind-Knoten.</param>
         /// <param name="result">Neues Result des Kind-Knotens.</param>
-        protected override void SubNodeResultChanged(LogicalNode sender, Result result)
+        protected override void SubNodeResultChanged(LogicalNode sender, Result? result)
         {
             this.LastResult = result;
             base.OnNodeResultChanged();
@@ -532,9 +540,9 @@ namespace LogicalTaskTree
 
         #region private members
 
-        private NodeCheckerBase _valueModifier;
+        private NodeCheckerBase? _valueModifier;
 
-        private object modifyValue(object toConvert)
+        private object? modifyValue(object? toConvert)
         {
             if (this._valueModifier != null)
             {

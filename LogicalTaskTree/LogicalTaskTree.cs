@@ -75,18 +75,18 @@ namespace LogicalTaskTree
                               {
                                   try
                                   {
-                                      (n.Trigger as IDisposable).Dispose();
+                                      (n.Trigger as IDisposable)?.Dispose();
                                   }
                                   catch { };
                               }
                               if (n is SingleNode)
                               {
-                                  SingleNode node = n as SingleNode;
-                                  if (node.Checker != null && node.Checker is IDisposable)
+                                  SingleNode? node = n as SingleNode;
+                                  if (node?.Checker != null && node.Checker is IDisposable)
                                   {
                                       try
                                       {
-                                          (node.Checker as IDisposable).Dispose();
+                                          (node.Checker as IDisposable)?.Dispose();
                                       }
                                       catch { };
                                   }
@@ -128,7 +128,7 @@ namespace LogicalTaskTree
         public IVishnuNode SetTopJobList(IVishnuNode topJobList)
         {
             JobList oldTopJobList = this.Tree;
-            this.Tree = topJobList as JobList;
+            this.Tree = (JobList)topJobList;
             return oldTopJobList;
         }
 

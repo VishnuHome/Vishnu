@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading;
 using Vishnu.Interchange;
 using NetEti.ObjectSerializer;
+using LogicalTaskTree.Provider;
 
 namespace LogicalTaskTree
 {
@@ -33,7 +34,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Wird aufgerufen, wenn sich das logische Ergebnis eines Knotens geändert hat.
         /// </summary>
-        public event SnapshotRefreshedEventHandler SnapshotRefreshed;
+        public event SnapshotRefreshedEventHandler? SnapshotRefreshed;
 
         /// <summary>
         /// Anzahl der SingleNodes (letztendlich Checker) am Ende eines (Teil-)Baums;
@@ -74,8 +75,8 @@ namespace LogicalTaskTree
         /// </summary>
         public string SnapshotPath { get; set; }
 
-        private XDocument _lastXmlDoc;
-        private string _lastXmlDocFilePath;
+        private XDocument? _lastXmlDoc;
+        private string? _lastXmlDocFilePath;
 
         /// <summary>
         /// True, wenn dieser Snapshot nicht geladen werden konnte und stattdessen
@@ -114,7 +115,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this._userControlPath != null)
+                if (!String.IsNullOrEmpty(this._userControlPath))
                 {
                     return this._userControlPath;
                 }
@@ -136,7 +137,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this._jobListUserControlPath != null)
+                if (!String.IsNullOrEmpty(this._jobListUserControlPath))
                 {
                     return this._jobListUserControlPath;
                 }
@@ -158,7 +159,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this._nodeListUserControlPath != null)
+                if (!String.IsNullOrEmpty(this._nodeListUserControlPath))
                 {
                     return this._nodeListUserControlPath;
                 }
@@ -180,7 +181,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this._singleNodeUserControlPath != null)
+                if (!String.IsNullOrEmpty(this._singleNodeUserControlPath))
                 {
                     return this._singleNodeUserControlPath;
                 }
@@ -201,7 +202,7 @@ namespace LogicalTaskTree
         /// </summary>
         public bool WasDefaultSnapshot
         {
-            get { return this._job.WasDefaultSnapshot; }
+            get { return this._job?.WasDefaultSnapshot == true; }
         }
 
         /// <summary>
@@ -216,20 +217,26 @@ namespace LogicalTaskTree
             this._isDefaultSnapshot = false;
             if (this._job != null)
             {
-                this.UserControlPath = this._job.SnapshotUserControlPath;
-                this.JobListUserControlPath = this._job.JobListUserControlPath;
-                this.NodeListUserControlPath = this._job.NodeListUserControlPath;
-                this.SingleNodeUserControlPath = this._job.SingleNodeUserControlPath;
+                this._userControlPath = this._job.SnapshotUserControlPath;
+                this._jobListUserControlPath = this._job.JobListUserControlPath;
+                this._nodeListUserControlPath = this._job.NodeListUserControlPath;
+                this._singleNodeUserControlPath = this._job.SingleNodeUserControlPath;
                 this.ConstantNodeUserControlPath = this._job.ConstantNodeUserControlPath;
             }
             else
             {
-                this.UserControlPath = rootJobList.SnapshotUserControlPath;
-                this.JobListUserControlPath = rootJobList.UserControlPath;
-                this.NodeListUserControlPath = rootJobList.NodeListUserControlPath;
-                this.SingleNodeUserControlPath = rootJobList.SingleNodeUserControlPath;
+                this._userControlPath = rootJobList.SnapshotUserControlPath;
+                this._jobListUserControlPath = rootJobList.UserControlPath;
+                this._nodeListUserControlPath = rootJobList.NodeListUserControlPath;
+                this._singleNodeUserControlPath = rootJobList.SingleNodeUserControlPath;
                 this.ConstantNodeUserControlPath = rootJobList.ConstantNodeUserControlPath;
             }
+            this.SnapshotPath = String.Empty;
+            this._jobProvider = new EmptyJobProvider();
+            this._results = new();
+            this._treeStringList = new();
+            this._parsedJobs = new();
+            this._parsedNodeExceptions = new();
         }
 
         /// <summary>
@@ -239,10 +246,10 @@ namespace LogicalTaskTree
         /// <returns>Baumdarstellung in einer StringList</returns>
         public List<string> Show(string indent)
         {
-            this.indent = indent;
-            this.treeStringList.Clear();
+            this._indent = indent;
+            this._treeStringList.Clear();
             this.Traverse(this.element2StringList);
-            return this.treeStringList;
+            return this._treeStringList;
         }
 
         /// <summary>
@@ -272,7 +279,8 @@ namespace LogicalTaskTree
         /// </summary>
         public void RefreshSnapshot()
         {
-            this.RefreshSnapshot(null, false);
+            // this.RefreshSnapshot(null, false);
+            this.RefreshSnapshot(this, false);
         }
 
         /*
@@ -311,18 +319,23 @@ namespace LogicalTaskTree
         internal Snapshot(string logicalName, LogicalNode mother, JobList rootJoblist, TreeParameters treeParams, IJobProvider jobProvider, List<string> parsedJobs)
           : base(logicalName, mother, rootJoblist, treeParams)
         {
-            this.UserControlPath = rootJoblist.SnapshotUserControlPath;
+            this._userControlPath = rootJoblist.SnapshotUserControlPath;
             this.Level = mother.Level + 1;
             this.RootJobList = rootJoblist;
             this._parsedJobs = parsedJobs;
             this._parsedNodeExceptions = new List<KeyValuePair<LogicalNode, Exception>>();
             if (this._parsedJobs.Contains(logicalName))
             {
-                throw new ApplicationException(String.Format("Rekursion bei ID: {0}!", logicalName));
+                throw new ApplicationException(String.Format("Rekursion bei ID: {0}.", logicalName));
             }
             this._jobProvider = jobProvider;
-            this._job = this._jobProvider.GetJob(ref logicalName);
-            this.SnapshotPath = this._jobProvider.GetPhysicalJobPath(logicalName);
+            string tmpJobName = logicalName;
+            this._job = this._jobProvider.GetJob(ref tmpJobName);
+            if (!String.IsNullOrEmpty(tmpJobName) && tmpJobName != logicalName)
+            {
+                logicalName = tmpJobName;
+            }
+            this.SnapshotPath = this._jobProvider.GetPhysicalJobPath(logicalName) ?? throw new ArgumentException($"SnapshotPath von {logicalName} ist null.");
             this.Id = logicalName;
             this.Name = this.Id;
             if (this.Id.Length > 1 && this.Id.StartsWith("#"))
@@ -342,8 +355,8 @@ namespace LogicalTaskTree
                     this.StartCollapsed = true;
                 }
             } // 15.02.2019 Nagel-
-            this.results = new ResultList();
-            this.treeStringList = new List<string>();
+            this._results = new ResultList();
+            this._treeStringList = new List<string>();
             this.Trigger = this._job.JobTrigger;
             this.Logger = this._job.JobLogger;
             this.Logical = null;
@@ -358,11 +371,11 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="nodeId">Die Id des Knotens, der ein Result-Objekt hier abgelegt hat.</param>
         /// <returns>Das Result-Objekt des Knotens.</returns>
-        internal Result GetResult(string nodeId)
+        internal Result? GetResult(string nodeId)
         {
-            if (nodeId != null && this.results.ContainsKey(nodeId))
+            if (nodeId != null && this._results.ContainsKey(nodeId))
             {
-                return this.results[nodeId];
+                return this._results[nodeId];
             }
             return null;
         }
@@ -376,7 +389,7 @@ namespace LogicalTaskTree
         /// Diese Routine wird asynchron ausgeführt.
         /// </summary>
         /// <param name="source">Auslösendes TreeEvent oder null.</param>
-        protected override void DoRun(TreeEvent source)
+        protected override void DoRun(TreeEvent? source)
         {
             this.RefreshSnapshot();
             if (this.Trigger != null)
@@ -394,10 +407,7 @@ namespace LogicalTaskTree
         /// </summary>
         protected virtual void OnSnapshotRefreshed()
         {
-            if (SnapshotRefreshed != null)
-            {
-                SnapshotRefreshed(this);
-            }
+            SnapshotRefreshed?.Invoke(this);
         }
 
         #endregion protected members
@@ -407,19 +417,19 @@ namespace LogicalTaskTree
         private IJobProvider _jobProvider;
 
         // Der externe Job mit logischem Ausdruck und Dictionary der Worker.
-        private Job _job;
+        private Job? _job;
 
-        private ResultList results;
-        private string indent;
-        private List<string> treeStringList;
+        private ResultList _results;
+        private string? _indent;
+        private List<string> _treeStringList;
         private List<string> _parsedJobs;
         private List<KeyValuePair<LogicalNode, Exception>> _parsedNodeExceptions;
 
         private bool _isDefaultSnapshot;
-        private string _userControlPath;
-        private string _jobListUserControlPath;
-        private string _nodeListUserControlPath;
-        private string _singleNodeUserControlPath;
+        private string? _userControlPath;
+        private string? _jobListUserControlPath;
+        private string? _nodeListUserControlPath;
+        private string? _singleNodeUserControlPath;
 
         // 1. Stößt das Parsen des booleschen Ausdrucks an.
         // 2. Baut nach dem Vorbild des Boolean-Tree den LogicalTask(Teil-)Tree
@@ -431,14 +441,17 @@ namespace LogicalTaskTree
         // und performante Lösung gefunden werden.
         private void parse(LogicalNode mother, bool isConstructor = false)
         {
-            XDocument xmlDoc = new XDocument();
-            string xmlFilePath = "";
+            XDocument? xmlDoc = new XDocument();
+            string? xmlFilePath = String.Empty;
             try
             {
-                xmlFilePath = File.ReadAllText(this._jobProvider.GetPhysicalJobPath(this.Id));
-                string snapshotPhysicalName = System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(xmlFilePath));
+                string? physicalJobPath = this._jobProvider.GetPhysicalJobPath(this.Id);
+                if (physicalJobPath != null)
+                {
+                    xmlFilePath = File.ReadAllText(physicalJobPath);
+                }
+                string? snapshotPhysicalName = System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(xmlFilePath));
                 xmlDoc = XDocument.Load(xmlFilePath);
-
             }
             catch (IOException)
             {
@@ -456,7 +469,8 @@ namespace LogicalTaskTree
             // DEBUG 24.02.2020 Nagel-
             this.IsDefaultSnapshot = false;
             LogicalNode para = this;
-            this.buildTreeFromRemoteJob(mother, this.Level, ref para, xmlDoc.Element("Snapshot"), isConstructor);
+            XElement snapshotXml = xmlDoc.Element("Snapshot") ?? throw new ArgumentNullException("XElement Snapshot ist null.");
+            this.buildTreeFromRemoteJob(mother, this.Level, ref para, snapshotXml, isConstructor);
             this._parsedNodeExceptions.Clear();
         }
 
@@ -472,21 +486,21 @@ namespace LogicalTaskTree
         {
             string type;
             string subType = "";
-            XAttribute xVar = xElement.Attributes("Type").FirstOrDefault();
+            XAttribute? xVar = xElement.Attributes("Type").FirstOrDefault() ?? throw new ArgumentException("Snapshot: Attribut 'Type' nicht gefunden.");
             type = xVar.Value;
             if (type == "NodeConnector")
             {
                 type = "SingleNode";
             }
-            if (node2parse != null && node2parse.GetType().Name != type)
+            if (node2parse.GetType().Name != type)
             {
                 if (node2parse is IDisposable)
                 {
-                    (node2parse as IDisposable).Dispose();
+                    ((IDisposable)node2parse).Dispose();
                 }
-                node2parse = null;
+                node2parse = UndefinedLogicalNode;
             }
-            if (node2parse == null)
+            if (node2parse == UndefinedLogicalNode)
             {
                 switch (type)
                 {
@@ -510,7 +524,8 @@ namespace LogicalTaskTree
                         //case "NodeConnector":
                         node2parse = new SingleNode(mother, this.RootJobList, this.TreeParams);
                         node2parse.NodeType = NodeTypes.Checker;
-                        subType = xElement.Attributes("NodeType").FirstOrDefault().Value;
+                        subType = xElement.Attributes("NodeType").FirstOrDefault()?.Value
+                            ?? throw new ArgumentException("SingleNode: Attribut 'SubType' nicht gefunden.");
                         if (subType != "Constant")
                         {
                             node2parse.UserControlPath = this.SingleNodeUserControlPath;
@@ -523,11 +538,12 @@ namespace LogicalTaskTree
                     case "JobConnector":
                         node2parse = new JobConnector(mother, this.RootJobList, this.TreeParams);
                         node2parse.NodeType = NodeTypes.JobConnector;
-                        subType = xElement.Attributes("NodeType").FirstOrDefault().Value;
+                        subType = xElement.Attributes("NodeType").FirstOrDefault()?.Value
+                            ?? throw new ArgumentException("JobConnector: Attribut 'SubType' nicht gefunden.");
                         node2parse.UserControlPath = this.JobConnectorUserControlPath;
                         break;
                     default:
-                        break;
+                        throw new ArgumentNullException($"Type '{type}' nicht gefunden.");
                 }
             }
             node2parse.Level = level;
@@ -537,9 +553,9 @@ namespace LogicalTaskTree
             if (type == "Snapshot")
             {
                 // Snapshot-spezifische Werte übernehmen
-                (node2parse as Snapshot).Timestamp = Convert.ToDateTime(xElement.Element("Timestamp").Value);
-                (node2parse as Snapshot).SnapshotPath = xElement.Element("Path").Value;
-                XElement tmpVar = xElement.Element("SleepTimeTo");
+                ((Snapshot)node2parse).Timestamp = Convert.ToDateTime(xElement.Element("Timestamp")?.Value);
+                ((Snapshot)node2parse).SnapshotPath = xElement.Element("Path")?.Value ?? throw new ArgumentNullException("Snapshot mit Path=null.");
+                XElement? tmpVar = xElement.Element("SleepTimeTo");
                 if (tmpVar != null)
                 {
                     node2parse.SleepTimeTo = TimeSpan.Parse(tmpVar.Value);
@@ -551,11 +567,11 @@ namespace LogicalTaskTree
                     node2parse.IsInSleepTime = false;
                 }
             }
-            if (type == "Snapshot" && (node2parse as Snapshot).IsInSnapshot == false) // 10.05.2018 Nagel: IsInSnapshot muss sein! 
+            if (type == "Snapshot" && ((Snapshot)node2parse).IsInSnapshot == false) // 10.05.2018 Nagel: IsInSnapshot muss sein! 
             {
                 // Im Snapshot enthaltene JobList parsen
-                xElement = xElement.Element("JobDescription");
-                LogicalNode subNode2parse = null;
+                xElement = xElement.Element("JobDescription") ?? throw new ApplicationException("JobDescription ist null.");
+                LogicalNode? subNode2parse = null;
                 bool buildNew = true;
                 if (node2parse.Children != null && node2parse.Children.Count > 0)
                 {
@@ -563,26 +579,29 @@ namespace LogicalTaskTree
                     buildNew = false;
                 }
                 // Rekursion - Subtree bauen
-                this.buildTreeFromRemoteJob(this, level + 1, ref subNode2parse, xElement, isConstructor);
-                if (buildNew)
+                if (subNode2parse != null)
                 {
-                    // JobList als Kind-Knoten einbauen
-                    node2parse.Children.Clear();
-                    //(node2parse as NodeList).HookChildEvents(subNode2parse);
-                    node2parse.Children.Add(subNode2parse);
+                    this.buildTreeFromRemoteJob(this, level + 1, ref subNode2parse, xElement, isConstructor);
+                    if (buildNew)
+                    {
+                        // JobList als Kind-Knoten einbauen
+                        node2parse.Children?.Clear();
+                        //(node2parse as NodeList).HookChildEvents(subNode2parse);
+                        node2parse.Children?.Add(subNode2parse);
+                    }
+                    // Relevante Werte des Kind-Knotens auf den Snapshot übernehmen.
+                    lastNotNullLogical = subNode2parse.LastNotNullLogical;
                 }
-                // Relevante Werte des Kind-Knotens auf den Snapshot übernehmen.
-                lastNotNullLogical = subNode2parse.LastNotNullLogical;
             }
             else
             {
                 // Ab hier innerhalb der JobList des Snapshots
-                node2parse.Id = xElement.Attribute("Id").Value;
-                node2parse.Name = xElement.Attribute("Name").Value;
+                node2parse.Id = xElement.Attribute("Id")?.Value ?? "";
+                node2parse.Name = xElement.Attribute("Name")?.Value ?? "";
                 try
                 {
-                    node2parse.LastRun = Convert.ToDateTime(xElement.Attribute("LastRun").Value);
-                    node2parse.NextRunInfo = xElement.Attribute("NextRunInfo").Value;
+                    node2parse.LastRun = Convert.ToDateTime(xElement.Attribute("LastRun")?.Value);
+                    node2parse.NextRunInfo = xElement.Attribute("NextRunInfo")?.Value;
                 }
 #if DEBUG
                 catch (Exception ex)
@@ -597,7 +616,7 @@ namespace LogicalTaskTree
                 }
 #endif
                 xVar = xElement.Attribute("LastNotNullLogical");
-                if (xVar.Value != "")
+                if (!String.IsNullOrEmpty(xVar?.Value))
                 {
                     lastNotNullLogical = Convert.ToBoolean(xVar.Value);
                 }
@@ -607,26 +626,27 @@ namespace LogicalTaskTree
                 }
                 if (subType == "NodeConnector" | subType == "JobConnector")
                 {
-                    node2parse.ReferencedNodeId = xElement.Element("ReferencedNodeId").Value;
-                    node2parse.ReferencedNodeName = xElement.Element("ReferencedNodeName").Value;
-                    node2parse.ReferencedNodePath = xElement.Element("ReferencedNodePath").Value;
+                    node2parse.ReferencedNodeId = xElement.Element("ReferencedNodeId")?.Value;
+                    node2parse.ReferencedNodeName = xElement.Element("ReferencedNodeName")?.Value;
+                    node2parse.ReferencedNodePath = xElement.Element("ReferencedNodePath")?.Value;
                 }
                 if (subType == "JobConnector")
                 {
-                    (node2parse as JobConnector).LogicalExpression = xElement.Element("LogicalExpression").Value;
+                    ((JobConnector)node2parse).LogicalExpression = xElement.Element("LogicalExpression")?.Value ?? "";
                 }
                 if (type == "NodeList" || type == "JobList" || type == "Snapshot")
                 {
                     if (type == "JobList")
                     {
-                        (node2parse as JobList).LogicalExpression = xElement.Element("LogicalExpression").Value;
+                        ((JobList)node2parse).LogicalExpression = xElement.Element("LogicalExpression")?.Value
+                            ?? throw new ArgumentNullException("JobList ohne LogicalExpression.");
                     }
-                    XElement tmpVar = xElement.Element("ThreadLocked");
-                    node2parse.ThreadLocked = tmpVar == null ? false : Convert.ToBoolean(tmpVar.Value);
+                    XElement? tmpVar = xElement.Element("ThreadLocked");
+                    node2parse.ThreadLocked = tmpVar != null && Convert.ToBoolean(tmpVar.Value);
                     tmpVar = xElement.Element("BreakWithResult");
-                    node2parse.BreakWithResult = tmpVar == null ? false : Convert.ToBoolean(tmpVar.Value);
+                    node2parse.BreakWithResult = tmpVar != null && Convert.ToBoolean(tmpVar.Value);
                     tmpVar = xElement.Element("StartCollapsed");
-                    node2parse.StartCollapsed = tmpVar == null ? false : Convert.ToBoolean(tmpVar.Value);
+                    node2parse.StartCollapsed = tmpVar != null && Convert.ToBoolean(tmpVar.Value);
                     if (ConfigurationManager.IsExpanded(node2parse.IdPath) != null) // 15.02.2019 Nagel+
                     {
                         if (ConfigurationManager.IsExpanded(node2parse.IdPath) == true)
@@ -639,14 +659,14 @@ namespace LogicalTaskTree
                         }
                     } // 15.02.2019 Nagel-
                     tmpVar = xElement.Element("IsVolatile");
-                    ((NodeList)node2parse).IsVolatile = tmpVar == null ? false : Convert.ToBoolean(tmpVar.Value);
+                    ((NodeList)node2parse).IsVolatile = tmpVar != null && Convert.ToBoolean(tmpVar.Value);
                     IEnumerable<XElement> logicalNodes = from item in xElement.Elements("LogicalNode") select item;
                     int i = 0;
                     // 06.07.2016 Nagel+ foreach (XElement xLogicalNode in logicalNodes)
                     foreach (XElement xLogicalNode in logicalNodes.ToList()) // 06.07.2016 Nagel-
                     {
-                        LogicalNode subNode2parse = null;
-                        string lastTypeName = null;
+                        LogicalNode subNode2parse = UndefinedLogicalNode;
+                        string? lastTypeName = null;
                         if (node2parse.Children != null && node2parse.Children.Count > i)
                         {
                             lastTypeName = node2parse.Children[i].GetType().Name;
@@ -657,7 +677,7 @@ namespace LogicalTaskTree
                         string subNodeTypeName = subNode2parse.GetType().Name;
                         if (subNodeTypeName == "Snapshot")
                         {
-                            (subNode2parse as Snapshot).IsInSnapshot = true;
+                            ((Snapshot)subNode2parse).IsInSnapshot = true;
                         }
                         if (lastTypeName != null)
                         {
@@ -665,23 +685,23 @@ namespace LogicalTaskTree
                             {
                                 // JobList als Kind-Knoten austauschen
                                 // 09.08.2018+- (node2parse as NodeList).UnhookChildEvents(node2parse.Children[i]);
-                                node2parse.Children.RemoveAt(i);
+                                node2parse.Children?.RemoveAt(i);
                                 // 09.08.2018+- (node2parse as NodeList).HookChildEvents(subNode2parse);
-                                node2parse.Children.Insert(i, subNode2parse);
+                                node2parse.Children?.Insert(i, subNode2parse);
                             } // anderenfalls nichts machen, der Knoten ist im Typ unverändert
                         }
                         else
                         {
                             // JobList als Kind-Knoten einbauen
                             //(node2parse as NodeList).HookChildEvents(subNode2parse);
-                            node2parse.Children.Add(subNode2parse);
+                            node2parse.Children?.Add(subNode2parse);
                         }
                         i++;
                     }
                     if (type == "Snapshot")
                     {
                         tmpVar = xElement.Element("IsDefaultSnapshot");
-                        (node2parse as Snapshot).IsDefaultSnapshot = tmpVar == null ? false : Convert.ToBoolean(tmpVar.Value);
+                        ((Snapshot)node2parse).IsDefaultSnapshot = tmpVar != null && Convert.ToBoolean(tmpVar.Value);
                     }
                 } // if (type == "NodeList" || type == "JobList")
             }
@@ -692,14 +712,14 @@ namespace LogicalTaskTree
                 node2parse.LastLogical = lastNotNullLogical; // ist
                 node2parse.LastNotNullLogical = lastNotNullLogical; // essenziell!
 
-                XElement lastExceptionsGroup = xElement.Element("LastExceptions");
+                XElement? lastExceptionsGroup = xElement.Element("LastExceptions");
                 if (lastExceptionsGroup != null)
                 {
                     // 06.07.2016 Nagel+ foreach (XElement xException in lastExceptionsGroup.Descendants())
                     foreach (XElement xException in lastExceptionsGroup.Descendants().ToList()) // 06.07.2016 Nagel-
                     {
                         // TODO: hier ggf. noch den Type der Exception übernehmen
-                        Exception exception = new ApplicationException(xException.Attribute("Message").Value);
+                        Exception exception = new ApplicationException(xException.Attribute("Message")?.Value);
                         // 17.08.2018+
                         if (node2parse != this && (node2parse is NodeParent))
                         {
@@ -732,18 +752,18 @@ namespace LogicalTaskTree
                 if (node2parse is SingleNode)
                 {
                     node2parse.State = NodeState.Finished;
-                    XElement xresult = xElement.Descendants("Result").FirstOrDefault();
+                    XElement? xresult = xElement.Descendants("Result").FirstOrDefault();
                     if (xresult != null && !String.IsNullOrEmpty(xresult.Value.ToString()))
                     {
                         string encoded = xresult.Value.ToString();
-                        Result deserializedResult = (Result)XMLSerializationUtility.DeserializeObjectFromBase64(encoded);
-                        (node2parse as SingleNode).SetReturnObject(deserializedResult.ReturnObject);
+                        Result? deserializedResult = SerializationUtility.DeserializeObjectFromBase64<Result>(encoded);
+                        (node2parse as SingleNode)?.SetReturnObject(deserializedResult?.ReturnObject);
                     }
                     else
                     {
-                        (node2parse as SingleNode).SetReturnObject(null);
+                        (node2parse as SingleNode)?.SetReturnObject(null);
                     }
-                  (node2parse as SingleNode).SetLastResult();
+                  (node2parse as SingleNode)?.SetLastResult();
                     node2parse.Logical = lastNotNullLogical;
                 }
                 //if (node2parse is JobConnector)
@@ -781,7 +801,7 @@ namespace LogicalTaskTree
             }
             else
             {
-                XElement userControlPath = xElement.Element("UserControlPath");
+                XElement? userControlPath = xElement.Element("UserControlPath");
                 if (userControlPath != null)
                 {
                     node2parse.UserControlPath = userControlPath.Value.ToString();
@@ -800,9 +820,9 @@ namespace LogicalTaskTree
 
         private void element2StringList(int depth, LogicalNode node)
         {
-            string depthIndent = String.Join(this.indent, new string[++depth]);
+            string depthIndent = String.Join(this._indent, new string[++depth]);
             Snapshot snapshot = (Snapshot)node;
-            this.treeStringList.Add(String.Concat(depthIndent, "Snapshot: ", snapshot.Id, " (", snapshot.Name,
+            this._treeStringList.Add(String.Concat(depthIndent, "Snapshot: ", snapshot.Id, " (", snapshot.Name,
               ", n-: ", snapshot.nMinus, ", n+: ", snapshot.nPlus, "): ", snapshot.LastNotNullLogical.ToString()));
         }
 

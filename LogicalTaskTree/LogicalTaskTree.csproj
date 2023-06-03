@@ -1,131 +1,79 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Title>$(AssemblyName) - Business Logic</Title>
+    <Authors>Erik Nagel</Authors>
+    <Company>NetEti</Company>
+    <Description>Haupt-Verarbeitungslogik von Vishnu</Description>
+    <Copyright>Copyright © $(Authors) 2012-2023</Copyright>
+    <AssemblyVersion>7.0.0.0</AssemblyVersion>
+    <FileVersion>7.0.0.0</FileVersion>
+    <PackageTags>NetEti Vishnu Businesslogic</PackageTags>
+  </PropertyGroup>
+
  	<PropertyGroup>
    	<VishnuRoot>$(ProjectDir)../../..</VishnuRoot>
    	<AssemblyRoot>$(VishnuRoot)/ReadyBin/Assemblies</AssemblyRoot>
 	</PropertyGroup>
 	<Import Project="$(ProjectDir)../../AddOn/proj/*" Condition="exists('$(ProjectDir)../../AddOn/proj')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{4AC4B58A-3BB3-418D-A204-917642A6963B}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LogicalTaskTree</RootNamespace>
-    <AssemblyName>LogicalTaskTree</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\LogicalTaskTree.XML</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="NetEti.BasicAppSettings">
-      <HintPath>$(AssemblyRoot)\NetEti.BasicAppSettings.dll</HintPath>
-    </Reference>
-    <Reference Include="NetEti.ExpressionParser, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(AssemblyRoot)\NetEti.ExpressionParser.dll</HintPath>
-    </Reference>
-    <Reference Include="NetEti.Global">
-      <HintPath>$(AssemblyRoot)\NetEti.Global.dll</HintPath>
-    </Reference>
-    <Reference Include="NetEti.InfoController">
-      <HintPath>$(AssemblyRoot)\NetEti.InfoController.dll</HintPath>
-    </Reference>
-    <Reference Include="NetEti.Logging">
-      <HintPath>$(AssemblyRoot)\NetEti.Logging.dll</HintPath>
-    </Reference>
-    <Reference Include="NetEti.MVVMini">
-      <HintPath>$(AssemblyRoot)\NetEti.MVVMini.dll</HintPath>
-    </Reference>
-    <Reference Include="NetEti.ObjectSerializer">
-      <HintPath>$(AssemblyRoot)\NetEti.ObjectSerializer.dll</HintPath>
-    </Reference>
-    <Reference Include="NetEti.TaskWorker">
-      <HintPath>$(AssemblyRoot)\NetEti.TaskWorker.dll</HintPath>
-    </Reference>
-    <Reference Include="NetEti.ZipAccess">
-      <HintPath>$(AssemblyRoot)\NetEti.ZipAccess.dll</HintPath>
-    </Reference>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ConfigurationManager.cs" />
-    <Compile Include="JobConnector.cs" />
-    <Compile Include="JobPackage.cs" />
-    <Compile Include="LogicalTaskTree.cs" />
-    <Compile Include="NodeParent.cs" />
-    <Compile Include="NodeShellBase.cs" />
-    <Compile Include="ResultList.cs" />
-    <Compile Include="SnapshotManager.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="IJobProvider.cs" />
-    <Compile Include="Job.cs" />
-    <Compile Include="JobList.cs" />
-    <Compile Include="JobProviderBase.cs" />
-    <Compile Include="Provider\MixedTestJobProvider.cs" />
-    <Compile Include="LoggerShell.cs" />
-    <Compile Include="LogicalNode.cs" />
-    <Compile Include="NodeCheckerBase.cs" />
-    <Compile Include="NodeConnector.cs" />
-    <Compile Include="NodeList.cs" />
-    <Compile Include="NodeResultComparer.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Provider\ProductionJobProvider.cs" />
-    <Compile Include="SingleNode.cs" />
-    <Compile Include="CheckerShell.cs" />
-    <Compile Include="Snapshot.cs" />
-    <Compile Include="TreeEventQueue.cs" />
-    <Compile Include="TreeEventTrigger.cs" />
-    <Compile Include="TriggerShell.cs" />
-    <Compile Include="ValueModifier.cs" />
-    <Compile Include="WorkerShell.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Vishnu.Interchange\Vishnu.Interchange.csproj">
-      <Project>{96b1ebc8-9460-4061-9a8a-defa18a885ca}</Project>
-      <Name>Vishnu.Interchange</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
+	<Choose>
+  	<When Condition="!('$(TF_BUILD)' == 'true' Or '$(GITHUB_ACTIONS)' == 'true' Or '$(NETETI_CIB)' == 'true')">
+		  <ItemGroup>
+		    <Reference Include="Vishnu.Interchange">
+		      <HintPath>$(AssemblyRoot)/Vishnu.Interchange.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.BasicAppSettings">
+		      <HintPath>$(AssemblyRoot)/NetEti.BasicAppSettings.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.ExpressionParser">
+		      <HintPath>$(AssemblyRoot)/NetEti.ExpressionParser.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.Global">
+		      <HintPath>$(AssemblyRoot)/NetEti.Global.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.InfoController">
+		      <HintPath>$(AssemblyRoot)/NetEti.InfoController.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.Logging">
+		      <HintPath>$(AssemblyRoot)/NetEti.Logging.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.MVVMini">
+		      <HintPath>$(AssemblyRoot)/NetEti.MVVMini.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.ObjectSerializer">
+		      <HintPath>$(AssemblyRoot)/NetEti.ObjectSerializer.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.ProcessTools">
+		      <HintPath>$(AssemblyRoot)/NetEti.ProcessTools.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.TaskWorker">
+		      <HintPath>$(AssemblyRoot)/NetEti.TaskWorker.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.ZipAccess">
+		      <HintPath>$(AssemblyRoot)/NetEti.ZipAccess.dll</HintPath>
+		    </Reference>
+		  </ItemGroup>
+  	</When>
+    <Otherwise>
+		  <ItemGroup>
+		    <PackageReference Include="Vishnu.Interchange" Version="1.0.0" />
+		    <PackageReference Include="NetEti.BasicAppSettings" Version="1.0.0" />
+		    <PackageReference Include="NetEti.ExpressionParser" Version="1.0.0" />
+		    <PackageReference Include="NetEti.Global" Version="1.0.0" />
+		    <PackageReference Include="NetEti.InfoController" Version="1.0.0" />
+		    <PackageReference Include="NetEti.Logging" Version="1.0.0" />
+		    <PackageReference Include="NetEti.MVVMini" Version="1.0.0" />
+		    <PackageReference Include="NetEti.ObjectSerializer" Version="1.0.0" />
+		    <PackageReference Include="NetEti.ProcessTools" Version="1.0.0" />
+		    <PackageReference Include="NetEti.TaskWorker" Version="1.0.0" />
+		    <PackageReference Include="NetEti.ZipAccess" Version="1.0.0" />
+		  </ItemGroup>
+    </Otherwise>
+	</Choose>
+
 </Project>

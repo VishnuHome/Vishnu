@@ -42,7 +42,7 @@ namespace LogicalTaskTree
                 if (!TreeEventQueue._treeEventQueue.Contains(queueElement, new ComposedQueueElementCompare()))
                 {
                     TreeEventQueue._treeEventQueue.Enqueue(queueElement);
-                    // InfoController.GetInfoPublisher().Publish(nodeId, String.Format($"TreeEventQueue.AddTreeEventTrigger {eventNode} - enqueued({counter.ToString()})!"), InfoType.NoRegex);
+                    // InfoController.GetInfoPublisher().Publish(nodeId, String.Format($"TreeEventQueue.AddTreeEventTrigger {eventNode} - enqueued({counter.ToString()})."), InfoType.NoRegex);
                     if (!TreeEventQueue._isWorking)
                     {
                         TreeEventQueue._taskWorker.RunTask(new Action<TaskWorker>(TreeEventQueue.processQueue));
@@ -51,7 +51,7 @@ namespace LogicalTaskTree
                 }
                 else
                 {
-                    // InfoController.GetInfoPublisher().Publish(nodeId, String.Format($"TreeEventQueue.AddTreeEventTrigger {eventNode} - REFUSED({counter.ToString()})!"), InfoType.NoRegex);
+                    // InfoController.GetInfoPublisher().Publish(nodeId, String.Format($"TreeEventQueue.AddTreeEventTrigger {eventNode} - REFUSED({counter.ToString()})."), InfoType.NoRegex);
                 }
                 counter++;
             }
@@ -80,10 +80,10 @@ namespace LogicalTaskTree
             TreeEventQueue._isWorking = true;
             while (!TreeEventQueue._treeEventQueue.IsEmpty)
             {
-                ComposedQueueElement composedQueueElement = null;
+                ComposedQueueElement? composedQueueElement = null;
                 if (TreeEventQueue._treeEventQueue.TryDequeue(out composedQueueElement))
                 {
-                    composedQueueElement.Trigger.OnTriggerFired(composedQueueElement.Source);
+                    composedQueueElement.Trigger?.OnTriggerFired(composedQueueElement.Source);
                 }
             }
             TreeEventQueue._isWorking = false;
@@ -103,17 +103,17 @@ namespace LogicalTaskTree
         /// <summary>
         /// treeEvent + ":" + nodeId.
         /// </summary>
-        public string Key { get; set; }
+        public string? Key { get; set; }
 
         /// <summary>
         /// Das auslösende TreeEvent.
         /// </summary>
-        public TreeEvent Source { get; set; }
+        public TreeEvent? Source { get; set; }
 
         /// <summary>
         /// TreeEventTrigger.
         /// </summary>
-        public TreeEventTrigger Trigger { get; set; }
+        public TreeEventTrigger? Trigger { get; set; }
 
         #endregion public members
 
@@ -123,14 +123,14 @@ namespace LogicalTaskTree
     {
         #region public members
 
-        public bool Equals(ComposedQueueElement x, ComposedQueueElement y)
+        public bool Equals(ComposedQueueElement? x, ComposedQueueElement? y)
         {
-            return x.Key == y.Key;
+            return x?.Key == y?.Key;
         }
 
         public int GetHashCode(ComposedQueueElement codeh)
         {
-            return codeh.Key.GetHashCode();
+            return codeh.Key?.GetHashCode() ?? 0;
         }
 
         #endregion public members

@@ -1,0 +1,128 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageId>$(AssemblyName)</PackageId>
+    <Title>$(AssemblyName) - User-Interface der MVVM-Anwendung Vishnu</Title>
+    <Authors>Erik Nagel</Authors>
+    <Company>NetEti</Company>
+    <Description>Assembly mit einem User-Interface für die MVVM-Anwendung Vishnu</Description>
+    <Copyright>Copyright © $(Authors) 2012-2023</Copyright>
+    <AssemblyVersion>7.0.0.0</AssemblyVersion>
+    <FileVersion>7.0.0.0</FileVersion>
+    <PackageTags>NetEti Vishnu Main View</PackageTags>
+  </PropertyGroup>
+
+ 	<PropertyGroup>
+   	<VishnuRoot>$(ProjectDir)../../..</VishnuRoot>
+   	<AssemblyRoot>$(VishnuRoot)/ReadyBin/Assemblies</AssemblyRoot>
+	</PropertyGroup>
+	<Import Project="$(ProjectDir)../../AddOn/proj/*" Condition="exists('$(ProjectDir)../../AddOn/proj')" />
+
+	<Choose>
+  	<When Condition="!('$(TF_BUILD)' == 'true' Or '$(GITHUB_ACTIONS)' == 'true' Or '$(NETETI_CIB)' == 'true')">
+		  <ItemGroup>
+		    <Reference Include="Vishnu.Interchange">
+		      <HintPath>$(AssemblyRoot)/Vishnu.Interchange.dll</HintPath>
+		    </Reference>
+		    <Reference Include="Vishnu.ViewModel">
+		      <HintPath>$(AssemblyRoot)/Vishnu.ViewModel.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.CustomProgressBar">
+		      <HintPath>$(AssemblyRoot)/NetEti.CustomProgressBar.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.InfoController">
+		      <HintPath>$(AssemblyRoot)/NetEti.InfoController.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.Logging">
+		      <HintPath>$(AssemblyRoot)/NetEti.Logging.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.MultiScreen">
+		      <HintPath>$(AssemblyRoot)/NetEti.MultiScreen.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.MVVMini">
+		      <HintPath>$(AssemblyRoot)/NetEti.MVVMini.dll</HintPath>
+		    </Reference>
+		    <Reference Include="NetEti.ZoomBox">
+		      <HintPath>$(AssemblyRoot)/NetEti.ZoomBox.dll</HintPath>
+		    </Reference>
+		  </ItemGroup>
+  	</When>
+    <Otherwise>
+		  <ItemGroup>
+		    <PackageReference Include="Vishnu.Interchange" Version="1.0.0" />
+		    <PackageReference Include="Vishnu.ViewModel" Version="1.0.0" />
+		    <PackageReference Include="NetEti.CustomProgressBar" Version="1.0.0" />
+		    <PackageReference Include="NetEti.InfoController" Version="1.0.0" />
+		    <PackageReference Include="NetEti.Logging" Version="1.0.0" />
+		    <PackageReference Include="NetEti.MultiScreen" Version="1.0.0" />
+		    <PackageReference Include="NetEti.MVVMini" Version="1.0.0" />
+		    <PackageReference Include="NetEti.ZoomBox" Version="1.0.0" />
+		  </ItemGroup>
+    </Otherwise>
+	</Choose>
+
+  <ItemGroup>
+    <Compile Remove="ValueConverter\NullableBoolToBarBrush.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Media\checkmark.png" />
+    <None Remove="Media\checkmark_small.png" />
+    <None Remove="Media\DALL_E_Tree.png" />
+    <None Remove="Media\dumpTree.png" />
+    <None Remove="Media\empty.png" />
+    <None Remove="Media\empty_flag.png" />
+    <None Remove="Media\event.png" />
+    <None Remove="Media\finish_flag.png" />
+    <None Remove="Media\flash.png" />
+    <None Remove="Media\flash_bang.png" />
+    <None Remove="Media\historical.png" />
+    <None Remove="Media\pauseTree.png" />
+    <None Remove="Media\play.png" />
+    <None Remove="Media\reloadTree.png" />
+    <None Remove="Media\running_man.png" />
+    <None Remove="Media\self_distract.png" />
+    <None Remove="Media\stopwatch.png" />
+    <None Remove="Media\support.png" />
+    <None Remove="Media\timer.png" />
+    <None Remove="Media\topic.png" />
+    <None Remove="Media\Tree.png" />
+    <None Remove="Media\yin_yang.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="Assets\LogicalTaskTreeControlResourceDictionary_LightTech.xaml" />
+    <Page Remove="Assets\LogicalTaskTreeControlResourceDictionary_StandardGrey.xaml" />
+    <Page Remove="LogicalTaskTreeControl_top.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Media\checkmark.png" />
+    <Resource Include="Media\checkmark_small.png" />
+    <Resource Include="Media\DALL_E_Tree.png" />
+    <Resource Include="Media\dumpTree.png" />
+    <Resource Include="Media\empty.png" />
+    <Resource Include="Media\empty_flag.png" />
+    <Resource Include="Media\event.png" />
+    <Resource Include="Media\finish_flag.png" />
+    <Resource Include="Media\flash.png" />
+    <Resource Include="Media\flash_bang.png" />
+    <Resource Include="Media\historical.png" />
+    <Resource Include="Media\pauseTree.png" />
+    <Resource Include="Media\play.png" />
+    <Resource Include="Media\reloadTree.png" />
+    <Resource Include="Media\running_man.png" />
+    <Resource Include="Media\self_distract.png" />
+    <Resource Include="Media\stopwatch.png" />
+    <Resource Include="Media\support.png" />
+    <Resource Include="Media\timer.png" />
+    <Resource Include="Media\topic.png" />
+    <Resource Include="Media\Tree.png" />
+    <Resource Include="Media\yin_yang.png" />
+  </ItemGroup>
+
+</Project>

@@ -31,7 +31,7 @@ namespace LogicalTaskTree
         /// Implementiert sind NextRun und NextRunInfo. Für das Hinzufügen weiterer
         /// Informationen kann die Klasse TriggerInfo abgeleitet werden.
         /// </summary>
-        public TriggerInfo Info
+        public TriggerInfo? Info
         {
             get
             {
@@ -66,7 +66,7 @@ namespace LogicalTaskTree
         /// <param name="internalTriggerParameters">Spezifische Aufrufparameter oder null.</param>
         /// <param name="triggerIt">Die aufzurufende Callback-Routine, wenn der Trigger feuert.</param>
         /// <returns>True, wenn der Trigger durch diesen Aufruf tatsächlich gestartet wurde.</returns>
-        public bool Start(object triggerController, object internalTriggerParameters, Action<TreeEvent> triggerIt)
+        public bool Start(object? triggerController, object? internalTriggerParameters, Action<TreeEvent> triggerIt)
         {
             if (this._slaveTriggerShell != null)
             {
@@ -76,7 +76,7 @@ namespace LogicalTaskTree
             {
                 lock (this._startTriggerLocker)
                 {
-                    if (!this._triggerControllers.ContainsKey(triggerController))
+                    if (triggerController != null && !this._triggerControllers.ContainsKey(triggerController))
                     {
                         if (this._triggerControllers.TryAdd(triggerController, triggerIt))
                         {
@@ -92,13 +92,13 @@ namespace LogicalTaskTree
                         {
                             if (item is LogicalNode)
                             {
-                                info.Append((item as LogicalNode).Id + ";");
+                                info.Append(((LogicalNode)item).Id + ";");
                             }
                             else
                             {
                                 if (item is WorkerShell)
                                 {
-                                    info.Append((item as WorkerShell).SlavePathName + ";");
+                                    info.Append(((WorkerShell)item).SlavePathName + ";");
                                 }
                             }
                         }
@@ -111,21 +111,28 @@ namespace LogicalTaskTree
                             }
                             if (this._slave == null)
                             {
-                                this.Slave = this.dynamicLoadSlaveDll(this._slavePathName);
+                                this._slave = this.dynamicLoadSlaveDll(this._slavePathName);
                             }
                         }
                         if (this._slave != null)
                         {
-                            string effectiveTriggerParameters = this.TriggerParameters.ToString();
-                            if (!(this.Slave is TreeEventTrigger))
+                            string? effectiveTriggerParameters = this.TriggerParameters?.ToString();
+                            if (!(this._slave is TreeEventTrigger))
                             {
                                 this._lastDllWriteTime = File.GetLastWriteTime(this._slavePathName);
                                 if (internalTriggerParameters?.ToString() == "UserRun")
                                 {
-                                    effectiveTriggerParameters += "|UserRun";
+                                    if (effectiveTriggerParameters != null)
+                                    {
+                                        effectiveTriggerParameters += "|UserRun";
+                                    }
+                                    else
+                                    {
+                                        effectiveTriggerParameters = "UserRun";
+                                    }
                                 }
                             }
-                            this.Slave.Start(triggerController, effectiveTriggerParameters, this.SlaveTriggersIt);
+                            this.Slave?.Start(triggerController, effectiveTriggerParameters, this.SlaveTriggersIt);
                             this._isStarted = true;
                             return true;
                         }
@@ -151,7 +158,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="triggerController">Das Objekt, das Trigger.Stop aufruft.</param>
         /// <param name="triggerIt">Die aufzurufende Callback-Routine, wenn der Trigger feuert.</param>
-        public void Stop(object triggerController, Action<TreeEvent> triggerIt)
+        public void Stop(object? triggerController, Action<TreeEvent> triggerIt)
         {
             if (this._slaveTriggerShell != null)
             {
@@ -161,7 +168,7 @@ namespace LogicalTaskTree
             {
                 lock (this._startTriggerLocker)
                 {
-                    if (this._triggerControllers.ContainsKey(triggerController))
+                    if (triggerController != null && this._triggerControllers.ContainsKey(triggerController))
                     {
                         this._triggerControllers.TryRemove(triggerController, out this._dummyActionTreeEvent);
                         this.TriggerIt -= this._dummyActionTreeEvent;
@@ -171,7 +178,7 @@ namespace LogicalTaskTree
                     {
                         if (this._slave != null)
                         {
-                            this.Slave.Stop(triggerController, this.SlaveTriggersIt);
+                            this.Slave?.Stop(triggerController, this.SlaveTriggersIt);
                         }
                         this._registeredHandlersCounter = 0;
                         this._isStarted = false;
@@ -206,7 +213,7 @@ namespace LogicalTaskTree
                 {
                     try
                     {
-                        (this._slave as IDisposable).Dispose();
+                        ((IDisposable)this._slave).Dispose();
                     }
                     catch { };
                 }
@@ -242,13 +249,13 @@ namespace LogicalTaskTree
         /// <summary>
         /// Name eines ursprünglich referenzierten Knotens oder null.
         /// </summary>
-        public string ReferencedNodeName { get; private set; }
+        public string? ReferencedNodeName { get; private set; }
 
         /// <summary>
         /// Liefert den Trigger, wenn die TriggerShell einen TreeEventTrigger kapselt oder null.
         /// </summary>
         /// <returns>Zugeordneter TreeEventTrigger oder der einer zugeordneten Slave-TriggerShell oder null.</returns>
-        public TreeEventTrigger GetTreeEventTrigger()
+        public TreeEventTrigger? GetTreeEventTrigger()
         {
             if ((this.Slave != null) && (this.Slave is TreeEventTrigger))
             {
@@ -266,7 +273,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeTrigger implementiert.</param>
         /// <param name="triggerParameters">String mit Steuerparametern für den Trigger.</param>
-        public TriggerShell(string slavePathName, object triggerParameters) : this(triggerParameters)
+        public TriggerShell(string slavePathName, object? triggerParameters) : this(triggerParameters)
         {
             this._slavePathName = slavePathName;
             string userEventNames = TreeEvent.GetUserEventNamesForInternalEventNames(this._slavePathName);
@@ -274,10 +281,9 @@ namespace LogicalTaskTree
             {
                 this.Slave = this.TriggerParameters as TreeEventTrigger;
                 this.HasTreeEventTrigger = true;
-                this.ReferencedNodeName = this.TriggerParameters.ToString();
+                this.ReferencedNodeName = this.TriggerParameters?.ToString();
             }
             this._lastDllWriteTime = DateTime.MinValue;
-            this._assemblyLoader = VishnuAssemblyLoader.GetAssemblyLoader();
         }
 
         /// <summary>
@@ -286,14 +292,14 @@ namespace LogicalTaskTree
         /// <param name="triggerShellReference">Name eines benannten Triggers.</param>
         /// <param name="triggerParameters">String mit Zusatzinformationen (Node-Id).</param>
         /// <param name="dummy">Dient nur zur Unterscheidung der Signatur dieses zum anderen Konstruktor.</param>
-        public TriggerShell(string triggerShellReference, string triggerParameters, bool dummy) : this(triggerParameters)
+        public TriggerShell(string triggerShellReference, object? triggerParameters, bool dummy) : this(triggerParameters)
         {
             this.TriggerShellReference = triggerShellReference;
             string internalEventNames = TreeEvent.GetInternalEventNamesForUserEventNames(this.TriggerShellReference);
             if (!String.IsNullOrEmpty(internalEventNames))
             {
                 this.HasTreeEventTrigger = true;
-                this.ReferencedNodeName = this.TriggerParameters.ToString();
+                this.ReferencedNodeName = this.TriggerParameters?.ToString();
             }
             this._slaveTriggerShell = null;
         }
@@ -311,7 +317,7 @@ namespace LogicalTaskTree
         /// Liefert die zuletzt übergebenen Parameter dieses Triggers.
         /// </summary>
         /// <returns>die zuletzt übergebenen Parameter dieses Triggers.</returns>
-        public object GetTriggerParameters()
+        public object? GetTriggerParameters()
         {
             return this.TriggerParameters;
         }
@@ -399,10 +405,10 @@ namespace LogicalTaskTree
         #region private members
 
         // Wird ausgelöst, wenn das Trigger-Ereignis (z.B. Timer) eintritt. 
-        private event Action<TreeEvent> TriggerIt;
+        private event Action<TreeEvent>? TriggerIt;
 
         // Instanz vom INodeTrigger. Macht die Prüf-Arbeit.
-        private INodeTrigger Slave
+        private INodeTrigger? Slave
         {
             get
             {
@@ -420,26 +426,26 @@ namespace LogicalTaskTree
         /// <summary>
         /// Bei TreeEventTriggern der Knoten, auf den der Trigger reagiert.
         /// </summary>
-        internal object TriggerParameters;
+        internal object? TriggerParameters;
 
         /// <summary>
         /// Bei TreeEventTriggern die Events, auf die der Trigger feuert.
         /// </summary>
         internal string TriggerShellReference;
 
-        private string _slavePathName;
-        private INodeTrigger _slave;
+        private string _slavePathName = String.Empty;
+        private INodeTrigger? _slave;
         private DateTime _lastDllWriteTime;
         private VishnuAssemblyLoader _assemblyLoader;
         private object _startTriggerLocker;
-        private TriggerShell _slaveTriggerShell;
+        private TriggerShell? _slaveTriggerShell;
         private bool _isStarted;
         private ConcurrentDictionary<object, Action<TreeEvent>> _triggerControllers;
         private object _registerHandlerLocker;
-        private Action<TreeEvent> _dummyActionTreeEvent;
+        private Action<TreeEvent>? _dummyActionTreeEvent;
         private int _registeredHandlersCounter;
 
-        private TriggerShell(object triggerParameters)
+        private TriggerShell(object? triggerParameters)
         {
             this.TriggerParameters = triggerParameters;
             this._isStarted = false;
@@ -451,6 +457,8 @@ namespace LogicalTaskTree
             this._dummyActionTreeEvent = null; // new Action<TreeEvent>(x => { });
             this.HasTreeEventTrigger = false;
             this.ReferencedNodeName = null;
+            this.TriggerShellReference = String.Empty;
+            this._assemblyLoader = VishnuAssemblyLoader.GetAssemblyLoader();
         }
 
         /// <summary>
@@ -463,12 +471,9 @@ namespace LogicalTaskTree
         {
             if (path != null)
             {
-                LogicalNode dummy;
+                LogicalNode? dummy;
                 this.RegisteredMayBeTriggeredNodePathes.TryRemove(path, out dummy);
-                if (this._slaveTriggerShell != null)
-                {
-                    this._slaveTriggerShell.UnregisterTriggerIt(path);
-                }
+                this._slaveTriggerShell?.UnregisterTriggerIt(path);
             }
         }
 
@@ -476,9 +481,9 @@ namespace LogicalTaskTree
         // aus der Dll kennen, Bedingung ist nur, dass eine Klasse in der Dll das
         // Interface INodeTrigger implementiert. Die erste gefundene Klasse wird
         // als Instanz von INodeTrigger zurückgegeben.
-        private INodeTrigger dynamicLoadSlaveDll(string slavePathName)
+        private INodeTrigger? dynamicLoadSlaveDll(string slavePathName)
         {
-            return (INodeTrigger)this._assemblyLoader.DynamicLoadObjectOfTypeFromAssembly(slavePathName, typeof(INodeTrigger));
+            return (INodeTrigger?)this._assemblyLoader.DynamicLoadObjectOfTypeFromAssembly(slavePathName, typeof(INodeTrigger));
         }
 
         /// <summary>
@@ -495,9 +500,11 @@ namespace LogicalTaskTree
                 for (int i = 0; i < invocations.Length; i++)
                 {
                     string nodeId = "WorkerShell";
-                    if (invocations[i].Target is LogicalNode)
+                    LogicalNode? targetNode = (LogicalNode?)invocations[i].Target;
+                    if (targetNode != null)
                     {
-                        nodeId = (invocations[i].Target as LogicalNode).Id;
+                        // nodeId = (invocations[i].Target as LogicalNode).Id;
+                        nodeId = targetNode.Id;
                     }
                     invocationStrings[i] = nodeId;
                 }

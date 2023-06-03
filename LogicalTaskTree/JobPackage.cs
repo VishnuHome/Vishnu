@@ -80,11 +80,11 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="jobFilePath">Dateipfad zur XML-Datei mit der Job-Beschreibung.</param>
         /// <param name="jobName">Name der XML-Datei mit der Job-Beschreibung.</param>
-        public JobPackage(string jobFilePath, string jobName)
+        public JobPackage(string jobFilePath, string? jobName)
         {
-            this.JobFilePath = jobFilePath;
-            this.JobName = jobName == null ? "" : jobName;
-            this.Job = new Job();
+            this._jobFilePath = jobFilePath;
+            this._jobName = jobName ?? String.Empty;
+            this._job = new Job();
             this.SubJobPackages = new Dictionary<string, JobPackage>();
         }
 

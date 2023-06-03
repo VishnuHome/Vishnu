@@ -20,6 +20,6 @@
         /// <param name="treeParameters">Interne Parameter des Trees.</param>
         /// <param name="source">Aufrufewndes TreeEvent.</param>
         /// <returns>True, wenn der Run/Start ausgeführt werden kann.</returns>
-        bool CanRun(ref object parameters, TreeParameters treeParameters, TreeEvent source);
+        bool CanRun(ref object? parameters, TreeParameters treeParameters, TreeEvent source);
     }
 }

@@ -84,7 +84,7 @@ namespace Vishnu.Interchange
         /// <param name="objectType">Der Typ des aus der Assembly zu instanzierenden Objekts</param>
         /// <param name="force">Optional - bei true wird die Assembly nicht aus dem Cache genomen, default: false</param>
         /// <returns>Instanz aus der übergebenen Assembly vom übergebenen Typ oder null</returns>
-        public object DynamicLoadObjectOfTypeFromAssembly(string assemblyPathName, Type objectType, bool force = false)
+        public object? DynamicLoadObjectOfTypeFromAssembly(string assemblyPathName, Type objectType, bool force = false)
         {
             if (VishnuAssemblyLoader.AssembliesToBeReloadedNext.ContainsKey(assemblyPathName))
             {
@@ -92,12 +92,12 @@ namespace Vishnu.Interchange
                 bool success;
                 VishnuAssemblyLoader.AssembliesToBeReloadedNext.TryRemove(assemblyPathName, out success);
             }
-            Exception lastException = null;
+            Exception? lastException = null;
             try
             {
                 ThreadLocker.LockNameGlobal("AssemblyLoader");
-                object candidate = null;
-                Assembly slave = dynamicLoadAssembly(assemblyPathName, false, force);
+                object? candidate = null;
+                Assembly? slave = dynamicLoadAssembly(assemblyPathName, false, force);
                 if (slave != null)
                 {
                     Type[] exports = slave.GetExportedTypes();
@@ -173,9 +173,9 @@ namespace Vishnu.Interchange
         /// <param name="quiet">Keine Meldung bei Misserfolg.</param>
         /// <param name="force">Optional - bei true wird die Assembly nicht aus dem Cache genomen, default: false</param>
         /// <returns>Geladene Assembly oder null</returns>
-        private Assembly dynamicLoadAssembly(string slavePathName, bool quiet, bool force = false)
+        private Assembly? dynamicLoadAssembly(string slavePathName, bool quiet, bool force = false)
         {
-            Assembly candidate = null;
+            Assembly? candidate = null;
             foreach (string assemblyDirectory in (new List<string> { "" }).Union(this._assemblyDirectories))
             {
                 string dllPath = Path.Combine(assemblyDirectory, slavePathName).Replace(@"Plugin\Plugin", "Plugin");
@@ -199,9 +199,9 @@ namespace Vishnu.Interchange
             return candidate;
         }
 
-        private Assembly directLoadAssembly(string dllPath, bool quiet, bool force = false)
+        private Assembly? directLoadAssembly(string dllPath, bool quiet, bool force = false)
         {
-            Assembly candidate = null;
+            Assembly? candidate = null;
             string currentDir = Environment.CurrentDirectory;
             string currentDir2 = Directory.GetCurrentDirectory();
             if (File.Exists(dllPath))
@@ -246,9 +246,10 @@ namespace Vishnu.Interchange
         {
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.AssemblyResolve += new ResolveEventHandler(myResolveEventHandler);
+            this._assemblyDirectories = new List<string>();
         }
 
-        private Assembly myResolveEventHandler(object sender, ResolveEventArgs args)
+        private Assembly? myResolveEventHandler(object? sender, ResolveEventArgs args)
         {
             return dynamicLoadAssembly(args.Name.Split(',')[0], true);
         }

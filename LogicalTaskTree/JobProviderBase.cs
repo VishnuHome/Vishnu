@@ -30,17 +30,17 @@ namespace LogicalTaskTree
         /// <returns>Instanz des Jobs, der zu dem Namen gehört.</returns>
         public virtual Job GetJob(ref string name)
         {
-            if (name == null || !this.LoadedJobPackages.ContainsKey(name))
+            if (String.IsNullOrEmpty(name) || !this.LoadedJobPackages.ContainsKey(name))
             {
                 this.TryLoadJobPackage(ref name); // lädt ggf. auch alle SubJobs
             }
-            if (this.LoadedJobPackages.ContainsKey(name))
+            if (!String.IsNullOrEmpty(name) && this.LoadedJobPackages.ContainsKey(name))
             {
                 return this.LoadedJobPackages[name].Job;
             }
             else
             {
-                throw new ArgumentException(String.Format("Der Job oder Checker '{0}' wurde nicht gefunden (bitte auch auf Groß- und Kleinschreibung achten)!", name));
+                throw new ArgumentException(String.Format("Der Job oder Checker '{0}' wurde nicht gefunden (bitte auch auf Groß- und Kleinschreibung achten).", name));
             }
         }
 
@@ -49,8 +49,8 @@ namespace LogicalTaskTree
         /// physischen Namen des JobPackages oder logischen Namen des Jobs.
         /// </summary>
         /// <param name="name">Logischer oder physischer Name des Jobs oder JobPackages.</param>
-        /// <returns>Logischer Name des Jobs</returns>
-        public virtual string GetLogicalJobName(string name)
+        /// <returns>Logischer Name des Jobs oder null.</returns>
+        public virtual string? GetLogicalJobName(string name)
         {
             KeyValuePair<string, JobPackage> kv = this.LoadedJobPackages.Where(p => { return p.Value.JobName == name || p.Value.JobFilePath == name; }).First();
             if (!kv.Equals(default(KeyValuePair<string, JobPackage>)))
@@ -68,8 +68,8 @@ namespace LogicalTaskTree
         /// physischen Namen des JobPackages oder logischen Namen des Jobs.
         /// </summary>
         /// <param name="name">Logischer oder physischer Name des Jobs oder JobPackages.</param>
-        /// <returns>Physischer Name des JobPackages</returns>
-        public virtual string GetPhysicalJobPath(string name)
+        /// <returns>Physischer Name des JobPackages oder null.</returns>
+        public virtual string? GetPhysicalJobPath(string name)
         {
             KeyValuePair<string, JobPackage> kv = this.LoadedJobPackages.Where(p => { return p.Value.JobName == name || p.Value.JobFilePath == name; }).First();
             if (!kv.Equals(default(KeyValuePair<string, JobPackage>)))

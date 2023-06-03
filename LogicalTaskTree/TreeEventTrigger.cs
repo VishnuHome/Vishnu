@@ -30,7 +30,7 @@ namespace LogicalTaskTree
         /// Implementiert sind NextRun und NextRunInfo. Für das Hinzufügen weiterer
         /// Informationen kann diese Klasse abgeleitet werden.
         /// </summary>
-        public TriggerInfo Info
+        public TriggerInfo? Info
         {
             get
             {
@@ -63,7 +63,7 @@ namespace LogicalTaskTree
         /// <param name="triggerParameters">Spezifische Aufrufparameter oder null.</param>
         /// <param name="triggerIt">Die aufzurufende Callback-Routine, wenn der Trigger feuert.</param>
         /// <returns>True, wenn der Trigger durch diesen Aufruf tatsächlich gestartet wurde.</returns>
-        public bool Start(object triggerController, object triggerParameters, Action<TreeEvent> triggerIt)
+        public bool Start(object? triggerController, object? triggerParameters, Action<TreeEvent> triggerIt)
         {
             this.TriggerIt += triggerIt;
             if (this._eventTimer != null)
@@ -81,13 +81,10 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="triggerController">Das Objekt, das den Trigger aufruft.</param>
         /// <param name="triggerIt">Die aufzurufende Callback-Routine, wenn der Trigger feuert.</param>
-        public void Stop(object triggerController, Action<TreeEvent> triggerIt)
+        public void Stop(object? triggerController, Action<TreeEvent> triggerIt)
         {
             this.IsActive = false;
-            if (this._eventTimer != null)
-            {
-                this._eventTimer.Stop();
-            }
+            this._eventTimer?.Stop();
             this.TriggerIt -= triggerIt;
             this.LastTreeEvent = null;
         }
@@ -113,7 +110,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Das letzte aufgetretene TreeEvent für diesen Trigger oder null.
         /// </summary>
-        public TreeEvent LastTreeEvent { get; set; }
+        public TreeEvent? LastTreeEvent { get; set; }
 
         /// <summary>
         /// Enthält den Namen des referenzierten Originalknotens.
@@ -156,7 +153,7 @@ namespace LogicalTaskTree
                     default:
                         throw new ArgumentException("Falsche Einheit, zulässig sind: MS=Millisekunden, S=Sekunden, M=Minuten, H=Stunden, D=Tage.");
                 }
-                this._eventTimer = new Timer(this._timerInterval);
+                this._eventTimer = new System.Timers.Timer(this._timerInterval);
                 this._eventTimer.Elapsed += new ElapsedEventHandler(eventTimer_Elapsed);
                 this._eventTimer.Stop();
             }
@@ -164,7 +161,7 @@ namespace LogicalTaskTree
             this.IsActive = false;
         }
 
-        private void eventTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void eventTimer_Elapsed(object? sender, ElapsedEventArgs e)
         {
             this.OnTriggerFired(null);
         }
@@ -177,13 +174,10 @@ namespace LogicalTaskTree
         /// Trigger-Event auslösen.
         /// </summary>
         /// <param name="source">Der Auslöser des Ereignisses oder null (bei Timer-Induzierung).</param>
-        internal void OnTriggerFired(TreeEvent source)
+        internal void OnTriggerFired(TreeEvent? source)
         {
             this.LastTreeEvent = source;
-            if (this._eventTimer != null)
-            {
-                this._eventTimer.Stop();
-            }
+            this._eventTimer?.Stop();
             if (this.IsActive && this.TriggerIt != null)
             {
                 this.TriggerIt(source);
@@ -209,7 +203,7 @@ namespace LogicalTaskTree
 
         #region private members
 
-        private Timer _eventTimer;
+        private System.Timers.Timer? _eventTimer;
         private int _timerInterval;
         private string _textPattern;
         private Regex _compiledPattern;
@@ -220,7 +214,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Wird ausgelöst, wenn das Trigger-Ereignis eintritt. 
         /// </summary>
-        private event Action<TreeEvent> TriggerIt;
+        private event Action<TreeEvent?>? TriggerIt;
 
         #endregion private members
     }

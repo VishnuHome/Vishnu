@@ -1,5 +1,6 @@
 ﻿using NetEti.Globals;
 using System;
+using System.ComponentModel;
 using Vishnu.Interchange;
 // using System.Threading;
 // using NetEti.ApplicationControl;
@@ -47,10 +48,11 @@ namespace LogicalTaskTree
         /// <param name="mother">Der Parent-Knoten.</param>
         /// <param name="rootJobList">Die zuständige JobList.</param>
         /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
-        public NodeParent(string id, LogicalNode mother, JobList rootJobList, TreeParameters treeParams) : base(id, mother, rootJobList, treeParams)
+        public NodeParent(string id, LogicalNode? mother, JobList? rootJobList, TreeParameters treeParams) : base(id, mother, rootJobList, treeParams)
         {
             this.IsResultDependant = false;
             this.LastSingleNodesFinishedLocker = new object();
+            this.ThreadRefreshParentNodeLocker = new object();
             this.SubNodeStateChangedLocker = new object();
             this.HookedTo = "NULL";
             this.ThreadUpdateLastSingleNodesFinished(-1); // invalidate
@@ -74,18 +76,18 @@ namespace LogicalTaskTree
         /// <param name="index">Der Index, an dem der Child-Knoten freigegeben werden soll.</param>
         public virtual void FreeChildAt(int index)
         {
-            if (index < this.Children?.Count && this.Children[index] != null)
+            if (index < this.Children.Count && this.Children[index] != null)
             {
                 this.UnhookChildEvents(this.Children[index]);
                 if (this.Children[index] is IDisposable)
                 {
                     try
                     {
-                        (this.Children[index] as IDisposable).Dispose();
+                        (this.Children[index] as IDisposable)?.Dispose();
                     }
                     catch { }
                 }
-                this.Children[index] = null;
+                this.Children[index] = UndefinedLogicalNode;
             }
         }
 
@@ -95,10 +97,10 @@ namespace LogicalTaskTree
         /// <param name="index">Der Index, an dem der Child-Knoten freigegeben werden soll.</param>
         public virtual void ReleaseChildAt(int index)
         {
-            if (index < this.Children?.Count && this.Children[index] != null)
+            if (index < this.Children.Count && this.Children[index] != UndefinedLogicalNode)
             {
                 this.UnhookChildEvents(this.Children[index]);
-                this.Children[index] = null;
+                this.Children[index] = UndefinedLogicalNode;
             }
         }
 
@@ -136,7 +138,6 @@ namespace LogicalTaskTree
         /// <returns>Eindeutige Id</returns>
         internal string GenerateNextChildId()
         {
-            // return "Internal_" + (++InternalIdBase).ToString();
             return "Child_" + this.GetNextChildIndex().ToString();
         }
 
@@ -169,19 +170,22 @@ namespace LogicalTaskTree
         /// <param name="child">Der zu lösende Child-Knoten.</param>
         internal virtual void UnhookChildEvents(LogicalNode child)
         {
-            child.NodeProgressStarted -= this.SubNodeProgressStarted;
-            child.NodeProgressChanged -= this.SubNodeProgressChanged;
-            child.NodeProgressFinished -= this.SubNodeProgressFinished;
-            child.NodeStateChanged -= this.SubNodeStateChanged;
-            child.NodeLogicalChanged -= this.SubNodeLogicalChanged;
-            child.NodeLastNotNullLogicalChanged -= SubNodeLastNotNullLogicalChanged;
-            child.NodeResultChanged -= this.SubNodeResultChanged;
-            child.ExceptionRaised -= this.SubNodeExceptionRaised;
-            child.ExceptionCleared -= this.SubNodeExceptionCleared;
-            string childInfo = child.TreeParams.Name + ": " + child.NameId;
-            if (this.HookedTo.Contains(childInfo))
+            if (!(child is UndefinedLogicalNodeClass))
             {
-                this.HookedTo = (this.HookedTo + ",").Replace(childInfo + ",", "").TrimEnd(',');
+                child.NodeProgressStarted -= this.SubNodeProgressStarted;
+                child.NodeProgressChanged -= this.SubNodeProgressChanged;
+                child.NodeProgressFinished -= this.SubNodeProgressFinished;
+                child.NodeStateChanged -= this.SubNodeStateChanged;
+                child.NodeLogicalChanged -= this.SubNodeLogicalChanged;
+                child.NodeLastNotNullLogicalChanged -= SubNodeLastNotNullLogicalChanged;
+                child.NodeResultChanged -= this.SubNodeResultChanged;
+                child.ExceptionRaised -= this.SubNodeExceptionRaised;
+                child.ExceptionCleared -= this.SubNodeExceptionCleared;
+                string childInfo = child.TreeParams.Name + ": " + child.NameId;
+                if (this.HookedTo.Contains(childInfo))
+                {
+                    this.HookedTo = (this.HookedTo + ",").Replace(childInfo + ",", "").TrimEnd(',');
+                }
             }
         }
 
@@ -194,24 +198,28 @@ namespace LogicalTaskTree
             ResultList resultList = new ResultList();
             foreach (LogicalNode node in this.Children)
             {
-                ResultList part = node.GetResultList();
-                foreach (string id in part.Keys)
+                ResultList? part = node.GetResultList();
+                if (part != null)
                 {
-                    // Qualifizierter Zugriff auf die Results wäre zwar schön, ist aber unpragmatisch, da
-                    // ansonsten Checker, die diese Results verwerten, mit der Id des Knotens im Baum
-                    // kompiliert werden müssten.
-                    //if (!resultList.ContainsKey(this.Id + "." + id))
-                    //{
-                    //  resultList.TryAdd(this.Id + "." + id, part[id]); // Auf Concurrent umgestellt
-                    //}
-                    // Konsequenz: Result-Ids müssen über den gesamten Tree eindeutig sein, nur das erste
-                    // Result einer Id wird vermerkt.
-                    if (!resultList.ContainsKey(id))
+                    foreach (string id in part.Keys)
                     {
-                        resultList.TryAdd(id, part[id]); // Auf Concurrent umgestellt
+                        // Qualifizierter Zugriff auf die Results wäre zwar schön, ist aber unpragmatisch, da
+                        // ansonsten Checker, die diese Results verwerten, mit der Id des Knotens im Baum
+                        // kompiliert werden müssten.
+                        //if (!resultList.ContainsKey(this.Id + "." + id))
+                        //{
+                        //  resultList.TryAdd(this.Id + "." + id, part[id]); // Auf Concurrent umgestellt
+                        //}
+                        // Konsequenz: Result-Ids müssen über den gesamten Tree eindeutig sein, nur das erste
+                        // Result einer Id wird vermerkt.
+                        if (!resultList.ContainsKey(id))
+                        {
+                            resultList.TryAdd(id, part[id]); // Auf Concurrent umgestellt
+                        }
                     }
                 }
             }
+
             return resultList;
         }
 
@@ -332,7 +340,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="sender">Der Kind-Knoten.</param>
         /// <param name="result">Neues Result des Kind-Knotens.</param>
-        protected virtual void SubNodeResultChanged(LogicalNode sender, Result result)
+        protected virtual void SubNodeResultChanged(LogicalNode sender, Result? result)
         {
             if (this.IsResultDependant)
             {
@@ -372,7 +380,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="source">Die Quelle der Exception.</param>
         /// <param name="args">Zusätzliche Event-Parameter (Fortschritts-% und Info-Object).</param>
-        protected void SubNodeProgressStarted(object source, CommonProgressChangedEventArgs args)
+        protected void SubNodeProgressStarted(object? source, ProgressChangedEventArgs args)
         {
             this.ThreadUpdateLastSingleNodesFinished(-1); // führt zur Neuauswertung.
             this.OnNodeProgressStarted(source, args);
@@ -385,9 +393,9 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="sender">Der referenzierte Originalknoten (LogicalNode).</param>
         /// <param name="args">Informationen zum Verarbeitungsfortschritt.</param>
-        protected virtual void SubNodeProgressChanged(object sender, CommonProgressChangedEventArgs args)
+        protected virtual void SubNodeProgressChanged(object? sender, ProgressChangedEventArgs args)
         {
-            this.OnNodeProgressChanged(this.Id + "." + this.Name + " | " + args.ItemName, this.SingleNodes, this.SingleNodesFinished, ItemsTypes.itemGroups);
+            this.OnNodeProgressChanged(this.Id + "." + this.Name + " | ", this.SingleNodes, this.SingleNodesFinished);
         }
 
         /// <summary>
@@ -398,21 +406,21 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="sender">Der referenzierte Originalknoten (LogicalNode).</param>
         /// <param name="args">Informationen zum Verarbeitungsfortschritt.</param>
-        protected virtual void SubNodeProgressFinished(object sender, CommonProgressChangedEventArgs args)
+        protected virtual void SubNodeProgressFinished(object? sender, ProgressChangedEventArgs args)
         {
             this.ThreadUpdateLastSingleNodesFinished(-1); // führt zur Neuauswertung.
-            if (args.CountSucceeded < this.Children.Count) // TODO: der IF ist so kompletter Unfug!
+            if (args.ProgressPercentage < this.Children.Count) // TODO: der IF ist so kompletter Unfug!
             {
-                this.OnNodeProgressChanged(this.Id + "." + this.Name + " | " + args.ItemName, this.SingleNodes, this.SingleNodesFinished, ItemsTypes.itemGroups);
+                this.OnNodeProgressChanged(this.Id + "." + this.Name + " | ", this.SingleNodes, this.SingleNodesFinished);
             }
             else
             {
-                this.OnNodeProgressFinished(this.Id + "." + this.Name + " | " + args.ItemName, this.SingleNodes, this.SingleNodesFinished, ItemsTypes.itemGroups);
+                this.OnNodeProgressFinished(this.Id + "." + this.Name + " | ", this.SingleNodes, this.SingleNodesFinished);
             }
         }
 
         /// <summary>
-        /// Setz threadsafe LastLogicalState.
+        /// Setzt threadsafe LastLogicalState.
         /// </summary>
         /// <param name="newLogicalState">Neuer Wert (NodeLogicalState?)</param>
         protected override void ThreadUpdateLastLogicalState(NodeLogicalState newLogicalState)

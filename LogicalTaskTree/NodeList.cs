@@ -306,7 +306,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this._userControlPath != null)
+                if (!String.IsNullOrEmpty(this._userControlPath))
                 {
                     return this._userControlPath;
                 }
@@ -416,13 +416,13 @@ namespace LogicalTaskTree
         /// Liefert ein Result für diesen Knoten.
         /// </summary>
         /// <returns>Ein Result-Objekten für den Knoten.</returns>
-        public override Result LastResult
+        public override Result? LastResult
         {
             get
             {
                 lock (this.ResultLocker)
                 {
-                    object returnObject = null;
+                    object? returnObject = null;
                     if (this.LastExceptions != null && this.LastExceptions.Count > 0)
                     {
                         try
@@ -473,7 +473,7 @@ namespace LogicalTaskTree
             this.LastCountPositiveResultsLocker = new object();
             this.LastReturnedLogicalLocker = new object();
             this.ListLogicalStateLocker = new object();
-            this.UserControlPath = rootJobList.NodeListUserControlPath;
+            this._userControlPath = rootJobList.NodeListUserControlPath;
             this.SnapshotUserControlPath = rootJobList.SnapshotUserControlPath;
             this.JobListUserControlPath = rootJobList.JobListUserControlPath;
             this.SingleNodeUserControlPath = rootJobList.SingleNodeUserControlPath;
@@ -500,7 +500,7 @@ namespace LogicalTaskTree
         /// <param name="mother">Id des Parent-Knotens.</param>
         /// <param name="rootJobList">Die zuständige JobList.</param>
         /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
-        public NodeList(string id, LogicalNode mother, JobList rootJobList, TreeParameters treeParams)
+        public NodeList(string id, LogicalNode? mother, JobList? rootJobList, TreeParameters treeParams)
           : base(id, mother, rootJobList, treeParams)
         {
             this.nOperands = 0;
@@ -510,7 +510,6 @@ namespace LogicalTaskTree
             this.ListNodeState = NodeState.None;
             this.ListLogicalState = NodeLogicalState.None;
             this.LastSingleNodesLocker = new object();
-            this.ThreadRefreshParentNodeLocker = new object();
             this.LastCountResultsLocker = new object();
             this.LastCountPositiveResultsLocker = new object();
             this.LastReturnedLogicalLocker = new object();
@@ -524,14 +523,11 @@ namespace LogicalTaskTree
             {
                 this.Name = "";
             }
-            if (rootJobList != null)
-            {
-                this.UserControlPath = rootJobList.NodeListUserControlPath;
-                this.SnapshotUserControlPath = rootJobList.SnapshotUserControlPath;
-                this.JobListUserControlPath = rootJobList.JobListUserControlPath;
-                this.SingleNodeUserControlPath = rootJobList.SingleNodeUserControlPath;
-                this.ConstantNodeUserControlPath = rootJobList.ConstantNodeUserControlPath;
-            }
+            this._userControlPath = rootJobList?.NodeListUserControlPath ?? String.Empty;
+            this.SnapshotUserControlPath = rootJobList?.SnapshotUserControlPath ?? String.Empty;
+            this.JobListUserControlPath = rootJobList?.JobListUserControlPath ?? String.Empty;
+            this.SingleNodeUserControlPath = rootJobList?.SingleNodeUserControlPath ?? String.Empty;
+            this.ConstantNodeUserControlPath = rootJobList?.ConstantNodeUserControlPath ?? String.Empty;
             if (ConfigurationManager.IsExpanded(this.IdPath) != null) // 15.02.2019 Nagel+
             {
                 if (ConfigurationManager.IsExpanded(this.IdPath) == true)
@@ -555,8 +551,8 @@ namespace LogicalTaskTree
             base.InitFromNode(source);
             if (source != null && source is NodeList)
             {
-                this.ThreadUpdateLastSingleNodes((source as NodeList).LastSingleNodes);
-                this.ThreadUpdateLastSingleNodesFinished((source as NodeList).LastSingleNodesFinished);
+                this.ThreadUpdateLastSingleNodes(((NodeList)source).LastSingleNodes);
+                this.ThreadUpdateLastSingleNodesFinished(((NodeList)source).LastSingleNodesFinished);
             }
         }
 
@@ -755,7 +751,7 @@ namespace LogicalTaskTree
         /// Diese Routine wird asynchron ausgeführt.
         /// </summary>
         /// <param name="source">Bei abhängigen Checkern das auslösende TreeEvent.</param>
-        protected override void DoRun(TreeEvent source)
+        protected override void DoRun(TreeEvent? source)
         {
             if (source != null && source.Name != "UserRun" && this.TriggeredRunDelay > 0)
             {
@@ -782,7 +778,7 @@ namespace LogicalTaskTree
             }
             foreach (LogicalNode child in this.Children)
             {
-                if ((this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
+                if ((this.CancellationToken.IsCancellationRequested)
                   || (this.LastLogicalState == NodeLogicalState.UserAbort))
                 {
                     break;
@@ -848,7 +844,7 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
-        /// Setz threadsafe ListLogicalState.
+        /// Setzt threadsafe ListLogicalState.
         /// </summary>
         /// <param name="newLogicalState">Neuer Wert (NodeLogicalState?)</param>
         protected void ThreadUpdateListLogicalState(NodeLogicalState newLogicalState)
@@ -860,7 +856,7 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
-        /// Setz threadsafe LastReturnedLogical.
+        /// Setzt threadsafe LastReturnedLogical.
         /// </summary>
         /// <param name="newLogical">Neuer Wert (bool?)</param>
         protected void ThreadUpdateLastReturnedLogical(bool? newLogical)
@@ -924,7 +920,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="sender">Die Ereignis-Quelle.</param>
         /// <param name="result">Das neue Result.</param>
-        protected override void SubNodeResultChanged(LogicalNode sender, Result result)
+        protected override void SubNodeResultChanged(LogicalNode sender, Result? result)
         {
             base.SubNodeResultChanged(sender, result);
             if (sender.LastLogical != null || (sender is NodeConnector))
@@ -938,7 +934,7 @@ namespace LogicalTaskTree
         #region private members
 
         private string _userControlPath;
-        private string _childrenString;
+        private string? _childrenString;
 
         #endregion private members
 

@@ -1755,5 +1755,27 @@ HotPlug
 		///		
 		///		        #endregion tree globals
 
+TrueChecker weg?
+Check_D weg?
+Spendenaufruf rein?
+NetEti.ObjectSerializer in Vishnu.doc?
 
+Checken
+	VisualStudio
+		Besen Codebereinigung?
+		Design time data
+		Xaml live preview
+		Xaml binding failures
+		Xaml quick actives
+		Top Window: set design data context
+
+Testen
+	BreakWithResult
+	IsVolatile
+
+Xamarin
+	Status Bar
+	Naviogation Bar
+	Content
+	
 

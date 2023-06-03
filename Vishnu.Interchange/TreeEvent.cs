@@ -8,6 +8,24 @@ using System.Text;
 namespace Vishnu.Interchange
 {
     /// <summary>
+    /// Klassendefinition für ein undefiniertes TreeEvent.
+    /// Ersetzt null, um die elenden null-Warnungen bei der Verwendung von TreeEvents
+    /// zu umgehen, bei denen sichergestellt ist oder sein muss, dass sie zum Zeitpunkt
+    /// der Verwendung ungleich null sind, die aber im Konstruktor sonst noch nicht
+    /// sinnvoll instanziiert werden könnten.
+    /// Bei eventuellen späteren null-Abfragen muss null durch die statische Instanz
+    /// 'UndefinedTreeEvent' (siehe weiter unten) ersetzt werden.
+    /// </summary>
+    public class UndefinedTreeEventClass : TreeEvent, IUndefinedElement
+    {
+        /// <summary>
+        /// Standard-Konstruktor.
+        /// </summary>
+        public UndefinedTreeEventClass()
+            : base("UNDEFINED", "UNDEFINED", "UNDEFINED", "UNDEFINED", "UNDEFINED", null, NodeLogicalState.Fault, null, null) { }
+    }
+
+    /// <summary>
     /// Klasse mit diversen Informationen für Ereignisse im LogicalTaskTree.
     /// </summary>
     /// <remarks>
@@ -19,6 +37,17 @@ namespace Vishnu.Interchange
     public class TreeEvent
     {
         #region public members
+
+        /// <summary>
+        /// Statische Instanz für ein undefiniertes TreeEvent.
+        /// Ersetzt null, um die elenden null-Warnungen bei der Verwendung von TreeEvents
+        /// zu umgehen, bei denen sichergestellt ist oder sein muss, dass sie zum Zeitpunkt
+        /// der Verwendung ungleich null sind, die aber im Konstruktor sonst noch nicht
+        /// sinnvoll instanziiert werden könnten.
+        /// Bei eventuellen späteren null-Abfragen muss null durch diese Instanz ersetzt werden.
+        /// Es kann dann ggf. auf 'is IUndefinedElement' geprüft werden.
+        /// </summary>
+        public static readonly UndefinedTreeEventClass UndefinedTreeEvent = new();
 
         /// <summary>
         /// Mappt einen normalisierten String mit entsprechendeninternen Ereignis-Namen
@@ -38,7 +67,7 @@ namespace Vishnu.Interchange
                 List<string> userEvents = new List<string>();
                 foreach (string item in internalEventNames.ToUpper().Split(new char[] { '|' }))
                 {
-                    string userEvent = GetUserEventNameForInternalEventName(item);
+                    string? userEvent = GetUserEventNameForInternalEventName(item);
                     if (!String.IsNullOrEmpty(userEvent))
                     {
                         userEvents.Add(userEvent);
@@ -59,7 +88,7 @@ namespace Vishnu.Interchange
         /// </summary>
         /// <param name="internalEventName">Der Programm-seitige Event-Name.</param>
         /// <returns>Der Benutzer-freundliche Event-Name.</returns>
-        public static string GetUserEventNameForInternalEventName(string internalEventName)
+        public static string? GetUserEventNameForInternalEventName(string internalEventName)
         {
             if (_internalEventNames_userEventNames.ContainsKey(internalEventName.ToUpper()))
             {
@@ -86,7 +115,7 @@ namespace Vishnu.Interchange
                 List<string> internalEvents = new List<string>();
                 foreach (string item in userEventNames.ToUpper().Split(new char[] { '|' }))
                 {
-                    string internalEvent = GetInternalEventNameForUserEventName(item);
+                    string? internalEvent = GetInternalEventNameForUserEventName(item);
                     if (!String.IsNullOrEmpty(internalEvent))
                     {
                         internalEvents.Add(internalEvent);
@@ -107,14 +136,13 @@ namespace Vishnu.Interchange
         /// </summary>
         /// <param name="userEventName">Der Benutzer-freundliche Event-Name.</param>
         /// <returns>Der Programm-seitige Event-Name.</returns>
-        public static string GetInternalEventNameForUserEventName(string userEventName)
+        public static string? GetInternalEventNameForUserEventName(string userEventName)
         {
             if (_userEventNames_internalEventNames.ContainsKey(userEventName.ToUpper()))
             {
                 return _userEventNames_internalEventNames[userEventName.ToUpper()];
             }
             return null;
-            //return userEventName;
         }
 
         /// <summary>User-Name des Ereignisses</summary>
@@ -145,10 +173,10 @@ namespace Vishnu.Interchange
         public string State { get; internal set; }
         
         /// <summary>Liste mit Verarbeitungsergebnissen des Knotens, der das Ereignis meldet.</summary>
-        public ResultDictionary Results { get; set; }
+        public ResultDictionary? Results { get; set; }
         
         /// <summary>Liste mit Verarbeitungsergebnissen der Vorläufer des Knotens, der das Ereignis meldet.</summary>
-        public ResultDictionary Environment { get; set; }
+        public ResultDictionary? Environment { get; set; }
 
         /// <summary>
         /// Konstruktor: übernimmt und erzeugt diverse Informationen für das TreeEvent.
@@ -162,7 +190,8 @@ namespace Vishnu.Interchange
         /// <param name="logicalState">Verarbeitungszustand des Knotens (None, Start, Done, Fault, Timeout, UserAbort).</param>
         /// <param name="results">List of Result (Verarbeitungsergebnisse der untergeordneten INodeChecker).</param>
         /// <param name="environment">List of Result (Verarbeitungsergebnisse der untergeordneten INodeChecker der vorhergehenden Knoten).</param>
-        public TreeEvent(string name, string sourceId, string senderId, string nodeName, string nodePath, bool? lastLogical, NodeLogicalState logicalState, ResultDictionary results, ResultDictionary environment)
+        public TreeEvent(string name, string sourceId, string senderId, string nodeName, string nodePath,
+            bool? lastLogical, NodeLogicalState logicalState, ResultDictionary? results, ResultDictionary? environment)
         {
             this.Name = name;
             this.SourceId = sourceId;
@@ -188,7 +217,8 @@ namespace Vishnu.Interchange
         /// <returns>Laufzeit-Ersetzung</returns>
         public string ReplaceWildcards(string inString)
         {
-            string replaced = GenericSingletonProvider.GetInstance<AppSettings>().GetStringValue("__NOPPES__", inString);
+            string replaced = GenericSingletonProvider.GetInstance<AppSettings>()
+                .GetStringValue("__REPLACE_WILDCARDS__", inString) ?? inString;
             // Regex.Replace(inString, @"%HOME%", AppDomain.CurrentDomain.BaseDirectory.TrimEnd('\\'), RegexOptions.IgnoreCase);
             return replaced;
         }
@@ -234,7 +264,7 @@ namespace Vishnu.Interchange
         /// </summary>
         /// <param name="obj">Vergleichs-Result.</param>
         /// <returns>True, wenn das übergebene Result inhaltlich (ohne Timestamp) gleich diesem Result ist.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null || GetType() != obj.GetType())
             {
@@ -244,8 +274,8 @@ namespace Vishnu.Interchange
             {
                 return true;
             }
-            TreeEvent res = obj as TreeEvent;
-            if (res.Name == this.Name && res.SourceId == this.SourceId && res.SenderId == this.SenderId
+            TreeEvent? res = obj as TreeEvent;
+            if (res?.Name == this.Name && res.SourceId == this.SourceId && res.SenderId == this.SenderId
                 && res.Logical == this.Logical && res.State == this.State
                 && res.NodePath == this.NodePath)
             {

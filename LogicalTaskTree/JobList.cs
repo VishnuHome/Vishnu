@@ -6,6 +6,7 @@ using Vishnu.Interchange;
 using NetEti.ApplicationControl;
 using System.Text;
 using System.Text.RegularExpressions;
+using LogicalTaskTree.Provider;
 
 namespace LogicalTaskTree
 {
@@ -34,25 +35,27 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this.Job != null)
-                {
-                    return this.Job.LogicalExpression;
-                }
-                else
-                {
-                    return this._presetLogicalExpression;
-                }
+                //if (this.Job != null)
+                //{
+                //    return this.Job.LogicalExpression;
+                //}
+                //else
+                //{
+                //    return this._presetLogicalExpression;
+                //}
+                return this.Job.LogicalExpression;
             }
             set
             {
-                if (this.Job != null)
-                {
-                    this.Job.LogicalExpression = value;
-                }
-                else
-                {
-                    this._presetLogicalExpression = value;
-                }
+                //if (this.Job != null)
+                //{
+                //    this.Job.LogicalExpression = value;
+                //}
+                //else
+                //{
+                //    this._presetLogicalExpression = value;
+                //}
+                this.Job.LogicalExpression = value;
             }
         }
 
@@ -60,7 +63,7 @@ namespace LogicalTaskTree
         /// Ein optionaler Trigger, der steuert, wann ein Snapshot des Jobs erstellt
         /// werden soll oder null.
         /// </summary>
-        public INodeTrigger SnapshotTrigger { get; set; }
+        public INodeTrigger? SnapshotTrigger { get; set; }
 
         /// <summary>
         /// Bei true ist diese Joblist ein JobController, das heist u.a.:
@@ -77,7 +80,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this._userControlPath != null)
+                if (!String.IsNullOrEmpty(this._userControlPath))
                 {
                     return this._userControlPath;
                 }
@@ -99,7 +102,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this._snapshotUserControlPath != null)
+                if (!String.IsNullOrEmpty(this._snapshotUserControlPath))
                 {
                     return this._snapshotUserControlPath;
                 }
@@ -121,7 +124,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this._jobConnectorUserControlPath != null)
+                if (!String.IsNullOrEmpty(this._jobConnectorUserControlPath))
                 {
                     return this._jobConnectorUserControlPath;
                 }
@@ -143,7 +146,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this._nodeListUserControlPath != null)
+                if (!String.IsNullOrEmpty(this._nodeListUserControlPath))
                 {
                     return this._nodeListUserControlPath;
                 }
@@ -165,7 +168,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this._singleNodeUserControlPath != null)
+                if (!String.IsNullOrEmpty(this._singleNodeUserControlPath))
                 {
                     return this._singleNodeUserControlPath;
                 }
@@ -187,7 +190,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this._constantNodeUserControlPath != null)
+                if (!String.IsNullOrEmpty(this._constantNodeUserControlPath))
                 {
                     return this._constantNodeUserControlPath;
                 }
@@ -212,14 +215,15 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this.Job != null)
-                {
-                    return this.Job.MaxSubJobDepth;
-                }
-                else
-                {
-                    return 0;
-                }
+                //if (this.Job != null)
+                //{
+                //    return this.Job.MaxSubJobDepth;
+                //}
+                //else
+                //{
+                //    return 0;
+                //}
+                return this.Job.MaxSubJobDepth;
             }
         }
 
@@ -231,14 +235,15 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this.Job != null)
-                {
-                    return this.Job.LogicalChangedDelay;
-                }
-                else
-                {
-                    return 0;
-                }
+                //if (this.Job != null)
+                //{
+                //    return this.Job.LogicalChangedDelay;
+                //}
+                //else
+                //{
+                //    return 0;
+                //}
+                return this.Job.LogicalChangedDelay;
             }
         }
 
@@ -255,14 +260,31 @@ namespace LogicalTaskTree
             {
                 this.RootJobList = this;
             }
-            this.UserControlPath = rootJobList.JobListUserControlPath;
-            this.SnapshotUserControlPath = rootJobList.SnapshotUserControlPath;
-            this.NodeListUserControlPath = rootJobList.NodeListUserControlPath;
-            this.SingleNodeUserControlPath = rootJobList.SingleNodeUserControlPath;
-            this.ConstantNodeUserControlPath = rootJobList.ConstantNodeUserControlPath;
-            this.JobConnectorUserControlPath = rootJobList.JobConnectorUserControlPath;
+            this._userControlPath = rootJobList.JobListUserControlPath;
+            this._snapshotUserControlPath = rootJobList.SnapshotUserControlPath;
+            this._nodeListUserControlPath = rootJobList.NodeListUserControlPath;
+            this._singleNodeUserControlPath = rootJobList.SingleNodeUserControlPath;
+            this._constantNodeUserControlPath = rootJobList.ConstantNodeUserControlPath;
+            this._jobConnectorUserControlPath = rootJobList.JobConnectorUserControlPath;
             this.IsConrolled = false;
-            this.TreeExternalSingleNodes = new List<SingleNode>();
+            this.TreeExternalSingleNodes = new();
+            this.AllCheckersForUnreferencingNodeConnectors = new();
+            this.UnsatisfiedNodeConnectors = new();
+            this.TreeExternalCheckers = new();
+            this.TriggerRelevantEventCache = new();
+            this.WorkerRelevantEventCache = new();
+            this.LoggerRelevantEventCache = new();
+            this.JobsByName = new();
+            this.NodesByName = new();
+            this.TreeRootLastChanceNodesByName = new();
+            this.NodesById = new();
+            this.Job = new Job();
+            this._jobProvider = new EmptyJobProvider();
+            this._results = new();
+            this._treeStringList = new();
+            this._parsedJobs = new();
+            this._lastExecutedWorkersSendersEvents = new();
+            this._lastExecutedWorkersSendersEventsLocker = new();
         }
 
         /// <summary>
@@ -271,7 +293,7 @@ namespace LogicalTaskTree
         /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
         /// <param name="jobProvider">Die Datenquelle für den Job</param>
         public JobList(TreeParameters treeParams, IJobProvider jobProvider)
-          : this(null, null, null, treeParams, jobProvider, new List<string>(), new Dictionary<string, JobList>())
+          : this(String.Empty, null, null, treeParams, jobProvider, new List<string>(), new Dictionary<string, JobList>())
         { }
 
         /// <summary>
@@ -381,14 +403,16 @@ namespace LogicalTaskTree
         /// <returns>Zusammenfassung des aktuellen Trees mit den aktuellen Zuständen seiner Knoten als String-List.</returns>
         public List<string> GetAllTreeInfos()
         {
-            List<string> allTreeInfos = new List<string>();
-            allTreeInfos.Add("------------------------------------------------------------------------------------------------------------------------");
-            allTreeInfos.Add(this.LogicalExpression);
-            allTreeInfos.Add("------------------------------------------------------------------------------------------------------------------------");
-            allTreeInfos.Add(this.ShowFlatSyntaxTree());
-            allTreeInfos.Add("------------------------------------------------------------------------------------------------------------------------");
+            List<string> allTreeInfos = new()
+            {
+                "------------------------------------------------------------------------------------------------------------------------",
+                this.LogicalExpression,
+                "------------------------------------------------------------------------------------------------------------------------",
+                this.ShowFlatSyntaxTree() ?? "---",
+                "------------------------------------------------------------------------------------------------------------------------"
+            };
             //allTreeInfos.AddRange(this._root.ShowSyntaxTree().ToArray()); // es gibt leider kein AddRange
-            this.ShowSyntaxTree().ToArray().FirstOrDefault(a => { allTreeInfos.Add(a); return false; });
+            this.ShowSyntaxTree()?.ToArray().FirstOrDefault(a => { allTreeInfos.Add(a); return false; });
             allTreeInfos.Add("------------------------------------------------------------------------------------------------------------------------");
             this.Show("  ").ToArray().FirstOrDefault(a => { allTreeInfos.Add(a); return false; });
             return allTreeInfos;
@@ -411,9 +435,9 @@ namespace LogicalTaskTree
         /// Gibt den zugehörigen Boolean-Tree in eine StringList aus.
         /// </summary>
         /// <returns>Baumdarstellung in einer StringList</returns>
-        public List<string> ShowSyntaxTree()
+        public List<string>? ShowSyntaxTree()
         {
-            return this.syntaxTree.Show("  ");
+            return this._syntaxTree?.Show("  ");
         }
 
         /// <summary>
@@ -421,9 +445,9 @@ namespace LogicalTaskTree
         /// wiederum einzeilig als logischen Ausdruck aus.
         /// </summary>
         /// <returns>Ein einzeiliger boolescher Ausdruck</returns>
-        public string ShowFlatSyntaxTree()
+        public string? ShowFlatSyntaxTree()
         {
-            return this.syntaxTree.ShowFlat();
+            return this._syntaxTree?.ShowFlat();
         }
 
         #region tree globals
@@ -517,7 +541,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="obj">Die JobList zum Vergleich.</param>
         /// <returns>True, wenn die übergebene JobList inhaltlich gleich dieser ist.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (!base.Equals(obj))
             {
@@ -527,7 +551,7 @@ namespace LogicalTaskTree
             {
                 return true;
             }
-            return this.LogicalExpression == (obj as JobList).LogicalExpression;
+            return this.LogicalExpression == ((JobList)obj).LogicalExpression;
         }
 
         /// <summary>
@@ -565,9 +589,9 @@ namespace LogicalTaskTree
         /// <returns>Array von Workern (oder null)</returns>
         internal WorkerShell[] GetWorkers(string idLogical)
         {
-            if (this.Job != null && this.Job.Workers.ContainsCombinedKey(idLogical))
+            if (this.Job.Workers.ContainsCombinedKey(idLogical))
             {
-                return this.Job.Workers[idLogical];
+                return this.Job.Workers[idLogical] ?? throw new NullReferenceException($"Internal Error: Job.Workers {idLogical}.");
             }
             else
             {
@@ -581,13 +605,13 @@ namespace LogicalTaskTree
         /// Parameter benötigt werden könnten.
         /// </summary>
         /// <param name="results">Kopie der zu speichernden ResultList eines Knotens einer Nodelist.</param>
-        internal void RegisterResults(Dictionary<string, Result> results)
+        internal void RegisterResults(Dictionary<string, Result?> results)
         {
             lock (this.ResultLocker)
             {
                 foreach (string id in results.Keys)
                 {
-                    Result res = results[id];
+                    Result? res = results[id];
                     string combinedKey = this.Id + "." + id;
                     this.UnregisterResult(combinedKey);
                     this._results.TryAdd(combinedKey, res);
@@ -627,7 +651,7 @@ namespace LogicalTaskTree
         {
             if (this._results.ContainsKey(key))
             {
-                Result outDummy;
+                Result? outDummy;
                 this._results.TryRemove(key, out outDummy);
             }
         }
@@ -638,7 +662,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="nodeId">Die Id des Knotens, der ein Result-Objekt hier abgelegt hat.</param>
         /// <returns>Das Result-Objekt des Knotens.</returns>
-        internal Result GetResult(string nodeId)
+        internal Result? GetResult(string nodeId)
         {
             if (nodeId != null && this._results != null && this._results.ContainsKey(nodeId))
             {
@@ -657,30 +681,27 @@ namespace LogicalTaskTree
         internal Dictionary<string, List<LogicalNode>> GetTriggeringNodeIdAndTriggeredNodes() // 06.04.2019 TEST
         {
             Dictionary<string, List<LogicalNode>> res = new Dictionary<string, List<LogicalNode>>();
-            if (this.Job != null && this.Job.EventTriggers != null)
+            // Das Event selbst interessiert hier nicht weiter.
+            foreach (Dictionary<string, TriggerShell> triggerIdTriggerShell in this.Job.EventTriggers.Values)
             {
-                // Das Event selbst interessiert hier nicht weiter.
-                foreach (Dictionary<string, TriggerShell> triggerIdTriggerShell in this.Job.EventTriggers.Values)
+                // Der Key interressiert hier nicht weiter, da er sich im TreeEventTrigger
+                // der TriggerShell als ReferencedNodeId noch mal wiederfindet.
+                foreach (TriggerShell triggerShell in triggerIdTriggerShell.Values)
                 {
-                    // Der Key interressiert hier nicht weiter, da er sich im TreeEventTrigger
-                    // der TriggerShell als ReferencedNodeId noch mal wiederfindet.
-                    foreach (TriggerShell triggerShell in triggerIdTriggerShell.Values)
+                    TreeEventTrigger? trigger = triggerShell.GetTreeEventTrigger();
+                    if (trigger != null)
                     {
-                        TreeEventTrigger trigger = triggerShell.GetTreeEventTrigger();
-                        if (trigger != null)
+                        string triggeringNodeId = trigger.ReferencedNodeId;
+                        // string triggeredNodeId = trigger.OwnerId;
+                        if (!res.ContainsKey(triggeringNodeId))
                         {
-                            string triggeringNodeId = trigger.ReferencedNodeId;
-                            // string triggeredNodeId = trigger.OwnerId;
-                            if (!res.ContainsKey(triggeringNodeId))
+                            res.Add(triggeringNodeId, new List<LogicalNode>());
+                        }
+                        foreach (LogicalNode triggeredNode in triggerShell.RegisteredMayBeTriggeredNodePathes.Values)
+                        {
+                            if (!res[triggeringNodeId].Contains(triggeredNode))
                             {
-                                res.Add(triggeringNodeId, new List<LogicalNode>());
-                            }
-                            foreach (LogicalNode triggeredNode in triggerShell.RegisteredMayBeTriggeredNodePathes.Values)
-                            {
-                                if (!res[triggeringNodeId].Contains(triggeredNode))
-                                {
-                                    res[triggeringNodeId].Add(triggeredNode);
-                                }
+                                res[triggeringNodeId].Add(triggeredNode);
                             }
                         }
                     }
@@ -697,19 +718,17 @@ namespace LogicalTaskTree
         /// <param name="triggers">Eine Liste von für das Event zuständigen Triggern.</param>
         internal void FindEventTriggers(string eventName, string senderId, List<TreeEventTrigger> triggers)
         {
-            if (this.TreeRootJobList.Job != null && this.TreeRootJobList.Job.EventTriggers != null)
+            foreach (string eventsString in this.TreeRootJobList.Job.EventTriggers.Keys)
             {
-                foreach (string eventsString in this.TreeRootJobList.Job.EventTriggers.Keys)
+                if (eventsString.Contains(eventName))
                 {
-                    if (eventsString.Contains(eventName))
+                    string fullEventsString = eventsString;
+                    if (this.TreeRootJobList.Job.EventTriggers[fullEventsString].ContainsKey(senderId))
                     {
-                        string fullEventsString = eventsString;
-                        if (this.TreeRootJobList.Job.EventTriggers[fullEventsString].ContainsKey(senderId))
+                        TreeEventTrigger? treeEventTrigger = this.TreeRootJobList.Job.EventTriggers[fullEventsString][senderId].GetTreeEventTrigger();
+                        if (treeEventTrigger != null && !triggers.Contains(treeEventTrigger))
                         {
-                            if (!triggers.Contains(this.TreeRootJobList.Job.EventTriggers[fullEventsString][senderId].GetTreeEventTrigger()))
-                            {
-                                triggers.Add(this.TreeRootJobList.Job.EventTriggers[fullEventsString][senderId].GetTreeEventTrigger());
-                            }
+                            triggers.Add(treeEventTrigger);
                         }
                     }
                 }
@@ -744,16 +763,16 @@ namespace LogicalTaskTree
         /// <returns>Eine Liste von für das Event zuständigen Worker-Arrays.</returns>
         internal List<WorkerShell[]> FindEventWorkers(string eventName, string senderId, bool allEvents, List<WorkerShell[]> workers)
         {
-            if (this.Job != null && this.Job.Workers != null)
+            foreach (string eventsString in this.Job.Workers.Keys)
             {
-                foreach (string eventsString in this.Job.Workers.Keys)
+                if (eventsString.Contains(eventName) || allEvents)
                 {
-                    if (eventsString.Contains(eventName) || allEvents)
+                    string fullEventsString = eventsString;
+                    if (this.Job.Workers.ContainsCombinedKey(senderId + ":" + fullEventsString))
                     {
-                        string fullEventsString = eventsString;
-                        if (this.Job.Workers.ContainsCombinedKey(senderId + ":" + fullEventsString))
+                        WorkerShell[]? workerArray = this.Job.Workers[senderId + ":" + fullEventsString];
+                        if (workerArray != null)
                         {
-                            WorkerShell[] workerArray = this.Job.Workers[senderId + ":" + fullEventsString];
                             workers.Add(workerArray);
                         }
                     }
@@ -918,7 +937,7 @@ namespace LogicalTaskTree
         /// Diese Routine wird asynchron ausgeführt.
         /// </summary>
         /// <param name="source">Bei abhängigen Checkern das auslösende TreeEvent.</param>
-        protected override void DoRun(TreeEvent source)
+        protected override void DoRun(TreeEvent? source)
         {
             this.RunTreeExternals();
             base.DoRun(source);
@@ -945,7 +964,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="nodeId">Die Id der zu suchenden Node.</param>
         /// <returns>Die gefundene LogicalNode oder null.</returns>
-        public override LogicalNode FindNodeById(string nodeId)
+        public override LogicalNode? FindNodeById(string nodeId)
         {
             if (this.NodesById.ContainsKey(nodeId))
             {
@@ -990,15 +1009,15 @@ namespace LogicalTaskTree
         // Der aus dem logischen Ausdruck des Jobs geparste Boolean-Tree.
         // Dieser dient als Bauplan für den LogicalTaskTree, wird aber darüber hinaus
         // nicht weiterverwendet.
-        private SyntaxTree syntaxTree;
+        private SyntaxTree? _syntaxTree;
 
         private ResultList _results;
-        private string _indent;
+        private string? _indent;
         private List<string> _treeStringList;
         private List<string> _parsedJobs;
 
         private Dictionary<string, Dictionary<string, List<WorkerShell>>> _lastExecutedWorkersSendersEvents;
-        private string _presetLogicalExpression;
+        // private string _presetLogicalExpression;
         private string _userControlPath;
         private string _snapshotUserControlPath;
         private string _jobConnectorUserControlPath;
@@ -1017,27 +1036,28 @@ namespace LogicalTaskTree
         /// <param name="jobProvider">Die Datenquelle für den Job</param>
         /// <param name="parsedJobs">Liste von Namen aller bisher geparsten Jobs.</param>
         /// <param name="subJobs">Liste von Namen aller bisher verarbeiteten JobLists.</param>
-        private JobList(string logicalName, LogicalNode mother, JobList rootJoblist, TreeParameters treeParams, IJobProvider jobProvider,
+        private JobList(string logicalName, LogicalNode? mother, JobList? rootJoblist, TreeParameters treeParams, IJobProvider jobProvider,
           List<string> parsedJobs, Dictionary<string, JobList> subJobs)
           : base(logicalName, mother, rootJoblist, treeParams)
         {
             this._parsedJobs = parsedJobs;
             this.JobsByName = subJobs;
+            // this._presetLogicalExpression = String.Empty;
             this.NodesByName = new Dictionary<string, LogicalNode>();
             this.TreeRootLastChanceNodesByName = new Dictionary<string, LogicalNode>();
             this.NodesById = new Dictionary<string, LogicalNode>();
             if (this._parsedJobs.Contains(logicalName))
             {
-                throw new ApplicationException(String.Format("Rekursion bei ID: {0}!", logicalName));
+                throw new ApplicationException(String.Format("Rekursion bei ID: {0}.", logicalName));
             }
             this._jobProvider = jobProvider;
             this.Job = this._jobProvider.GetJob(ref logicalName);
-            this.UserControlPath = this.Job.JobListUserControlPath;
-            this.SnapshotUserControlPath = this.Job.SnapshotUserControlPath;
-            this.JobConnectorUserControlPath = this.Job.JobConnectorUserControlPath;
-            this.NodeListUserControlPath = this.Job.NodeListUserControlPath;
-            this.SingleNodeUserControlPath = this.Job.SingleNodeUserControlPath;
-            this.ConstantNodeUserControlPath = this.Job.ConstantNodeUserControlPath;
+            this._userControlPath = this.Job.JobListUserControlPath;
+            this._snapshotUserControlPath = this.Job.SnapshotUserControlPath;
+            this._jobConnectorUserControlPath = this.Job.JobConnectorUserControlPath;
+            this._nodeListUserControlPath = this.Job.NodeListUserControlPath;
+            this._singleNodeUserControlPath = this.Job.SingleNodeUserControlPath;
+            this._constantNodeUserControlPath = this.Job.ConstantNodeUserControlPath;
             this.Id = logicalName;
             this._parsedJobs.Add(logicalName);
             this.StartCollapsed = this.Job.StartCollapsed;
@@ -1077,7 +1097,7 @@ namespace LogicalTaskTree
             if (this.Job.JobTrigger != null)
             {
                 this.Trigger = this.Job.JobTrigger;
-                this.climb2Top(this.setBreakWithResult2False);
+                this.Climb2Top(this.setBreakWithResult2False);
             }
             else
             {
@@ -1097,13 +1117,13 @@ namespace LogicalTaskTree
                 }
                 foreach (string key in this.Job.EventTriggers.Keys)
                 {
-                    if (!this.RootJobList.Job.EventTriggers.ContainsKey(key))
+                    if (this.RootJobList.Job.EventTriggers.ContainsKey(key) != true)
                     {
                         this.RootJobList.Job.EventTriggers.Add(key, this.Job.EventTriggers[key]);
                     }
                     foreach (string nodeKey in this.Job.EventTriggers[key].Keys)
                     {
-                        if (!this.RootJobList.Job.EventTriggers[key].ContainsKey(nodeKey))
+                        if (this.RootJobList.Job.EventTriggers[key].ContainsKey(nodeKey) != true)
                         {
                             this.RootJobList.Job.EventTriggers[key].Add(nodeKey, this.Job.EventTriggers[key][nodeKey]);
                         }
@@ -1124,7 +1144,7 @@ namespace LogicalTaskTree
             }
         }
 
-        private void requestSnapshot(TreeEvent source)
+        private void requestSnapshot(TreeEvent? source)
         {
             // Neu+
             // this.ThreadRefreshNodeList();
@@ -1147,8 +1167,8 @@ namespace LogicalTaskTree
         private void parse()
         {
             // this.syntaxTree = new LogicalParser().Parse(this.LogicalExpression);
-            this.syntaxTree = new TresholdParser().Parse(this.LogicalExpression);
-            this.buildParallelTree(this, this.syntaxTree);
+            this._syntaxTree = new TresholdParser().Parse(this.LogicalExpression);
+            this.buildParallelTree(this, this._syntaxTree);
             foreach (string nodeName in this.TreeExternalCheckers.Keys)
             {
                 NodeCheckerBase checker = this.TreeExternalCheckers[nodeName];
@@ -1201,18 +1221,18 @@ namespace LogicalTaskTree
         // Sucht nach der Instanz des Triggers mit dem Namen 'triggerReference'
         // in allen Triggers (Dictionaries) des aktuellen Jobs und aller übergeordneten Jobs.
         // Der erste Treffer gewinnt.
-        private TriggerShell FindReferencedTrigger(string triggerReference, object triggerParameters, string ownerId)
+        private TriggerShell FindReferencedTrigger(string triggerReference, object? triggerParameters, string ownerId)
         {
             JobList jobList = this;
             do
             {
-                if (jobList.Job.Triggers.ContainsKey(triggerReference))
+                if (jobList.Job.Triggers.ContainsKey(triggerReference) == true)
                 {
                     TriggerShell triggerShell = jobList.Job.Triggers[triggerReference];
                     string transitiveTriggerReference = triggerShell.GetTriggerReference();
                     if (transitiveTriggerReference != null)
                     {
-                        object transitiveTriggerParameters = triggerShell.GetTriggerParameters();
+                        object? transitiveTriggerParameters = triggerShell.GetTriggerParameters();
                         TriggerShell transitiveTriggerShell = this.createInternalEventsTrigger(transitiveTriggerReference, transitiveTriggerParameters, ownerId);
                         triggerShell.SetSlaveTriggerShell(transitiveTriggerShell);
                     }
@@ -1229,41 +1249,37 @@ namespace LogicalTaskTree
 
         // Erzeugt einen TreeEventTrigger und retourniert eine TriggerShell mit diesem TreeEventTrigger.
         // Retourniert null, wenn triggerReference keine TreeEvent-Namen enthält.
-        private TriggerShell createInternalEventsTrigger(string triggerReference, object triggerParameters, string ownerId)
+        private TriggerShell createInternalEventsTrigger(string triggerReference, object? triggerParameters, string ownerId)
         {
+
             if (triggerParameters == null)
             {
                 throw new ApplicationException(String.Format("Die Referenz '{0}' konnte nicht aufgelöst werden.", triggerReference));
             }
             string internalEvents = TreeEvent.GetInternalEventNamesForUserEventNames(triggerReference);
-            if (!String.IsNullOrEmpty(internalEvents))
+            string nodeId = triggerParameters.ToString() ?? "";
+            if (!this.TreeRootJobList.Job.EventTriggers.ContainsKey(internalEvents))
             {
-                string nodeId = triggerParameters.ToString();
-                if (!this.TreeRootJobList.Job.EventTriggers.ContainsKey(internalEvents))
-                {
-                    this.TreeRootJobList.Job.EventTriggers.Add(internalEvents, new Dictionary<string, TriggerShell>());
-                    this.tryAddEventsToCache(this.TreeRootJobList.TriggerRelevantEventCache, internalEvents);
-                }
-                TreeEventTrigger newTrigger = null;
-                TriggerShell newTriggerShell = null;
-                if (!this.TreeRootJobList.Job.EventTriggers[internalEvents].ContainsKey(nodeId))
-                {
-                    newTrigger = new TreeEventTrigger(internalEvents, ownerId, triggerReference, nodeId);
-                    newTriggerShell = new TriggerShell(internalEvents, newTrigger);
-                    this.TreeRootJobList.Job.EventTriggers[internalEvents].Add(nodeId, newTriggerShell);
-                }
-                if (!this.Job.EventTriggers.ContainsKey(internalEvents))
-                {
-                    this.Job.EventTriggers.Add(internalEvents, new Dictionary<string, TriggerShell>());
-                    this.tryAddEventsToCache(this.TreeRootJobList.TriggerRelevantEventCache, internalEvents);
-                }
-                if (!this.Job.EventTriggers[internalEvents].ContainsKey(nodeId))
-                {
-                    this.Job.EventTriggers[internalEvents].Add(nodeId, newTriggerShell);
-                }
-                return this.TreeRootJobList.Job.EventTriggers[internalEvents][nodeId];
+                this.TreeRootJobList.Job.EventTriggers.Add(internalEvents, new Dictionary<string, TriggerShell>());
+                this.tryAddEventsToCache(this.TreeRootJobList.TriggerRelevantEventCache, internalEvents);
             }
-            return null;
+            TriggerShell newTriggerShell;
+            TreeEventTrigger newTrigger = new TreeEventTrigger(internalEvents, ownerId, triggerReference, nodeId);
+            newTriggerShell = new TriggerShell(internalEvents, newTrigger);
+            if (!this.TreeRootJobList.Job.EventTriggers[internalEvents].ContainsKey(nodeId))
+            {
+                this.TreeRootJobList.Job.EventTriggers[internalEvents].Add(nodeId, newTriggerShell);
+            }
+            if (!this.Job.EventTriggers.ContainsKey(internalEvents))
+            {
+                this.Job.EventTriggers.Add(internalEvents, new Dictionary<string, TriggerShell>());
+                this.tryAddEventsToCache(this.TreeRootJobList.TriggerRelevantEventCache, internalEvents);
+            }
+            if (!this.Job.EventTriggers[internalEvents].ContainsKey(nodeId))
+            {
+                this.Job.EventTriggers[internalEvents].Add(nodeId, newTriggerShell);
+            }
+            return this.TreeRootJobList.Job.EventTriggers[internalEvents][nodeId];
         }
 
         private void tryAddEventsToCache(List<string> list, string internalEvents)
@@ -1282,7 +1298,7 @@ namespace LogicalTaskTree
         // und ordnet sie nachträglich den betreffenden CheckerShells zu.
         private void fillTriggerReferences()
         {
-            string triggerReference = null;
+            string? triggerReference = null;
             foreach (string id in this.Job.Checkers.Keys)
             {
                 NodeCheckerBase node = this.Job.Checkers[id];
@@ -1319,7 +1335,7 @@ namespace LogicalTaskTree
                 }
                 jobList = jobList.RootJobList;
             } while (true);
-            return null;
+            throw new ApplicationException("Der referenzierte Logger wurde nicht gefunden.");
         }
 
         // Sucht für CheckerShells, die nicht direkt einen Logger zugeordnet haben, aber eine namentliche
@@ -1327,7 +1343,7 @@ namespace LogicalTaskTree
         // und ordnet sie nachträglich den betreffenden CheckerShells zu.
         private void fillLoggerReferences()
         {
-            string loggerReference = null;
+            string? loggerReference = null;
             foreach (NodeCheckerBase node in this.Job.Checkers.Values)
             {
                 if (node.CheckerLogger != null)
@@ -1344,7 +1360,7 @@ namespace LogicalTaskTree
                     else
                     {
                         string info = node.CheckerLogger.LoggerShellReference ?? (node.ReferencedNodeName ?? node.GetType().Name);
-                        throw new ArgumentException(String.Format($"Fehler bei der Logger-Konfiguration ({info})!"));
+                        throw new ArgumentException(String.Format($"Fehler bei der Logger-Konfiguration ({info})."));
                     }
                 }
             }
@@ -1352,11 +1368,8 @@ namespace LogicalTaskTree
             {
                 if ((loggerReference = this.Job.JobLogger.GetLoggerReference()) != null)
                 {
-                    LoggerShell loggerShell = this.FindReferencedLogger(loggerReference);
-                    if (loggerShell == null)
-                    {
-                        throw new ArgumentException(String.Format($"Die Logger-Referenz {loggerReference} konnte nicht aufgelöst werden."));
-                    }
+                    LoggerShell loggerShell = this.FindReferencedLogger(loggerReference)
+                        ?? throw new ArgumentException(String.Format($"Die Logger-Referenz {loggerReference} konnte nicht aufgelöst werden."));
                     this.Job.JobLogger.SetSlaveLoggerShell(loggerShell);
                 }
                 string logEvents = this.Job.JobLogger.GetLogEvents();
@@ -1367,7 +1380,7 @@ namespace LogicalTaskTree
                 else
                 {
                     string info = this.Job.JobLogger.LoggerShellReference ?? (this.Job.JobLogger.LoggerParameters ?? this.Job.LogicalExpression);
-                    throw new ArgumentException(String.Format($"Fehler bei der Logger-Konfiguration ({info})!"));
+                    throw new ArgumentException(String.Format($"Fehler bei der Logger-Konfiguration ({info})."));
                 }
             }
         }
@@ -1377,11 +1390,11 @@ namespace LogicalTaskTree
             for (int i = 0; i < this.UnsatisfiedNodeConnectors.Count; i++)
             {
                 NodeConnector actNodeConnector = this.UnsatisfiedNodeConnectors[i];
-                string checkerReference = this.AllCheckersForUnreferencingNodeConnectors[actNodeConnector.Name].GetCheckerReference();
+                string? checkerReference = this.AllCheckersForUnreferencingNodeConnectors[actNodeConnector.Name].GetCheckerReference();
                 if (checkerReference != null)
                 {
                     // Es handelt sich um einen ValueModifier, der auf einen existierenden Checker verweist.
-                    LogicalNode ownerOfReferencedChecker = this.FindNodeByName(checkerReference, NodeTypes.Checker | NodeTypes.ValueModifier, actNodeConnector.IsGlobal);
+                    LogicalNode? ownerOfReferencedChecker = this.FindNodeByName(checkerReference, NodeTypes.Checker | NodeTypes.ValueModifier, actNodeConnector.IsGlobal);
                     if (ownerOfReferencedChecker != null)
                     {
                         actNodeConnector.InitReferencedNode(ownerOfReferencedChecker);
@@ -1398,208 +1411,211 @@ namespace LogicalTaskTree
         /// <param name="template">Der boolesche (Teil-)Baum (Bauplan)</param>
         private void buildParallelTree(NodeList mother, SyntaxTree template)
         {
-            mother.nOperands = template.Children.Where(c => c.NodeType == SyntaxElement.NONE || c.NodeType == SyntaxElement.STRUCT).Count();
-            for (int i = 0; i < template.Children.Count; i++)
+            if (template.Children != null)
             {
-                SyntaxTree child = template.Children[i];
-                switch (child.NodeType)
+                mother.nOperands = template.Children.Where(c => c.NodeType == SyntaxElement.NONE || c.NodeType == SyntaxElement.STRUCT).Count();
+                for (int i = 0; i < template.Children.Count; i++)
                 {
-                    case SyntaxElement.NONE:
-                        LogicalNode newChild;
-                        string userControlPath = null;
-                        bool initNodes = false;
-                        int triggeredRunDelay = 0;
-                        if (child.NodeName.StartsWith(@"@") || this.Job.Checkers.ContainsKey(child.NodeName))
-                        {
-                            // Es handelt sich um ein Einzelelement (Checker oder Konstante).
-                            if (this.Job.Checkers.ContainsKey(child.NodeName))
+                    SyntaxTree child = template.Children[i];
+                    switch (child.NodeType)
+                    {
+                        case SyntaxElement.NONE:
+                            LogicalNode? newChild;
+                            string userControlPath = String.Empty;
+                            bool initNodes = false;
+                            int triggeredRunDelay = 0;
+                            if (child.NodeName.StartsWith(@"@") || this.Job.Checkers.ContainsKey(child.NodeName))
                             {
-                                // Es handelt sich um einen Checker (keine Konstante).
-                                userControlPath = (this.Job.Checkers[child.NodeName] as NodeCheckerBase).UserControlPath;
-                                initNodes = (this.Job.Checkers[child.NodeName] as NodeCheckerBase).InitNodes;
-                                triggeredRunDelay = (this.Job.Checkers[child.NodeName] as NodeCheckerBase).TriggeredRunDelay;
-                                if (userControlPath == null)
+                                // Es handelt sich um ein Einzelelement (Checker oder Konstante).
+                                if (this.Job.Checkers.ContainsKey(child.NodeName))
                                 {
-                                    userControlPath = mother.SingleNodeUserControlPath;
-                                }
-                                string checkerReference = this.Job.Checkers[child.NodeName].GetCheckerReference();
-                                bool isGlobal = this.Job.Checkers[child.NodeName].IsGlobal;
-                                newChild = this.FindNodeByName(child.NodeName, NodeTypes.Checker | NodeTypes.ValueModifier, isGlobal); // Muss vom Knoten abhängen, nur bei Attribut IsGlobal auf true.
-                                if (newChild == null)
-                                {
-                                    // Es gibt noch keinen Knoten mit diesem Checker.
-                                    if (checkerReference != null)
+                                    // Es handelt sich um einen Checker (keine Konstante).
+                                    userControlPath = (this.Job.Checkers[child.NodeName] as NodeCheckerBase).UserControlPath;
+                                    initNodes = (this.Job.Checkers[child.NodeName] as NodeCheckerBase).InitNodes;
+                                    triggeredRunDelay = (this.Job.Checkers[child.NodeName] as NodeCheckerBase).TriggeredRunDelay;
+                                    if (String.IsNullOrEmpty(userControlPath))
                                     {
-                                        // Es handelt sich um einen ValueModifier, der auf einen existierenden Checker verweist.
-                                        LogicalNode ownerOfReferencedChecker = this.FindNodeByName(checkerReference, NodeTypes.Checker | NodeTypes.ValueModifier, IsGlobal); // ist true erforderlich? TEST 12.2015+-
-                                        newChild = new NodeConnector(child.NodeName, mother, this, this.TreeParams, ownerOfReferencedChecker, this.Job.Checkers[child.NodeName]);
-                                        newChild.NodeType = NodeTypes.ValueModifier;
-                                        newChild.IsGlobal = isGlobal;
-                                        if (ownerOfReferencedChecker == null)
-                                        {
-                                            this.UnsatisfiedNodeConnectors.Add(newChild as NodeConnector);
-                                        }
-                                        this.TryAddToNodesByName(newChild.Name, newChild);
+                                        userControlPath = mother.SingleNodeUserControlPath;
                                     }
-                                    else // if (checkerReference != null)
+                                    string? checkerReference = this.Job.Checkers[child.NodeName].GetCheckerReference();
+                                    bool isGlobal = this.Job.Checkers[child.NodeName].IsGlobal;
+                                    newChild = this.FindNodeByName(child.NodeName, NodeTypes.Checker | NodeTypes.ValueModifier, isGlobal); // Muss vom Knoten abhängen, nur bei Attribut IsGlobal auf true.
+                                    if (newChild == null)
                                     {
-                                        // Es handelt sich um einen normalen Checker.
-                                        newChild = new SingleNode(child.NodeName, mother, this, this.TreeParams);
-                                        newChild.NodeType = NodeTypes.Checker;
+                                        // Es gibt noch keinen Knoten mit diesem Checker.
+                                        if (checkerReference != null)
+                                        {
+                                            // Es handelt sich um einen ValueModifier, der auf einen existierenden Checker verweist.
+                                            LogicalNode? ownerOfReferencedChecker = this.FindNodeByName(checkerReference, NodeTypes.Checker | NodeTypes.ValueModifier, IsGlobal); // ist true erforderlich? TEST 12.2015+-
+                                            newChild = new NodeConnector(child.NodeName, mother, this, this.TreeParams, ownerOfReferencedChecker, this.Job.Checkers[child.NodeName]);
+                                            newChild.NodeType = NodeTypes.ValueModifier;
+                                            newChild.IsGlobal = isGlobal;
+                                            if (ownerOfReferencedChecker == null)
+                                            {
+                                                this.UnsatisfiedNodeConnectors.Add((NodeConnector)newChild);
+                                            }
+                                            this.TryAddToNodesByName(newChild.Name, newChild);
+                                        }
+                                        else // if (checkerReference != null)
+                                        {
+                                            // Es handelt sich um einen normalen Checker.
+                                            newChild = new SingleNode(child.NodeName, mother, this, this.TreeParams);
+                                            newChild.NodeType = NodeTypes.Checker;
+                                            newChild.IsGlobal = IsGlobal;
+                                            this.Job.Checkers[child.NodeName].ThreadLocked |= this.ThreadLocked;
+                                            ((SingleNode)newChild).Checker = this.Job.Checkers[child.NodeName];
+                                            if (this.TreeExternalCheckers.ContainsValue(this.Job.Checkers[child.NodeName]))
+                                            {
+                                                this.TreeExternalCheckers.Remove(this.TreeExternalCheckers.FirstOrDefault(c => c.Value == this.Job.Checkers[child.NodeName]).Key);
+                                                // am Ende bleiben im Dictionary nur Checker übrig, die nicht in der LogicalExpression auftreten.
+                                            }
+                                            if (((SingleNode)newChild).Checker?.CheckerTrigger != null)
+                                            {
+                                                newChild.Trigger = ((SingleNode)newChild).Checker?.CheckerTrigger;
+                                                newChild.Climb2Top(this.setBreakWithResult2False);
+                                            }
+                                            else
+                                            {
+                                                newChild.BreakWithResult = this.BreakWithResult;
+                                            }
+                                            newChild.Logger = ((SingleNode)newChild).Checker?.CheckerLogger;
+                                            this.TryAddToNodesByName(newChild.Name, newChild);
+                                        }
+                                    }
+                                    else // if (newChild == null)
+                                    {
+                                        // Es gibt schon einen Knoten mit diesem Checker (direkte Referenz über den child.NodeName),
+                                        // auf den Originalknoten verweisen.
+                                        newChild = new NodeConnector(child.NodeName, mother, this, this.TreeParams, newChild, null);
+                                        newChild.NodeType = NodeTypes.NodeConnector;
                                         newChild.IsGlobal = IsGlobal;
-                                        this.Job.Checkers[child.NodeName].ThreadLocked |= this.ThreadLocked;
-                                        (newChild as SingleNode).Checker = this.Job.Checkers[child.NodeName];
                                         if (this.TreeExternalCheckers.ContainsValue(this.Job.Checkers[child.NodeName]))
                                         {
                                             this.TreeExternalCheckers.Remove(this.TreeExternalCheckers.FirstOrDefault(c => c.Value == this.Job.Checkers[child.NodeName]).Key);
                                             // am Ende bleiben im Dictionary nur Checker übrig, die nicht in der LogicalExpression auftreten.
                                         }
-                                        if ((newChild as SingleNode).Checker.CheckerTrigger != null)
-                                        {
-                                            newChild.Trigger = (newChild as SingleNode).Checker.CheckerTrigger;
-                                            newChild.climb2Top(this.setBreakWithResult2False);
-                                        }
-                                        else
-                                        {
-                                            newChild.BreakWithResult = this.BreakWithResult;
-                                        }
-                                        newChild.Logger = (newChild as SingleNode).Checker.CheckerLogger;
-                                        this.TryAddToNodesByName(newChild.Name, newChild);
                                     }
                                 }
-                                else // if (newChild == null)
+                                else // if (this._job.Checkers.ContainsKey(child.NodeName))
                                 {
-                                    // Es gibt schon einen Knoten mit diesem Checker (direkte Referenz über den child.NodeName),
-                                    // auf den Originalknoten verweisen.
-                                    newChild = new NodeConnector(child.NodeName, mother, this, this.TreeParams, newChild, null);
-                                    newChild.NodeType = NodeTypes.NodeConnector;
-                                    newChild.IsGlobal = IsGlobal;
-                                    if (this.TreeExternalCheckers.ContainsValue(this.Job.Checkers[child.NodeName]))
+                                    // Es handelt sich um eine Konstante
+                                    newChild = new SingleNode(child.NodeName, mother, this, this.TreeParams);
+                                    newChild.NodeType = NodeTypes.Constant;
+                                    userControlPath = mother.ConstantNodeUserControlPath;
+                                }
+                                newChild.UserControlPath = userControlPath;
+                                newChild.InitNodes = initNodes;
+                                newChild.TriggeredRunDelay = triggeredRunDelay;
+                                mother.AddChild(newChild);
+                            }
+                            else // if (child.NodeName.StartsWith(@"@") || this._job.Checkers.ContainsKey(child.NodeName))
+                            {
+                                // if (!child.NodeName.StartsWith(@"#"))
+                                if (!this.Job.SnapshotNames.Contains(child.NodeName))
+                                {
+                                    // Es handelt sich um einen SubJob.
+                                    newChild = this.FindJobByName(child.NodeName, true);
+                                    if (newChild == null)
                                     {
-                                        this.TreeExternalCheckers.Remove(this.TreeExternalCheckers.FirstOrDefault(c => c.Value == this.Job.Checkers[child.NodeName]).Key);
-                                        // am Ende bleiben im Dictionary nur Checker übrig, die nicht in der LogicalExpression auftreten.
+                                        newChild = new JobList(child.NodeName, mother, this, this.TreeParams, this._jobProvider, this._parsedJobs, this.JobsByName);
+                                        newChild.NodeType = NodeTypes.JobList;
                                     }
-                                }
-                            }
-                            else // if (this._job.Checkers.ContainsKey(child.NodeName))
-                            {
-                                // Es handelt sich um eine Konstante
-                                newChild = new SingleNode(child.NodeName, mother, this, this.TreeParams);
-                                newChild.NodeType = NodeTypes.Constant;
-                                userControlPath = mother.ConstantNodeUserControlPath;
-                            }
-                            newChild.UserControlPath = userControlPath;
-                            newChild.InitNodes = initNodes;
-                            newChild.TriggeredRunDelay = triggeredRunDelay;
-                            mother.AddChild(newChild);
-                        }
-                        else // if (child.NodeName.StartsWith(@"@") || this._job.Checkers.ContainsKey(child.NodeName))
-                        {
-                            // if (!child.NodeName.StartsWith(@"#"))
-                            if (!this.Job.SnapshotNames.Contains(child.NodeName))
-                            {
-                                // Es handelt sich um einen SubJob.
-                                newChild = this.FindJobByName(child.NodeName, true);
-                                if (newChild == null)
-                                {
-                                    newChild = new JobList(child.NodeName, mother, this, this.TreeParams, this._jobProvider, this._parsedJobs, this.JobsByName);
-                                    newChild.NodeType = NodeTypes.JobList;
+                                    else
+                                    {
+                                        // Es gibt schon einen Knoten mit diesem SubJob (direkte Referenz über den child.NodeName),
+                                        // auf den Originalknoten verweisen.
+                                        newChild = new JobConnector(child.NodeName, mother, this, this.TreeParams, newChild, null);
+                                        newChild.NodeType = NodeTypes.JobConnector;
+                                        newChild.UserControlPath = mother.JobConnectorUserControlPath;
+                                    }
+                                    mother.AddChild(newChild);
+                                    this.TryAddToJobsByName(newChild.Id, ((JobList)newChild));
                                 }
                                 else
                                 {
-                                    // Es gibt schon einen Knoten mit diesem SubJob (direkte Referenz über den child.NodeName),
-                                    // auf den Originalknoten verweisen.
-                                    newChild = new JobConnector(child.NodeName, mother, this, this.TreeParams, newChild, null);
-                                    newChild.NodeType = NodeTypes.JobConnector;
-                                    newChild.UserControlPath = mother.JobConnectorUserControlPath;
+                                    // Es handelt sich um einen Snapshot eines externen LogicalTree.
+                                    newChild = new Snapshot(child.NodeName, this, this, this.TreeParams, this._jobProvider, this._parsedJobs);
+                                    newChild.NodeType = NodeTypes.Snapshot;
+                                    mother.AddChild(newChild);
                                 }
-                                mother.AddChild(newChild);
-                                this.TryAddToJobsByName(newChild.Id, (newChild as JobList));
                             }
-                            else
+                            this.AddToNodesById(newChild.Id, (newChild));
+                            break;
+                        case SyntaxElement.OPERATOR:
+                            // True wird dann zurückgegeben, wenn die Anzahl der Kinder mit Logical=True
+                            // größer als die Schranke nPlus ist und kleiner als die Schranke n- ist und
+                            // auch durch die noch nicht fertigen Kinder nicht mehr >= n- werden kann.
+                            // False wird dann zurückgegeben, wenn entweder die Anzahl der Kinder mit
+                            // Logical=True größer als die Schranke nMinus ist oder
+                            // auch durch die noch nicht fertigen Kinder die Schranke nPlus nicht
+                            // mehr überschritten werden kann.
+                            mother.Name = child.NodeName;
+                            switch (child.NodeName)
                             {
-                                // Es handelt sich um einen Snapshot eines externen LogicalTree.
-                                newChild = new Snapshot(child.NodeName, this, this, this.TreeParams, this._jobProvider, this._parsedJobs);
-                                newChild.NodeType = NodeTypes.Snapshot;
-                                mother.AddChild(newChild);
+                                case "NOT":
+                                    mother.nPlus = -1;
+                                    mother.nMinus = 1;
+                                    break;
+                                case "IS":
+                                    mother.nPlus = 0;
+                                    mother.nMinus = mother.nOperands + 1;
+                                    break;
+                                case "OR":
+                                    mother.nPlus = 0;
+                                    mother.nMinus = mother.nOperands + 1;
+                                    break;
+                                //case "XOR": // nur für zweiwertige Logik ok.
+                                //  mother.nPlus = 0;
+                                //  mother.nMinus = 2;
+                                //  break;
+                                case "XOR":
+                                    mother.nPlus = mother.nOperands - 1;
+                                    mother.nMinus = mother.nOperands + 1;
+                                    break;
+                                case "AND":
+                                    mother.nPlus = mother.nOperands - 1;
+                                    mother.nMinus = mother.nOperands + 1;
+                                    break;
+                                case "LT":
+                                case "LE":
+                                case "GE":
+                                case "GT":
+                                case "NE":
+                                case "EQ":
+                                    mother.nPlus = mother.nOperands - 1;
+                                    mother.nMinus = mother.nOperands + 1;
+                                    mother.IsResultDependant = true;
+                                    break;
+                                case "TR10":
+                                case "TR20":
+                                case "TR30":
+                                case "TR40":
+                                case "TR50":
+                                case "TR60":
+                                case "TR70":
+                                case "TR80":
+                                case "TR90":
+                                    double factor = Int32.Parse(child.NodeName.Substring(2)) / 100.0;
+                                    // mother.nPlus = mother.nOperands - 1;
+                                    mother.nPlus = (int)(mother.nOperands * factor + 0.9999) - 1;
+                                    mother.nMinus = mother.nOperands + 1;
+                                    break;
+                                default:
+                                    break;
                             }
-                        }
-                        this.AddToNodesById(newChild.Id, (newChild));
-                        break;
-                    case SyntaxElement.OPERATOR:
-                        // True wird dann zurückgegeben, wenn die Anzahl der Kinder mit Logical=True
-                        // größer als die Schranke nPlus ist und kleiner als die Schranke n- ist und
-                        // auch durch die noch nicht fertigen Kinder nicht mehr >= n- werden kann.
-                        // False wird dann zurückgegeben, wenn entweder die Anzahl der Kinder mit
-                        // Logical=True größer als die Schranke nMinus ist oder
-                        // auch durch die noch nicht fertigen Kinder die Schranke nPlus nicht
-                        // mehr überschritten werden kann.
-                        mother.Name = child.NodeName;
-                        switch (child.NodeName)
-                        {
-                            case "NOT":
-                                mother.nPlus = -1;
-                                mother.nMinus = 1;
-                                break;
-                            case "IS":
-                                mother.nPlus = 0;
-                                mother.nMinus = mother.nOperands + 1;
-                                break;
-                            case "OR":
-                                mother.nPlus = 0;
-                                mother.nMinus = mother.nOperands + 1;
-                                break;
-                            //case "XOR": // nur für zweiwertige Logik ok.
-                            //  mother.nPlus = 0;
-                            //  mother.nMinus = 2;
-                            //  break;
-                            case "XOR":
-                                mother.nPlus = mother.nOperands - 1;
-                                mother.nMinus = mother.nOperands + 1;
-                                break;
-                            case "AND":
-                                mother.nPlus = mother.nOperands - 1;
-                                mother.nMinus = mother.nOperands + 1;
-                                break;
-                            case "LT":
-                            case "LE":
-                            case "GE":
-                            case "GT":
-                            case "NE":
-                            case "EQ":
-                                mother.nPlus = mother.nOperands - 1;
-                                mother.nMinus = mother.nOperands + 1;
-                                mother.IsResultDependant = true;
-                                break;
-                            case "TR10":
-                            case "TR20":
-                            case "TR30":
-                            case "TR40":
-                            case "TR50":
-                            case "TR60":
-                            case "TR70":
-                            case "TR80":
-                            case "TR90":
-                                double factor = Int32.Parse(child.NodeName.Substring(2)) / 100.0;                                
-                                // mother.nPlus = mother.nOperands - 1;
-                                mother.nPlus = (int)(mother.nOperands * factor + 0.9999) - 1;
-                                mother.nMinus = mother.nOperands + 1;
-                                break;
-                            default:
-                                break;
-                        }
-                        break;
-                    case SyntaxElement.STRUCT:
-                        NodeList newListChild = new NodeList(mother.GenerateNextChildId(), mother, this, this.TreeParams);
-                        newListChild.NodeType = NodeTypes.NodeList;
-                        this.AddToNodesById(newListChild.Id, (newListChild));
-                        newListChild.BreakWithResult = this.BreakWithResult;
-                        newListChild.IsVolatile = this.IsVolatile;
-                        mother.AddChild(newListChild);
-                        this.buildParallelTree(newListChild, child); // Rekursion
-                        break;
-                    default:
-                        break;
+                            break;
+                        case SyntaxElement.STRUCT:
+                            NodeList newListChild = new NodeList(mother.GenerateNextChildId(), mother, this, this.TreeParams);
+                            newListChild.NodeType = NodeTypes.NodeList;
+                            this.AddToNodesById(newListChild.Id, (newListChild));
+                            newListChild.BreakWithResult = this.BreakWithResult;
+                            newListChild.IsVolatile = this.IsVolatile;
+                            mother.AddChild(newListChild);
+                            this.buildParallelTree(newListChild, child); // Rekursion
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
             this.SetWorkersState(null);
@@ -1651,7 +1667,7 @@ namespace LogicalTaskTree
         /// <param name="nodeTypes">Zulässige Knotentypen für einen Treffer.</param>
         /// <param name="tryLastChance">Bei true wird auch in TreeRootJobList._treeRootLastChanceNodesByName gesucht.</param>
         /// <returns>Die gefundene LogicalNode oder null.</returns>
-        private LogicalNode FindNodeByName(string nodeName, NodeTypes nodeTypes, bool tryLastChance)
+        private LogicalNode? FindNodeByName(string nodeName, NodeTypes nodeTypes, bool tryLastChance)
         {
             if (this.NodesByName.ContainsKey(nodeName) && (nodeTypes & this.NodesByName[nodeName].NodeType) > 0 && !this.NodesByName[nodeName].IsSnapshotDummy)
             {
@@ -1699,7 +1715,7 @@ namespace LogicalTaskTree
         /// <param name="jobName">Name der gesuchten JobList.</param>
         /// <param name="recurse">Bei true wird bis zur Tree-Root gesucht.</param>
         /// <returns>Die gefundene JobList oder null.</returns>
-        private JobList FindJobByName(string jobName, bool recurse)
+        private JobList? FindJobByName(string jobName, bool recurse)
         {
             if (this.JobsByName.ContainsKey(jobName))
             {
@@ -1739,7 +1755,7 @@ namespace LogicalTaskTree
                     userControlPath = ((Snapshot)node).UserControlPath;
                 }
                 string refString = typedNode.ReferencedNodeName == null ? "" : ", Ref:" + typedNode.ReferencedNodeName;
-                string logicalString = typedNode.LastNotNullLogical == null ? "null" : typedNode.LastNotNullLogical.ToString();
+                string logicalString = typedNode.LastNotNullLogical == null ? "null" : typedNode.LastNotNullLogical.ToString() ?? "";
                 this._treeStringList.Add(String.Concat(depthIndent, node.NodeType.ToString() + ": ", typedNode.Id, " (", typedNode.Name,
                   refString,
                   ", n-: ", typedNode.nMinus, ", n+: ", typedNode.nPlus, "): ", userControlPath, " ", logicalString));
@@ -1748,7 +1764,7 @@ namespace LogicalTaskTree
             {
                 LogicalNode typedNode = (LogicalNode)node;
                 string userControlPath = typedNode.UserControlPath;
-                string logicalString = typedNode.LastNotNullLogical == null ? "null" : typedNode.LastNotNullLogical.ToString();
+                string logicalString = typedNode.LastNotNullLogical == null ? "null" : typedNode.LastNotNullLogical.ToString() ?? "";
                 string refString = typedNode.ReferencedNodeName == null ? "" : ", Ref:" + typedNode.ReferencedNodeName;
                 this._treeStringList.Add(String.Concat(depthIndent, node.NodeType.ToString() + ": ", typedNode.Id, " (", typedNode.Name,
                   refString,

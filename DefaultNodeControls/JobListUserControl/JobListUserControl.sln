@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33424.131
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobListUserControl", "JobListUserControl\JobListUserControl.csproj", "{C4541564-FF8D-438D-8BA2-C9B9F228F682}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobListUserControlDemo", "JobListUserControlDemo\JobListUserControlDemo.csproj", "{8D1AF3FA-D5A0-4DF6-B78D-558E7FF01EA0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C4541564-FF8D-438D-8BA2-C9B9F228F682}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4541564-FF8D-438D-8BA2-C9B9F228F682}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4541564-FF8D-438D-8BA2-C9B9F228F682}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4541564-FF8D-438D-8BA2-C9B9F228F682}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D1AF3FA-D5A0-4DF6-B78D-558E7FF01EA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D1AF3FA-D5A0-4DF6-B78D-558E7FF01EA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D1AF3FA-D5A0-4DF6-B78D-558E7FF01EA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D1AF3FA-D5A0-4DF6-B78D-558E7FF01EA0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {19884541-EC99-4C51-9F7A-26615951AF2D}
+	EndGlobalSection
+EndGlobal

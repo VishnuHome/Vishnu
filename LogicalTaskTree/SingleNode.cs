@@ -7,6 +7,7 @@ using Vishnu.Interchange;
 using System.Text;
 using System.Reflection;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace LogicalTaskTree
 {
@@ -117,7 +118,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this._userControlPath != null)
+                if (!String.IsNullOrEmpty(this._userControlPath))
                 {
                     return this._userControlPath;
                 }
@@ -143,7 +144,7 @@ namespace LogicalTaskTree
         /// Der Arbeitsprozess - hier wird mit der Welt kommuniziert,
         /// externe Prozesse gestartet oder beobachtet.
         /// </summary>
-        public virtual NodeCheckerBase Checker
+        public virtual NodeCheckerBase? Checker
         {
             get
             {
@@ -175,7 +176,7 @@ namespace LogicalTaskTree
         /// Liefert ein Result für diesen Knoten.
         /// </summary>
         /// <returns>Ein Result-Objekten für den Knoten.</returns>
-        public override Result LastResult
+        public override Result? LastResult
         {
             get
             {
@@ -190,7 +191,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Name eines ursprünglich referenzierten Knotens oder null.
         /// </summary>
-        public override string ReferencedNodeName
+        public override string? ReferencedNodeName
         {
             get
             {
@@ -219,7 +220,7 @@ namespace LogicalTaskTree
             this.IsSnapshotDummy = true;
             this._lastSucceeded = 0;
             this._environment = new ResultList();
-            this.UserControlPath = ""; // Wird nach Instanziierung über die Property gesetzt.
+            this._userControlPath = String.Empty; // Wird nach Instanziierung über die Property gesetzt.
         }
 
         /// <summary>
@@ -287,10 +288,11 @@ namespace LogicalTaskTree
                     this._constantValue = this.Id.Substring(1);
                 }
                 //this.Id = LogicalNode.GenerateInternalId();
-                this.Id = (this.Mother as NodeParent).GenerateNextChildId() + "_" + this.Id;
+                NodeParent parent = (NodeParent?)this.Mother ?? throw new ArgumentNullException("SingleNode: Mother muss vom Typ 'NodeParent' sein.");
+                this.Id = ((NodeParent)this.Mother).GenerateNextChildId() + "_" + this.Id;
             }
             this._lastSucceeded = 0;
-            this.UserControlPath = null; // Wird nach Instanziierung über die Property gesetzt.
+            this._userControlPath = String.Empty; // Wird nach Instanziierung über die Property gesetzt.
             this._parentViewLocker = new object();
         }
 
@@ -298,7 +300,7 @@ namespace LogicalTaskTree
         /// Setzt das ReturnObject auf ein Object (für Snapshots).
         /// </summary>
         /// <param name="returnObject">Ein beliebiges Object.</param>
-        public void SetReturnObject(object returnObject)
+        public void SetReturnObject(object? returnObject)
         {
             lock (this.ResultLocker)
             {
@@ -307,7 +309,7 @@ namespace LogicalTaskTree
                 {
                     try
                     {
-                        (this._returnObject as IDisposable).Dispose();
+                        ((IDisposable)this._returnObject).Dispose();
                     }
                     catch { }
                 }
@@ -326,19 +328,19 @@ namespace LogicalTaskTree
             StringBuilder stringBuilder = new StringBuilder(base.ToString());
             string slavePathName = "";
             string referencedNodeName = "";
-            string checkerParameters = "";
+            string? checkerParameters = "";
             if (this.Checker != null)
             {
                 if (this.Checker is CheckerShell)
                 {
-                    slavePathName = (this.Checker as CheckerShell).SlavePathName ?? "";
-                    checkerParameters = ((this.Checker as CheckerShell).OriginalCheckerParameters ?? "").ToString();
-                    referencedNodeName = (this.Checker as CheckerShell).ReferencedNodeName ?? "";
+                    slavePathName = ((CheckerShell)this.Checker).SlavePathName ?? "";
+                    checkerParameters = (((CheckerShell)this.Checker).OriginalCheckerParameters ?? "").ToString();
+                    referencedNodeName = ((CheckerShell)this.Checker).ReferencedNodeName ?? "";
                 }
                 else
                 {
-                    slavePathName = (this.Checker as ValueModifier<object>).SlavePathName ?? "";
-                    referencedNodeName = (this.Checker as ValueModifier<object>).ReferencedNodeName ?? "";
+                    slavePathName = ((ValueModifier<object>)this.Checker).SlavePathName ?? "";
+                    referencedNodeName = ((ValueModifier<object>)this.Checker).ReferencedNodeName ?? "";
                 }
             }
             if (!String.IsNullOrEmpty(slavePathName))
@@ -363,7 +365,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="obj">Die SingleNode zum Vergleich.</param>
         /// <returns>True, wenn die übergebene SingleNode inhaltlich gleich dieser ist.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (!base.Equals(obj))
             {
@@ -373,7 +375,7 @@ namespace LogicalTaskTree
             {
                 return true;
             }
-            return this.ToString() == (obj as SingleNode).ToString();
+            return this.ToString() == (obj as SingleNode)?.ToString();
         }
 
         /// <summary>
@@ -487,7 +489,7 @@ namespace LogicalTaskTree
         /// Diese Routine läuft asynchron.
         /// </summary>
         /// <param name="source">Auslösendes TreeEvent oder null.</param>
-        protected override void DoRun(TreeEvent source)
+        protected override void DoRun(TreeEvent? source)
         {
             if (source != null && source.Name != "UserRun" && this.TriggeredRunDelay > 0)
             {
@@ -500,18 +502,18 @@ namespace LogicalTaskTree
             this.State = NodeState.Working;
             this.LogicalState = NodeLogicalState.None;
             this.Logical = null;
-            if ((this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
+            if ((this.CancellationToken.IsCancellationRequested)
               || (this.LastLogicalState == NodeLogicalState.UserAbort))
             {
                 return;
             }
             bool? logical = null;
-            Exception runException = null;
+            Exception? runException = null;
             try
             {
                 this.TreeParams.ParentView = this.ParentView;
                 this._lastSucceeded = 0;
-                this.OnNodeProgressStarted(this, new CommonProgressChangedEventArgs(this.Id, 100, 0, ItemsTypes.itemParts, null));
+                this.OnNodeProgressStarted(this, new ProgressChangedEventArgs(0, null));
                 if (this.Checker != null)
                 {
                     // 14.07.2022 Nagel+ Wenn die Results oder das Environment des TreeEvents(source) nicht
@@ -551,7 +553,7 @@ namespace LogicalTaskTree
                     // 14.07.2022 Nagel-
 
                     logical = this.Checker.Run(null, this.TreeParams, source);
-                    if (!this.IsThreadValid(Thread.CurrentThread) || (this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
+                    if (!this.IsThreadValid(Thread.CurrentThread) || (this.CancellationToken.IsCancellationRequested)
                       || (this.LastLogicalState == NodeLogicalState.UserAbort))
                     {
                         if (this.Trigger != null)
@@ -582,7 +584,7 @@ namespace LogicalTaskTree
                 else
                 {
                     // Konstante
-                    this.checkerProgressChanged(this, new CommonProgressChangedEventArgs(this.Id + "." + this.Name, 100, 0, ItemsTypes.items, 0));
+                    this.checkerProgressChanged(this, new ProgressChangedEventArgs(0, 0));
                     this._returnObject = this._constantValue;
                     this._lastSucceeded = 100;
                     if (this._returnConstantValue)
@@ -593,15 +595,15 @@ namespace LogicalTaskTree
                     {
                         logical = true; // immer true, wenn der Wert selbst kein BOOLEAN ist.
                     }
-                    this.checkerProgressChanged(this, new CommonProgressChangedEventArgs(this.Id + "." + this.Name, 100, this._lastSucceeded, ItemsTypes.items, 0));
-                    if ((this.CancellationToken == null || !this.CancellationToken.IsCancellationRequested)
+                    this.checkerProgressChanged(this, new ProgressChangedEventArgs((int)this._lastSucceeded, 0));
+                    if ((!this.CancellationToken.IsCancellationRequested)
                       && (this.LastLogicalState != NodeLogicalState.UserAbort))
                     {
                         this.State = NodeState.None; // 03.06.2018 Nagel
                         this.LogicalState = NodeLogicalState.Done;
                     }
                 }
-                if ((this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
+                if ((this.CancellationToken.IsCancellationRequested)
                   || (this.LastLogicalState == NodeLogicalState.UserAbort))
                 {
                     return;
@@ -622,7 +624,7 @@ namespace LogicalTaskTree
             catch (OperationCanceledException ex)
             {
                 runException = ex;
-                if ((this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
+                if ((this.CancellationToken.IsCancellationRequested)
                   || (this.LastLogicalState == NodeLogicalState.UserAbort))
                 {
                     return;
@@ -632,7 +634,7 @@ namespace LogicalTaskTree
             catch (ApplicationException ex)
             {
                 runException = ex;
-                if ((this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
+                if ((this.CancellationToken.IsCancellationRequested)
                   || (this.LastLogicalState == NodeLogicalState.UserAbort))
                 {
                     return;
@@ -644,7 +646,7 @@ namespace LogicalTaskTree
             catch (Exception ex)
             {
                 runException = ex; // Achtung, keine direkte Referenz, sondern über new Exception entkoppeln.
-                if ((this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
+                if ((this.CancellationToken.IsCancellationRequested)
                   || (this.LastLogicalState == NodeLogicalState.UserAbort))
                 {
                     return;
@@ -699,8 +701,8 @@ namespace LogicalTaskTree
             {
                 this.SetLastResult();
             } // 17.02.2023 Nagel-
-            this.OnNodeProgressChanged(this.Id + "." + this.Name, 100, this._lastSucceeded, ItemsTypes.items);
-            this.OnNodeProgressFinished(this.Id + "." + this.Name, 100, this._lastSucceeded, ItemsTypes.items);
+            this.OnNodeProgressChanged(this.Id + "." + this.Name, 100, this._lastSucceeded);
+            this.OnNodeProgressFinished(this.Id + "." + this.Name, 100, this._lastSucceeded);
         }
 
         /// <summary>
@@ -709,11 +711,10 @@ namespace LogicalTaskTree
         /// <param name="itemsName">Name für die Elemente, die für den Verarbeitungsfortschritt gezählt werden.</param>
         /// <param name="countAll">Gesamtanzahl - entspricht 100%.</param>
         /// <param name="countSucceeded">Erreichte Anzahl - kleiner-gleich 100%.</param>
-        /// <param name="itemsType">Art der zu zählenden Elemente - Teile eines Ganzen, Ganze Elemente oder Element-Gruppen.</param>
-        public override void OnNodeProgressFinished(string itemsName, long countAll, long countSucceeded, ItemsTypes itemsType)
+        public override void OnNodeProgressFinished(string itemsName, long countAll, long countSucceeded)
         {
             this._lastSucceeded = countSucceeded;
-            base.OnNodeProgressFinished(itemsName, countAll, countSucceeded, itemsType);
+            base.OnNodeProgressFinished(itemsName, countAll, countSucceeded);
         }
 
         #endregion protected members
@@ -723,15 +724,15 @@ namespace LogicalTaskTree
         /// <summary>
         /// Rückgabe-Objekt des letzten Checker-Durchlaufs, nicht öffentliche, interne Representation.
         /// </summary>
-        protected object _returnObject;
+        protected object? _returnObject;
 
         private long _lastSucceeded;
-        private object _constantValue;
+        private object? _constantValue;
         private bool _returnConstantValue;
-        private NodeCheckerBase _checker;
+        private NodeCheckerBase? _checker;
         private ResultList _environment;
         private string _userControlPath;
-        private Result _lastResult;
+        private Result? _lastResult;
         /// <summary>
         /// Der Verarbeitungszustand des Knotens:
         /// Null, None, Waiting, Working, Finished, Triggered, Ready (= Finished | Triggered), Busy (= Waiting | Working) oder CanStart (= None | Ready)
@@ -745,10 +746,10 @@ namespace LogicalTaskTree
         private bool? _logical;
 
         // Wird ausgelöst, wenn sich der Verarbeitungsfortschritt des Checkers geändert hat.
-        private void checkerProgressChanged(object sender, CommonProgressChangedEventArgs args)
+        private void checkerProgressChanged(object? sender, ProgressChangedEventArgs args)
         {
-            this._lastSucceeded = args.CountSucceeded;
-            this.OnNodeProgressChanged(this.Id + "." + this.Name + args.ItemName, args.CountAll, args.CountSucceeded, ItemsTypes.items);
+            this._lastSucceeded = args.ProgressPercentage;
+            this.OnNodeProgressChanged(this.Id + "." + this.Name, 100, args.ProgressPercentage);
             //if (this.CancellationToken.IsCancellationRequested)
             //{
             //  this.CancellationToken.ThrowIfCancellationRequested();

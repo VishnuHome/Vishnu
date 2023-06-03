@@ -11,22 +11,22 @@ namespace Vishnu.Interchange
         /// <summary>
         /// Wird ausgelöst, wenn sich eine Property ändert.
         /// </summary>
-        event PropertyChangedEventHandler PropertyChanged;
+        event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
         /// Das ReturnObject der zugeordneten LogicalNode.
         /// </summary>
-        Result Result { get; }
+        Result? Result { get; }
 
         /// <summary>
         /// Das Parent-Control.
         /// </summary>
-        FrameworkElement ParentView { get; set; }
+        FrameworkElement? ParentView { get; set; }
 
         /// <summary>
         /// Bindung an ein optionales, spezifisches User-ViewModel.
         /// </summary>
-        object UserDataContext { get; set; }
+        object? UserDataContext { get; set; }
 
     }
 }

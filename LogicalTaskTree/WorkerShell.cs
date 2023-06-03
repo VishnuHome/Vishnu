@@ -52,10 +52,7 @@ namespace LogicalTaskTree
             }
             if (isResetting)
             {
-                if (this.Trigger != null)
-                {
-                    this.Trigger.Stop(this, this.Trigger_TriggerIt);
-                }
+                this.Trigger?.Stop(this, this.Trigger_TriggerIt);
                 args.Predecessor = this._lastWorkerArguments;
                 this._lastWorkerArguments = null;
                 this._workerArgumentsEventQueue = new ConcurrentQueue<WorkerArguments>(); // leeren
@@ -64,13 +61,16 @@ namespace LogicalTaskTree
             {
                 this._lastWorkerArguments = args;
                 ResultDictionary copiedResults = new ResultDictionary();
-                foreach (string id in this._lastWorkerArguments.TreeEventInfo.Results.Keys)
+                if (this._lastWorkerArguments.TreeEventInfo.Results != null)
                 {
-                    Result res = this._lastWorkerArguments.TreeEventInfo.Results[id];
-                    if (res != null)
+                    foreach (string id in this._lastWorkerArguments.TreeEventInfo.Results.Keys)
                     {
-                        Result newRes = new Result(id, res.Logical, res.State, res.LogicalState, res.ReturnObject);
-                        copiedResults.Add(id, newRes);
+                        Result? res = this._lastWorkerArguments.TreeEventInfo.Results[id];
+                        if (res != null)
+                        {
+                            Result newRes = new Result(id, res.Logical, res.State, res.LogicalState, res.ReturnObject);
+                            copiedResults.Add(id, newRes);
+                        }
                     }
                 }
                 this._lastWorkerArguments.TreeEventInfo.Results = copiedResults;
@@ -95,7 +95,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Die bei Änderung des Zustands von Logical aufzurufende Exe.
         /// </summary>
-        public string SlavePathName
+        public string? SlavePathName
         {
             get
             {
@@ -131,10 +131,7 @@ namespace LogicalTaskTree
                 string slave = Path.GetFileName(this.SlavePathName ?? "");
                 this.Trigger.Stop(this, this.Trigger_TriggerIt);
             }
-            if (this._nodeCancellationTokenSource != null)
-            {
-                this._nodeCancellationTokenSource.Cancel();
-            }
+            this._nodeCancellationTokenSource?.Cancel();
         }
 
         /// <summary>
@@ -145,7 +142,7 @@ namespace LogicalTaskTree
         {
             if (File.Exists(this.SlavePathName))
             {
-                Stream s = null;
+                Stream? s = null;
                 try
                 {
                     s = File.Open(this.SlavePathName, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -194,7 +191,7 @@ namespace LogicalTaskTree
         /// <param name="slaveParameters">Aufrufparameter der Exe als XML.</param>
         /// <param name="transportByFile">Bei True werden die Parameter über eine XML-Datei übergeben, ansonsten über die Kommandozeile.</param>
         /// <param name="workerTrigger">Ein Trigger, der den Job wiederholt aufruft oder null.</param>
-        public WorkerShell(string slavePathName, XElement slaveParameters, bool transportByFile, INodeTrigger workerTrigger)
+        public WorkerShell(string slavePathName, XElement slaveParameters, bool transportByFile, INodeTrigger? workerTrigger)
         {
             this.Trigger = workerTrigger;
             this._dontExecute = GenericSingletonProvider.GetInstance<AppSettings>().GetValue<bool>("NoWorkers", false);
@@ -223,7 +220,7 @@ namespace LogicalTaskTree
         /// Ein optionaler Trigger, der den Job wiederholt aufruft oder null.
         /// Wird vom IJobProvider bei der Instanziierung mitgegeben.
         /// </summary>
-        public INodeTrigger Trigger { get; set; }
+        public INodeTrigger? Trigger { get; set; }
 
         #endregion public members
 
@@ -233,7 +230,7 @@ namespace LogicalTaskTree
         /// Hierüber kann eine Task für einen Loop zum Mehrfach-Start des Workers
         /// von außen abgebrochen werden.
         /// </summary>
-        private CancellationTokenSource _nodeCancellationTokenSource { get; set; }
+        private CancellationTokenSource? _nodeCancellationTokenSource { get; set; }
 
         /// <summary>
         /// Über die CancellationTokenSource kann dieses Token auf
@@ -242,10 +239,10 @@ namespace LogicalTaskTree
         private CancellationToken _cancellationToken;
 
         // Der Start eines Workers läuft immer asynchron.
-        private Task _asyncWorkerTask;
+        private Task? _asyncWorkerTask;
         private object _workerLocker;
         private ConcurrentQueue<WorkerArguments> _workerArgumentsEventQueue;
-        private Process _externalProcess;
+        private Process? _externalProcess;
 
         /// <summary>
         /// Eigene (Timer-)Task Action für den Exec eines Workers.
@@ -259,7 +256,7 @@ namespace LogicalTaskTree
                 Thread.CurrentThread.Name = "execAsync";
                 if (!this._cancellationToken.IsCancellationRequested)
                 {
-                    WorkerArguments workerArguments;
+                    WorkerArguments? workerArguments;
                     while (!this._workerArgumentsEventQueue.TryDequeue(out workerArguments))
                     {
                         Thread.Sleep(1);
@@ -293,7 +290,7 @@ namespace LogicalTaskTree
             {
                 this._externalProcess = new Process();
                 string countString = callCounter.ToString();
-                string logicalString = eventParameters.Logical == null ? "null" : eventParameters.Logical.ToString();
+                string logicalString = eventParameters.Logical == null ? "null" : eventParameters.Logical.ToString() ?? "";
                 string konvertedSlaveParameters;
                 if (!this.TransportByFile)
                 {
@@ -305,23 +302,23 @@ namespace LogicalTaskTree
                 }
                 string delimiter = "";
                 string resultsString = "";
-                foreach (string id in eventParameters.Results.Keys)
-                {
-                    Result res = eventParameters.Results[id];
-                    resultsString += delimiter + res.ToString();
-                    delimiter = ", ";
-                }
                 string msg = "";
                 if (eventParameters.Results != null && eventParameters.Results.Count > 0)
                 {
+                    foreach (string id in eventParameters.Results.Keys)
+                    {
+                        Result? res = eventParameters.Results[id];
+                        resultsString += delimiter + res?.ToString() ?? "null";
+                        delimiter = ", ";
+                    }
                     foreach (string key in eventParameters.Results.Keys)
                     {
                         if (key.EndsWith(eventParameters.SourceId))
                         {
-                            Result res = eventParameters.Results[key];
-                            if (res.ReturnObject != null && (res.ReturnObject is Exception))
+                            Result? res = eventParameters.Results[key];
+                            if (res?.ReturnObject != null && (res.ReturnObject is Exception))
                             {
-                                msg = (res.ReturnObject as Exception).Message;
+                                msg = ((Exception)res.ReturnObject).Message;
                             }
                         }
                     }
@@ -334,7 +331,11 @@ namespace LogicalTaskTree
                   .Replace("%Logical%", logicalString).Replace("%Counter%", countString)
                   .Replace("%Result%", resultsString)
                   .Replace("%Exception%", msg);
-                konvertedSlaveParameters = GenericSingletonProvider.GetInstance<AppSettings>().GetStringValue("__NOPPES__", konvertedSlaveParameters);
+                string? strVal = GenericSingletonProvider.GetInstance<AppSettings>().GetStringValue("__NOPPES__", konvertedSlaveParameters);
+                if (strVal != null)
+                {
+                    konvertedSlaveParameters = strVal;
+                }
                 this._externalProcess.StartInfo.FileName = this._slavePathName;
                 this._externalProcess.StartInfo.Arguments = countString
                                          + " \"" + treeParameters.Name.Replace("|", "\" \"")
@@ -369,7 +370,7 @@ namespace LogicalTaskTree
         }
 
         // Instanz vom INodeWorker. Macht die Arbeit.
-        private INodeWorker Slave
+        private INodeWorker? Slave
         {
             get
             {
@@ -381,10 +382,10 @@ namespace LogicalTaskTree
             }
         }
 
-        private string _slavePathName;
-        private INodeWorker _slave;
+        private string? _slavePathName;
+        private INodeWorker? _slave;
         private XElement _slaveParameters;
-        private WorkerArguments _lastWorkerArguments;
+        private WorkerArguments? _lastWorkerArguments;
         private bool _dontExecute;
 
         #endregion private members
@@ -396,9 +397,9 @@ namespace LogicalTaskTree
         public string TreeInfo { get; set; }
         public string NodeInfo { get; set; }
         public TreeEvent TreeEventInfo { get; set; }
-        public WorkerArguments Predecessor { get; set; }
+        public WorkerArguments? Predecessor { get; set; }
 
-        public WorkerArguments(int callCounter, string treeInfo, string nodeInfo, TreeEvent treeEventInfo, WorkerArguments predecessor)
+        public WorkerArguments(int callCounter, string treeInfo, string nodeInfo, TreeEvent treeEventInfo, WorkerArguments? predecessor)
         {
             this.CallCounter = callCounter;
             this.TreeInfo = treeInfo;

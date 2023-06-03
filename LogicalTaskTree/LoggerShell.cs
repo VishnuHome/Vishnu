@@ -27,7 +27,7 @@ namespace LogicalTaskTree
         /// <param name="treeParameters">Für den gesamten Tree gültige Parameter oder null.</param>
         /// <param name="treeEvent">Informationen über den Knoten, in dem das Ereignis auftritt.</param>
         /// <param name="additionalEventArgs">Enthält z.B. beim Event 'Exception' die zugehörige Exception.</param>
-        public void Log(object loggerParameters, TreeParameters treeParameters, TreeEvent treeEvent, object additionalEventArgs)
+        public void Log(object? loggerParameters, TreeParameters? treeParameters, TreeEvent treeEvent, object? additionalEventArgs)
         {
             if (this.LoggerParameters != null)
             {
@@ -42,28 +42,31 @@ namespace LogicalTaskTree
                 lock (this._loggerLocker)
                 {
                     // hot plug
-                    if (!File.Exists(this._slavePathName) || (File.GetLastWriteTime(this._slavePathName) != this._lastDllWriteTime))
+                    if (!String.IsNullOrEmpty(this._slavePathName))
                     {
-                        this._slave = null;
-                    }
-                    if (this._slave == null)
-                    {
-                        this.Slave = this.dynamicLoadSlaveDll(this._slavePathName);
-                    }
-                    if (this._slave != null)
-                    {
-                        this._lastDllWriteTime = File.GetLastWriteTime(this._slavePathName);
-                        try
+                        if (!File.Exists(this._slavePathName) || (File.GetLastWriteTime(this._slavePathName) != this._lastDllWriteTime))
                         {
-                            this.Slave.Log(loggerParameters, treeParameters, treeEvent, additionalEventArgs);
+                            this._slave = null;
                         }
-                        finally
+                        if (this._slave == null)
                         {
+                            this.Slave = this.dynamicLoadSlaveDll(this._slavePathName);
                         }
-                    }
-                    else
-                    {
-                        throw new ApplicationException(String.Format("Load failure on assembly '{0}'", this._slavePathName));
+                        if (this._slave != null)
+                        {
+                            this._lastDllWriteTime = File.GetLastWriteTime(this._slavePathName);
+                            try
+                            {
+                                this._slave.Log(loggerParameters, treeParameters, treeEvent, additionalEventArgs);
+                            }
+                            finally
+                            {
+                            }
+                        }
+                        else
+                        {
+                            throw new ApplicationException(String.Format("Load failure on assembly '{0}'", this._slavePathName));
+                        }
                     }
                 }
             }
@@ -99,7 +102,7 @@ namespace LogicalTaskTree
                     {
                         try
                         {
-                            (this._slave as IDisposable).Dispose();
+                            ((IDisposable)this._slave).Dispose();
                         }
                         catch { };
                     }
@@ -143,7 +146,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// String mit zusätzlichen Logger-Parametern.
         /// </summary>
-        public string LoggerParameters { get; set; }
+        public string? LoggerParameters { get; set; }
 
         /// <summary>
         /// Konstruktor
@@ -171,16 +174,18 @@ namespace LogicalTaskTree
         /// <param name="loggerShellReference">Name eines benannten Loggers.</param>
         public LoggerShell(string loggerShellReference)
         {
+            this._assemblyLoader = VishnuAssemblyLoader.GetAssemblyLoader();
+            this._loggerLocker = new object();
             this.LoggerShellReference = loggerShellReference;
             this._slaveLoggerShell = null;
-            this.LogEvents = null;
+            this.LogEvents = String.Empty;
         }
 
         /// <summary>
         /// Liefert den Namen des Loggers, der einem Knoten zugeordnet werden soll.
         /// </summary>
         /// <returns>Namen des Loggers, der dem Knoten zugeordnet werden soll oder null.</returns>
-        public string GetLoggerReference()
+        public string? GetLoggerReference()
         {
             return this.LoggerShellReference;
         }
@@ -200,14 +205,14 @@ namespace LogicalTaskTree
 
         #region internal members
         
-        internal string LoggerShellReference { get; set; }
+        internal string? LoggerShellReference { get; set; }
         
         #endregion internal members
 
         #region private members
 
         // Instanz vom INodeLogger. Macht die Prüf-Arbeit.
-        private INodeLogger Slave
+        private INodeLogger? Slave
         {
             get
             {
@@ -219,20 +224,20 @@ namespace LogicalTaskTree
             }
         }
 
-        private string _slavePathName;
-        private INodeLogger _slave;
+        private string? _slavePathName;
+        private INodeLogger? _slave;
         private DateTime _lastDllWriteTime;
         private VishnuAssemblyLoader _assemblyLoader;
         private object _loggerLocker;
-        private LoggerShell _slaveLoggerShell;
+        private LoggerShell? _slaveLoggerShell;
 
         // Lädt eine Plugin-Dll dynamisch. Muss keine Namespaces oder Klassennamen
         // aus der Dll kennen, Bedingung ist nur, dass eine Klasse in der Dll das
         // Interface INodeLogger implementiert. Die erste gefundene Klasse wird
         // als Instanz von INodeLogger zurückgegeben.
-        private INodeLogger dynamicLoadSlaveDll(string slavePathName)
+        private INodeLogger? dynamicLoadSlaveDll(string slavePathName)
         {
-            return (INodeLogger)this._assemblyLoader.DynamicLoadObjectOfTypeFromAssembly(slavePathName, typeof(INodeLogger));
+            return (INodeLogger?)this._assemblyLoader.DynamicLoadObjectOfTypeFromAssembly(slavePathName, typeof(INodeLogger));
         }
 
         #endregion private members

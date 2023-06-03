@@ -1,4 +1,5 @@
 ﻿using NetEti.Globals;
+using System.ComponentModel;
 using Vishnu.Interchange;
 
 namespace LogicalTaskTree
@@ -22,12 +23,12 @@ namespace LogicalTaskTree
         /// <summary>
         /// Wird aufgerufen, wenn sich der Verarbeitungs-Fortschritt des Checkers geändert hat.
         /// </summary>
-        public event CommonProgressChangedEventHandler NodeProgressChanged;
+        public event ProgressChangedEventHandler? NodeProgressChanged;
 
         /// <summary>
         /// Rückgabe-Objekt des Checkers, kann null sein.
         /// </summary>
-        public virtual object ReturnObject { get; set; }
+        public virtual object? ReturnObject { get; set; }
 
         /// <summary>
         /// Der Pfad zum aktuell dynamisch zu ladenden UserControl.
@@ -67,7 +68,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Name eines ursprünglich referenzierten Knotens oder null.
         /// </summary>
-        public string ReferencedNodeName { get; internal set; }
+        public string? ReferencedNodeName { get; internal set; }
 
         /// <summary>
         /// Bei True wird nach erfolgreichem globalen Locking
@@ -95,7 +96,7 @@ namespace LogicalTaskTree
         /// <param name="treeParameters">Für den gesamten Tree gültige Parameter oder null.</param>
         /// <param name="source">Auslösendes TreeEvent oder null.</param>
         /// <returns>True, False oder null</returns>
-        public abstract bool? Run(object checkerParameters, TreeParameters treeParameters, TreeEvent source);
+        public abstract bool? Run(object? checkerParameters, TreeParameters treeParameters, TreeEvent source);
 
         /// <summary>
         /// Konvertiert einen Wert in ein gegebenes Format.
@@ -103,7 +104,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="toConvert">Zu konvertierender Wert</param>
         /// <returns>Konvertierter Wert.</returns>
-        public abstract object ModifyValue(object toConvert);
+        public abstract object? ModifyValue(object? toConvert);
 
         #endregion INodeChecker members
 
@@ -112,14 +113,14 @@ namespace LogicalTaskTree
         /// oder null (setzt intern BreakWithResult auf false).
         /// Wird vom IJobProvider bei der Instanziierung mitgegeben.
         /// </summary>
-        public virtual TriggerShell CheckerTrigger { get; set; }
+        public virtual TriggerShell? CheckerTrigger { get; set; }
 
         /// <summary>
         /// Ein optionaler Logger, der vom Knoten aufgerufen wird
         /// oder null.
         /// Wird vom IJobProvider bei der Instanziierung mitgegeben.
         /// </summary>
-        public virtual LoggerShell CheckerLogger { get; set; }
+        public virtual LoggerShell? CheckerLogger { get; set; }
 
         /// <summary>
         /// Das zuletzt zurückgegebene Ergebnis.
@@ -138,7 +139,7 @@ namespace LogicalTaskTree
         /// Liefert den Namen des Checkers, der einem ValueConverter zugeordnet werden soll.
         /// </summary>
         /// <returns>Namen des Checkers, der dem ValueConverter zugeordnet werden soll oder null.</returns>
-        public virtual string GetCheckerReference()
+        public virtual string? GetCheckerReference()
         {
             return null;
         }
@@ -164,7 +165,7 @@ namespace LogicalTaskTree
         /// Optionaler zum globalen Sperren verwendeter Name.
         /// Wird verwendet, wenn ThreadLocked gesetzt ist.
         /// </summary>
-        internal string LockName { get; set; }
+        internal string? LockName { get; set; }
 
         #endregion internal members
 
@@ -181,12 +182,9 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="sender">Der Checker-Prozess des Anwenders.</param>
         /// <param name="args">CommonProgressChangedEventArgs.</param>
-        protected void SubNodeProgressChanged(object sender, CommonProgressChangedEventArgs args)
+        protected void SubNodeProgressChanged(object? sender, ProgressChangedEventArgs args)
         {
-            if (NodeProgressChanged != null)
-            {
-                NodeProgressChanged(sender, args);
-            }
+            NodeProgressChanged?.Invoke(sender, args);
         }
 
         #endregion protected members

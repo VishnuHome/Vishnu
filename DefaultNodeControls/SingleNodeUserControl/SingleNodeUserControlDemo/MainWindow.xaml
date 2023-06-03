@@ -1,0 +1,21 @@
+﻿<Window x:Class="Vishnu.DemoApplications.SingleNodeUserControlDemo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Vishnu.DemoApplications.SingleNodeUserControlDemo"
+        xmlns:ctrl="clr-namespace:Vishnu.UserControls;assembly=SingleNodeUserControl"
+        xmlns:ctrl2="clr-namespace:Vishnu.UserControls"
+        mc:Ignorable="d"
+        Title="MainWindow" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ctrl:SingleNodeUserControl Grid.Row="0"/>
+        <ctrl2:SingleNodeUserControlDerived Grid.Row="1"/>
+        <Button Grid.Row="2" Click="Button_Click">Refresh</Button>
+    </Grid>
+</Window>

@@ -41,7 +41,7 @@ namespace LogicalTaskTree
         {
             if (!ThreadLocker._lockers.ContainsKey(name))
             {
-                throw new ArgumentNullException(String.Format("ThreadLocker.UnlockNameGlobal: Der Name {0} existiert nicht!", name));
+                throw new ArgumentNullException(String.Format("ThreadLocker.UnlockNameGlobal: Der Name {0} existiert nicht.", name));
             }
             Monitor.Exit(ThreadLocker._lockers[name]);
         }

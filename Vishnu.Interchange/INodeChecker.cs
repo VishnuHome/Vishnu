@@ -1,4 +1,6 @@
 ﻿using NetEti.Globals;
+using System.ComponentModel;
+
 namespace Vishnu.Interchange
 {
     /// <summary>
@@ -12,12 +14,12 @@ namespace Vishnu.Interchange
         /// des Checkers geändert hat, muss aber zumindest aber einmal zum
         /// Schluss der Verarbeitung aufgerufen werden.
         /// </summary>
-        event CommonProgressChangedEventHandler NodeProgressChanged;
+        event ProgressChangedEventHandler NodeProgressChanged;
 
         /// <summary>
         /// Rückgabe-Objekt des Checkers.
         /// </summary>
-        object ReturnObject { get; set; }
+        object? ReturnObject { get; set; }
 
         /// <summary>
         /// Hier wird der (normalerweise externe) Arbeitsprozess ausgeführt (oder beobachtet).
@@ -26,7 +28,7 @@ namespace Vishnu.Interchange
         /// <param name="treeParameters">Für den gesamten Tree gültige Parameter oder null.</param>
         /// <param name="source">Auslösendes TreeEvent oder null.</param>
         /// <returns>True, False oder null</returns>
-        bool? Run(object checkerParameters, TreeParameters treeParameters, TreeEvent source);
+        bool? Run(object? checkerParameters, TreeParameters treeParameters, TreeEvent source);
 
     }
 }

@@ -47,14 +47,14 @@ namespace Vishnu.Interchange
         /// <summary>
         /// Ein eventuelles Rückgabeobjekt des Knoten (Checker).
         /// </summary>
-        public object ReturnObject { get; set; }
+        public object? ReturnObject { get; set; }
 
         /// <summary>
         /// Standard Konstruktor.
         /// </summary>
         public Result()
         {
-            // nix
+            this.Id = "anonymus";
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Vishnu.Interchange
         /// Busy (= Waiting | Working) oder CanStart (= None|Finished).</param>
         /// <param name="logicalState">Logischer Zustand des besitzenden Knoten: None, Done, Fault, Timeout, UserAbort</param>
         /// <param name="returnObject">Ein beliebiges Object.</param>
-        public Result(string id, bool? logical, NodeState? state, NodeLogicalState? logicalState, object returnObject)
+        public Result(string id, bool? logical, NodeState? state, NodeLogicalState? logicalState, object? returnObject)
         {
             this.Id = id;
             this.Timestamp = DateTime.Now;
@@ -83,10 +83,10 @@ namespace Vishnu.Interchange
         /// <param name="context">Übertragungs-Kontext.</param>
         protected Result(SerializationInfo info, StreamingContext context)
         {
-            Id = info.GetString("Id");
+            Id = info.GetString("Id") ?? "anonymus";
             Timestamp = info.GetDateTime("Timestamp");
             Logical = (bool?)info.GetValue("Logical", typeof(bool?));
-            State = (NodeState)info.GetValue("State", typeof(NodeState));
+            State = (NodeState?)info.GetValue("State", typeof(NodeState));
             LogicalState = (NodeLogicalState?)info.GetValue("LogicalState", typeof(NodeLogicalState));
             ReturnObject = info.GetValue("ReturnObject", typeof(object));
         }
@@ -114,7 +114,7 @@ namespace Vishnu.Interchange
         {
             if (!String.IsNullOrEmpty(this.Id))
             {
-                string rtn = (this.ReturnObject ?? "null").ToString();
+                string rtn = (this.ReturnObject ?? "null").ToString() ?? "null";
                 return this.Id + ": " + rtn;
             }
             else
@@ -129,7 +129,7 @@ namespace Vishnu.Interchange
         /// </summary>
         /// <param name="obj">Vergleichs-Result.</param>
         /// <returns>True, wenn das übergebene Result inhaltlich (ohne Timestamp) gleich diesem Result ist.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null || GetType() != obj.GetType())
             {
@@ -139,9 +139,9 @@ namespace Vishnu.Interchange
             {
                 return true;
             }
-            Result res = obj as Result;
-            if (res.Id == this.Id && res.Logical == this.Logical && res.LogicalState == this.LogicalState
-              && (res.ReturnObject == null && this.ReturnObject == null || res.ReturnObject.Equals(this.ReturnObject)))
+            Result? res = obj as Result;
+            if (res?.Id == this.Id && res.Logical == this.Logical && res.LogicalState == this.LogicalState
+              && (res.ReturnObject == null && this.ReturnObject == null || (res?.ReturnObject?.Equals(this.ReturnObject) == true)))
             {
                 return true;
             }
@@ -166,7 +166,7 @@ namespace Vishnu.Interchange
     /// Typisierte Liste von Results.
     /// </summary>
     [Serializable]
-    public class ResultDictionary : Dictionary<string, Result>
+    public class ResultDictionary : Dictionary<string, Result?>
     {
         /// <summary>
         /// Standard Konstruktor.

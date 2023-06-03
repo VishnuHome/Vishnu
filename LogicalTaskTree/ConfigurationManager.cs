@@ -38,12 +38,12 @@ namespace LogicalTaskTree
         /// <param name="windowAspects">Aktuelle UI-Eigenschaften (z.B. WindowTop, WindowWidth, ...).</param>
         public static void SaveLocalConfiguration(IExpandableNode tree, TreeOrientation treeOrientationState, WindowAspects windowAspects)
         {
-            string localConfigurationDirectory = GenericSingletonProvider.GetInstance<AppSettings>().LocalConfigurationDirectory;
-            if (!Directory.Exists(Path.GetDirectoryName(localConfigurationDirectory)))
+            string? localConfigurationDirectory = GenericSingletonProvider.GetInstance<AppSettings>().LocalConfigurationDirectory;
+            if (!String.IsNullOrEmpty(localConfigurationDirectory) && !Directory.Exists(Path.GetDirectoryName(localConfigurationDirectory)))
             {
                 Directory.CreateDirectory(localConfigurationDirectory);
             }
-            string localConfigurationPath = Path.Combine(localConfigurationDirectory, tree.Id + "_Configuration.xml");
+            string localConfigurationPath = Path.Combine(localConfigurationDirectory ?? "", tree.Id + "_Configuration.xml");
             //foreach (System.Windows.Window win in System.Windows.Application.Current.Windows)
             //{
             //    string name = win.Name;
@@ -63,9 +63,9 @@ namespace LogicalTaskTree
                           new XElement("IsScrollbarVisible", windowAspects.IsScrollbarVisible.ToString()),
                           new XElement("ActTabControlTab", windowAspects.ActTabControlTab.ToString()),
                           xmlTree);
-            XDocument xmlDoc = new XDocument();
+            XDocument? xmlDoc = new XDocument();
             xmlDoc.Add(configXml);
-            FileStream xmlStream = null;
+            FileStream? xmlStream = null;
             try
             {
                 xmlStream = new FileStream(localConfigurationPath, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -96,64 +96,70 @@ namespace LogicalTaskTree
         /// <returns>True, wenn eine lokale Konfiguration geladen werden konnte.</returns>
         public static bool LoadLocalConfiguration(string jobName)
         {
-            string localConfigurationDirectory = GenericSingletonProvider.GetInstance<AppSettings>().LocalConfigurationDirectory;
+            string localConfigurationDirectory = GenericSingletonProvider.GetInstance<AppSettings>().LocalConfigurationDirectory ?? "";
             string localConfigurationPath = Path.Combine(localConfigurationDirectory, jobName + "_Configuration.xml");
 
             if (File.Exists(localConfigurationPath))
             {
                 XDocument xDoc = XDocument.Load(localConfigurationPath);
 
-                XNamespace nameSpace = xDoc.Root.Name.Namespace;
+                XNamespace? nameSpace = xDoc.Root?.Name?.Namespace;
                 //XNamespace nameSpace = "";
-                IEnumerable<XElement> nodes = xDoc.Descendants(nameSpace + "Node");
-                XElement startTreeOrientation = xDoc.Descendants(nameSpace + "StartTreeOrientation")?.FirstOrDefault();
-                if (!String.IsNullOrEmpty(startTreeOrientation?.Value))
+                if (nameSpace != null)
                 {
-                    GenericSingletonProvider.GetInstance<AppSettings>().StartTreeOrientation
-                        = (TreeOrientation)Enum.Parse(typeof(TreeOrientation), startTreeOrientation.Value);
-                }
-
-                XElement xWindowLeft = xDoc.Descendants(nameSpace + "WindowLeft")?.FirstOrDefault();
-                double windowLeft = String.IsNullOrEmpty(xWindowLeft?.Value) ? 0.0 : Convert.ToDouble(xWindowLeft.Value);
-                XElement xWindowTop = xDoc.Descendants(nameSpace + "WindowTop")?.FirstOrDefault();
-                double windowTop = String.IsNullOrEmpty(xWindowTop?.Value) ? 0.0 : Convert.ToDouble(xWindowTop.Value);
-                XElement xWindowWidth = xDoc.Descendants(nameSpace + "WindowWidth")?.FirstOrDefault();
-                double windowWidth = String.IsNullOrEmpty(xWindowWidth?.Value) ? 0.0 : Convert.ToDouble(xWindowWidth.Value);
-                XElement xWindowHeight = xDoc.Descendants(nameSpace + "WindowHeight")?.FirstOrDefault();
-                double windowHeight = String.IsNullOrEmpty(xWindowHeight?.Value) ? 0.0 : Convert.ToDouble(xWindowHeight.Value);
-                XElement xWindowScrollLeft = xDoc.Descendants(nameSpace + "WindowScrollLeft")?.FirstOrDefault();
-                double windowScrollLeft = String.IsNullOrEmpty(xWindowScrollLeft?.Value) ? 0.0 : Convert.ToDouble(xWindowScrollLeft.Value);
-                XElement xWindowScrollTop = xDoc.Descendants(nameSpace + "WindowScrollTop")?.FirstOrDefault();
-                double windowScrollTop = String.IsNullOrEmpty(xWindowScrollTop?.Value) ? 0.0 : Convert.ToDouble(xWindowScrollTop.Value);
-                XElement xWindowZoom = xDoc.Descendants(nameSpace + "WindowZoom")?.FirstOrDefault();
-                double windowZoom = String.IsNullOrEmpty(xWindowZoom?.Value) ? 1.0 : Convert.ToDouble(xWindowZoom.Value);
-                XElement xIsScrollbarVisible = xDoc.Descendants(nameSpace + "IsScrollbarVisible")?.FirstOrDefault();
-                bool isScrollbarVisible = String.IsNullOrEmpty(xIsScrollbarVisible?.Value) ? true : Convert.ToBoolean(xIsScrollbarVisible.Value);
-                XElement xActTabControlTab = xDoc.Descendants(nameSpace + "ActTabControlTab")?.FirstOrDefault();
-                int actTabControlTab = String.IsNullOrEmpty(xActTabControlTab?.Value) ? 0 : Convert.ToInt32(xActTabControlTab.Value);
-                GenericSingletonProvider.GetInstance<AppSettings>().VishnuWindowAspects
-                    = new WindowAspects()
+                    IEnumerable<XElement> nodes = xDoc.Descendants(nameSpace + "Node");
+                    XElement? startTreeOrientation = xDoc.Descendants(nameSpace + "StartTreeOrientation")?.FirstOrDefault();
+                    if (!String.IsNullOrEmpty(startTreeOrientation?.Value))
                     {
-                        WindowLeft = windowLeft,
-                        WindowTop = windowTop,
-                        WindowWidth = windowWidth,
-                        WindowHeight = windowHeight,
-                        WindowScrollLeft = windowScrollLeft,
-                        WindowScrollTop = windowScrollTop,
-                        WindowZoom = windowZoom,
-                        IsScrollbarVisible = isScrollbarVisible,
-                        ActTabControlTab = actTabControlTab
-                    };
+                        GenericSingletonProvider.GetInstance<AppSettings>().StartTreeOrientation
+                            = (TreeOrientation)Enum.Parse(typeof(TreeOrientation), startTreeOrientation.Value);
+                    }
 
-                ConfigurationManager._nodeConfiguration.Clear();
-                for (int nodeIndex = 0; nodeIndex < nodes.Count(); nodeIndex++)
-                {
-                    XElement xNode = nodes.ElementAt(nodeIndex);
-                    string nodePath = xNode.Descendants(nameSpace + "Path")?.FirstOrDefault().Value.ToString();
-                    bool isExpanded = Convert.ToBoolean(xNode.Descendants(nameSpace + "IsExpanded")?.FirstOrDefault().Value);
-                    ConfigurationManager._nodeConfiguration.Add(nodePath, isExpanded);
+                    XElement? xWindowLeft = xDoc.Descendants(nameSpace + "WindowLeft")?.FirstOrDefault();
+                    double windowLeft = String.IsNullOrEmpty(xWindowLeft?.Value) ? 0.0 : Convert.ToDouble(xWindowLeft.Value);
+                    XElement? xWindowTop = xDoc.Descendants(nameSpace + "WindowTop")?.FirstOrDefault();
+                    double windowTop = String.IsNullOrEmpty(xWindowTop?.Value) ? 0.0 : Convert.ToDouble(xWindowTop.Value);
+                    XElement? xWindowWidth = xDoc.Descendants(nameSpace + "WindowWidth")?.FirstOrDefault();
+                    double windowWidth = String.IsNullOrEmpty(xWindowWidth?.Value) ? 0.0 : Convert.ToDouble(xWindowWidth.Value);
+                    XElement? xWindowHeight = xDoc.Descendants(nameSpace + "WindowHeight")?.FirstOrDefault();
+                    double windowHeight = String.IsNullOrEmpty(xWindowHeight?.Value) ? 0.0 : Convert.ToDouble(xWindowHeight.Value);
+                    XElement? xWindowScrollLeft = xDoc.Descendants(nameSpace + "WindowScrollLeft")?.FirstOrDefault();
+                    double windowScrollLeft = String.IsNullOrEmpty(xWindowScrollLeft?.Value) ? 0.0 : Convert.ToDouble(xWindowScrollLeft.Value);
+                    XElement? xWindowScrollTop = xDoc.Descendants(nameSpace + "WindowScrollTop")?.FirstOrDefault();
+                    double windowScrollTop = String.IsNullOrEmpty(xWindowScrollTop?.Value) ? 0.0 : Convert.ToDouble(xWindowScrollTop.Value);
+                    XElement? xWindowZoom = xDoc.Descendants(nameSpace + "WindowZoom")?.FirstOrDefault();
+                    double windowZoom = String.IsNullOrEmpty(xWindowZoom?.Value) ? 1.0 : Convert.ToDouble(xWindowZoom.Value);
+                    XElement? xIsScrollbarVisible = xDoc.Descendants(nameSpace + "IsScrollbarVisible")?.FirstOrDefault();
+                    bool isScrollbarVisible = String.IsNullOrEmpty(xIsScrollbarVisible?.Value) ? true : Convert.ToBoolean(xIsScrollbarVisible.Value);
+                    XElement? xActTabControlTab = xDoc.Descendants(nameSpace + "ActTabControlTab")?.FirstOrDefault();
+                    int actTabControlTab = String.IsNullOrEmpty(xActTabControlTab?.Value) ? 0 : Convert.ToInt32(xActTabControlTab.Value);
+                    GenericSingletonProvider.GetInstance<AppSettings>().VishnuWindowAspects
+                        = new WindowAspects()
+                        {
+                            WindowLeft = windowLeft,
+                            WindowTop = windowTop,
+                            WindowWidth = windowWidth,
+                            WindowHeight = windowHeight,
+                            WindowScrollLeft = windowScrollLeft,
+                            WindowScrollTop = windowScrollTop,
+                            WindowZoom = windowZoom,
+                            IsScrollbarVisible = isScrollbarVisible,
+                            ActTabControlTab = actTabControlTab
+                        };
+
+                    ConfigurationManager._nodeConfiguration.Clear();
+                    for (int nodeIndex = 0; nodeIndex < nodes.Count(); nodeIndex++)
+                    {
+                        XElement? xNode = nodes.ElementAt(nodeIndex);
+                        string? nodePath = xNode.Descendants(nameSpace + "Path").FirstOrDefault()?.Value.ToString();
+                        bool? isExpanded = Convert.ToBoolean(xNode.Descendants(nameSpace + "IsExpanded")?.FirstOrDefault()?.Value);
+                        if (isExpanded != null && nodePath != null)
+                        {
+                            ConfigurationManager._nodeConfiguration.Add(nodePath, isExpanded == true);
+                        }
+                    }
+                    return true;
                 }
-                return true;
             }
             return false;
         }
@@ -170,7 +176,7 @@ namespace LogicalTaskTree
         /// Null, wenn der Knoten keine NodeList ist oder keine lokale Konfiguration geladen wurde.</returns>
         public static bool? IsExpanded(string nodePath)
         {
-            if (ConfigurationManager._nodeConfiguration.ContainsKey(nodePath ?? ""))
+            if (ConfigurationManager._nodeConfiguration.ContainsKey(nodePath))
             {
                 return ConfigurationManager._nodeConfiguration[nodePath];
             }
@@ -197,7 +203,7 @@ namespace LogicalTaskTree
         /// <returns>Baumdarstellung in einer XML-Struktur (XElement).</returns>
         private static XElement Tree2XML(IExpandableNode tree)
         {
-            return (XElement)tree.Traverse(Node2XML);
+            return (XElement?)tree.Traverse(Node2XML) ?? throw new ArgumentException($"Branch {tree.Name} konnte nicht in Xml übertragen werden.");
         }
 
         /// <summary>
@@ -207,7 +213,7 @@ namespace LogicalTaskTree
         /// <param name="node">Basisklasse eines Knotens im LogicalTaskTree.</param>
         /// <param name="parent">Elternelement des User-Objekts.</param>
         /// <returns>XElement mit Knoten-Informationen.</returns>
-        private static XElement Node2XML(int depth, IExpandableNode node, object parent)
+        private static object? Node2XML(int depth, IExpandableNode node, object? parent)
         {
             XElement nodeXML = new XElement("Node");
             if (parent != null)

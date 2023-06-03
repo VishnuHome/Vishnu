@@ -7,6 +7,8 @@ using System.Xml.Linq;
 using Vishnu.Interchange;
 using System.Collections.Generic;
 using NetEti.ObjectSerializer;
+using System.ComponentModel;
+using System.Xml;
 
 namespace LogicalTaskTree
 {
@@ -84,9 +86,10 @@ namespace LogicalTaskTree
             SnapshotManager._publisher = InfoController.GetInfoPublisher();
         }
 
-        private static void _taskWorker_TaskProgressFinished(object sender, Exception threadException)
+        private static void _taskWorker_TaskProgressFinished(object? sender, RunWorkerCompletedEventArgs args)
         {
-            SnapshotManager._publisher.Publish("SnapshotManager", threadException.ToString(), InfoType.Exception);
+            string error = args.Error?.ToString() ?? "";
+            SnapshotManager._publisher.Publish("SnapshotManager", error, InfoType.Exception);
         }
 
         private static void processSnapshot(TaskWorker taskWorker, object tree)
@@ -96,7 +99,7 @@ namespace LogicalTaskTree
             while (SnapshotManager._snapshotRequested)
             {
                 SnapshotManager._snapshotRequested = false;
-                Exception exception = null;
+                Exception? exception = null;
                 bool treePausedByMe = false;
                 try
                 {
@@ -105,7 +108,7 @@ namespace LogicalTaskTree
                     {
                         LogicalNode.PauseTree(); // Jetzt den Tree selbst für die Dauer der Snapshot-Erzeugung anhalten.
                         treePausedByMe = true;
-                        SnapshotManager.saveSnapshot((LogicalNode)tree);
+                        SnapshotManager.SaveSnapshot((LogicalNode)tree);
                     }
                 }
                 catch (Exception ex)
@@ -128,7 +131,7 @@ namespace LogicalTaskTree
             SnapshotManager._isWorking = false;
         }
 
-        private static void saveSnapshot(LogicalNode tree)
+        private static void SaveSnapshot(LogicalNode tree)
         {
             AppSettings appSettings = GenericSingletonProvider.GetInstance<AppSettings>();
             string snapshotDirectory = Path.Combine(appSettings.ResolvedSnapshotDirectory, appSettings.MainJobName);
@@ -163,10 +166,9 @@ namespace LogicalTaskTree
             catch (IOException)
             {
 #if DEBUG
-                InfoController.Say("Snapshot creation failed!");
+                InfoController.Say("Snapshot creation failed.");
 #endif
             }
-            xmlDoc = null;
             SnapshotManager.CleanUpSnapshots();
         }
 
@@ -212,7 +214,9 @@ namespace LogicalTaskTree
         /// <returns>Baumdarstellung in einer XML-Struktur (XElement).</returns>
         private static XElement Tree2XML(LogicalNode tree)
         {
-            return (XElement)tree.Traverse(Node2XML);
+            XElement? xElement = (XElement?)tree.Traverse(Node2XML) 
+                ?? throw new XmlException($"LogicalNode {tree.NameId} konnte nicht in eine XML-Struktur überführt werden.");
+            return xElement;
         }
 
         /// <summary>
@@ -222,7 +226,7 @@ namespace LogicalTaskTree
         /// <param name="node">Basisklasse eines Knotens im LogicalTaskTree.</param>
         /// <param name="parent">Elternelement des User-Objekts.</param>
         /// <returns>User-Objekt.</returns>
-        private static XElement Node2XML(int depth, LogicalNode node, object parent)
+        private static XElement Node2XML(int depth, LogicalNode node, object? parent)
         {
             bool? LastMinuteNotNullLogical = node.LastNotNullLogical;
             /* // 19.08.2018 auskommentiert+
@@ -255,7 +259,7 @@ namespace LogicalTaskTree
             nodeXML.Add(new XAttribute("NodeType", node.NodeType));
             nodeXML.Add(new XAttribute("Id", node.Id));
             nodeXML.Add(new XAttribute("Name", node.Name));
-            nodeXML.Add(new XAttribute("LastNotNullLogical", LastMinuteNotNullLogical == null ? "" : LastMinuteNotNullLogical.ToString()));
+            nodeXML.Add(new XAttribute("LastNotNullLogical", LastMinuteNotNullLogical == null ? "" : LastMinuteNotNullLogical.ToString() ?? ""));
             nodeXML.Add(new XAttribute("LastRun", node.LastRun.ToString()));
             nodeXML.Add(new XAttribute("NextRunInfo", node.NextRunInfo ?? ""));
             if (node.GetType().Name != "Snapshot")
@@ -291,7 +295,7 @@ namespace LogicalTaskTree
                 catch (Exception ex)
                 {
                     InfoController.Say(String.Format("Node2XML_a: {0}", ex.Message));
-                    XElement result = new XElement("Result", new XCData(XMLSerializationUtility.SerializeObjectToBase64(
+                    XElement result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64(
                         new Result(ex.GetType().Name, null, NodeState.Finished, NodeLogicalState.Fault, ex))));
                     nodeXML.Add(result);
                 }
@@ -301,46 +305,79 @@ namespace LogicalTaskTree
                 nodeXML.Add(new XElement("ReferencedNodeId", node.ReferencedNodeId));
                 nodeXML.Add(new XElement("ReferencedNodeName", node.ReferencedNodeName));
                 nodeXML.Add(new XElement("ReferencedNodePath", node.ReferencedNodePath));
-                // 23.08.2018+
+                /* 11.03.2023 Nagel+// 23.08.2018+
                 try
                 {
-                    NodeConnector tmpNode = node as NodeConnector;
-                    XElement result = new XElement("Result", new XCData(XMLSerializationUtility.SerializeObjectToBase64(tmpNode.LastResult)));
+                    NodeConnector? tmpNode = node as NodeConnector;
+                    XElement result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64(tmpNode.LastResult)));
                     nodeXML.Add(result);
                 }
                 catch (Exception ex)
                 {
                     InfoController.Say(String.Format("Node2XML_b: {0}", ex.Message));
-                    XElement result = new XElement("Result", new XCData(XMLSerializationUtility.SerializeObjectToBase64(
+                    XElement result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64(
                         new Result(ex.GetType().Name, null, NodeState.Finished, NodeLogicalState.Fault, ex))));
                     nodeXML.Add(result);
                 }
                 // 23.08.2018-
-            }
-            if (node is JobConnector)
-            {
-                nodeXML.Add(new XElement("LogicalExpression", (node as JobConnector).LogicalExpression));
-            }
-            if (node is SingleNode)
-            {
+                11.03.2023 Nagel- */
+
+                // 11.03.2023 Nagel+
+                XElement result;
                 try
                 {
-                    SingleNode tmpNode = node as SingleNode;
-                    XElement result = new XElement("Result", new XCData(XMLSerializationUtility.SerializeObjectToBase64(tmpNode.LastResult)));
-                    nodeXML.Add(result);
-
+                    Result? lastResult = ((NodeConnector)node).LastResult;
+                    if (lastResult != null)
+                    {
+                        result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64(lastResult)));
+                    }
+                    else
+                    {
+                        result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64(
+                            new Result("unset", null, NodeState.Finished, NodeLogicalState.Fault, null))));
+                    }
                 }
                 catch (Exception ex)
                 {
                     InfoController.Say(String.Format("Node2XML_b: {0}", ex.Message));
-                    XElement result = new XElement("Result", new XCData(XMLSerializationUtility.SerializeObjectToBase64(
+                    result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64(
+                        new Result(ex.GetType().Name, null, NodeState.Finished, NodeLogicalState.Fault, ex))));
+                }
+                nodeXML.Add(result);
+                // 11.03.2023 Nagel-
+            }
+            if (node is JobConnector)
+            {
+                nodeXML.Add(new XElement("LogicalExpression", ((JobConnector)node).LogicalExpression));
+            }
+            if (node is SingleNode)
+            {
+                XElement result;
+                try
+                {
+                    SingleNode? tmpNode = node as SingleNode;
+                    if (tmpNode != null && tmpNode.LastResult != null)
+                    {
+                        result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64(tmpNode.LastResult)));
+                    }
+                    else
+                    {
+                        result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64(
+                            new Result("unset", null, NodeState.Finished, NodeLogicalState.Fault, null))));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    InfoController.Say(String.Format("Node2XML_b: {0}", ex.Message));
+                    result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64(
                         new Result(ex.GetType().Name, null, NodeState.Finished, NodeLogicalState.Fault, ex))));
                     nodeXML.Add(result);
                 }
+                nodeXML.Add(result);
             }
             if (node is NodeList)
             {
-                NodeList tmpNode = node as NodeList;
+                NodeList tmpNode = (NodeList)node;
                 List<object> xParamsList = new List<object>();
                 xParamsList.Add(new XElement("LogicalName", node.Id.ToString()));
                 if (node is JobList)

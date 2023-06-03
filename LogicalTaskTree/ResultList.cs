@@ -6,5 +6,5 @@ namespace LogicalTaskTree
     /// <summary>
     /// Ein Thread-safes Dictionary mit Results; Keys sind die jeweiligen NodeIDs.
     /// </summary>
-    internal class ResultList : ConcurrentDictionary<string, Result> { }
+    internal class ResultList : ConcurrentDictionary<string, Result?> { }
 }

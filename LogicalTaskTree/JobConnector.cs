@@ -27,7 +27,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                if (this._userControlPath != null)
+                if (! String.IsNullOrEmpty(this._userControlPath))
                 {
                     return this._userControlPath;
                 }
@@ -54,11 +54,11 @@ namespace LogicalTaskTree
                 {
                     if (this._node != null)
                     {
-                        return (this._node as JobList).LogicalExpression;
+                        return ((JobList)this._node).LogicalExpression;
                     }
                     else
                     {
-                        return "";
+                        return String.Empty;
                     }
                 }
                 else
@@ -76,7 +76,7 @@ namespace LogicalTaskTree
         /// Liefert ein Result für diesen Knoten.
         /// </summary>
         /// <returns>Ein Result-Objekten für den Knoten.</returns>
-        public override Result LastResult
+        public override Result? LastResult
         {
             get
             {
@@ -239,7 +239,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Info-Text über den nächsten Start des Knotens (wenn bekannt) oder null.
         /// </summary>
-        public override string NextRunInfo
+        public override string? NextRunInfo
         {
             get
             {
@@ -268,7 +268,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Name eines ursprünglich referenzierten Knotens oder null.
         /// </summary>
-        public override string ReferencedNodeName
+        public override string? ReferencedNodeName
         {
             get
             {
@@ -278,7 +278,7 @@ namespace LogicalTaskTree
                     //if (this._node is NodeConnector)
                     if ((this._node.NodeType == NodeTypes.NodeConnector || this._node.NodeType == NodeTypes.JobConnector) && !this._node.IsSnapshotDummy)
                     {
-                        return (this._node as NodeConnector).ReferencedNodeName;
+                        return ((NodeConnector)this._node).ReferencedNodeName;
                     }
                     else
                     {
@@ -299,7 +299,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Id des ursprünglich referenzierten Knotens.
         /// </summary>
-        public override string ReferencedNodeId
+        public override string? ReferencedNodeId
         {
             get
             {
@@ -309,7 +309,7 @@ namespace LogicalTaskTree
                     //if (this._node is NodeConnector)
                     if ((this._node.NodeType == NodeTypes.NodeConnector || this._node.NodeType == NodeTypes.JobConnector) && !this._node.IsSnapshotDummy)
                     {
-                        return (this._node as NodeConnector).ReferencedNodeId;
+                        return ((NodeConnector)this._node).ReferencedNodeId;
                     }
                     else
                     {
@@ -330,7 +330,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Pfad des ursprünglich referenzierten Knotens.
         /// </summary>
-        public override string ReferencedNodePath
+        public override string? ReferencedNodePath
         {
             get
             {
@@ -339,7 +339,7 @@ namespace LogicalTaskTree
                 {
                     if (this._node is NodeConnector)
                     {
-                        return (this._node as NodeConnector).ReferencedNodePath;
+                        return ((NodeConnector)this._node).ReferencedNodePath;
                     }
                     else
                     {
@@ -404,7 +404,8 @@ namespace LogicalTaskTree
         public JobConnector(LogicalNode mother, JobList rootJobList, TreeParameters treeParams)
           : base(mother, rootJobList, treeParams)
         {
-            this.UserControlPath = rootJobList.JobConnectorUserControlPath;
+            this.UserControlPath = String.Empty;
+            this._logicalExpression = String.Empty;
         }
 
         /// <summary>
@@ -416,8 +417,11 @@ namespace LogicalTaskTree
         /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
         /// <param name="node">Die LogicalNode, zu der sich dieser NodeConnector verbinden soll.</param>
         /// <param name="valueModifier">Ein optionaler ValueModifier oder null.</param>
-        public JobConnector(string id, LogicalNode mother, JobList rootJoblist, TreeParameters treeParams, LogicalNode node, NodeCheckerBase valueModifier)
-          : base(id, mother, rootJoblist, treeParams, node, null) { }
+        public JobConnector(string id, LogicalNode mother, JobList rootJoblist, TreeParameters treeParams, LogicalNode node, NodeCheckerBase? valueModifier)
+          : base(id, mother, rootJoblist, treeParams, node, null)
+        {
+            this._logicalExpression = RootJobList.LogicalExpression; // Vorbelegung
+        }
 
         #endregion public members
 
@@ -425,9 +429,9 @@ namespace LogicalTaskTree
 
         private string _logicalExpression;
         private DateTime _nextRun;
-        private string _referencedNodeName;
-        private string _referencedNodeId;
-        private string _referencedNodePath;
+        private string? _referencedNodeName;
+        private string? _referencedNodeId;
+        private string? _referencedNodePath;
         /// <summary>
         /// Der Verarbeitungszustand des Knotens:
         /// Null, None, Waiting, Working, Finished, Triggered, Ready (= Finished | Triggered), Busy (= Waiting | Working) oder CanStart (= None | Ready)

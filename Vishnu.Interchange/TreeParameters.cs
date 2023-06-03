@@ -25,12 +25,12 @@ namespace Vishnu.Interchange
         /// <summary>
         /// Pfad zum Verzeichnis der Checker.dll.
         /// </summary>
-        public string CheckerDllDirectory { get; set; }
+        public string? CheckerDllDirectory { get; set; }
 
         /// <summary>
         /// Das Parent-Control.
         /// </summary>
-        public FrameworkElement ParentView { get; set; }
+        public FrameworkElement? ParentView { get; set; }
 
         /// <summary>
         /// Absolute Bildschirmposition des beinhaltenden Controls.
@@ -67,7 +67,7 @@ namespace Vishnu.Interchange
         /// </summary>
         /// <param name="name">Der logische Name des Trees.</param>
         /// <param name="parentView">Das Parent-Control.</param>
-        public TreeParameters(string name, FrameworkElement parentView)
+        public TreeParameters(string name, FrameworkElement? parentView)
         {
             this.Name = name;
             this.ParentView = parentView;
@@ -87,7 +87,7 @@ namespace Vishnu.Interchange
         /// </summary>
         /// <param name="obj">Vergleichs-TreeParameters.</param>
         /// <returns>True, wenn beide Objekte Instanzen von TreeParameters sind und ihr Hashcode übereinstimmt.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return base.Equals(obj);
         }
@@ -108,7 +108,7 @@ namespace Vishnu.Interchange
         /// Wird innerhalb der Assembly Vishnu.ViewModel wieder aufgelöst.
         /// Dort existiert ein Verweis auf LogicalTaskTree.
         /// </summary>
-        public IBusinessLogicRoot BusinessLogicRoot { get; set; }
+        public IBusinessLogicRoot? BusinessLogicRoot { get; set; }
 
         /// <summary>
         /// Interner, Assembly-übergreifender Parameter.
@@ -116,6 +116,6 @@ namespace Vishnu.Interchange
         /// Assembly-Verweis auf Vishnu.ViewModel zu vermeiden.
         /// Wird innerhalb der Assembly Vishnu.ViewModel wieder aufgelöst.
         /// </summary>
-        public IViewModelRoot ViewModelRoot { get; set; }
+        public IViewModelRoot? ViewModelRoot { get; set; }
     }
 }

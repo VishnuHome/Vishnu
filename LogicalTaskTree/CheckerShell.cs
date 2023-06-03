@@ -3,6 +3,7 @@ using System.IO;
 using System.Diagnostics;
 using Vishnu.Interchange;
 using NetEti.Globals;
+using System.ComponentModel;
 
 namespace LogicalTaskTree
 {
@@ -34,22 +35,22 @@ namespace LogicalTaskTree
         /// <param name="treeParameters">Für den gesamten Tree gültige Parameter oder null.</param>
         /// <param name="source">Auslösendes TreeEvent oder null.</param>
         /// <returns>True, False oder null</returns>
-        public override bool? Run(object checkerParameters, TreeParameters treeParameters, TreeEvent source)
+        public override bool? Run(object? checkerParameters, TreeParameters treeParameters, TreeEvent source)
         {
             if (this.CanRunLoadingException == null)
             {
-                object actCheckerParameters = checkerParameters ?? this.CheckerParameters;
+                object? actCheckerParameters = checkerParameters ?? this.CheckerParameters;
                 if (this.CanRunDll == null || this.CanRunDll.CanRun(ref actCheckerParameters, treeParameters, source))
                 {
                     if (actCheckerParameters != this._checkerParameters)
                     {
                         this._checkerParameters = GenericSingletonProvider.GetInstance<AppSettings>()
-                            .ReplaceWildcards(actCheckerParameters.ToString());
+                            .ReplaceWildcards(actCheckerParameters?.ToString() ?? "");
                     }
-                    if (this.ThreadLocked)
+                    string? lockName = this.LockName ?? this._slaveName;
+                    if (this.ThreadLocked && !String.IsNullOrEmpty(lockName))
                     {
                         bool? res = null;
-                        string lockName = this.LockName == null ? this._slaveName : this.LockName;
                         try
                         {
                             this.IsInvalid = false;
@@ -116,7 +117,7 @@ namespace LogicalTaskTree
                     {
                         try
                         {
-                            (this._slave as IDisposable).Dispose();
+                            (this._slave as IDisposable)?.Dispose();
                         }
                         catch { };
                     }
@@ -168,7 +169,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Pfad zur Dll der externen Checker-Routine.
         /// </summary>
-        public string SlavePathName
+        public string? SlavePathName
         {
             get
             {
@@ -184,7 +185,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Spezifische Aufrufparameter für die Checker-Dll oder null.
         /// </summary>
-        public string CheckerParameters
+        public string? CheckerParameters
         {
             get
             {
@@ -211,7 +212,7 @@ namespace LogicalTaskTree
         /// Auftretens je nach Timing unterschiedlich sein können, sind solche veränderbaren
         /// Parameter nicht für Equal-Vergleiche geeignet.
         /// </summary>
-        public object OriginalCheckerParameters { get; private set; }
+        public object? OriginalCheckerParameters { get; private set; }
 
         /// <summary>
         /// Konstruktor
@@ -234,7 +235,7 @@ namespace LogicalTaskTree
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
         /// <param name="checkerParameters">Spezifische Aufrufparameter u.U. mit Variablenersetzung.</param>
         /// <param name="originalCheckerParameters">Spezifische Aufrufparameter ohne Variablenersetzung.</param>
-        public CheckerShell(string slavePathName, object checkerParameters, object originalCheckerParameters)
+        public CheckerShell(string slavePathName, object? checkerParameters, object? originalCheckerParameters)
             : this(slavePathName, checkerParameters, originalCheckerParameters, null, null, false) { }
 
         /// <summary>
@@ -244,7 +245,7 @@ namespace LogicalTaskTree
         /// <param name="checkerParameters">Spezifische Aufrufparameter u.U. mit Variablenersetzung.</param>
         /// <param name="originalCheckerParameters">Spezifische Aufrufparameter ohne Variablenersetzung.</param>
         /// <param name="alwaysReload">Bei True wird die Dll für jeden Run neu instanziiert (für den Debug von Memory Leaks).</param>
-        public CheckerShell(string slavePathName, object checkerParameters, object originalCheckerParameters, bool alwaysReload)
+        public CheckerShell(string slavePathName, object? checkerParameters, object? originalCheckerParameters, bool alwaysReload)
             : this(slavePathName, checkerParameters, originalCheckerParameters, null, null, alwaysReload) { }
 
         /// <summary>
@@ -252,7 +253,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
         /// <param name="checkerTrigger">Ein Trigger, der den Job wiederholt aufruft.</param>
-        public CheckerShell(string slavePathName, TriggerShell checkerTrigger)
+        public CheckerShell(string slavePathName, TriggerShell? checkerTrigger)
             : this(slavePathName, null, null, checkerTrigger, null, false) { }
 
         /// <summary>
@@ -261,7 +262,7 @@ namespace LogicalTaskTree
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
         /// <param name="checkerTrigger">Ein Trigger, der den Job wiederholt aufruft.</param>
         /// <param name="alwaysReload">Bei True wird die Dll für jeden Run neu instanziiert (für den Debug von Memory Leaks).</param>
-        public CheckerShell(string slavePathName, TriggerShell checkerTrigger, bool alwaysReload)
+        public CheckerShell(string slavePathName, TriggerShell? checkerTrigger, bool alwaysReload)
             : this(slavePathName, null, null, checkerTrigger, null, alwaysReload) { }
 
         /// <summary>
@@ -271,7 +272,7 @@ namespace LogicalTaskTree
         /// <param name="checkerParameters">Spezifische Aufrufparameter u.U. mit Variablenersetzung.</param>
         /// <param name="originalCheckerParameters">Spezifische Aufrufparameter ohne Variablenersetzung.</param>
         /// <param name="checkerTrigger">Ein Trigger, der den Job wiederholt aufruft.</param>
-        public CheckerShell(string slavePathName, object checkerParameters, object originalCheckerParameters, TriggerShell checkerTrigger)
+        public CheckerShell(string slavePathName, object? checkerParameters, object? originalCheckerParameters, TriggerShell? checkerTrigger)
             : this(slavePathName, checkerParameters, originalCheckerParameters, checkerTrigger, null, false) { }
 
         /// <summary>
@@ -282,7 +283,7 @@ namespace LogicalTaskTree
         /// <param name="originalCheckerParameters">Spezifische Aufrufparameter ohne Variablenersetzung.</param>
         /// <param name="checkerTrigger">Ein Trigger, der den Job wiederholt aufruft.</param>
         /// <param name="alwaysReload">Bei True wird die Dll für jeden Run neu instanziiert (für den Debug von Memory Leaks).</param>
-        public CheckerShell(string slavePathName, object checkerParameters, object originalCheckerParameters, TriggerShell checkerTrigger, bool alwaysReload)
+        public CheckerShell(string slavePathName, object? checkerParameters, object? originalCheckerParameters, TriggerShell? checkerTrigger, bool alwaysReload)
             : this(slavePathName, checkerParameters, originalCheckerParameters, checkerTrigger, null, alwaysReload) { }
 
         /// <summary>
@@ -290,7 +291,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
         /// <param name="checkerLogger">Ein Logger, der Logging-Informationen weiterverarbeitet.</param>
-        public CheckerShell(string slavePathName, LoggerShell checkerLogger)
+        public CheckerShell(string slavePathName, LoggerShell? checkerLogger)
             : this(slavePathName, null, null, null, checkerLogger, false) { }
 
         /// <summary>
@@ -299,7 +300,7 @@ namespace LogicalTaskTree
         /// <param name="slavePathName">Dateipfad und Name einer Dll, die INodeChecker implementiert.</param>
         /// <param name="checkerLogger">Ein Logger, der Logging-Informationen weiterverarbeitet.</param>
         /// <param name="alwaysReload">Bei True wird die Dll für jeden Run neu instanziiert (für den Debug von Memory Leaks).</param>
-        public CheckerShell(string slavePathName, LoggerShell checkerLogger, bool alwaysReload)
+        public CheckerShell(string slavePathName, LoggerShell? checkerLogger, bool alwaysReload)
             : this(slavePathName, null, null, null, checkerLogger, alwaysReload) { }
 
         /// <summary>
@@ -309,7 +310,7 @@ namespace LogicalTaskTree
         /// <param name="checkerParameters">Spezifische Aufrufparameter u.U. mit Variablenersetzung.</param>
         /// <param name="originalCheckerParameters">Spezifische Aufrufparameter ohne Variablenersetzung.</param>
         /// <param name="checkerLogger">Ein Logger, der Logging-Informationen weiterverarbeitet.</param>
-        public CheckerShell(string slavePathName, object checkerParameters, object originalCheckerParameters, LoggerShell checkerLogger)
+        public CheckerShell(string slavePathName, object? checkerParameters, object? originalCheckerParameters, LoggerShell? checkerLogger)
             : this(slavePathName, checkerParameters, originalCheckerParameters, null, checkerLogger, false) { }
 
         /// <summary>
@@ -320,7 +321,7 @@ namespace LogicalTaskTree
         /// <param name="originalCheckerParameters">Spezifische Aufrufparameter ohne Variablenersetzung.</param>
         /// <param name="checkerLogger">Ein Logger, der Logging-Informationen weiterverarbeitet.</param>
         /// <param name="alwaysReloadChecker">Bei True wird die Dll für jeden Run neu instanziiert (für den Debug von Memory Leaks).</param>
-        public CheckerShell(string slavePathName, object checkerParameters, object originalCheckerParameters, LoggerShell checkerLogger, bool alwaysReloadChecker)
+        public CheckerShell(string slavePathName, object? checkerParameters, object? originalCheckerParameters, LoggerShell? checkerLogger, bool alwaysReloadChecker)
             : this(slavePathName, checkerParameters, originalCheckerParameters, null, checkerLogger, alwaysReloadChecker) { }
 
         /// <summary>
@@ -332,7 +333,7 @@ namespace LogicalTaskTree
         /// <param name="checkerTrigger">Ein Trigger, der den Job wiederholt aufruft oder null.</param>
         /// <param name="checkerLogger">Ein Logger, der Logging-Informationen weiterverarbeitet.</param>
         /// <param name="alwaysReload">Bei True wird die Dll für jeden Run neu instanziiert (für den Debug von Memory Leaks).</param>
-        public CheckerShell(string slavePathName, object checkerParameters, object originalCheckerParameters, TriggerShell checkerTrigger, LoggerShell checkerLogger, bool alwaysReload)
+        public CheckerShell(string slavePathName, object? checkerParameters, object? originalCheckerParameters, TriggerShell? checkerTrigger, LoggerShell? checkerLogger, bool alwaysReload)
             : base()
         {
             this.LastReturned = null;
@@ -345,6 +346,7 @@ namespace LogicalTaskTree
             this._runProcessLocker = new object();
             this._assemblyLoader = VishnuAssemblyLoader.GetAssemblyLoader();
             this._alwaysReload = alwaysReload;
+            this.UserControlPath = String.Empty;
         }
 
         /// <summary>
@@ -354,7 +356,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="toConvert">Zu konvertierender Wert</param>
         /// <returns>Unveränderter Wert.</returns>
-        public override object ModifyValue(object toConvert)
+        public override object? ModifyValue(object? toConvert)
         {
             return toConvert;
         }
@@ -364,7 +366,7 @@ namespace LogicalTaskTree
         #region private members
 
         // Instanz vom INodeChecker. Macht die Prüf-Arbeit.
-        private INodeChecker Slave
+        private INodeChecker? Slave
         {
             get
             {
@@ -376,18 +378,18 @@ namespace LogicalTaskTree
             }
         }
 
-        private string _slavePathName;
-        private object _checkerParameters;
+        private string? _slavePathName;
+        private object? _checkerParameters;
 
-        private INodeChecker _slave;
+        private INodeChecker? _slave;
         private DateTime _lastDllWriteTime;
-        private VishnuAssemblyLoader _assemblyLoader;
+        private readonly VishnuAssemblyLoader _assemblyLoader;
 
-        private object _runProcessLocker;
+        private readonly object _runProcessLocker;
 
-        private static object _runProcessClassLocker = new object();
-        private bool _alwaysReload;
-        private string _slaveName;
+        private static readonly object _runProcessClassLocker = new object();
+        private readonly bool _alwaysReload;
+        private string? _slaveName;
 
         /// <summary>
         /// Hier wird der (normalerweise externe) Arbeitsprozess ausgeführt (oder beobachtet).
@@ -396,7 +398,7 @@ namespace LogicalTaskTree
         /// <param name="treeParameters">Für den gesamten Tree gültige Parameter oder null.</param>
         /// <param name="source">Auslösendes TreeEvent oder null.</param>
         /// <returns>True, False oder null</returns>
-        private bool? runIt(object checkerParameters, TreeParameters treeParameters, TreeEvent source)
+        private bool? runIt(object? checkerParameters, TreeParameters treeParameters, TreeEvent source)
         {
             lock (this._runProcessLocker)
             {
@@ -414,25 +416,28 @@ namespace LogicalTaskTree
                 {
                     if (this._slave != null)
                     {
-                        this.Slave.NodeProgressChanged -= this.SubNodeProgressChanged;
+                        this._slave.NodeProgressChanged -= this.SubNodeProgressChanged;
                         this.ReturnObject = null;
                         this._slave = null;
                     }
                 }
                 if (this._slave == null)
                 {
-                    if (this._slavePathName.ToLower().EndsWith(".dll"))
+                    if (this._slavePathName?.ToLower().EndsWith(".dll") == true)
                     {
                         this.Slave = this.dynamicLoadSlaveDll(this._slavePathName);
                     }
                     else
                     {
-                        this.Slave = this.dynamicLoadSlaveExe(this._slavePathName);
+                        if (this._slavePathName != null)
+                        {
+                            this.Slave = this.dynamicLoadSlaveExe(this._slavePathName);
+                        }
                     }
-                    if (this._slave != null)
+                    if (this._slave != null && this._slavePathName != null)
                     {
                         this._lastDllWriteTime = File.GetLastWriteTime(this._slavePathName);
-                        this.Slave.NodeProgressChanged += this.SubNodeProgressChanged;
+                        this._slave.NodeProgressChanged += this.SubNodeProgressChanged;
                     }
                 }
                 if (this._slave != null)
@@ -440,18 +445,18 @@ namespace LogicalTaskTree
                     try
                     {
                         treeParameters.CheckerDllDirectory = Path.GetDirectoryName(this._slavePathName);
-                        string cp = this._checkerParameters == null ? "" : this._checkerParameters.ToString();
-                        rtn = this.Slave.Run(GenericSingletonProvider.GetInstance<AppSettings>()
+                        string cp = this._checkerParameters?.ToString() ?? "";
+                        rtn = this._slave.Run(GenericSingletonProvider.GetInstance<AppSettings>()
                             .ReplaceWildcards(cp), treeParameters, source);
                     }
                     finally
                     {
                     }
-                    this.ReturnObject = this.Slave.ReturnObject;
+                    this.ReturnObject = this._slave.ReturnObject;
                 }
                 else
                 {
-                    throw new ApplicationException(String.Format("Die Assembly '{0}' konnte nicht geladen werden!", this._slavePathName));
+                    throw new ApplicationException(String.Format("Die Assembly '{0}' konnte nicht geladen werden.", this._slavePathName));
                 }
                 this.LastReturned = rtn;
                 return rtn;
@@ -462,17 +467,17 @@ namespace LogicalTaskTree
         // aus der Dll kennen, Bedingung ist nur, dass eine Klasse in der Dll das
         // Interface INodeChecker implementiert. Die erste gefundene Klasse wird
         // als Instanz von INodeChecker zurückgegeben.
-        private INodeChecker dynamicLoadSlaveDll(string slavePathName)
+        private INodeChecker? dynamicLoadSlaveDll(string slavePathName)
         {
-            return (INodeChecker)this._assemblyLoader.DynamicLoadObjectOfTypeFromAssembly(slavePathName, typeof(INodeChecker));
+            return (INodeChecker?)this._assemblyLoader.DynamicLoadObjectOfTypeFromAssembly(slavePathName, typeof(INodeChecker));
         }
 
         // Kapselt eine Exe in eine Klasseninstanz, die InodeChecker implementiert.
-        private INodeChecker dynamicLoadSlaveExe(string p)
+        private INodeChecker? dynamicLoadSlaveExe(string program)
         {
             try
             {
-                return new EXEtoSlaveDllFake(this._slavePathName);
+                return new EXEtoSlaveDllFake(program);
             }
             catch (Exception)
             {
@@ -488,12 +493,12 @@ namespace LogicalTaskTree
     {
         #region public members
 
-        public event NetEti.Globals.CommonProgressChangedEventHandler NodeProgressChanged;
+        public event ProgressChangedEventHandler? NodeProgressChanged;
 
         /// <summary>
         /// Konsolen-Ausgabe der Fremd-Exe.
         /// </summary>
-        public object ReturnObject
+        public object? ReturnObject
         {
             get
             {
@@ -522,21 +527,21 @@ namespace LogicalTaskTree
         {
             if (!File.Exists(slaveExePath))
             {
-                throw new IOException(String.Format("Die Exe {0} wurde nicht gefunden!", slaveExePath));
+                throw new IOException(String.Format("Die Exe {0} wurde nicht gefunden.", slaveExePath));
             }
             this._slavePathName = slaveExePath;
         }
 
-        public bool? Run(object checkerParameters, TreeParameters treeParameters, TreeEvent source)
+        public bool? Run(object? checkerParameters, TreeParameters treeParameters, TreeEvent source)
         {
-            this.onNodeProgressChanged(false);
+            this.OnNodeProgressChanged(false);
             object exeReturnObject;
-            bool rtn = this.exec(checkerParameters.ToString(), out exeReturnObject);
+            bool rtn = this.exec(checkerParameters?.ToString(), out exeReturnObject);
             if (rtn)
             {
                 this.ReturnObject = exeReturnObject;
             }
-            this.onNodeProgressChanged(true);
+            this.OnNodeProgressChanged(true);
             return rtn;
         }
 
@@ -544,8 +549,8 @@ namespace LogicalTaskTree
 
         #region private members
 
-        private object _returnObject;
-        private string _slavePathName;
+        private object? _returnObject;
+        private readonly string _slavePathName;
 
         /// <summary>
         /// Hier wird der (normalerweise externe) Arbeitsprozess ausgeführt.
@@ -553,7 +558,7 @@ namespace LogicalTaskTree
         /// <param name="slaveParameters">Aufrufparameter für die Exe.</param>
         /// <param name="returnObject">StdOut der Exe.</param>
         /// <returns>Exe-Returncode:0 = True, ungleich 0 = False.</returns>
-        private bool exec(string slaveParameters, out object returnObject)
+        private bool exec(string? slaveParameters, out object returnObject)
         {
             try
             {
@@ -567,7 +572,7 @@ namespace LogicalTaskTree
                 nPad.Start();
                 nPad.WaitForExit();
                 returnObject = nPad.StandardOutput.ReadToEnd();
-                return nPad.ExitCode == 0 ? true : false;
+                return nPad.ExitCode == 0;
             }
             catch (Exception)
             {
@@ -575,12 +580,9 @@ namespace LogicalTaskTree
             }
         }
 
-        private void onNodeProgressChanged(bool finished)
+        private void OnNodeProgressChanged(bool finished)
         {
-            if (this.NodeProgressChanged != null)
-            {
-                this.NodeProgressChanged(this, new NetEti.Globals.CommonProgressChangedEventArgs(finished ? 100 : 0, null));
-            }
+            this.NodeProgressChanged?.Invoke(this, new ProgressChangedEventArgs(finished ? 100 : 0, null));
         }
 
         #endregion private members

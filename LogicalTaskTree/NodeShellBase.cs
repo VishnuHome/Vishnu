@@ -34,7 +34,7 @@ namespace LogicalTaskTree
         /// <param name="treeParameters">Interne Parameter des Trees.</param>
         /// <param name="source">Aufrufewndes TreeEvent.</param>
         /// <returns>True, wenn der Run/Start ausgeführt werden kann.</returns>
-        public bool CanRun(ref object parameters, TreeParameters treeParameters, TreeEvent source)
+        public bool CanRun(ref object? parameters, TreeParameters treeParameters, TreeEvent source)
         {
             if (this.CanRunDll == null)
             {
@@ -54,7 +54,7 @@ namespace LogicalTaskTree
         /// CanRun aufgerufen. Liefert CanRun false zurück, wird der Start abgebrochen.
         /// Zusätzlich können in CanRun die übergebenen Parameter noch modifiziert werden.
         /// </summary>
-        public string CanRunDllPath
+        public string? CanRunDllPath
         {
             get
             {
@@ -88,7 +88,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Wenn ungleich null, dann ist beim dynamischen Laden der Dll ein Fehler aufgetreten.
         /// </summary>
-        internal ApplicationException CanRunLoadingException { get; set; }
+        internal ApplicationException? CanRunLoadingException { get; set; }
 
         #endregion internal members
 
@@ -100,19 +100,19 @@ namespace LogicalTaskTree
         /// In CanRun können darüber hinaus die per ref übergebenen Parameter noch
         /// modifiziert werden.
         /// </summary>
-        protected ICanRun CanRunDll { get; private set; }
+        protected ICanRun? CanRunDll { get; private set; }
 
         #endregion protected members
 
         #region private members
 
-        private string _canRunDllPath;
+        private string? _canRunDllPath;
 
         private void loadCanRunDll()
         {
             if (!String.IsNullOrEmpty(this.CanRunDllPath) && this.CanRunDll == null)
             {
-                this.CanRunDll = (ICanRun)VishnuAssemblyLoader.GetAssemblyLoader()
+                this.CanRunDll = (ICanRun?)VishnuAssemblyLoader.GetAssemblyLoader()
                         .DynamicLoadObjectOfTypeFromAssembly(this.CanRunDllPath, typeof(ICanRun));
                 if (this.CanRunDll == null)
                 {

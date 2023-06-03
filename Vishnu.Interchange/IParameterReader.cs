@@ -17,7 +17,7 @@ namespace Vishnu.Interchange
         /// <summary>
         /// Event, das ausgelöst wird, wenn die Parameter neu geladen wurden.
         /// </summary>
-        event EventHandler ParametersReloaded;
+        event EventHandler? ParametersReloaded;
 
         /// <summary>
         /// Routine, die Startparameter übernimmt und den ParameterReader
@@ -25,7 +25,7 @@ namespace Vishnu.Interchange
         /// aufgerufen werden.
         /// </summary>
         /// <param name="parameters">Ein Objekt zur Parameterübergabe.</param>
-        void Init(object parameters);
+        void Init(object? parameters);
 
         /// <summary>
         /// Liefert zu einem String-Parameter einen String-Wert.

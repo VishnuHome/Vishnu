@@ -26,14 +26,18 @@ namespace LogicalTaskTree
         /// <param name="comparer">Vergleichsoperator:"LT","LE","NE","EQ","GE" oder "GT"</param>
         /// <param name="results">Liste mit zu vergleichenden Objekten</param>
         /// <returns>True, False oder null</returns>
-        public bool? Compare(string comparer, List<Result> results)
+        public bool? Compare(string comparer, List<Result?>? results)
         {
+            if (results == null)
+            {
+                return null;
+            }
             for (int i = 0; i < results.Count - 1; i++)
             {
-                object left = null;
-                object right = null;
-                object leftCandidate = results[i]?.ReturnObject;
-                object rightCandidate = results[i + 1]?.ReturnObject;
+                object? left = null;
+                object? right = null;
+                object? leftCandidate = results[i]?.ReturnObject;
+                object? rightCandidate = results[i + 1]?.ReturnObject;
                 if (leftCandidate == null || rightCandidate == null)
                 {
                     return null;
@@ -200,7 +204,7 @@ namespace LogicalTaskTree
                     left = leftCandidate.ToString();
                     right = rightCandidate.ToString();
                 }
-                if (!this.compare(comparer, left.GetType(), left, right))
+                if (!this.compare(comparer, left?.GetType(), left, right))
                 {
                     return false;
                 }
@@ -212,8 +216,12 @@ namespace LogicalTaskTree
 
         #region private members
 
-        private bool compare(string comparer, Type typeToCompare, object candidate1, object candidate2)
+        private bool compare(string comparer, Type? typeToCompare, object? candidate1, object? candidate2)
         {
+            if (candidate1 == null || candidate2 == null || typeToCompare == null)
+            {
+                return false;
+            }
             if (typeToCompare == typeof(bool))
             {
                 switch (comparer)
@@ -261,17 +269,17 @@ namespace LogicalTaskTree
                         switch (comparer)
                         {
                             case "LT":
-                                return (candidate1.ToString().CompareTo(candidate2.ToString()) < 0);
+                                return (((string)candidate1).CompareTo(candidate2.ToString()) < 0);
                             case "LE":
-                                return (candidate1.ToString().CompareTo(candidate2.ToString()) <= 0);
+                                return (((string)candidate1).CompareTo(candidate2.ToString()) <= 0);
                             case "NE":
-                                return (candidate1.ToString().CompareTo(candidate2.ToString()) != 0);
+                                return (((string)candidate1).CompareTo(candidate2.ToString()) != 0);
                             case "EQ":
-                                return (candidate1.ToString().CompareTo(candidate2.ToString()) == 0);
+                                return (((string)candidate1).CompareTo(candidate2.ToString()) == 0);
                             case "GE":
-                                return (candidate1.ToString().CompareTo(candidate2.ToString()) >= 0);
+                                return (((string)candidate1).CompareTo(candidate2.ToString()) >= 0);
                             case "GT":
-                                return (candidate1.ToString().CompareTo(candidate2.ToString()) > 0);
+                                return (((string)candidate1).CompareTo(candidate2.ToString()) > 0);
                             default: return false;
                         }
                     }
@@ -343,17 +351,17 @@ namespace LogicalTaskTree
                                     switch (comparer)
                                     {
                                         case "LT":
-                                            return (candidate1.ToString().CompareTo(candidate2.ToString()) < 0);
+                                            return (((string)candidate1).CompareTo(candidate2.ToString()) < 0);
                                         case "LE":
-                                            return (candidate1.ToString().CompareTo(candidate2.ToString()) <= 0);
+                                            return (((string)candidate1).CompareTo(candidate2.ToString()) <= 0);
                                         case "NE":
-                                            return (candidate1.ToString().CompareTo(candidate2.ToString()) != 0);
+                                            return (((string)candidate1).CompareTo(candidate2.ToString()) != 0);
                                         case "EQ":
-                                            return (candidate1.ToString().CompareTo(candidate2.ToString()) == 0);
+                                            return (((string)candidate1).CompareTo(candidate2.ToString()) == 0);
                                         case "GE":
-                                            return (candidate1.ToString().CompareTo(candidate2.ToString()) >= 0);
+                                            return (((string)candidate1).CompareTo(candidate2.ToString()) >= 0);
                                         case "GT":
-                                            return (candidate1.ToString().CompareTo(candidate2.ToString()) > 0);
+                                            return (((string)candidate1).CompareTo(candidate2.ToString()) > 0);
                                         default: return false;
                                     }
                                 }

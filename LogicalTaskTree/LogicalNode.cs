@@ -11,6 +11,7 @@ using NetEti.MVVMini;
 using LogicalTaskTree.Provider;
 using System.Text;
 using System.Windows;
+using System.ComponentModel;
 // using System.Windows.Threading;
 
 namespace LogicalTaskTree
@@ -60,7 +61,7 @@ namespace LogicalTaskTree
     /// </summary>
     /// <param name="sender">Die Ereignis-Quelle.</param>
     /// <param name="result">Das neue Result.</param>
-    public delegate void ResultChangedEventHandler(LogicalNode sender, Result result);
+    public delegate void ResultChangedEventHandler(LogicalNode sender, Result? result);
 
     /// <summary>
     /// Wird aufgerufen, wenn eine Exception aufgetreten ist.
@@ -78,6 +79,82 @@ namespace LogicalTaskTree
     #endregion definitions
 
     /// <summary>
+    /// Klassendefinition für eine undefinierte LogicalNode.
+    /// Ersetzt null, um die elenden null-Warnungen bei der Verwendung von LogicalNodes
+    /// zu umgehen, bei denen sichergestellt ist, dass sie zum Zeitpunkt der Verwendung
+    /// ungleich null sind, die aber im Konstruktor sonst noch nicht sinnvoll instanziiert
+    /// werden könnten.
+    /// Bei eventuellen späteren null-Abfragen muss null durch die statische Instanz
+    /// 'UndefinedLogicalNode' (siehe weiter unten) ersetzt werden.
+    /// </summary>
+    public class UndefinedLogicalNodeClass : LogicalNode, IUndefinedElement
+    {
+        /// <summary>
+        /// Result für diesen Knoten.
+        /// Wirft hier eine NotImplementedException.
+        /// </summary>
+        public override Result? LastResult { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        /// <summary>
+        /// Der logische Zustand eines Knotens; hierum geht es letztendlich in der
+        /// gesamten Verarbeitung.
+        /// Wirft hier eine NotImplementedException.
+        /// </summary>
+        public override bool? Logical { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        /// <summary>
+        /// Anzahl der SingleNodes (letztendlich Checker) am Ende eines (Teil-)Baums.
+        /// Wirft hier eine NotImplementedException.
+        /// </summary>
+        public override int SingleNodes => throw new NotImplementedException();
+
+        /// <summary>
+        /// Prozentwert für den Anteil der beendeten SingleNodes
+        /// (letztendlich Checker) am Ende eines (Teil-)Baums.
+        /// Wirft hier eine NotImplementedException.
+        /// </summary>
+        public override int SingleNodesFinished => throw new NotImplementedException();
+
+        /// <summary>
+        /// Der Verarbeitungszustand eines Knotens:
+        /// None, Waiting, Working, Finished, Triggered, Ready (= Finished | Triggered), CanStart (= None|Ready), Busy (= Waiting | Working).
+        /// Wirft hier eine NotImplementedException.
+        /// </summary>
+        public override NodeState State { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        /// <summary>
+        /// Der Pfad zum aktuell dynamisch zu ladenden UserControl.
+        /// Wirft hier eine NotImplementedException.
+        /// </summary>
+        public override string UserControlPath { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        /// <summary>
+        /// Die eigentliche, Knotentyp-spezifische Verarbeitung.
+        /// Wirft hier eine NotImplementedException.
+        /// </summary>
+        /// <param name="source">Auslösendes TreeEvent oder null.</param>
+        protected override void DoRun(TreeEvent? source)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Liefert eine Liste mit allen Result-Objekten des Teilbaums.
+        /// Wirft hier eine NotImplementedException.
+        /// </summary>
+        /// <returns>Wirft hier eine NotImplementedException.</returns>
+        internal override ResultList GetResultList()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Standard-Konstruktor.
+        /// </summary>
+        public UndefinedLogicalNodeClass() : base("UNDEFINED", null, null, null) { }
+    }
+
+    /// <summary>
     /// Abstrakte Basisklasse für einen Knoten im LogicalTaskTree.
     /// </summary>
     /// <remarks>
@@ -89,74 +166,84 @@ namespace LogicalTaskTree
     /// </remarks>
     public abstract class LogicalNode : GenericTree<LogicalNode>, IVishnuNode
     {
+        /// <summary>
+        /// Statische Instanz für eine undefinierte LogicalNode.
+        /// Ersetzt null, um die elenden null-Warnungen bei der Verwendung von LogicalNodes
+        /// zu umgehen, bei denen sichergestellt ist, dass sie zum Zeitpunkt der Verwendung
+        /// ungleich null sind, die aber im Konstruktor sonst noch nicht sinnvoll instanziiert
+        /// werden könnten.
+        /// Bei eventuellen späteren null-Abfragen muss null durch diese Instanz ersetzt werden.
+        /// Es kann dann ggf. auf 'is IUndefinedElement' geprüft werden.
+        /// </summary>
+        public static readonly UndefinedLogicalNodeClass UndefinedLogicalNode = new();
 
         #region events
 
         /// <summary>
         /// Wird aufgerufen, wenn sich der Verarbeitungszustand eines Knotens geändert hat.
         /// </summary>
-        public static event AllStatesChangedEventHandler AllNodesStateChanged;
+        public static event AllStatesChangedEventHandler? AllNodesStateChanged;
 
         /// <summary>
         /// Dieses Event aus IVishnuNode.INotifyPropertiesChanged kann von LogicalNodeViewmodel abonniert werden.
         /// Dieses erhält über die übergebenen PropertiesChangedEventArgs eine String-List mit Property-Namen
         /// und kann seinerseits über INotifyProperyChanged die UI informieren.
         /// </summary>
-        public event PropertiesChangedEventHandler PropertiesChanged;
+        public event PropertiesChangedEventHandler? PropertiesChanged;
 
         /// <summary>
         /// Wird aufgerufen, wenn sich das logische Ergebnis eines Knotens geändert hat.
         /// </summary>
-        public event LogicalChangedEventHandler NodeLogicalChanged;
+        public event LogicalChangedEventHandler? NodeLogicalChanged;
 
         /// <summary>
         /// Wird aufgerufen, wenn sich das logische Ergebnis eines Knotens geändert hat
         /// und ungleich null ist.
         /// </summary>
-        public event LastNotNullLogicalChangedEventHandler NodeLastNotNullLogicalChanged;
+        public event LastNotNullLogicalChangedEventHandler? NodeLastNotNullLogicalChanged;
 
         /// <summary>
         /// Wird aufgerufen, wenn sich das Result eines Knotens geändert hat.
         /// Dient dazu, die Berechnung des logischen Zustands des übergeordneten
         /// Knotens neu zu starten.
         /// </summary>
-        public event ResultChangedEventHandler NodeResultChanged;
+        public event ResultChangedEventHandler? NodeResultChanged;
 
         /// <summary>
         /// Wird aufgerufen, wenn sich der Verarbeitungszustand eines Knotens geändert hat.
         /// </summary>
-        public event StateChangedEventHandler NodeStateChanged;
+        public event StateChangedEventHandler? NodeStateChanged;
 
         /// <summary>
         /// Wird aufgerufen, wenn eine Exception aufgetreten ist.
         /// </summary>
-        public event ExceptionRaisedEventHandler ExceptionRaised;
+        public event ExceptionRaisedEventHandler? ExceptionRaised;
 
         /// <summary>
         /// Wird aufgerufen, wenn eine Exception gelöscht wird.
         /// </summary>
-        public event NodeChangedEventHandler ExceptionCleared;
+        public event NodeChangedEventHandler? ExceptionCleared;
 
         /// <summary>
         /// Wird aufgerufen, wenn sich der Gesamtzustand der dem Knoten
         /// zugeordneten Worker geändert hat.
         /// </summary>
-        public event NodeChangedEventHandler NodeWorkersStateChanged;
+        public event NodeChangedEventHandler? NodeWorkersStateChanged;
 
         /// <summary>
         /// Wird aufgerufen, wenn ein Knoten gestartet wurde.
         /// </summary>
-        public event CommonProgressChangedEventHandler NodeProgressStarted;
+        public event ProgressChangedEventHandler? NodeProgressStarted;
 
         /// <summary>
         /// Wird aufgerufen, wenn sich der Verarbeitungs-Fortschritt eines Knotens geändert hat.
         /// </summary>
-        public event CommonProgressChangedEventHandler NodeProgressChanged;
+        public event ProgressChangedEventHandler? NodeProgressChanged;
 
         /// <summary>
         /// Wird aufgerufen, wenn die Verarbeitung eines Knotens abgeschlossen wurde (unabhängig vom Ergebnis).
         /// </summary>
-        public event CommonProgressChangedEventHandler NodeProgressFinished;
+        public event ProgressChangedEventHandler? NodeProgressFinished;
 
         #endregion events
 
@@ -339,7 +426,7 @@ namespace LogicalTaskTree
         /// Das letzte auslösende TreeEvent (bei TreeEvent-getriggerten Knoten)
         /// oder null.
         /// </summary>
-        public TreeEvent LastExecutingTreeEvent { get; protected set; }
+        public TreeEvent? LastExecutingTreeEvent { get; protected set; }
 
         /// <summary>
         /// Der letzte logische Zustand eines Knotens.
@@ -368,7 +455,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Result für diesen Knoten.
         /// </summary>
-        public abstract Result LastResult { get; set; }
+        public abstract Result? LastResult { get; set; }
 
         /// <summary>
         /// Zeitpunkt des letzten Starts des Knoten.
@@ -402,7 +489,7 @@ namespace LogicalTaskTree
         /// Optionaler zum globalen Sperren verwendeter Name.
         /// Wird verwendet, wenn ThreadLocked gesetzt ist.
         /// </summary>
-        public string LockName
+        public string? LockName
         {
             get
             {
@@ -432,7 +519,7 @@ namespace LogicalTaskTree
         /// Ein optionaler Logger, der bei bestimmten Ereignissen
         /// aufgerufen wird oder null.
         /// </summary>
-        public LoggerShell Logger { get; set; }
+        public LoggerShell? Logger { get; set; }
 
         /// <summary>
         /// Der logische Zustand eines Knotens; hierum geht es letztendlich in der
@@ -508,7 +595,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Info-Text über den nächsten Start des Knotens (wenn bekannt) oder null.
         /// </summary>
-        public virtual string NextRunInfo
+        public virtual string? NextRunInfo
         {
             get
             {
@@ -546,7 +633,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Das Parent-Control, in dem dieser Knoten dargestellt wird.
         /// </summary>
-        public FrameworkElement ParentView { get; set; }
+        public FrameworkElement? ParentView { get; set; }
 
         /// <summary>
         /// Der Pfad zum Knoten bestehend aus einer durch '/' getrennte Kette von NameIds:
@@ -557,7 +644,7 @@ namespace LogicalTaskTree
         {
             get
             {
-                return this.Mother == null ? this.NameId : (this.Mother as LogicalNode).Path + '/' + this.NameId;
+                return this.Mother == null ? this.NameId : ((LogicalNode)this.Mother).Path + '/' + this.NameId;
             }
         }
 
@@ -568,24 +655,24 @@ namespace LogicalTaskTree
         {
             get
             {
-                return this.Mother == null ? this.Id : (this.Mother as LogicalNode).IdPath + '/' + this.Id;
+                return this.Mother == null ? this.Id : ((LogicalNode)this.Mother).IdPath + '/' + this.Id;
             }
         }
 
         /// <summary>
         /// Id eines ursprünglich referenzierten Knotens oder null.
         /// </summary>
-        public virtual string ReferencedNodeId { get; set; }
+        public virtual string? ReferencedNodeId { get; set; }
 
         /// <summary>
         /// Name eines ursprünglich referenzierten Knotens oder null.
         /// </summary>
-        public virtual string ReferencedNodeName { get; set; }
+        public virtual string? ReferencedNodeName { get; set; }
 
         /// <summary>
         /// Pfad eines ursprünglich referenzierten Knotens oder null.
         /// </summary>
-        public virtual string ReferencedNodePath { get; set; }
+        public virtual string? ReferencedNodePath { get; set; }
 
         /// <summary>
         /// Anzahl der SingleNodes (letztendlich Checker) am Ende eines (Teil-)Baums.
@@ -640,7 +727,7 @@ namespace LogicalTaskTree
         /// Ein optionaler Trigger, der den Job wiederholt aufruft
         /// oder null (setzt intern BreakWithResult außer Kraft).
         /// </summary>
-        public INodeTrigger Trigger
+        public INodeTrigger? Trigger
         {
             get
             {
@@ -681,10 +768,7 @@ namespace LogicalTaskTree
         /// </summary>
         internal static void OnAllNodesStateChanged()
         {
-            if (AllNodesStateChanged != null)
-            {
-                AllNodesStateChanged();
-            }
+            AllNodesStateChanged?.Invoke();
         }
 
         /// <summary>
@@ -708,7 +792,7 @@ namespace LogicalTaskTree
                     else
                     {
                         // Hier folgt die LogicalChangedDelay-Verarbeitung.
-                        if (!((this as JobList).IsChangeEventPending))
+                        if (!(((JobList)this).IsChangeEventPending))
                         {
                             if (this.AppSettings.LogicalChangedDelay == 0)
                             {
@@ -716,7 +800,7 @@ namespace LogicalTaskTree
                             }
                             else
                             {
-                                ((this as JobList).IsChangeEventPending) = true;
+                                (((JobList)this).IsChangeEventPending) = true;
                                 Task.Factory.StartNew(() =>
                                 {
                                     Thread.CurrentThread.Name = "LogicalChangeDelay";
@@ -735,10 +819,7 @@ namespace LogicalTaskTree
         /// </summary>
         internal virtual void OnNodeLogicalChanged()
         {
-            if (NodeLogicalChanged != null)
-            {
-                NodeLogicalChanged(this, this.Logical);
-            }
+            NodeLogicalChanged?.Invoke(this, this.Logical);
         }
 
         /// <summary>
@@ -747,10 +828,7 @@ namespace LogicalTaskTree
         /// </summary>
         internal virtual void OnPropertiesChanged(List<string> propertyNames)
         {
-            if (PropertiesChanged != null)
-            {
-                PropertiesChanged(this, new PropertiesChangedEventArgs(propertyNames));
-            }
+            PropertiesChanged?.Invoke(this, new PropertiesChangedEventArgs(propertyNames));
         }
 
         /// <summary>
@@ -758,10 +836,7 @@ namespace LogicalTaskTree
         /// </summary>
         internal virtual void OnNodeStateChanged()
         {
-            if (NodeStateChanged != null)
-            {
-                NodeStateChanged(this, this.State);
-            }
+            NodeStateChanged?.Invoke(this, this.State);
         }
 
         /// <summary>
@@ -769,10 +844,7 @@ namespace LogicalTaskTree
         /// </summary>
         internal virtual void OnNodeResultChanged()
         {
-            if (NodeResultChanged != null)
-            {
-                NodeResultChanged(this, this.LastResult);
-            }
+            NodeResultChanged?.Invoke(this, this.LastResult);
         }
 
         /// <summary>
@@ -798,7 +870,7 @@ namespace LogicalTaskTree
                 {
                     if (this.LastExceptions[source].GetType() != exception.GetType())
                     {
-                        Exception dummyException = null;
+                        Exception? dummyException = null;
                         this.LastExceptions.TryRemove(source, out dummyException);
                     }
                 }
@@ -826,10 +898,7 @@ namespace LogicalTaskTree
                         // deshalb hier auskommentiert und unterhalb dieses "if" eingefügt.
                         // Testfall für den Fehler ist "TestJobs/SnapshotTest/ShowRefAll".
                     }
-                    if (ExceptionRaised != null)
-                    {
-                        ExceptionRaised(source, exception);
-                    } // 18.08.2018-
+                    ExceptionRaised?.Invoke(source, exception); // 18.08.2018-
                 }
             }
         }
@@ -844,7 +913,7 @@ namespace LogicalTaskTree
             {
                 if (this.LastExceptions.ContainsKey(source))
                 {
-                    Exception dummyException = null;
+                    Exception? dummyException = null;
                     this.LastExceptions.TryRemove(source, out dummyException);
                     if (this.LastExceptions.Count == 0)
                     {
@@ -859,10 +928,7 @@ namespace LogicalTaskTree
                         // deshalb hier auskommentiert und unterhalb dieses "if" eingefügt.
                         // Testfall für den Fehler ist "TestJobs/SnapshotTest/ShowRefAll".
                     }
-                    if (ExceptionCleared != null)
-                    {
-                        ExceptionCleared(source);
-                    } // 18.08.2018-
+                    ExceptionCleared?.Invoke(source); // 18.08.2018-
                 }
             }
         }
@@ -877,13 +943,10 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="source">Der Knoten , der das Event ausgelöst hat.</param>
         /// <param name="args">CommonProgressChangedEventArgs.</param>
-        protected void OnNodeProgressStarted(object source, CommonProgressChangedEventArgs args)
+        protected void OnNodeProgressStarted(object? source, ProgressChangedEventArgs args)
         {
             this.ProcessTreeEvent("Started", null);
-            if (NodeProgressStarted != null)
-            {
-                NodeProgressStarted(source, args);
-            }
+            NodeProgressStarted?.Invoke(source, args);
         }
 
         /// <summary>
@@ -892,18 +955,14 @@ namespace LogicalTaskTree
         /// <param name="itemsName">Name für die Elemente, die für den Verarbeitungsfortschritt gezählt werden.</param>
         /// <param name="countAll">Gesamtanzahl - entspricht 100%.</param>
         /// <param name="countSucceeded">Erreichte Anzahl - kleiner-gleich 100%.</param>
-        /// <param name="itemsType">Art der zu zählenden Elemente - Teile eines Ganzen, Ganze Elemente oder Element-Gruppen.</param>
-        protected virtual void OnNodeProgressChanged(string itemsName, long countAll, long countSucceeded, ItemsTypes itemsType)
+        protected virtual void OnNodeProgressChanged(string itemsName, long countAll, long countSucceeded)
         {
             LogicalNode.WaitWhileTreePaused();
             if (this.IsThreadValid(Thread.CurrentThread))
             {
-                CommonProgressChangedEventArgs args = new CommonProgressChangedEventArgs(itemsName, countAll, countSucceeded, itemsType, null);
+                ProgressChangedEventArgs args = new ProgressChangedEventArgs((int)(((100.0 * countSucceeded) / countAll) + .5), null);
                 this.ProcessTreeEvent("ProgressChanged", args.ProgressPercentage);
-                if (NodeProgressChanged != null)
-                {
-                    NodeProgressChanged(null, args);
-                }
+                NodeProgressChanged?.Invoke(null, args);
             }
         }
 
@@ -913,8 +972,7 @@ namespace LogicalTaskTree
         /// <param name="itemsName">Name für die Elemente, die für den Verarbeitungsfortschritt gezählt werden.</param>
         /// <param name="countAll">Gesamtanzahl - entspricht 100%.</param>
         /// <param name="countSucceeded">Erreichte Anzahl - kleiner-gleich 100%.</param>
-        /// <param name="itemsType">Art der zu zählenden Elemente - Teile eines Ganzen, Ganze Elemente oder Element-Gruppen.</param>
-        public virtual void OnNodeProgressFinished(string itemsName, long countAll, long countSucceeded, ItemsTypes itemsType)
+        public virtual void OnNodeProgressFinished(string itemsName, long countAll, long countSucceeded)
         {
             LogicalNode.WaitWhileTreePaused();
             if (this.IsThreadValid(Thread.CurrentThread))
@@ -924,7 +982,7 @@ namespace LogicalTaskTree
                 {
                     try
                     {
-                        NodeProgressFinished(null, new CommonProgressChangedEventArgs(itemsName, countAll, countSucceeded, itemsType, null));
+                        NodeProgressFinished(null, new ProgressChangedEventArgs((int)(((100.0 * countSucceeded) / countAll) + .5), null));
                     }
                     catch (Exception ex)
                     {
@@ -988,10 +1046,7 @@ namespace LogicalTaskTree
         /// <param name="eventId">Eine optionale Guid zur eindeutigen Identifizierung des Events.</param>
         protected void RaiseNodeLogicalChanged(LogicalNode source, bool? logical, Guid eventId)
         {
-            if (this.NodeLogicalChanged != null)
-            {
-                this.NodeLogicalChanged(source, logical);
-            }
+            this.NodeLogicalChanged?.Invoke(source, logical);
         }
 
         /// <summary>
@@ -1019,10 +1074,7 @@ namespace LogicalTaskTree
         /// <param name="eventId">Eine optionale Guid zur eindeutigen Identifizierung des Events.</param>
         internal void OnNodeLastNotNullLogicalChanged(LogicalNode source, bool? lastNotNullLogical, Guid eventId)
         {
-            if (NodeLastNotNullLogicalChanged != null)
-            {
-                NodeLastNotNullLogicalChanged(source, this.LastNotNullLogical, eventId);
-            }
+            NodeLastNotNullLogicalChanged?.Invoke(source, this.LastNotNullLogical, eventId);
         }
 
         /// <summary>
@@ -1090,39 +1142,42 @@ namespace LogicalTaskTree
         /// benötigt (JobSnapshotTrigger).
         /// </summary>
         /// <returns>Feuernder Knoten oder null.</returns>
-        public LogicalNode GetlastEventSourceIfIsTreeEventTriggered()
+        public LogicalNode? GetlastEventSourceIfIsTreeEventTriggered()
         {
-            LogicalNode source = null;
-            if (this.Trigger != null && (this.Trigger as TriggerShell).HasTreeEventTrigger)
+            LogicalNode? source = null;
+            if (this.Trigger != null && ((TriggerShell)this.Trigger).HasTreeEventTrigger)
             {
-                TreeEventTrigger trigger = (this.Trigger as TriggerShell).GetTreeEventTrigger();
-                TreeEvent triggersLastTreeEvent = trigger.LastTreeEvent;
-                string treeEventString = triggersLastTreeEvent == null ? "" : triggersLastTreeEvent.ToString();
-                if (triggersLastTreeEvent != null) // prüft nur, ob der Trigger überhaupt schon mal gefeuert hat
+                TreeEventTrigger? trigger = ((TriggerShell)this.Trigger).GetTreeEventTrigger();
+                if (trigger != null)
                 {
-                    // TODO: Eventliste komplettieren, elegantere Lösung suchen
+                    TreeEvent? triggersLastTreeEvent = trigger.LastTreeEvent;
+                    string treeEventString = triggersLastTreeEvent == null ? "" : triggersLastTreeEvent.ToString();
+                    if (triggersLastTreeEvent != null) // prüft nur, ob der Trigger überhaupt schon mal gefeuert hat
+                    {
+                        // TODO: Eventliste komplettieren, elegantere Lösung suchen
 
-                    // 16.05.2019 Nagel+ diese Variante auskommentiert:
-                    // source = this.FindNodeById(triggersLastTreeEvent.SourceId);
-                    // Grund: TreeEventTrigger auf JobLists funktionierten bei mehrmaligem Run nicht mehr.
-                    // Ursache war, dass immer der Zustand der Source des Events abgefragt wurde anstelle
-                    // korrekterweise der Zustand des referenzierten Knoten(in diesem Falle der JobList)
-                    // wie in der nachfolgenden Variante; Im Extremfall löste so der abfragende Knoten
-                    // selbst die Joblist neu aus und fragte dann in Folge seinen eigenen Zustand ab
-                    // (Test - Job: CheckAnyTreeEvent).
-                    source = this.FindNodeById(trigger.ReferencedNodeId); // 16.05.2019 Nagel- dies ist die korrekte Abfrage
-                    if ((trigger.InternalEvents.Contains("LastNotNullLogicalToTrue") && source?.LastNotNullLogical == true)
-                        || (trigger.InternalEvents.Contains("LastNotNullLogicalToFalse") && source?.LastNotNullLogical == false)
-                        || (trigger.InternalEvents.Contains("AnyException") && source?.LastExceptions.Count > 0)
-                        || (trigger.InternalEvents.Contains("LastNotNullLogicalChanged"))
-                        || (trigger.InternalEvents.Contains("Breaked") && source?.LastLogicalState == NodeLogicalState.UserAbort))
-                    {
-                        this.Logical = source.Logical;
-                        this.LastExecutingTreeEvent = triggersLastTreeEvent;
-                    }
-                    else
-                    {
-                        this.LastExecutingTreeEvent = null;
+                        // 16.05.2019 Nagel+ diese Variante auskommentiert:
+                        // source = this.FindNodeById(triggersLastTreeEvent.SourceId);
+                        // Grund: TreeEventTrigger auf JobLists funktionierten bei mehrmaligem Run nicht mehr.
+                        // Ursache war, dass immer der Zustand der Source des Events abgefragt wurde anstelle
+                        // korrekterweise der Zustand des referenzierten Knoten(in diesem Falle der JobList)
+                        // wie in der nachfolgenden Variante; Im Extremfall löste so der abfragende Knoten
+                        // selbst die Joblist neu aus und fragte dann in Folge seinen eigenen Zustand ab
+                        // (Test - Job: CheckAnyTreeEvent).
+                        source = this.FindNodeById(trigger.ReferencedNodeId); // 16.05.2019 Nagel- dies ist die korrekte Abfrage
+                        if ((trigger.InternalEvents.Contains("LastNotNullLogicalToTrue") && source?.LastNotNullLogical == true)
+                            || (trigger.InternalEvents.Contains("LastNotNullLogicalToFalse") && source?.LastNotNullLogical == false)
+                            || (trigger.InternalEvents.Contains("AnyException") && source?.LastExceptions.Count > 0)
+                            || (trigger.InternalEvents.Contains("LastNotNullLogicalChanged"))
+                            || (trigger.InternalEvents.Contains("Breaked") && source?.LastLogicalState == NodeLogicalState.UserAbort))
+                        {
+                            this.Logical = source?.Logical;
+                            this.LastExecutingTreeEvent = triggersLastTreeEvent;
+                        }
+                        else
+                        {
+                            this.LastExecutingTreeEvent = null;
+                        }
                     }
                 }
             }
@@ -1148,11 +1203,11 @@ namespace LogicalTaskTree
             {
                 return this.CanTreeStart;
             }
-            LogicalNode source = this.GetlastEventSourceIfIsTreeEventTriggered();
+            LogicalNode? source = this.GetlastEventSourceIfIsTreeEventTriggered();
             // 02.02.2019 TEST Nagel+ if (this.Trigger == null || (this.LastExecutingTreeEvent != null && this.LastExecutingTreeEvent.Results != null)
             //   || this.RootJobList == this)
             if (this.Trigger == null
-                || !((this.Trigger as TriggerShell).HasTreeEventTrigger)
+                || !(((TriggerShell)this.Trigger).HasTreeEventTrigger)
                 || (this.LastExecutingTreeEvent != null && this.LastExecutingTreeEvent.Results != null)
                 || this.RootJobList == this) // 02.02.2019 TEST Nagel-
             {
@@ -1162,7 +1217,7 @@ namespace LogicalTaskTree
                     {
                         if (this.LastExecutingTreeEvent.Results != null)
                         {
-                            foreach (KeyValuePair<string, Result> item in this.LastExecutingTreeEvent.Results)
+                            foreach (KeyValuePair<string, Result?> item in this.LastExecutingTreeEvent.Results)
                             {
                                 if (!collectedEnvironment.ContainsKey(item.Key))
                                 {
@@ -1185,7 +1240,7 @@ namespace LogicalTaskTree
                         this.LastExecutingTreeEvent = new TreeEvent("PseudoTreeEvent", this.Id, this.Id, this.Name, this.Path, this.LastNotNullLogical, this.LastLogicalState, null, null);
                     }
                     this.Environment = new ResultList();
-                    foreach (KeyValuePair<string, Result> item in collectedEnvironment)
+                    foreach (KeyValuePair<string, Result?> item in collectedEnvironment)
                     {
                         this.Environment.TryAdd(item.Key, item.Value);
                     }
@@ -1218,6 +1273,8 @@ namespace LogicalTaskTree
           : base(mother)
         {
             this.IsSnapshotDummy = true;
+            this.Id = "Dummy";
+            this.Name = "Dummy";
             this.TreeParams = treeParams;
             this.AppSettings = GenericSingletonProvider.GetInstance<AppSettings>();
             this.DebugMode = this.AppSettings.DebugMode;
@@ -1229,12 +1286,13 @@ namespace LogicalTaskTree
             this.LastStateLocker = new object();
             this.LastLogicalStateLocker = new object();
             this._runLocker = new object();
+            this._runAsyncLocker = new object();
             this.ResultLocker = new object();
             this._loggerLocker = new object();
             this.LastExceptions = new ConcurrentDictionary<LogicalNode, Exception>();
             this.IsInSnapshot = true;
             this.LastExecutingTreeEvent = null;
-            this.Environment = new ResultList();
+            this._environment = new ResultList();
             this._threadStartLocker = new object();
             this._validateLastNotNullLogicalLocker = new object();
             this._nodeLogicalChangedLocker = new object();
@@ -1256,7 +1314,7 @@ namespace LogicalTaskTree
         /// <param name="mother">Der Parent-Knoten.</param>
         /// <param name="rootJobList">Die zuständige JobList.</param>
         /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
-        public LogicalNode(string id, LogicalNode mother, JobList rootJobList, TreeParameters treeParams)
+        public LogicalNode(string id, LogicalNode? mother, JobList? rootJobList, TreeParameters? treeParams)
           : base(mother)
         {
             this.IsSnapshotDummy = false;
@@ -1266,7 +1324,14 @@ namespace LogicalTaskTree
             this.Level = mother == null ? 0 : mother.Level + 1;
             this.Name = id;
             this.Mother = mother;
-            this.TreeParams = treeParams;
+            if (treeParams != null)
+            {
+                this.TreeParams = treeParams;
+            }
+            else
+            {
+                this.TreeParams = new TreeParameters("undefined", null);
+            }
             if (rootJobList != null)
             {
                 this.RootJobList = rootJobList;
@@ -1275,7 +1340,7 @@ namespace LogicalTaskTree
             {
                 this.RootJobList = (JobList)this;
             }
-            this.TreeRootJobList = this.RootJobList == null ? (JobList)this : this.RootJobList.GetTopRootJobList();
+            this.TreeRootJobList = this.RootJobList.GetTopRootJobList();
             this.Trigger = null;
             this.IsTaskActiveOrScheduled = false;
             this.ExceptionLocker = new object();
@@ -1296,17 +1361,14 @@ namespace LogicalTaskTree
             this.LastExceptions = new ConcurrentDictionary<LogicalNode, Exception>();
             this.IsInSnapshot = false;
             this.LastExecutingTreeEvent = null;
-            this.Environment = new ResultList();
+            this._environment = new ResultList();
             this.IsFirstRun = true;
             this.IsRunRequired = false;
             this.IsResetting = false;
             this.InitNodes = false;
             this.IsGlobal = false;
             this._parentViewLocker = new object();
-            if (this.Id != null)
-            {
-                this.SetWorkersState(null);
-            }
+            this.SetWorkersState(null);
             this.SleepTimeFrom = this.AppSettings.SleepTimeFrom;
             this.SleepTimeTo = this.AppSettings.SleepTimeTo;
         }
@@ -1365,7 +1427,7 @@ namespace LogicalTaskTree
             this.ProcessTreeEvent(source.Name, source);
             if (this.IsSnapshotDummy)
             {
-                this.OnNodeProgressStarted(this, new CommonProgressChangedEventArgs(this.Id, 100, 0, ItemsTypes.itemParts, null));
+                this.OnNodeProgressStarted(this, new ProgressChangedEventArgs(0, null));
                 return;
             }
             // Bei einem "UserRun" innerhalb eines controlled-Jobs werden alle Knoten des Jobs
@@ -1423,16 +1485,16 @@ namespace LogicalTaskTree
                     }
                 }
             }
-            TriggerShell triggerShell = this.Trigger == null ? null : this.Trigger as TriggerShell;
+            TriggerShell? triggerShell = this.Trigger == null ? null : (TriggerShell)this.Trigger;
             //if (this.Trigger != null && triggerShell.HasTreeEventTrigger && !triggerShell.GetTreeEventTrigger().IsActive)
-            if (this.Trigger != null && triggerShell.HasTreeEventTrigger)
+            if (this.Trigger != null && triggerShell != null && triggerShell.HasTreeEventTrigger == true)
             {
                 // TreeEventTrigger werden bei UserRun auf jeden Fall gestartet.
                 triggerShell.Start(this, null, this.RunAsyncAsync);
                 if (this.LastExecutingTreeEvent == null || this.LastExecutingTreeEvent.Name == "UserRun")
                 {
-                    TreeEventTrigger trigger = triggerShell.GetTreeEventTrigger();
-                    if (trigger.LastTreeEvent != null && canRun)
+                    TreeEventTrigger? trigger = triggerShell.GetTreeEventTrigger();
+                    if (trigger?.LastTreeEvent != null && canRun)
                     {
                         this.RunAsyncAsync(trigger.LastTreeEvent);
                     }
@@ -1444,7 +1506,7 @@ namespace LogicalTaskTree
             }
             else
             {
-                this.OnNodeProgressStarted(this, new CommonProgressChangedEventArgs(this.Id, 100, 0, ItemsTypes.itemParts, null));
+                this.OnNodeProgressStarted(this, new ProgressChangedEventArgs(0, null));
             }
         }
 
@@ -1455,14 +1517,11 @@ namespace LogicalTaskTree
         {
             if (this.Trigger != null && this.Trigger is TriggerShell)
             {
-                (this.Trigger as TriggerShell).RegisterTriggerIt(this.Path, this);
+                ((TriggerShell)this.Trigger).RegisterTriggerIt(this.Path, this);
             }
-            if (this.Children != null)
+            foreach (LogicalNode child in this.Children)
             {
-                foreach (LogicalNode child in this.Children)
-                {
-                    child.RegisterTriggeredNodes();
-                }
+                child.RegisterTriggeredNodes();
             }
         }
 
@@ -1473,7 +1532,7 @@ namespace LogicalTaskTree
         {
             if (this.Trigger != null && this.Trigger is TriggerShell && this.Path != null)
             {
-                (this.Trigger as TriggerShell).UnregisterTriggerIt(this.Path);
+                ((TriggerShell)this.Trigger).UnregisterTriggerIt(this.Path);
             }
             LogicalNode.WaitWhileTreePaused(); // vermeidet Deadlocks
             this.Logical = null; // essenziell
@@ -1494,7 +1553,7 @@ namespace LogicalTaskTree
         /// Wird aufgerufen, wenn der Teilbaum neu geladen werden soll.
         /// </summary>
         /// <returns>Die RootJobList des neu geladenen Jobs.</returns>
-        public virtual JobList Reload()
+        public virtual JobList? Reload()
         {
             this.ProcessTreeEvent("Reload", this.Path);
             return this.ReloadBranch();
@@ -1518,7 +1577,7 @@ namespace LogicalTaskTree
         /// <param name="userBreak">Bei True hat der Anwender das Break ausgelöst.</param>
         public virtual void Break(bool userBreak)
         {
-            if (this.Trigger != null && (userBreak || !(this.Trigger as TriggerShell).HasTreeEventTrigger))
+            if (this.Trigger != null && (userBreak || !((TriggerShell)this.Trigger).HasTreeEventTrigger))
             {
                 this.Trigger.Stop(this, this.RunAsyncAsync);
             }
@@ -1560,7 +1619,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="eventName">Name des Events, das verarbeitet werden soll.</param>
         /// <param name="addInfo">Zusätzliche Information (Exception, Progress%, etc.).</param>
-        public void ProcessTreeEvent(string eventName, object addInfo)
+        public void ProcessTreeEvent(string eventName, object? addInfo)
         {
             this.ProcessTreeEvent(this, this, eventName, addInfo);
         }
@@ -1631,11 +1690,11 @@ namespace LogicalTaskTree
                 stringBuilder.AppendLine(String.Format($"    IsSnapshotDummy"));
             }
             stringBuilder.AppendLine(String.Format($"    Path: {this.Path ?? ""}"));
-            stringBuilder.AppendLine(String.Format($"    UserControlPath: {this.UserControlPath ?? ""}"));
+            stringBuilder.AppendLine(String.Format($"    UserControlPath: {this.UserControlPath}"));
             if (this.Trigger != null && this.Trigger is TriggerShell)
             {
                 stringBuilder.AppendLine(String.Format(
-                    $"    Trigger: {(this.Trigger as TriggerShell).TriggerParameters}"));
+                    $"    Trigger: {((TriggerShell)this.Trigger).TriggerParameters}"));
             }
             return stringBuilder.ToString();
         }
@@ -1646,7 +1705,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="obj">Die LogicalNode zum Vergleich.</param>
         /// <returns>True, wenn die übergebene LogicalNode inhaltlich gleich dieser ist.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null || this.GetType() != obj.GetType())
             {
@@ -1692,7 +1751,7 @@ namespace LogicalTaskTree
         /// Pfad zu dem Knoten, dessen Verarbeitung gerade vom Anwender
         /// über die Oberfläche abgebrochen wurde.
         /// </summary>
-        internal string UserBreakedNodePath { get; set; }
+        internal string? UserBreakedNodePath { get; set; }
 
         /// <summary>
         /// Setzt für diesen Knoten von außen die Instanz der Basisklasse für SingleNodeViewModels.
@@ -1761,11 +1820,14 @@ namespace LogicalTaskTree
         /// <returns>ResultDictionary mit Ids und zugehörigen Results.</returns>
         internal ResultDictionary GetResultsFromEnvironment()
         {
-            ResultList resultList = this.Environment;
+            ResultList? resultList = this.Environment;
             ResultDictionary results = new ResultDictionary();
-            foreach (string id in resultList.Keys)
+            if (resultList != null)
             {
-                results.Add(id, resultList[id]);
+                foreach (string id in resultList.Keys)
+                {
+                    results.Add(id, resultList[id]);
+                }
             }
             return results;
         }
@@ -1777,23 +1839,20 @@ namespace LogicalTaskTree
         /// <param name="source">Einzufügendes TreeEvent.</param>
         internal void AddEnvironment(TreeEvent source)
         {
-            if (source != null)
+            this.Environment.Clear();
+            if (source.Environment != null)
             {
-                this.Environment.Clear();
-                if (source.Environment != null)
+                foreach (KeyValuePair<string, Result?> item in source.Environment)
                 {
-                    foreach (KeyValuePair<string, Result> item in source.Environment)
-                    {
-                        this.Environment.TryAdd(item.Key, item.Value);
-                    }
+                    this.Environment.TryAdd(item.Key, item.Value);
                 }
-                if (source.Results != null)
+            }
+            if (source.Results != null)
+            {
+                foreach (KeyValuePair<string, Result?> item in source.Results)
                 {
-                    foreach (KeyValuePair<string, Result> item in source.Results)
-                    {
-                        this.Environment.AddOrUpdate(item.Key, item.Value,
-                          new Func<string, Result, Result>((key, value) => { return value; }));
-                    }
+                    this.Environment.AddOrUpdate(item.Key, item.Value,
+                      new Func<string, Result?, Result?>((key, value) => { return value; }));
                 }
             }
         }
@@ -1886,14 +1945,14 @@ namespace LogicalTaskTree
         /// <summary>
         /// Info-Text über den nächsten Start des Knotens (wenn bekannt) oder null (internes Feld).
         /// </summary>
-        protected string _nextRunInfo;
+        protected string? _nextRunInfo;
 
         /// <summary>
         /// Die eigentliche, Knotentyp-spezifische Verarbeitung;
         /// muss überschrieben werden.
         /// </summary>
         /// <param name="source">Auslösendes TreeEvent oder null.</param>
-        protected abstract void DoRun(TreeEvent source);
+        protected abstract void DoRun(TreeEvent? source);
 
         /// <summary>
         /// Hierüber kann eine Ableitung von LogicalNode ihren eigenen Thread
@@ -1906,7 +1965,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="nodeId">Die Id der zu suchenden SingleNode.</param>
         /// <returns>Die gefundene LogicalNode oder null.</returns>
-        public virtual LogicalNode FindNodeById(string nodeId)
+        public virtual LogicalNode? FindNodeById(string nodeId)
         {
             return this.RootJobList.FindNodeById(nodeId);
         }
@@ -1924,7 +1983,7 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
-        /// Setz threadsafe LastLogical.
+        /// Setzt threadsafe LastLogical.
         /// </summary>
         /// <param name="newLogical">Neuer Wert (bool?)</param>
         protected void ThreadUpdateLastLogical(bool? newLogical)
@@ -1939,7 +1998,7 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
-        /// Setz threadsafe LastState.
+        /// Setzt threadsafe LastState.
         /// </summary>
         /// <param name="newState">Neuer Wert (NodeLogicalState?)</param>
         protected void ThreadUpdateLastState(NodeState newState)
@@ -1951,7 +2010,7 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
-        /// Setz threadsafe LastLogicalState.
+        /// Setzt threadsafe LastLogicalState.
         /// </summary>
         /// <param name="newLogicalState">Neuer Wert (NodeLogicalState?)</param>
         protected virtual void ThreadUpdateLastLogicalState(NodeLogicalState newLogicalState)
@@ -1990,7 +2049,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="treeEvent">Das auslösende treeEvent (interner Name).</param>
         /// <returns>Kombinierter NodeWorkerState für alle NodeWorker.</returns>
-        protected NodeWorkerState SetWorkersState(string treeEvent)
+        protected NodeWorkerState SetWorkersState(string? treeEvent)
         {
             treeEvent = null; // 07.08.2018 Test+-
             this._workersState = NodeWorkerState.None;
@@ -1998,7 +2057,7 @@ namespace LogicalTaskTree
             JobList meOrRoot = this.RootJobList;
             if (this is JobList)
             {
-                meOrRoot = this as JobList;
+                meOrRoot = (JobList)this;
             }
             foreach (WorkerShell worker in meOrRoot.GetWorkers(key))
             {
@@ -2035,18 +2094,18 @@ namespace LogicalTaskTree
         /// falls der Thread noch aktiv ist.
         /// </summary>
         /// <param name="thread">Ungültiger Thread.</param>
-        protected void MarkThreadAsInvalidIfActive(Thread thread)
+        protected void MarkThreadAsInvalidIfActive(Thread? thread)
         {
             if (thread != null && thread.IsAlive)
             {
                 if (thread.IsAlive)
                 {
-                    LogicalNode._invalidThreads.TryAdd(this._starterThread, true);
+                    LogicalNode._invalidThreads.TryAdd(thread, true);
                 }
                 else
                 {
                     bool dummy;
-                    LogicalNode._invalidThreads.TryRemove(this._starterThread, out dummy); // 03.07.2018 Nagel: Test
+                    LogicalNode._invalidThreads.TryRemove(thread, out dummy);
                 }
             }
         }
@@ -2056,9 +2115,9 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="thread">Der zu prüfende Thread.</param>
         /// <returns>True, wenn der Thread gültig ist.</returns>
-        protected bool IsThreadValid(Thread thread)
+        protected bool IsThreadValid(Thread? thread)
         {
-            return !LogicalNode._invalidThreads.ContainsKey(thread);
+            return thread != null && !LogicalNode._invalidThreads.ContainsKey(thread);
         }
 
         /// <summary>
@@ -2099,7 +2158,8 @@ namespace LogicalTaskTree
             Dictionary<string, List<LogicalNode>> triggeringTriggered = this.TreeRootJobList.GetTriggeringNodeIdAndTriggeredNodes();
             foreach (string triggeringNodeId in triggeringTriggered.Keys)
             {
-                this.InitNode(0, FindNodeById(triggeringNodeId));
+                LogicalNode node = FindNodeById(triggeringNodeId) ?? throw new NullReferenceException($"Internal Error: {triggeringNodeId}");
+                this.InitNode(0, node);
                 //this.ResetPartTreeNodes(FindNodeById(triggeringNodeId));
             }
         }
@@ -2117,10 +2177,10 @@ namespace LogicalTaskTree
 
         // Die Verarbeitung eines Knotens läuft immer asynchron.
         // private Task asyncCheckerTask; Task geht nicht, wegen fehlendem ApartmentState.STA und WPF-Checkern.
-        private Thread _starterThread;
+        private Abortable? _starterThread;
         private NodeLogicalState _nextLogicalBreakState;
         private bool _threadLocked;
-        private INodeTrigger _trigger;
+        private INodeTrigger? _trigger;
         private Guid _lastProvidedEventId;
         private object _runLocker;
         private object _loggerLocker;
@@ -2132,7 +2192,7 @@ namespace LogicalTaskTree
         private object _nodeLogicalChangedLocker;
         private bool _isInSleepTime;
 
-        private CancellationTokenSource _nodeCancellationTokenSource { get; set; }
+        private CancellationTokenSource? _nodeCancellationTokenSource { get; set; }
         /// <summary>
         /// Der Ergebnis-Zustand des Knotens:
         /// None, Start, Done, Fault, Timeout, UserAbort (internes Feld).
@@ -2144,11 +2204,11 @@ namespace LogicalTaskTree
         /// </summary>
         private NodeWorkerState _workersState;
 
-        private string _lockName;
+        private string? _lockName;
 
         // Startet asynchron runAsync. Dieser Zwischenschritt wurde nötig, um Timer, auf die mehrere
         // Knoten verweisen, vom run eines Knotens zu entkoppeln (gleichzeitige Ausführung mehrerer runs).
-        private void RunAsyncAsync(TreeEvent source)
+        private void RunAsyncAsync(TreeEvent? source)
         {
             // InfoController.GetInfoPublisher().Publish(this, String.Format($"1. {this.NameId}.RunAsyncAsync {source.SourceId}/{source.SenderId} ({source.Name})"), InfoType.NoRegex);
             if (this.AppSettings.IsInSleepTime != this._isInSleepTime)
@@ -2166,40 +2226,43 @@ namespace LogicalTaskTree
             lock (this._threadStartLocker)
             {
                 this.LastExecutingTreeEvent = source;
-                if ((this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
+                if ((this.CancellationToken.IsCancellationRequested)
                   || (this.LastLogicalState == NodeLogicalState.UserAbort))
                 {
                     return;
                 }
                 this.IsRunRequired = true;
                 // InfoController.GetInfoPublisher().Publish(this, String.Format($"3. {this.NameId}.RunAsyncAsync {source.SourceId}/{source.SenderId} ({source.Name})"), InfoType.NoRegex);
-                if (this._starterThread == null || !(this._starterThread.IsAlive && this.IsThreadValid(this._starterThread)))
+                if (this._starterThread == null || !(this._starterThread.IsAlive && this.IsThreadValid(this._starterThread.GetThread())))
                 {
                     // this.asyncCheckerTask = new Task(() => this.runAsync(source));
                     // Läuft über Thread um ApartmentState.STA setzen zu können. Ansonsten könnten
                     // keine WPF-Dialog-Checker ausgeführt werden.
                     if (this._starterThread != null)
                     {
-                        this._starterThread.Abort();
+                        // this._starterThread.Abort();
+                        // Warnung	SYSLIB0006	"Thread.Abort()" ist veraltet: "Thread.Abort is not supported and throws PlatformNotSupportedException."
+                        this._starterThread.Abort(); // neue Methode Abortable.Abort()
                         this._starterThread = null;
                     }
-                    this._starterThread = new Thread((te) =>
+                    this._starterThread = new Abortable((te) =>
                     {
                         Thread.CurrentThread.Name = "tryRunAsyncWhileIsRunRequired";
                         // InfoController.GetInfoPublisher().Publish(this, String.Format($"4. {this.NameId}.RunAsyncAsync {source.SourceId}/{source.SenderId} ({source.Name})"), InfoType.NoRegex);
-                        this.TryRunAsyncWhileIsRunRequired(te as TreeEvent);
+                        this.TryRunAsyncWhileIsRunRequired((TreeEvent?)te);
                     });
                     _starterThread.SetApartmentState(ApartmentState.STA); // Ist wegen WPF-Checkern erforderlich.
                     _starterThread.IsBackground = true;
                     try
                     {
+                        // new NetEti.ProcessTools.Threader(_starterThread, this.CancellationToken).Start(source);
                         _starterThread.Start(source);
                     }
                     catch (InvalidOperationException) { }
                 }
                 else
                 {
-                    if (!this.IsThreadValid(this._starterThread))
+                    if (!this.IsThreadValid(this._starterThread.GetThread()))
                     {
                         this.ThreadUpdateLastState(NodeState.Null);
                         this.State = NodeState.Waiting;
@@ -2248,13 +2311,13 @@ namespace LogicalTaskTree
         /// Versucht, den Teil-Baum über runAsync zu starten, solange
         /// der Schalter IsRunRequired gesetzt ist.
         /// </summary>
-        private void TryRunAsyncWhileIsRunRequired(TreeEvent source)
+        private void TryRunAsyncWhileIsRunRequired(TreeEvent? source)
         {
             // InfoController.GetInfoPublisher().Publish(this, String.Format($"LogicalNode.TryRunAsyncWhileIsRunRequired {source.SourceId}/{source.SenderId} ({source.Name})"), InfoType.NoRegex);
             int waitingLoopCounter = 0;
             do
             {
-                if ((this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
+                if ((this.CancellationToken.IsCancellationRequested)
                   || (this.LastLogicalState == NodeLogicalState.UserAbort))
                 {
                     break;
@@ -2276,7 +2339,11 @@ namespace LogicalTaskTree
                         }
                         else
                         {
-                            InfoController.Say(String.Format($"#TRIGGER# X InternalError Id/Name: {this.IdInfo}, State: {this.State}, LogicalState: {this.LogicalState}"));
+                            // Hier nur loggen, kein Abbruch mit Exception.
+                            InfoController.GetInfoPublisher().Publish(this,
+                                String.Format($"InternalError Id/Name: {this.IdInfo}, State: {this.State}, LogicalState: {this.LogicalState}"),
+                                InfoType.NoRegex
+                            );
                             this.State = NodeState.InternalError;
                         }
                     }
@@ -2287,7 +2354,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Action für den Run eines (Teil-)Baums.
         /// </summary>
-        private void RunAsync(TreeEvent source)
+        private void RunAsync(TreeEvent? source)
         {
             lock (this._runAsyncLocker)
             {
@@ -2305,7 +2372,8 @@ namespace LogicalTaskTree
                         }
                         else
                         {
-                            InfoController.Say(msg);
+                            // Hier nur loggen, kein Abbruch mit Exception.
+                            InfoController.GetInfoPublisher().Publish(this, msg, InfoType.NoRegex);
                             break;
                         }
                     }
@@ -2313,7 +2381,7 @@ namespace LogicalTaskTree
                 this.LogicalState = NodeLogicalState.None;
                 this.LogicalState = NodeLogicalState.Start;
                 this.State = NodeState.None;
-                if ((this.CancellationToken != null && this.CancellationToken.IsCancellationRequested)
+                if ((this.CancellationToken.IsCancellationRequested)
                   || (this.LastLogicalState == NodeLogicalState.UserAbort))
                 {
                     return;
@@ -2337,12 +2405,12 @@ namespace LogicalTaskTree
         /// <param name="treeEvent">Klasse mit Informationen zum auslösenden Ereignis.</param>
         /// <param name="additionalEventArgs">Enthält z.B. beim Event 'Exception' die zugehörige Exception.</param>
         /// <param name="sender">Der Sender (Weiterleiter oder Auslöser) des Events und Besitzer des Loggers.</param>
-        private void LogAsync(LogicalNode sender, TreeEvent treeEvent, object additionalEventArgs)
+        private void LogAsync(LogicalNode sender, TreeEvent treeEvent, object? additionalEventArgs)
         {
             Thread.CurrentThread.Name = "logAsync";
             try
             {
-                sender.Logger.Log(null, this.TreeParams, treeEvent, additionalEventArgs);
+                sender.Logger?.Log(null, this.TreeParams, treeEvent, additionalEventArgs);
             }
             catch (Exception ex)
             {
@@ -2363,13 +2431,14 @@ namespace LogicalTaskTree
             this.ThreadUpdateLastState(NodeState.Finished);
             this.State = NodeState.Finished;
             this.LogicalState = this._nextLogicalBreakState;
-            this.MarkThreadAsInvalidIfActive(this._starterThread);
-            if ((this is SingleNode) && (this as SingleNode).Checker != null)
+            this.MarkThreadAsInvalidIfActive(this._starterThread?.GetThread());
+            NodeCheckerBase? checker = ((SingleNode)this).Checker;
+            if (checker != null)
             {
-                (this as SingleNode).Checker.IsInvalid = true;
+                checker.IsInvalid = true;
             }
             this.ThreadUpdateLastLogicalState(this.LogicalState);
-            this.OnNodeProgressFinished(this.Id + "." + this.Name + " | Item", 100, 0, ItemsTypes.itemGroups);
+            this.OnNodeProgressFinished(this.Id + "." + this.Name + " | Item", 100, 0);
             this.OnNodeBreaked();
         }
 
@@ -2380,7 +2449,7 @@ namespace LogicalTaskTree
         /// <param name="source">Quelle des Events, das verarbeitet werden soll.</param>
         /// <param name="eventName">Name des Events, das verarbeitet werden soll.</param>
         /// <param name="addInfo">Zusätzliche Information (Exception, Progress%, etc.).</param>
-        private void ProcessTreeEvent(LogicalNode sender, LogicalNode source, string eventName, object addInfo)
+        private void ProcessTreeEvent(LogicalNode sender, LogicalNode source, string eventName, object? addInfo)
         {
             lock (LogicalNode._eventLocker)
             {
@@ -2414,7 +2483,7 @@ namespace LogicalTaskTree
                     if (eventName.StartsWith("Any") && eventName != "AnyException"
                         && (!(sender is NodeList) || (sender is JobList)) && sender.Mother != null)
                     {
-                        sender.RootJobList.climb2Top(new Action<LogicalNode>(logicalNode =>
+                        sender.RootJobList.Climb2Top(new Action<LogicalNode?>(logicalNode =>
                         {
                             if (logicalNode is JobList)
                             {
@@ -2433,7 +2502,7 @@ namespace LogicalTaskTree
         /// <param name="source">Quelle des Events, das verarbeitet werden soll.</param>
         /// <param name="eventName">Name des Events, das verarbeitet werden soll.</param>
         /// <param name="addInfo">Zusätzliche Information (Exception, Progress%, etc.).</param>
-        private void ProcessSingleTreeEvent(LogicalNode sender, LogicalNode source, string eventName, object addInfo)
+        private void ProcessSingleTreeEvent(LogicalNode sender, LogicalNode source, string eventName, object? addInfo)
         {
             if (this.TreeRootJobList.TriggerRelevantEventCache.Contains(eventName))
             {
@@ -2470,7 +2539,7 @@ namespace LogicalTaskTree
                         worker.Exec(this.TreeParams, this.Id, treeEvent, false);
                         if (worker.WorkerState != NodeWorkerState.Invalid)
                         {
-                            string resettingEvents = this.GetResettingEventNames(eventName);
+                            string? resettingEvents = this.GetResettingEventNames(eventName);
                             if (resettingEvents != null)
                             {
                                 // sender mit Worker in Liste einfügen.
@@ -2501,7 +2570,7 @@ namespace LogicalTaskTree
             }
         }
 
-        private string GetResettingEventNames(string eventName)
+        private string? GetResettingEventNames(string eventName)
         {
             // Knoten                       A
             // Event            false     true      Exception
@@ -2527,7 +2596,7 @@ namespace LogicalTaskTree
         /// <param name="treeEvent">Klasse mit Informationen zum Ereignis.</param>
         /// <param name="internalEventName">Interner Name des aktuellen Events.</param>
         /// <param name="addInfo">Zusätzliche Information (Exception, Progress%, etc.).</param>
-        private void LogIfConfigured(LogicalNode sender, string internalEventName, TreeEvent treeEvent, object addInfo)
+        private void LogIfConfigured(LogicalNode sender, string internalEventName, TreeEvent treeEvent, object? addInfo)
         {
             if (sender.Logger != null)
             {
@@ -2574,7 +2643,7 @@ namespace LogicalTaskTree
             {
                 // Hier kommen nur JobLists hin.
                 bool? tmpLastNotNullLogical = orgLastNotNullLogical;
-                int timeToSleep = (this as JobList).LogicalChangedDelay;
+                int timeToSleep = ((JobList)this).LogicalChangedDelay;
                 Thread.Sleep(timeToSleep);
                 bool? tmpLogical = this.Logical; // mit Thread-entkoppelten Kopien arbeiten.
                 if (tmpLogical != tmpLastNotNullLogical)
@@ -2582,7 +2651,7 @@ namespace LogicalTaskTree
                     this.AcceptNewLogical(tmpLogical);
                 }
                 this.OnNodeStateChanged();
-                (this as JobList).IsChangeEventPending = false;
+                ((JobList)this).IsChangeEventPending = false;
             }
         }
 
@@ -2618,10 +2687,7 @@ namespace LogicalTaskTree
             }
             lock (this._runLocker)
             {
-                if (this._nodeCancellationTokenSource != null)
-                {
-                    this._nodeCancellationTokenSource.Dispose();
-                }
+                this._nodeCancellationTokenSource?.Dispose();
                 this._nodeCancellationTokenSource = new CancellationTokenSource();
                 this.CancellationToken = this._nodeCancellationTokenSource.Token;
                 this.CancellationToken.Register(() => CancelNotification());
@@ -2633,10 +2699,10 @@ namespace LogicalTaskTree
                     try
                     {
                         // Erst mal den Trigger starten, außer es ist ein TreeEventTrigger (der wurde schon vorher gestartet).
-                        TriggerShell triggerShell = (this.Trigger as TriggerShell);
+                        TriggerShell triggerShell = ((TriggerShell)this.Trigger);
                         if (!triggerShell.HasTreeEventTrigger)
                         {
-                            string internalTriggerParameters = null;
+                            string? internalTriggerParameters = null;
                             if (source.Name == "UserRun" && source.SenderId == this.Id)
                             {
                                 internalTriggerParameters = "UserRun";
@@ -2665,7 +2731,7 @@ namespace LogicalTaskTree
                     {
                         this.State = NodeState.Triggered;
                         this.OnNodeStateChanged();
-                        this.OnNodeProgressFinished(this.Id + "." + this.Name, 100, 100, ItemsTypes.itemGroups);
+                        this.OnNodeProgressFinished(this.Id + "." + this.Name, 100, 100);
                     }
                 }
             } // lock (this._runLocker)
@@ -2740,7 +2806,7 @@ namespace LogicalTaskTree
                 if (!(
                       ((this.AppSettings.StartTriggeredNodesOnUserRun & TriggeredNodeStartConstraint.None) != 0) ||
                       (((this.AppSettings.StartTriggeredNodesOnUserRun & TriggeredNodeStartConstraint.NoTreeEvents) != 0)
-                        && (this.Trigger as TriggerShell).HasTreeEventTrigger) ||
+                        && ((TriggerShell?)this.Trigger)?.HasTreeEventTrigger == true) ||
                       ((this.AppSettings.StartTriggeredNodesOnUserRun & TriggeredNodeStartConstraint.Direct) != 0
                         && (source.SenderId != this.Id))
                       )

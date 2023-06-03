@@ -32,33 +32,59 @@ namespace Vishnu
             manager.Run(args);
         }
 
+
+        private static bool IsNetworkDeployed
+        {
+            get
+            {
+                // return System.Deployment.Application.ApplicationDeployment.IsNetworkDeployed;
+                return false;
+            }
+        }
+
+        private static bool IsFirstRun
+        {
+            get
+            {
+                // return System.Deployment.Application.ApplicationDeployment.CurrentDeployment.IsFirstRun;
+                return false;
+            }
+        }
+
         /// <summary>
         /// Setzt das Icon in add/remove programs für Vishnu
         /// </summary>
         private static void SetAddRemoveProgramsIcon()
         {
+            // 11.03.2023 Nagel+
+            // if (System.Deployment.Application.ApplicationDeployment.IsNetworkDeployed
+            //    && System.Deployment.Application.ApplicationDeployment.CurrentDeployment.IsFirstRun)
+            // 11.03.2023 Nagel-
+
             // nur, wenn deployed
-            if (System.Deployment.Application.ApplicationDeployment.IsNetworkDeployed
-               && System.Deployment.Application.ApplicationDeployment.CurrentDeployment.IsFirstRun)
+            if (IsNetworkDeployed && IsFirstRun)
             {
                 try
                 {
-                    string iconSourcePath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "Vishnu_multi.ico");
+                    string iconSourcePath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()?.Location) ?? "", "Vishnu_multi.ico");
                     if (!File.Exists(iconSourcePath))
                     {
                         return;
                     }
 
-                    RegistryKey myUninstallKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
-                    string[] mySubKeyNames = myUninstallKey.GetSubKeyNames();
-                    for (int i = 0; i < mySubKeyNames.Length; i++)
+                    RegistryKey? myUninstallKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
+                    if (myUninstallKey != null)
                     {
-                        RegistryKey myKey = myUninstallKey.OpenSubKey(mySubKeyNames[i], true);
-                        object myValue = myKey.GetValue("DisplayName");
-                        if (myValue != null && myValue.ToString() == "Vishnu")
+                        string[] mySubKeyNames = myUninstallKey.GetSubKeyNames();
+                        for (int i = 0; i < mySubKeyNames.Length; i++)
                         {
-                            myKey.SetValue("DisplayIcon", iconSourcePath);
-                            break;
+                            RegistryKey? myKey = myUninstallKey.OpenSubKey(mySubKeyNames[i], true);
+                            object? myValue = myKey?.GetValue("DisplayName");
+                            if (myValue != null && myValue.ToString() == "Vishnu")
+                            {
+                                myKey?.SetValue("DisplayIcon", iconSourcePath);
+                                break;
+                            }
                         }
                     }
                 }
@@ -78,7 +104,7 @@ namespace Vishnu
     /// </summary>
     public class SingleInstanceManager : WindowsFormsApplicationBase
     {
-        private SingleInstanceApplication _app;
+        private SingleInstanceApplication? _app;
 
         /// <summary>
         /// Konstruktor.
@@ -91,7 +117,7 @@ namespace Vishnu
             }
             catch (Exception ex)
             {
-                MessageBox.Show(String.Format($"Fehler bei der Initialisierung: {ex.Message}"), "Fehlermeldung");
+                System.Windows.MessageBox.Show(String.Format($"Fehler bei der Initialisierung: {ex.Message}"), "Fehlermeldung");
                 throw;
             }
         }
@@ -115,7 +141,7 @@ namespace Vishnu
         protected override void OnStartupNextInstance(StartupNextInstanceEventArgs eventArgs)
         {
             base.OnStartupNextInstance(eventArgs);
-            _app.Activate();
+            _app?.Activate();
         }
     }
 
@@ -138,10 +164,10 @@ namespace Vishnu
     ///                        u.U. nicht mehr ganz durchlaufen wird, sondern z.B. bei Close des
     ///                        MainWindows über "X" rechts oben abrupt abbricht.
     /// </remarks>
-    public class SingleInstanceApplication : Application
+    public class SingleInstanceApplication : System.Windows.Application
     {
         // Das Main-Window
-        private WPF_UI.MainWindow _mainWindow;
+        private WPF_UI.MainWindow? _mainWindow;
 
         /// <summary>
         /// Wird von einer anderen startenden Instanz angesprungen, bevor jene sich beendet,
@@ -149,6 +175,10 @@ namespace Vishnu
         /// </summary>
         public void Activate()
         {
+            if (this._mainWindow == null)
+            {
+                return;
+            }
             // DEBUG: MessageBox.Show("Ich wurde gerade aktiviert.");
             // Reaktivieren des Hauptfensters dieser Instanz der Anwendung.
             if (!this._mainWindow.IsVisible)
@@ -184,9 +214,9 @@ namespace Vishnu
             {
                 string exceptionString;
 #if DEBUG
-                exceptionString = (args.ExceptionObject as Exception).ToString(); // Exception für später retten.
+                exceptionString = ((Exception)args.ExceptionObject).ToString(); // Exception für später retten.
 #else
-                exceptionString = (args.ExceptionObject as Exception).Message; // Exception für später retten.
+                exceptionString = ((Exception)args.ExceptionObject).Message; // Exception für später retten.
 #endif
                 if (this._splashWindow != null)
                 {
@@ -275,23 +305,22 @@ namespace Vishnu
                              + Environment.NewLine + " Bitte wenden Sie sich an die Administration.");
             }
             this.CopyJobsIfNecessary();
-            if (SingleInstanceApplication._appSettings.MainJobName == null)
+            if (String.IsNullOrEmpty(SingleInstanceApplication._appSettings?.MainJobName))
             {
-                if (!SingleInstanceApplication._appSettings.AppConfigUserLoaded)
+                if (!SingleInstanceApplication._appSettings?.AppConfigUserLoaded == true)
                 {
-                    string userCfgDir = Path.GetDirectoryName(SingleInstanceApplication._appSettings.AppConfigUser);
+                    string userCfgDir = Path.GetDirectoryName(SingleInstanceApplication._appSettings?.AppConfigUser) ?? "";
                     if (!Directory.Exists(userCfgDir))
                     {
                         Directory.CreateDirectory(userCfgDir);
                     }
-                    File.Copy(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Vishnu.exe.config.user.default"),
+                    File.Copy(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "Vishnu.exe.config.user.default"),
                               Path.Combine(userCfgDir, "Vishnu.exe.config.user"), true);
-                    SingleInstanceApplication._appSettings.LoadSettings();
+                    SingleInstanceApplication._appSettings?.LoadSettings();
                 }
-                if (SingleInstanceApplication._appSettings.MainJobName == null)
+                if (String.IsNullOrEmpty(SingleInstanceApplication._appSettings?.MainJobName))
                 {
-                    string msg = "Es wurde keine Job-Definition angegeben.";
-                    throw new ArgumentException(msg);
+                    throw new ArgumentException("Es wurde keine Job-Definition angegeben.");
                 }
             }
             this.CopyClickOnceStarter();
@@ -306,6 +335,10 @@ namespace Vishnu
             //     string loggingRegexFilter = ""; // Alles wird geloggt (ist der Default).
             //     string loggingRegexFilter = @"(?:_NOPPES_)"; // Nichts wird geloggt, bzw. nur Zeilen, die "_NOPPES_" enthalten.
             // analog: Statistics.RegexFilter.
+            if (SingleInstanceApplication._appSettings == null)
+            {
+                throw new ApplicationException("Keine AppSettings vorhanden.");
+            }
             SingleInstanceApplication._appSettings.AppEnvAccessor.UnregisterKey("DebugFile");
             string logFilePathName = SingleInstanceApplication._appSettings.ReplaceWildcards(SingleInstanceApplication._appSettings.DebugFile);
             SingleInstanceApplication._appSettings.AppEnvAccessor.RegisterKeyValue("DebugFile", logFilePathName);
@@ -316,7 +349,7 @@ namespace Vishnu
             InfoController.GetInfoSource().RegisterInfoReceiver(SingleInstanceApplication._logger, InfoTypes.Collection2InfoTypeArray(InfoTypes.All));
             Statistics.IsTimerTriggered = true; // LoggingTriggerCounter gibt die Anzahl Zählvorgänge vor, nach der die Ausgabe erfolgt.
             Statistics.LoggingTriggerCounter = 10000; // Default ist 5000 Zählvorgänge oder Millisekunden.
-            string statisticsFilePathName = SingleInstanceApplication._appSettings.ReplaceWildcards(SingleInstanceApplication._appSettings.StatisticsFile);
+            string statisticsFilePathName = SingleInstanceApplication._appSettings.ReplaceWildcards(SingleInstanceApplication._appSettings.StatisticsFile ?? "");
 
             Statistics.RegexFilter = SingleInstanceApplication._appSettings.StatisticsFileRegexFilter;
             SingleInstanceApplication._statisticsLogger = new Logger(statisticsFilePathName);
@@ -335,7 +368,7 @@ namespace Vishnu
             {
                 //InfoController.GetInfoPublisher().Publish(this,
                 //    String.Format($"IsClickOnce: {SingleInstanceApplication._appSettings.IsClickOnce}"), InfoType.NoRegex);
-                string clickOnceDataDirectoryString = SingleInstanceApplication._appSettings.ClickOnceDataDirectory == null ?
+                string clickOnceDataDirectoryString = SingleInstanceApplication._appSettings?.ClickOnceDataDirectory == null ?
                     "null" : SingleInstanceApplication._appSettings.ClickOnceDataDirectory;
                 //InfoController.GetInfoPublisher().Publish(this,
                 //    String.Format($"ClickOnceDataDirectory: {clickOnceDataDirectoryString}"), InfoType.NoRegex);
@@ -343,7 +376,7 @@ namespace Vishnu
                 //    String.Format($"NewDeployment.xml: {File.Exists(Path.Combine(SingleInstanceApplication._appSettings.ApplicationRootPath, "NewDeployment.xml"))}")
                 //    , InfoType.NoRegex);
                 // MessageBox.Show(String.Format($"Vor ClickOnceAktionen auf {clickOnceDataDirectoryString}"));
-                if (SingleInstanceApplication._appSettings.IsClickOnce
+                if (SingleInstanceApplication._appSettings?.IsClickOnce == true
                     && Directory.Exists(clickOnceDataDirectoryString)
                     && File.Exists(Path.Combine(SingleInstanceApplication._appSettings.ApplicationRootPath, "NewDeployment.xml")))
                 {
@@ -358,7 +391,7 @@ namespace Vishnu
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Fehler bei CopyJobsIfNecessary: " + ex.Message);
+                System.Windows.MessageBox.Show("Fehler bei CopyJobsIfNecessary: " + ex.Message);
                 // throw;
             }
         }
@@ -429,17 +462,18 @@ namespace Vishnu
                 StringBuilder sb = new StringBuilder();
                 sb.Append(Environment.GetFolderPath(Environment.SpecialFolder.Programs));
                 sb.Append("\\");
-                sb.Append(SingleInstanceApplication._appSettings.VishnuProvider);
+                sb.Append(SingleInstanceApplication._appSettings?.VishnuProvider);
                 sb.Append("\\");
                 sb.Append("ClickOnceStarter.exe");
                 string targetPath = sb.ToString();
                 if (!File.Exists(targetPath))
                 {
-                    if (!Directory.Exists(Path.GetDirectoryName(targetPath)))
+                    string? targetDir = Path.GetDirectoryName(targetPath);
+                    if (targetDir != null && !Directory.Exists(targetDir))
                     {
-                        Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
+                        Directory.CreateDirectory(targetDir);
                     }
-                    File.Copy(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                    File.Copy(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "",
                         Path.GetFileName(targetPath)),
                         targetPath, true);
                 }
@@ -447,7 +481,7 @@ namespace Vishnu
             catch { }
         }
 
-        void mainWindow_Closed(object sender, EventArgs e)
+        void mainWindow_Closed(object? sender, EventArgs e)
         {
             if (!SingleInstanceApplication._cleanupDone)
             {
@@ -462,29 +496,29 @@ namespace Vishnu
             Environment.Exit(-1); // TODO: erneut auf Notwendigkeit Testen
         }
 
-        private static AppSettings _appSettings;
-        private static Logger _logger;
-        private static Logger _statisticsLogger;
-        private static LogicalTaskTree.LogicalTaskTree _businessLogic;
-        private SplashWindow _splashWindow;
-        private ViewerAsWrapper _splashScreenMessageReceiver;
+        private static AppSettings? _appSettings;
+        private static Logger? _logger;
+        private static Logger? _statisticsLogger;
+        private static LogicalTaskTree.LogicalTaskTree? _businessLogic;
+        private SplashWindow? _splashWindow;
+        private ViewerAsWrapper? _splashScreenMessageReceiver;
         private static bool _cleanupDone;
 
-        private void ParameterReader_ParametersReloaded(object sender, EventArgs e)
+        private void ParameterReader_ParametersReloaded(object? sender, EventArgs e)
         {
             SingleInstanceApplication._businessLogic?.Tree.GetTopRootJobList()
-                .ProcessTreeEvent("ParametersReloaded", SingleInstanceApplication._appSettings.UserParameterReaderPath);
+                .ProcessTreeEvent("ParametersReloaded", SingleInstanceApplication._appSettings?.UserParameterReaderPath);
         }
 
-        private void handleSplashScreenMessages(object sender, InfoArgs msgArgs)
+        private void handleSplashScreenMessages(object? sender, InfoArgs msgArgs)
         {
-            this._splashWindow.ShowMessage((msgArgs.MessageObject as SplashScreenMessage).Message);
+            this._splashWindow?.ShowMessage(((SplashScreenMessage)msgArgs.MessageObject).Message);
         }
 
         // Wird in jedem Fall beim Beenden von Vishnu durchlaufen.
         // Versucht noch, Aufräumarbeiten auszuführen, endet aber u.U. aprupt
         // ohne fertig zu werden.
-        private static void OnProcessExit(object sender, EventArgs e)
+        private static void OnProcessExit(object? sender, EventArgs e)
         {
             if (!SingleInstanceApplication._cleanupDone)
             {
@@ -531,7 +565,7 @@ namespace Vishnu
                 Statistics.Stop();
                 try
                 {
-                    SingleInstanceApplication._statisticsLogger.Dispose();
+                    SingleInstanceApplication._statisticsLogger?.Dispose();
                 }
                 catch { }
             }

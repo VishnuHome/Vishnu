@@ -16,6 +16,12 @@ namespace LogicalTaskTree
     public class Job
     {
         #region public members
+        const string DEFAULTJOBLISTUSERCONTROLPATH = @"DefaultNodeControls\JobListUserControl.dll";
+        const string DEFAULTJOBCONNECTORUSERCONTROLPATH = @"DefaultNodeControls\JobConnectorUserControl.dll";
+        const string DEFAULTNODELISTUSERCONTROLPATH = @"DefaultNodeControls\NodeListUserControl.dll";
+        const string DEFAULTSINGLENODEUSERCONTROLPATH = @"DefaultNodeControls\SingleNodeUserControl.dll";
+        const string DEFAULTCONSTANTNODEUSERCONTROLPATH = @"DefaultNodeControls\ConstantNodeUserControl.dll";
+        const string DEFAULTSNAPSHOTUSERCONTROLPATH = @"DefaultNodeControls\SnapshotUserControl.dll";
 
         /// <summary>
         /// Der logische Ausdruck, der durch eine JobList im LogicalTaskTree
@@ -47,19 +53,19 @@ namespace LogicalTaskTree
         /// Ein optionaler Trigger, der steuert, wann ein Snapshot des Jobs erstellt
         /// werden soll oder null.
         /// </summary>
-        public TriggerShell JobSnapshotTrigger { get; set; }
+        public TriggerShell? JobSnapshotTrigger { get; set; }
 
         /// <summary>
         /// Ein optionaler Trigger, der den Job wiederholt aufruft
         /// oder null (setzt intern BreakWithResult auf false).
         /// </summary>
-        public TriggerShell JobTrigger { get; set; }
+        public TriggerShell? JobTrigger { get; set; }
 
         /// <summary>
         /// Ein optionaler Logger, der dem Job zugeordnet
         /// ist oder null.
         /// </summary>
-        public LoggerShell JobLogger { get; set; }
+        public LoggerShell? JobLogger { get; set; }
 
 
         /// <summary>
@@ -159,13 +165,13 @@ namespace LogicalTaskTree
         {
             get
             {
-                return this._snapshotControlPath;
+                return this._snapshotUserControlPath;
             }
             set
             {
                 if (value != null)
                 {
-                    this._snapshotControlPath = value;
+                    this._snapshotUserControlPath = value;
                 }
             }
         }
@@ -189,7 +195,7 @@ namespace LogicalTaskTree
         /// Optionaler zum globalen Sperren verwendeter Name.
         /// Wird verwendet, wenn ThreadLocked gesetzt ist.
         /// </summary>
-        public string LockName { get; set; }
+        public string? LockName { get; set; }
 
         /// <summary>
         /// Bei True wird zur Ergebnisermittlung im Tree "Logical" benutzt,
@@ -282,12 +288,12 @@ namespace LogicalTaskTree
             this.JobTrigger = null;
             this.ThreadLocked = false;
             this.IsVolatile = false;
-            this.JobListUserControlPath = @"DefaultNodeControls\JobListUserControl.dll";
-            this.JobConnectorUserControlPath = @"DefaultNodeControls\JobConnectorUserControl.dll";
-            this.NodeListUserControlPath = @"DefaultNodeControls\NodeListUserControl.dll";
-            this.SingleNodeUserControlPath = @"DefaultNodeControls\SingleNodeUserControl.dll";
-            this.ConstantNodeUserControlPath = @"DefaultNodeControls\ConstantNodeUserControl.dll";
-            this.SnapshotUserControlPath = @"DefaultNodeControls\SnapshotUserControl.dll";
+            this._jobListUserControlPath = Job.DEFAULTJOBLISTUSERCONTROLPATH; // @"DefaultNodeControls\JobListUserControl.dll";
+            this._jobConnectorUserControlPath = Job.DEFAULTJOBCONNECTORUSERCONTROLPATH; // @"DefaultNodeControls\JobConnectorUserControl.dll";
+            this._nodeListUserControlPath = Job.DEFAULTNODELISTUSERCONTROLPATH; // @"DefaultNodeControls\NodeListUserControl.dll";
+            this._singleNodeUserControlPath = Job.DEFAULTSINGLENODEUSERCONTROLPATH; // @"DefaultNodeControls\SingleNodeUserControl.dll";
+            this._constantNodeUserControlPath = Job.DEFAULTCONSTANTNODEUSERCONTROLPATH; // @"DefaultNodeControls\ConstantNodeUserControl.dll";
+            this._snapshotUserControlPath = Job.DEFAULTSNAPSHOTUSERCONTROLPATH; // @"DefaultNodeControls\SnapshotUserControl.dll";
         }
 
         #region tree globals
@@ -324,7 +330,7 @@ namespace LogicalTaskTree
 
         private bool _isDefaultSnapshot;
         private string _constantNodeUserControlPath;
-        private string _snapshotControlPath;
+        private string _snapshotUserControlPath;
         private string _singleNodeUserControlPath;
         private string _nodeListUserControlPath;
         private string _jobConnectorUserControlPath;
@@ -356,7 +362,7 @@ namespace LogicalTaskTree
         // zu den beiden in node_event kombinierten Keys enthält.
         private bool containsCombinedKey(string node_event)
         {
-            string[] id_treeEvents = findCombinedKey(node_event);
+            string[]? id_treeEvents = findCombinedKey(node_event);
             if (id_treeEvents != null)
             {
                 if (this.WorkersDictionary[id_treeEvents[1]].ContainsKey(id_treeEvents[0]))
@@ -373,7 +379,7 @@ namespace LogicalTaskTree
         // liefert im Erfolgsfall den erweiterten treeEventsString,
         // ansonsten null. Kann mit node_event null aufgerufen, liefert
         // dann alle für den aktuellen Knoten definierte Worker.
-        private string[] findCombinedKey(string node_event)
+        private string[]? findCombinedKey(string node_event)
         {
             string id;
             string treeEvent;
@@ -405,9 +411,9 @@ namespace LogicalTaskTree
 
         // Liefert zu einem aus Knoten-Id + : + TreeEvent-Name zusammengesetzten Key
         // direkt das zugehörige WorkerShell-Array aus dem privaten Dictionarys _workers. 
-        private WorkerShell[] getWorkers(string node_event)
+        private WorkerShell[]? getWorkers(string node_event)
         {
-            string[] id_treeEvents = findCombinedKey(node_event);
+            string[]? id_treeEvents = findCombinedKey(node_event);
             if (id_treeEvents != null)
             {
                 if (this.WorkersDictionary[id_treeEvents[1]].ContainsKey(id_treeEvents[0]))
@@ -518,7 +524,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="key"></param>
         /// <returns>Das WorkerShell-Array zu einem aus Knoten-Id + : + TreeEvent-Name zusammengesetzten Key.</returns>
-        internal WorkerShell[] this[string key]
+        internal WorkerShell[]? this[string key]
         {
             get
             {
@@ -538,7 +544,7 @@ namespace LogicalTaskTree
         /// <param name="jobGetKeys">Holt die Liste von Keys des privaten Dictionarys _workers von Job.</param>
         /// <param name="jobGetValues">Holt die Liste von Keys des privaten Dictionarys _workers von Job.</param>
         internal Workers(Action<string, WorkerShell[]> jobAddWorkers,
-                        Func<string, WorkerShell[]> jobGetWorkers,
+                        Func<string, WorkerShell[]?> jobGetWorkers,
                         Func<string, bool> jobContainsCombinedKey,
                         Func<Dictionary<string, Dictionary<string, WorkerShell[]>>.KeyCollection> jobGetKeys,
                         Func<Dictionary<string, Dictionary<string, WorkerShell[]>>.ValueCollection> jobGetValues)
@@ -556,7 +562,7 @@ namespace LogicalTaskTree
 
         private Action<string, WorkerShell[]> _jobAddWorkers;
         private Func<Dictionary<string, Dictionary<string, WorkerShell[]>>.KeyCollection> _jobGetKeys;
-        private Func<string, WorkerShell[]> _jobGetWorkers;
+        private Func<string, WorkerShell[]?> _jobGetWorkers;
         private Func<Dictionary<string, Dictionary<string, WorkerShell[]>>.ValueCollection> _jobGetValues;
         private Func<string, bool> _jobContainsCombinedKey;
 

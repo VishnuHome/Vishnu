@@ -27,11 +27,11 @@ namespace Vishnu.Interchange
         /// Informationen kann diese Property und/oder die Klasse TriggerInfo
         /// abgeleitet werden.
         /// </summary>
-        public virtual TriggerInfo Info
+        public virtual TriggerInfo? Info
         {
             get
             {
-                string info = null;
+                string? info = null;
                 if (this._triggerActive)
                 {
                     info = this._nextStart.ToString();
@@ -41,7 +41,7 @@ namespace Vishnu.Interchange
                 {
                     this._info.NextRun = DateTime.MinValue;
                 }
-                this._info.NextRunInfo = info;
+                this._info.NextRunInfo = info?? "---";
                 return this._info;
             }
             set
@@ -58,7 +58,7 @@ namespace Vishnu.Interchange
         /// Ausnahme: Vishnu versucht für in %-Zeichen eingeschlossene Zeichenketten eine Parameterersetzung.</param>
         /// <param name="triggerIt">Die aufzurufende Callback-Routine, wenn der Trigger feuert.</param>
         /// <returns>True, wenn der Trigger durch diesen Aufruf tatsächlich gestartet wurde (hier: immer true).</returns>
-        public virtual bool Start(object triggerController, object triggerParameters, Action<TreeEvent> triggerIt)
+        public virtual bool Start(object? triggerController, object? triggerParameters, Action<TreeEvent> triggerIt)
         {
             this.EvaluateParametersOrFail(ref triggerParameters, triggerController);
             this._triggerIt += triggerIt;
@@ -73,7 +73,7 @@ namespace Vishnu.Interchange
         /// </summary>
         /// <param name="triggerController">Das Objekt, das den Trigger definiert.</param>
         /// <param name="triggerIt">Die aufzurufende Callback-Routine, wenn der Trigger feuert.</param>
-        public virtual void Stop(object triggerController, Action<TreeEvent> triggerIt)
+        public virtual void Stop(object? triggerController, Action<TreeEvent> triggerIt)
         {
             this._triggerActive = false;
             this._lastStart = DateTime.Now;
@@ -92,6 +92,7 @@ namespace Vishnu.Interchange
             this._lastStart = DateTime.MinValue;
             this._nextStart = DateTime.MinValue;
             this._triggerActive = false;
+            this.TriggerName = "anonymus";
             this._syntaxInformation = null;
         }
 
@@ -125,7 +126,7 @@ namespace Vishnu.Interchange
         /// Kann mit Trigger-spezifischen Syntax-Informationen ausgestattet werden,
         /// wird dann im Fehlerfall im Zuge einer Exception ausgegeben, Default: null.
         /// </summary>
-        protected string _syntaxInformation;
+        protected string? _syntaxInformation;
 
         /// <summary>
         /// Wird automatisch auf true gesetzt, wenn der besitzende Knoten im Vishnu-Tree
@@ -145,7 +146,7 @@ namespace Vishnu.Interchange
             string assemblyName = String.IsNullOrEmpty(this.TriggerName) ? "Trigger" : this.TriggerName;
             if (this._triggerIt != null)
             {
-                this._triggerIt(new TreeEvent(TriggerName, TriggerName, this.Info.NextRunInfo,
+                this._triggerIt(new TreeEvent(TriggerName, TriggerName, this.Info?.NextRunInfo ?? "---",
                                   "", "", null, 0, null, null));
             }
         }
@@ -159,14 +160,14 @@ namespace Vishnu.Interchange
         /// </summary>
         /// <param name="triggerParameters">Die von Vishnu weitergeleiteten Parameter aus der JobDescription.xml.</param>
         /// <param name="triggerController">Der Knoten, dem dieser Trigger zugeordnet ist.</param>
-        protected virtual void EvaluateParametersOrFail(ref object triggerParameters, object triggerController)
+        protected virtual void EvaluateParametersOrFail(ref object? triggerParameters, object? triggerController)
         {
             this._isUserRun = false;
             if (triggerParameters == null || String.IsNullOrEmpty(triggerParameters.ToString()))
             {
                 this.ThrowSyntaxException("Es wurden keine Parameter übergeben.");
             }
-            string triggerParametersString = triggerParameters.ToString();
+            string triggerParametersString = triggerParameters?.ToString() ?? "";
             if (triggerParametersString.EndsWith("|UserRun"))
             {
                 this._isUserRun = true;
@@ -181,7 +182,7 @@ namespace Vishnu.Interchange
         /// <param name="errorMessage">Auslösender Fehler der Parameterprüfung.</param>
         protected void ThrowSyntaxException(string errorMessage)
         {
-            string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+            string assemblyName = Assembly.GetExecutingAssembly().GetName().Name ?? "anonymus";
             string fullMessage = assemblyName + ": " + errorMessage;
             if (!String.IsNullOrEmpty(this._syntaxInformation))
             {
@@ -198,7 +199,7 @@ namespace Vishnu.Interchange
         /// <summary>
         /// Wird ausgelöst, wenn das Trigger-Ereignis (z.B. Timer) eintritt. 
         /// </summary>
-        private event Action<TreeEvent> _triggerIt;
+        private event Action<TreeEvent>? _triggerIt;
         private bool _triggerActive;
 
         #endregion private members

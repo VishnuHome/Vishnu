@@ -25,6 +25,6 @@ namespace Vishnu.Interchange
         /// bei TimerTriggern ein DateTime.Now.ToString();
         /// bei sonstigen Triggern eine andere geeignete Information.
         /// </summary>
-        public string NextRunInfo { get; set; }
+        public string? NextRunInfo { get; set; }
     }
 }

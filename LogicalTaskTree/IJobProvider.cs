@@ -26,16 +26,16 @@ namespace LogicalTaskTree
         /// physischen Namen des JobPackages oder logischen Namen des Jobs.
         /// </summary>
         /// <param name="name">Logischer oder physischer Name des Jobs oder JobPackages.</param>
-        /// <returns>Logischer Name des Jobs</returns>
-        string GetLogicalJobName(string name);
+        /// <returns>Logischer Name des Jobs oder null.</returns>
+        string? GetLogicalJobName(string name);
 
         /// <summary>
         /// Retourniert den physischen Namen des JobPackages mit dem
         /// physischen Namen des JobPackages oder logischen Namen des Jobs.
         /// </summary>
         /// <param name="name">Logischer oder physischer Name des Jobs oder JobPackages.</param>
-        /// <returns>Physischer Name des JobPackages</returns>
-        string GetPhysicalJobPath(string name);
+        /// <returns>Physischer Name des JobPackages oder null.</returns>
+        string? GetPhysicalJobPath(string name);
 
     }
 }

@@ -17,6 +17,6 @@
         /// </summary>
         /// <param name="toConvert">Zu konvertierender Wert</param>
         /// <returns>Konvertierter Wert.</returns>
-        object ModifyValue(object toConvert);
+        object? ModifyValue(object? toConvert);
     }
 }

@@ -29,7 +29,7 @@ namespace Vishnu.Interchange
         /// <summary>
         /// Event, das ausgelöst wird, wenn User-Parameter neu geladen wurden.
         /// </summary>
-        public event EventHandler UserParametersReloaded;
+        public event EventHandler? UserParametersReloaded;
 
         /// <summary>
         /// Routine, die den ParameterReader entsprechend der vorher in
@@ -120,7 +120,7 @@ namespace Vishnu.Interchange
         /// <summary>
         /// Wenn ungleich null, dann sollte die Anwendung die Exception melden und sich beenden.
         /// </summary>
-        public Exception FatalInitializationException { get; set; }
+        public Exception? FatalInitializationException { get; set; }
 
         /// <summary>
         /// Kombinierbare Liste von Typen von Knoten des Trees zur Filterung
@@ -178,7 +178,7 @@ namespace Vishnu.Interchange
         /// Der Dateipfad zum Verzeichnis der lokalen Konfiguration.
         /// Default: Pfad zum AppConfigUser-Verzeichnis.
         /// </summary>
-        public string LocalConfigurationDirectory { get; set; }
+        public string? LocalConfigurationDirectory { get; set; }
 
         /// <summary>
         /// Verzögerung in Millisekunden, bevor ein LogicalCanged-Event weitergegeben wird.
@@ -227,7 +227,7 @@ namespace Vishnu.Interchange
         /// <summary>
         /// Dateipfad zum obersten Job.
         /// </summary>
-        public string RootJobPackagePath { get; set; }
+        public string? RootJobPackagePath { get; set; }
 
         /// <summary>
         /// XML-Name des obersten Jobs.
@@ -265,7 +265,7 @@ namespace Vishnu.Interchange
         /// SnapshotDirectory-Pfad immer relativ zum Verzeichnis, in dem die JobDescription.xml
         /// des MainJob liegt.
         /// </summary>
-        public string SnapshotDirectory { get; set; }
+        public string? SnapshotDirectory { get; set; }
 
         /// <summary>
         /// Ausrichtung des Trees beim Start der Anwendung.
@@ -329,22 +329,22 @@ namespace Vishnu.Interchange
         /// Wenn vorhanden, wird die Dll dynamisch geladen und erweitert Vishnus
         /// Fähigkeiten zur Parameter-Ersetzung in ReplaceWildcards.
         /// </summary>
-        public string UserParameterReaderPath { get; set; }
+        public string? UserParameterReaderPath { get; set; }
 
         /// <summary>
         /// Datenklasse mit wesentlichen Darstellungsmerkmalen des Vishnu-MainWindow.
         /// </summary>
-        public WindowAspects VishnuWindowAspects { get; set; }
+        public WindowAspects? VishnuWindowAspects { get; set; }
 
         /// <summary>
         /// Der Herausgeber der ClickOnce Installation.
         /// </summary>
-        public string VishnuProvider { get; private set; }
+        public string? VishnuProvider { get; private set; }
 
         /// <summary>
         /// Nur für internen Gebrauch.
         /// </summary>
-        public SecureString XUnlock { get; set; }
+        public SecureString? XUnlock { get; set; }
 
         /// <summary>
         /// Wenn es sich beim MainJob um ein Zip handelt, wird dieses von Vishnu
@@ -357,7 +357,7 @@ namespace Vishnu.Interchange
         /// relativen Pfadangaben genutzt.
         /// Vishnu löscht dieses Verzeichnis dann wieder, bevor es sich beendet.
         /// </summary>
-        public string ZipRelativeDummyDirectory { get; set; }
+        public string? ZipRelativeDummyDirectory { get; set; }
 
         #endregion Properties (alphabetic)
 
@@ -384,17 +384,16 @@ namespace Vishnu.Interchange
                     this.RootJobXmlName = Path.GetFileName(this.RootJobPackagePath);
                     this.RootJobPackagePath = Path.GetDirectoryName(this.RootJobPackagePath);
                 }
-                string tmpPath = this.RootJobPackagePath;
+                string? tmpPath = this.RootJobPackagePath;
                 if (this.RootJobXmlName.ToLower() != "jobdescription.xml")
                 {
-                    tmpPath = Path.Combine(tmpPath, Path.GetFileNameWithoutExtension(this.RootJobXmlName));
+                    tmpPath = Path.Combine(tmpPath ?? "", Path.GetFileNameWithoutExtension(this.RootJobXmlName));
                 }
-                this.MainJobName = Path.GetFileNameWithoutExtension(tmpPath);
-                this.AppEnvAccessor.RegisterKeyValue("MainJobName", this.MainJobName);
+                this.MainJobName = Path.GetFileNameWithoutExtension(tmpPath) ?? String.Empty;
             }
             else
             {
-                this.MainJobName = null;
+                this.MainJobName = String.Empty;
             }
             this.DemoModus = this.GetValue<bool>("DemoModus", false);
 
@@ -439,6 +438,7 @@ namespace Vishnu.Interchange
                 }
             }
             this.AppEnvAccessor.RegisterKeyValue("SnapshotDirectory(resolved)", this.ResolvedSnapshotDirectory);
+            string? tmpDirectory = null;
             if (this.AppEnvAccessor.IsDefault("WorkingDirectory"))
             {
                 string jobnameExtension = "";
@@ -446,18 +446,22 @@ namespace Vishnu.Interchange
                 {
                     jobnameExtension = "." + this.MainJobName;
                 }
-                this.WorkingDirectory = this.GetStringValue("__NOPPES__", Path.Combine(Path.Combine(this.TempDirectory, this.ApplicationName + jobnameExtension),
+                tmpDirectory = this.GetStringValue("__REPLACE_WILDCARDS__", Path.Combine(Path.Combine(this.TempDirectory, this.ApplicationName + jobnameExtension),
                   this.ProcessId.ToString()).TrimEnd(Path.DirectorySeparatorChar));
             }
             else
             {
-                this.WorkingDirectory = this.GetStringValue("__NOPPES__", this.WorkingDirectory);
+                tmpDirectory = this.GetStringValue("__REPLACE_WILDCARDS__", this.WorkingDirectory);
             }
-            //this.WorkingDirectoryCreated = false;
+            if (tmpDirectory != null)
+            {
+                this.WorkingDirectory = tmpDirectory;
+            }
 
             this.AppEnvAccessor.RegisterKeyValue("WorkingDirectory", this.WorkingDirectory);
-            this.SearchDirectory = this.GetStringValue("SearchDirectory", this.WorkingDirectory).TrimEnd(Path.DirectorySeparatorChar);
-            this.DebugFile = this.GetStringValue("DebugFile", this.WorkingDirectory + Path.DirectorySeparatorChar + this.ApplicationName + @".log");
+            this.SearchDirectory = this.GetStringValue("SearchDirectory", this.WorkingDirectory)?.TrimEnd(Path.DirectorySeparatorChar);
+            string defaultDebugFile = this.WorkingDirectory + Path.DirectorySeparatorChar + this.ApplicationName + @".log";
+            this.DebugFile = this.GetStringValue("DebugFile", defaultDebugFile) ?? defaultDebugFile;
             this.AppEnvAccessor.RegisterKeyValue("DebugFile", this.DebugFile);
             this.StatisticsFile = this.GetStringValue("StatisticsFile", this.WorkingDirectory + Path.DirectorySeparatorChar + this.ApplicationName + @".stat");
 
@@ -468,23 +472,23 @@ namespace Vishnu.Interchange
             };
             this.AcceptNullResults = this.GetValue<bool>("AcceptNullResults", false);
             string lastUserAssemblyDirectoryDefault = "UserAssemblies";
-            string vishnu_root = this.GetStringValue("Vishnu_Root", null);
+            string? vishnu_root = this.GetStringValue("Vishnu_Root", null);
             if (vishnu_root != null)
             {
                 lastUserAssemblyDirectoryDefault = 
                     Path.Combine(vishnu_root, "ReadyBin", "UserAssemblies");
             }
             this.UserAssemblyDirectory = this.GetStringValue("UserAssemblyDirectory",
-                this.GetStringValue("Vishnu_UserAssemblies", lastUserAssemblyDirectoryDefault));
+                this.GetStringValue("Vishnu_UserAssemblies", lastUserAssemblyDirectoryDefault)) ?? lastUserAssemblyDirectoryDefault;
             if (!this.AssemblyDirectories.Contains(this.UserAssemblyDirectory))
             {
                 this.AssemblyDirectories.Insert(0, this.UserAssemblyDirectory);
                 this.AppEnvAccessor.RegisterKeyValue("UserAssemblyDirectory", this.UserAssemblyDirectory);
             }
             this.UserParameterReaderPath = this.GetStringValue("UserParameterReaderPath", null);
-            this.StartTreeOrientation = (TreeOrientation)Enum.Parse(typeof(TreeOrientation), this.GetStringValue("StartTreeOrientation", "AlternatingHorizontal"));
+            this.StartTreeOrientation = (TreeOrientation)Enum.Parse(typeof(TreeOrientation), this.GetStringValue("StartTreeOrientation", "AlternatingHorizontal") ?? "AlternatingHorizontal");
             this.StartWithJobs = this.GetValue<bool>("StartWithJobs", false);
-            string userCheckerArrayString = this.GetStringValue("UncachedCheckers", null);
+            string? userCheckerArrayString = this.GetStringValue("UncachedCheckers", null);
             if (userCheckerArrayString != null)
             {
                 this.UncachedCheckers = new List<string>(userCheckerArrayString.Split(';'));
@@ -494,7 +498,7 @@ namespace Vishnu.Interchange
                 this.UncachedCheckers = new List<string>();
             }
             this.FlatNodeListFilter = NodeTypes.Constant | NodeTypes.JobConnector | NodeTypes.NodeConnector | NodeTypes.NodeList;
-            string filters = this.GetStringValue("FlatNodeListFilter", null);
+            string? filters = this.GetStringValue("FlatNodeListFilter", null);
             if (filters != null)
             {
                 this.FlatNodeListFilter = NodeTypes.None;
@@ -548,7 +552,7 @@ namespace Vishnu.Interchange
             {
                 this._controlledNodeUserRunDialog = DialogSettings.Question;
             }
-            if ((this.GetStringValue("r", "").ToUpper() == "R") || (this.GetStringValue("run", "").ToUpper() == "RUN"))
+            if ((this.GetStringValue("r", "")?.ToUpper() == "R") || (this.GetStringValue("run", "")?.ToUpper() == "RUN"))
             {
                 this.Autostart = true;
             }
@@ -563,12 +567,15 @@ namespace Vishnu.Interchange
             this.BreakTreeBeforeStart = this.GetValue<bool>("BreakTreeBeforeStart", false);
             this.InitAtUserRun = this.GetValue<bool>("InitAtUserRun", false);
             this.TryRunAsyncSleepTime = this.GetValue<int>("TryRunAsyncSleepTime", 100);
-            string tmpUnlock = this.GetStringValue("XUnlock", "");
+            string? tmpUnlock = this.GetStringValue("XUnlock", "");
             this.XUnlock = new SecureString();
-            for (int i = 0; i < tmpUnlock.Length; i++)
+            if (tmpUnlock != null)
             {
-                char c = tmpUnlock[i];
-                this.XUnlock.AppendChar(c);
+                for (int i = 0; i < tmpUnlock.Length; i++)
+                {
+                    char c = tmpUnlock[i];
+                    this.XUnlock.AppendChar(c);
+                }
             }
             this.XUnlock.MakeReadOnly();
             this.NoWorkers = this.GetValue<bool>("NoWorkers", false);
@@ -588,9 +595,9 @@ namespace Vishnu.Interchange
                 }
             }
             this.VishnuProvider = this.GetVishnuProvider();
-            string sleepTimeString = this.GetStringValue("SleepTime", "00:00:00-00:00:00");
+            string sleepTimeString = this.GetStringValue("SleepTime", "00:00:00-00:00:00") ?? "00:00:00-00:00:00";
             this.SetSleepTime(sleepTimeString);
-            string snapshotSustainString = this.GetStringValue("SnapshotSustain", "00:00:02");
+            string snapshotSustainString = this.GetStringValue("SnapshotSustain", "00:00:02") ?? "00:00:02";
             this.SetSnapshotSustain(snapshotSustainString);
         }
 
@@ -606,7 +613,7 @@ namespace Vishnu.Interchange
         {
             try
             {
-                NetEti.Globals.ThreadLocker.LockNameGlobal("ReplaceWildcards");
+                ThreadLocker.LockNameGlobal("ReplaceWildcards");
                 string replaced = base.ReplaceWildcards(inString);
                 // Regex.Replace(inString, @"%HOME%", AppDomain.CurrentDomain.BaseDirectory.TrimEnd('\\'), RegexOptions.IgnoreCase);
                 if (inString.ToUpper().Contains("%JOBDIRECTORIES%"))
@@ -617,7 +624,7 @@ namespace Vishnu.Interchange
             }
             finally
             {
-                NetEti.Globals.ThreadLocker.UnlockNameGlobal("ReplaceWildcards");
+                ThreadLocker.UnlockNameGlobal("ReplaceWildcards");
             }
         }
 
@@ -664,8 +671,8 @@ namespace Vishnu.Interchange
         private string _mainJobName;
         private TriggeredNodeStartConstraint _startTriggeredNodesOnUserRun;
         private DialogSettings _controlledNodeUserRunDialog;
-        private IParameterReader _userParameterReader;
-        private string _userParameterReaderParameters;
+        private IParameterReader? _userParameterReader;
+        private string? _userParameterReaderParameters;
         private bool _sleepTimeSet;
 
         /// <summary>
@@ -673,13 +680,25 @@ namespace Vishnu.Interchange
         /// GenericSingletonProvider über GetInstance() aufgerufen.
         /// Holt alle Infos und stellt sie als Properties zur Verfügung.
         /// </summary>
+#pragma warning disable CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
         private AppSettings()
+#pragma warning restore CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
           : base()
         {
-            this.FatalInitializationException = null;
+            // Die nachfolgenden Properties werden in BasicAppSettings auf jeden Fall gefüllt,
+            // weswegen oben die warning CS8618 disabled wird.
+
+            //this.FatalInitializationException = null;
+            //this.AssemblyDirectories = new List<string>();
+            //this.JobDirPathes = new Stack<string>();
+            //this.ResolvedSnapshotDirectory = ".";
+            //this.UserAssemblyDirectory = ".";
+            //this.RootJobXmlName = "jobdescription.xml";
+            //this.UncachedCheckers = new List<string>();
+            //this._mainJobName = string.Empty;
         }
 
-        private void ParameterReader_ParametersReloaded(object sender, EventArgs e)
+        private void ParameterReader_ParametersReloaded(object? sender, EventArgs e)
         {
             this.OnUserParametersReloaded();
         }
@@ -710,8 +729,8 @@ namespace Vishnu.Interchange
             this._sleepTimeSet = false;
             TimeSpan sleepTimeFrom;
             TimeSpan sleepTimeTo;
-            string sleeptimeFromString = sleepTimeString.Split('-')[0]?.Trim();
-            string sleeptimeToString = sleepTimeString.Split('-')[1]?.Trim();
+            string? sleeptimeFromString = sleepTimeString.Split('-')[0]?.Trim();
+            string? sleeptimeToString = sleepTimeString.Split('-')[1]?.Trim();
             if (TimeSpan.TryParse(sleeptimeFromString, out sleepTimeFrom))
             {
                 this.SleepTimeFrom = sleepTimeFrom;
@@ -757,12 +776,19 @@ namespace Vishnu.Interchange
                 userParameterReaderParameters = ((userParameterReaderPath + "|").Split(new char[] { '|' }, 2)[1]).TrimEnd('|');
                 userParameterReaderPath = (userParameterReaderPath + "|").Split(new char[] { '|' }, 2)[0];
             }
-            IParameterReader parameterReader = null;
+            IParameterReader? parameterReader = null;
             try
             {
-                parameterReader = (IParameterReader)VishnuAssemblyLoader.GetAssemblyLoader(
-                       this.AssemblyDirectories)
-                      .DynamicLoadObjectOfTypeFromAssembly(userParameterReaderPath, typeof(IParameterReader));
+                VishnuAssemblyLoader loader = VishnuAssemblyLoader.GetAssemblyLoader(this.AssemblyDirectories);
+                if (loader != null)
+                {
+                    object? candidate = loader.DynamicLoadObjectOfTypeFromAssembly(userParameterReaderPath, typeof(IParameterReader));
+                    if (candidate != null)
+                    {
+                        parameterReader = (IParameterReader)candidate;
+                    }
+                }
+
             }
             catch { }
             if (parameterReader != null)
@@ -775,16 +801,14 @@ namespace Vishnu.Interchange
             }
             else
             {
-                System.Windows.Forms.MessageBox.Show(String.Format(
-                    "Die User-Assembly {0} konnte nicht geladen werden.", userParameterReaderPath));
-                //throw new ApplicationException(String.Format("Die User-Assembly {0} konnte nicht geladen werden.",
-                //    userParameterReaderPath));
+                throw new ApplicationException(String.Format("Die User-Assembly {0} konnte nicht geladen werden.",
+                    userParameterReaderPath));
             }
         }
 
         private string GetVishnuProvider()
         {
-            string vishnuProvider = this.GetStringValue("VishnuProvider", "NetEti");
+            string vishnuProvider = this.GetStringValue("VishnuProvider", "NetEti") ?? "NetEti";
             return vishnuProvider;
         }
 
@@ -799,7 +823,7 @@ namespace Vishnu.Interchange
             /// <param name="key">Der Zugriffsschlüssel (string)</param>
             /// <param name="defaultValue">Das default-Ergebnis (string)</param>
             /// <returns>Der Ergebnis-String</returns>
-            public string GetStringValue(string key, string defaultValue)
+            public string? GetStringValue(string key, string? defaultValue)
             {
                 string result = this._parameterReader.ReadParameter(key);
                 return result ?? defaultValue;
@@ -812,7 +836,7 @@ namespace Vishnu.Interchange
             /// <param name="key">Der Zugriffsschlüssel (string)</param>
             /// <param name="defaultValues">Das default-Ergebnis (string[])</param>
             /// <returns>Das Ergebnis-String-Array</returns>
-            public string[] GetStringValues(string key, string[] defaultValues)
+            public string?[]? GetStringValues(string key, string?[]? defaultValues)
             {
                 throw new NotImplementedException();
             }
