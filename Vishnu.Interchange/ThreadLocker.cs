@@ -25,12 +25,15 @@ namespace LogicalTaskTree
         /// <param name="name">Ein Name, der über ein zugeordnetes Objekt global gesperrt werden soll.</param>
         public static void LockNameGlobal(string name)
         {
-            if (!ThreadLocker._lockers.ContainsKey(name))
+            lock (ThreadLocker._lockLocker)
             {
-                ThreadLocker._lockers.AddOrUpdate(name, new object(), new Func<string, object, object>((a, b) => { return new object(); }));
+                if (!ThreadLocker._lockers.ContainsKey(name))
+                {
+                    ThreadLocker._lockers.AddOrUpdate(name, new object(), new Func<string, object, object>((a, b) => { return new object(); }));
+                }
+                bool lockWasTaken = false;
+                Monitor.Enter(ThreadLocker._lockers[name], ref lockWasTaken);
             }
-            bool lockWasTaken = false;
-            Monitor.Enter(ThreadLocker._lockers[name], ref lockWasTaken);
         }
 
         /// <summary>
@@ -39,11 +42,14 @@ namespace LogicalTaskTree
         /// <param name="name">Ein Name, dessen zugeordnetes Objekt global entsperrt werden soll.</param>
         public static void UnlockNameGlobal(string name)
         {
-            if (!ThreadLocker._lockers.ContainsKey(name))
+            lock (ThreadLocker._unlockLocker)
             {
-                throw new ArgumentNullException(String.Format("ThreadLocker.UnlockNameGlobal: Der Name {0} existiert nicht.", name));
+                if (!ThreadLocker._lockers.ContainsKey(name))
+                {
+                    throw new ArgumentNullException(String.Format("ThreadLocker.UnlockNameGlobal: Der Name {0} existiert nicht.", name));
+                }
+                Monitor.Exit(ThreadLocker._lockers[name]);
             }
-            Monitor.Exit(ThreadLocker._lockers[name]);
         }
 
         #endregion public members
@@ -51,10 +57,14 @@ namespace LogicalTaskTree
         #region private members
 
         private static ConcurrentDictionary<string, object> _lockers;
+        private static object _lockLocker;
+        private static object _unlockLocker;
 
         static ThreadLocker()
         {
             ThreadLocker._lockers = new ConcurrentDictionary<string, object>();
+            ThreadLocker._lockLocker = new object();
+            ThreadLocker._unlockLocker = new object();
         }
 
         #endregion private members

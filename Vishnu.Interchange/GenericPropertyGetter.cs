@@ -57,12 +57,12 @@ namespace Vishnu.Interchange
             {
                 try
                 {
-                    string encoded = SerializationUtility.SerializeObjectToBase64(propertyValue);
-                    obj = SerializationUtility.DeserializeObjectFromBase64<T>(encoded);
+                    string encoded = SerializationUtility.SerializeObjectToBase64String(propertyValue);
+                    obj = SerializationUtility.DeserializeObjectFromBase64String(encoded);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    throw new TypeLoadException(String.Format("Die Property {0} ist nicht vom erwarteten Typ.", name));
+                    throw new TypeLoadException(String.Format("Die Property {0} ist nicht vom erwarteten Typ.", name), ex);
                 }
             }
             return (T?)obj;

@@ -308,7 +308,7 @@ namespace LogicalTaskTree
         /// Liefert den Namen des Triggers, der einem Checker zugeordnet werden soll.
         /// </summary>
         /// <returns>Namen des Triggers, der dem Checker zugeordnet werden soll oder null.</returns>
-        public string GetTriggerReference()
+        public string? GetTriggerReference()
         {
             return this.TriggerShellReference;
         }
@@ -327,7 +327,7 @@ namespace LogicalTaskTree
         /// mitbekommen haben, wird hier nachträglich der Trigger übergeben.
         /// </summary>
         /// <param name="triggerShell">Referenzierte TriggerShell.</param>
-        public void SetSlaveTriggerShell(TriggerShell triggerShell)
+        public void SetSlaveTriggerShell(TriggerShell? triggerShell)
         {
             if (this._slaveTriggerShell != triggerShell)
             {
@@ -431,7 +431,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Bei TreeEventTriggern die Events, auf die der Trigger feuert.
         /// </summary>
-        internal string TriggerShellReference;
+        internal string? TriggerShellReference;
 
         private string _slavePathName = String.Empty;
         private INodeTrigger? _slave;
@@ -457,7 +457,7 @@ namespace LogicalTaskTree
             this._dummyActionTreeEvent = null; // new Action<TreeEvent>(x => { });
             this.HasTreeEventTrigger = false;
             this.ReferencedNodeName = null;
-            this.TriggerShellReference = String.Empty;
+            this.TriggerShellReference = null;
             this._assemblyLoader = VishnuAssemblyLoader.GetAssemblyLoader();
         }
 

@@ -31,7 +31,7 @@ namespace Vishnu.Interchange
         /// Liefert zu einem String-Parameter einen String-Wert.
         /// </summary>
         /// <param name="parameterName">Parameter-Name.</param>
-        /// <returns>Parameter-Value.</returns>
-        string ReadParameter(string parameterName);
+        /// <returns>Parameter-Value or null.</returns>
+        string? ReadParameter(string parameterName);
     }
 }

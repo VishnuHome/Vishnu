@@ -920,6 +920,22 @@ ERLEDIGT: ZoomBox Mouse-wheel: Scroll-Events werden jetzt nicht mehr auf e.Handl
 
 Stand: 23.12.2022 Version 5.3.0.3 (Heavy Duty)
 
+ERLEDIGT: Umstellung auf .Net 7.0 (umfassende Test stehen noch aus)
+	Zusatz: siehe auch roadmap_dotnetcore_migration.txt
+ERLEDIGT: CheckDiskSpace: Sql-Zugriffe nach Company auslagern, wenn möglich
+ERLEDIGT: Framework-Assemblies in NuGet-Package (was ist mit pdb?)
+	Zusatz: allgemeingültige Lösung für alle Projekte über Environment-Variable NETETI_CIB=true
+	       und ...\AddOn\proj\Conditional_NuGet_Package_Properties.proj implementiert.
+ERLEDIGT: MailTo-Parameter
+ERLEDIGT: Parametertrennung mit Pipe | in Syntax führt zu Fehler in MicroMailer
+ERLEDIGT: Positionierung von UserDialogen ist noch unsauber (verschwindet rechts unten)
+		CheckCanRun, CheckDateDialog
+ERLEDIGT: Vishnu-eigene Meldungen mit korrekter Positionierung
+ERLEDIGT: Vishnu-Positionierung und Resizing bei Multiscreen-Orientierung
+          (-SizeOnVirtualScreen=true)
+ERLEDIGT: Meldung mit Mindestbreite in Überschrift-Länge
+
+Stand: 18.07.2023 Version 7.0.1.0 (Hard Core)
 
 -------------------------------------------------------------------------------------------------------------
 
@@ -973,11 +989,9 @@ Liste von Snapshots mit letzter Ladezeit verfügbar und prüfbar machen
 '#' bei Snapshots überdenken und ggf. abschaffen
 Dynamische multiple logger ermöglichen.
 Veröffentlichungsparameter nach Company auslagern, wenn möglich
-CheckDiskSpace: Sql-Zugriffe nach Company auslagern, wenn möglich
 Vishnu-Checker: Parameteraktualisierung im Hintergrund checken
 Snapshots: Serialisierung von LastRun fehlt
 "Ist behoben" in vorgeschalteten Prozess?
-Framework-Assemblies in NuGet-Package (was ist mit pdb?)
 Masud
 	"Ist behoben" Link zur Dokumentation der Fehlerbehebung
 	XML laden in Excel Pivot Tabelle
@@ -988,7 +1002,6 @@ Nächsten Lauf bei JobLists anzeigen.
 TrueFalseExceptionChecker Release-Zweig überprüfen
 CopyClickOnceStarter Pfad überprüfen
 Job.EventTriggers.Values Key ist nur die KnotenId, nicht der Pfad
-MailTo-Parameter
 SMS
 WhatsApp
 Dark Mode und weitere Designs.
@@ -1011,7 +1024,6 @@ False Knoten per User-Button auf true setzen und ab da in Tree ignorieren aber k
   (Motto: ist zwar falsch, können wir aber ignorieren).
 Prefix-Convention für Job_Connectoren - besser: SubJobs dort aufbauen, wo sie auch definiert sind.
 Vishnu-Ladevorgang weiter beschleunigen
-Parametertrennung mit Pipe | in Syntax führt zu Fehler in MicroMailer
 Messaging für Vishnu und Clients
 Zusatzinfos für Checker (Monitore, Mail-Verteiler...)
 Einzelknoten mit vereinfachter Distanz-Darstellung (große Schrift, viel Farbe)
@@ -1026,8 +1038,6 @@ CheckWorkerErrorToOk: break auf den Checker lässt Fehlermeldungen (TimerTrigger)
 DefaultUserControls: Demo-Projekte einführen.
 JobList(UserControl): erklärenden Text, wofür der Job ist hinzufügen (ausklappbar).
 Alle Testprojekte mit Erklärungen versehen.
-Positionierung von UserDialogen ist noch unsauber (verschwindet rechts unten)
-		CheckCanRun, CheckDateDialog
 TreeExternals gar nicht erst anlegen, wenn sie nicht referenziert werden.
 geschützte Namen (auch mit Leerzeichen)
 Über Checker, die melden, wenn ein Ereignis ausbleibt, nachdenken.
@@ -1081,7 +1091,6 @@ Alle WPF Properties auf virtual setzten, falls später jemand Proxies bauen will.
 Sicherheitsabfrage (konfigurierbar) wenn versucht wird, einen schon erfolgreich
 		gelaufenen Teil erneut zu starten.
 Abhängigkeiten visualisieren (TreeEventTrigger)
-Meldung mit Mindestbreite in Überschrift-Länge
 Exception Meldung mit Combo-Box (readonly)
 NodeConnectoren neu testen, Controlled TestJob
 Job-Steuerung über Prozess-/Servergrenzen hinweg
@@ -1777,5 +1786,22 @@ Xamarin
 	Status Bar
 	Naviogation Bar
 	Content
-	
 
+Alle Checker und Locking
+	Checker, der gestartet wird, wird in eine Wartetabelle eingetragen.
+	Checker, die schon gelaufen sind und wieder gestartet werden sollen, werden hinten an die Wartetabelle angefügt.
+	Wie läuft das mit wiederholten Starts?
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+Windows PowerShell
+PS > cd ..\WorkFrame\
+PS > (gci -include *.cs,*.cpp,*.xaml -recurse | select-string .).Count
+19573
+PS > cd ..\VishnuHome
+PS > (gci -include *.cs,*.cpp,*.xaml -recurse | select-string .).Count
+87050
+PS > cd ..\InPlug
+PS > (gci -include *.cs,*.cpp,*.xaml -recurse | select-string .).Count
+95448
+
+.Net 7 migration; version 7.0.1.1

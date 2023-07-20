@@ -5,19 +5,23 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageId>NetEti.$(AssemblyName)</PackageId>
     <Title>$(AssemblyName) - Bibliothek mit gemeinsamen Klassen für Vishnu und Plugins</Title>
     <Authors>Erik Nagel</Authors>
     <Company>NetEti</Company>
     <Description>$(AssemblyName) - Bibliothek mit gemeinsamen Klassen für Vishnu und Plugins</Description>
     <Copyright>Copyright © $(Authors) 2012-2023</Copyright>
-    <AssemblyVersion>7.0.0.0</AssemblyVersion>
-    <FileVersion>7.0.0.0</FileVersion>
+    <AssemblyVersion>7.0.1.1</AssemblyVersion>
+    <FileVersion>7.0.1.1</FileVersion>
     <PackageTags>NetEti Vishnu Basics</PackageTags>
   </PropertyGroup>
 
  	<PropertyGroup>
    	<VishnuRoot>$(ProjectDir)../../..</VishnuRoot>
    	<AssemblyRoot>$(VishnuRoot)/ReadyBin/Assemblies</AssemblyRoot>
+   	<RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+   	<RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+   	<EnableNETAnalyzers>False</EnableNETAnalyzers>
 	</PropertyGroup>
 	<Import Project="$(ProjectDir)../../AddOn/proj/*" Condition="exists('$(ProjectDir)../../AddOn/proj')" />
 
@@ -63,5 +67,9 @@
 		  </ItemGroup>
     </Otherwise>
 	</Choose>
+
+	<ItemGroup>
+	  <Compile Remove="Result - Kopie.cs" />
+	</ItemGroup>
 
 </Project>

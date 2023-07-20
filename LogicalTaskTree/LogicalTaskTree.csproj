@@ -4,29 +4,31 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageId>NetEti.$(AssemblyName)</PackageId>
     <Title>$(AssemblyName) - Business Logic</Title>
     <Authors>Erik Nagel</Authors>
     <Company>NetEti</Company>
     <Description>Haupt-Verarbeitungslogik von Vishnu</Description>
     <Copyright>Copyright © $(Authors) 2012-2023</Copyright>
-    <AssemblyVersion>7.0.0.0</AssemblyVersion>
-    <FileVersion>7.0.0.0</FileVersion>
+    <AssemblyVersion>7.0.1.1</AssemblyVersion>
+    <FileVersion>7.0.1.1</FileVersion>
     <PackageTags>NetEti Vishnu Businesslogic</PackageTags>
   </PropertyGroup>
 
  	<PropertyGroup>
    	<VishnuRoot>$(ProjectDir)../../..</VishnuRoot>
    	<AssemblyRoot>$(VishnuRoot)/ReadyBin/Assemblies</AssemblyRoot>
+   	<RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+   	<RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+   	<EnableNETAnalyzers>False</EnableNETAnalyzers>
 	</PropertyGroup>
 	<Import Project="$(ProjectDir)../../AddOn/proj/*" Condition="exists('$(ProjectDir)../../AddOn/proj')" />
 
 	<Choose>
   	<When Condition="!('$(TF_BUILD)' == 'true' Or '$(GITHUB_ACTIONS)' == 'true' Or '$(NETETI_CIB)' == 'true')">
 		  <ItemGroup>
-		    <Reference Include="Vishnu.Interchange">
-		      <HintPath>$(AssemblyRoot)/Vishnu.Interchange.dll</HintPath>
-		    </Reference>
 		    <Reference Include="NetEti.BasicAppSettings">
 		      <HintPath>$(AssemblyRoot)/NetEti.BasicAppSettings.dll</HintPath>
 		    </Reference>
@@ -61,7 +63,6 @@
   	</When>
     <Otherwise>
 		  <ItemGroup>
-		    <PackageReference Include="Vishnu.Interchange" Version="1.0.0" />
 		    <PackageReference Include="NetEti.BasicAppSettings" Version="1.0.0" />
 		    <PackageReference Include="NetEti.ExpressionParser" Version="1.0.0" />
 		    <PackageReference Include="NetEti.Global" Version="1.0.0" />
@@ -75,5 +76,9 @@
 		  </ItemGroup>
     </Otherwise>
 	</Choose>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Vishnu.Interchange\Vishnu.Interchange.csproj" />
+	</ItemGroup>
 
 </Project>

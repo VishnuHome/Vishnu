@@ -4,6 +4,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vishnu", "Vishnu\Vishnu.csproj", "{91593932-F860-4A38-AF0C-BD9A6F94A621}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2B9501E8-513F-4288-8616-7A1E9C4BCF97} = {2B9501E8-513F-4288-8616-7A1E9C4BCF97}
+		{391C9ADF-CB4B-438A-8591-93A565BD9DBC} = {391C9ADF-CB4B-438A-8591-93A565BD9DBC}
+		{4BCB82BC-AA6A-4C5D-91E0-5024F78C1766} = {4BCB82BC-AA6A-4C5D-91E0-5024F78C1766}
+		{7B791941-ECD2-4713-B0CB-EB4F8F1A891F} = {7B791941-ECD2-4713-B0CB-EB4F8F1A891F}
+		{8421069D-D2A4-4308-B881-726C3F29AD3F} = {8421069D-D2A4-4308-B881-726C3F29AD3F}
+		{DE16640B-89FE-4B53-9E33-543993885A1A} = {DE16640B-89FE-4B53-9E33-543993885A1A}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogicalTaskTree", "LogicalTaskTree\LogicalTaskTree.csproj", "{CCB845EF-FD32-4900-B663-9813B26C4DAB}"
 EndProject
@@ -13,9 +21,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vishnu.ViewModel", "Vishnu.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vishnu.WPF_UI", "Vishnu.WPF_UI\Vishnu.WPF_UI.csproj", "{8E28C654-5B36-49EF-AAF6-50560BA1237A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DefaultUserControls", "DefaultUserControls", "{95A96EA1-6584-4100-87D4-04511C358DCC}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DefaultNodeControls", "DefaultNodeControls", "{95A96EA1-6584-4100-87D4-04511C358DCC}"
+	ProjectSection(SolutionItems) = preProject
+		DefaultNodeControls\AddOn\Package.png = DefaultNodeControls\AddOn\Package.png
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConstantNodeUserControl", "DefaultNodeControls\ConstantNodeUserControl\ConstantNodeUserControl\ConstantNodeUserControl.csproj", "{DE16640B-89FE-4B53-9E33-543993885A1A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConstantNodeUserControlDemo", "DefaultNodeControls\ConstantNodeUserControl\ConstantNodeUserControlDemo\ConstantNodeUserControlDemo.csproj", "{2E44E08C-F50C-4F13-B52E-04717BE930F4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JobConnectorUserControl", "DefaultNodeControls\JobConnectorUserControl\JobConnectorUserControl\JobConnectorUserControl.csproj", "{4BCB82BC-AA6A-4C5D-91E0-5024F78C1766}"
 EndProject
@@ -30,6 +43,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SingleNodeUserControlDemo", "DefaultNodeControls\SingleNodeUserControl\SingleNodeUserControlDemo\SingleNodeUserControlDemo.csproj", "{8EBAA2B5-534F-4257-B875-0A6A563887F8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapshotUserControl", "DefaultNodeControls\SnapshotUserControl\SnapshotUserControl\SnapshotUserControl.csproj", "{2B9501E8-513F-4288-8616-7A1E9C4BCF97}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Projektmappenelemente", "{01697F04-7BE4-40B6-9FE8-A383E052171E}"
+	ProjectSection(SolutionItems) = preProject
+		Plugin\_vishnu_plugins_ = Plugin\_vishnu_plugins_
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +79,10 @@ Global
 		{DE16640B-89FE-4B53-9E33-543993885A1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE16640B-89FE-4B53-9E33-543993885A1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE16640B-89FE-4B53-9E33-543993885A1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E44E08C-F50C-4F13-B52E-04717BE930F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E44E08C-F50C-4F13-B52E-04717BE930F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E44E08C-F50C-4F13-B52E-04717BE930F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E44E08C-F50C-4F13-B52E-04717BE930F4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4BCB82BC-AA6A-4C5D-91E0-5024F78C1766}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4BCB82BC-AA6A-4C5D-91E0-5024F78C1766}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BCB82BC-AA6A-4C5D-91E0-5024F78C1766}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -95,6 +117,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DE16640B-89FE-4B53-9E33-543993885A1A} = {95A96EA1-6584-4100-87D4-04511C358DCC}
+		{2E44E08C-F50C-4F13-B52E-04717BE930F4} = {95A96EA1-6584-4100-87D4-04511C358DCC}
 		{4BCB82BC-AA6A-4C5D-91E0-5024F78C1766} = {95A96EA1-6584-4100-87D4-04511C358DCC}
 		{8421069D-D2A4-4308-B881-726C3F29AD3F} = {95A96EA1-6584-4100-87D4-04511C358DCC}
 		{CBD0555D-6C95-4D8C-BBD9-EB7F2AB122F5} = {95A96EA1-6584-4100-87D4-04511C358DCC}

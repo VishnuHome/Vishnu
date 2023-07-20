@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NetEti.TimerMessageBox</name>
+    </assembly>
+    <members>
+        <member name="T:NetEti.CustomControls.MessageBoxButtons">
+            <summary>
+            Gibt die Buttons an, die in der MessageBox angezeigt werden.
+            </summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxButtons.None">
+            <summary>Es soll kein Button angezeigt werden.</summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxButtons.OK">
+            <summary>Es soll ein OK-Button angezeigt werden.</summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxButtons.Cancel">
+            <summary>Es soll ein Abbrechen-Button angezeigt werden.</summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxButtons.OKCancel">
+            <summary>Es sollen ein OK-Button und ein Abbrechen-Button angezeigt werden.</summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxButtons.YesNo">
+            <summary>Es sollen ein Ja-Button und ein Nein-Button angezeigt werden.</summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxButtons.YesNoCancel">
+            <summary>Es sollen ein Ja-Button, ein Nein-Button und ein Abbrechen angezeigt werden.</summary>
+        </member>
+        <member name="T:NetEti.CustomControls.MessageBoxIcons">
+            <summary>
+            Gibt das Symbol an, das in der MessageBox angezeigt wird.
+            </summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxIcons.None">
+            <summary>Es wird kein Symbol angezeigt.</summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxIcons.Hand">
+            <summary>Das Meldungsfeld enthält ein Symbol, das aus einem weißen X in einem Kreis mit rotem Hintergrund besteht.</summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxIcons.Stop">
+            <summary>Das Meldungsfeld enthält ein Symbol, das aus einem weißen X in einem Kreis mit rotem Hintergrund besteht.</summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxIcons.Error">
+            <summary>Das Meldungsfeld enthält ein Symbol, das aus einem weißen X in einem Kreis mit rotem Hintergrund besteht.</summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxIcons.Question">
+            <summary>
+            Das Meldungsfeld enthält ein Symbol, das aus einem weißen Fragezeichen in einem blauen Kreis besteht.</summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxIcons.Exclamation">
+            <summary>Das Meldungsfeld enthält ein Symbol, das aus einem schwarzen Ausrufezeichen in einem Dreieck mit orangem Hintergrund besteht.</summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxIcons.Warning">
+            <summary>Das Meldungsfeld enthält ein Symbol, das aus einem schwarzen Ausrufezeichen in einem Dreieck mit orangem Hintergrund besteht.</summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxIcons.Asterisk">
+            <summary>Das Meldungsfeld enthält ein Symbol, das aus einem weißen Kleinbuchstaben i in einem blauen Kreis besteht.</summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxIcons.Information">
+            <summary>Das Meldungsfeld enthält ein Symbol, das aus einem weißen Kleinbuchstaben i in einem blauen Kreis besteht.</summary>
+        </member>
+        <member name="F:NetEti.CustomControls.MessageBoxIcons.Working">
+            <summary>Das Meldungsfeld enthält ein animiertes Symbol aus drei goldenen Zahnrädern für eine laufende Verarbeitung.</summary>
+        </member>
+        <member name="T:NetEti.CustomControls.TimerMessageBox">
+            <summary>
+            Interaktionslogik für TimerMessageBox.xaml
+            </summary>
+            <summary>
+            TimerMessageBox
+            </summary>
+        </member>
+        <member name="E:NetEti.CustomControls.TimerMessageBox.PropertyChanged">
+            <summary>
+            Das INotifyPropertyChanged-Event: dient der UI zur Erkennung
+            veränderter Properties.
+            </summary>
+        </member>
+        <member name="F:NetEti.CustomControls.TimerMessageBox.INFINITE">
+            <summary>
+            Namensvergabe "Infinite" an den LifetimeMilliSeconds-Wert 0.
+            </summary>
+        </member>
+        <member name="P:NetEti.CustomControls.TimerMessageBox.LifeTimeMilliSeconds">
+            <summary>
+            Ist LifeTimeMilliSeconds größer als  0, dann schließt sich
+            das Meldungsfenster nach LifeTimeMilliSeconds,
+            Default: INFINITE (= 0).
+            </summary>
+        </member>
+        <member name="P:NetEti.CustomControls.TimerMessageBox.Caption">
+            <summary>
+            Die Fenster-Überschrift, Default: "Information".
+            </summary>
+        </member>
+        <member name="P:NetEti.CustomControls.TimerMessageBox.Text">
+            <summary>
+            Die Meldung, Default: "".
+            </summary>
+        </member>
+        <member name="P:NetEti.CustomControls.TimerMessageBox.WindowIconPath">
+            <summary>
+            Das Icon links oben im Meldungsfenster.
+            </summary>
+        </member>
+        <member name="P:NetEti.CustomControls.TimerMessageBox.ImageUri">
+            <summary>
+            Das Symbol zur Meldung.
+            </summary>
+        </member>
+        <member name="P:NetEti.CustomControls.TimerMessageBox.Buttons">
+            <summary>
+            Die Buttons der UserTimerMessageBox:
+            None, OK, Cancel, OKCancel, YesNo, YesNoCancel
+            </summary>
+        </member>
+        <member name="P:NetEti.CustomControls.TimerMessageBox.Icon">
+            <summary>
+            Das Icon der UserTimerMessageBox.
+            </summary>
+        </member>
+        <member name="P:NetEti.CustomControls.TimerMessageBox.Position">
+            <summary>
+            Die Startposition des Meldungsfensters.
+            </summary>
+        </member>
+        <member name="P:NetEti.CustomControls.TimerMessageBox.Result">
+            <summary>
+            Das Ergebnis aus dieser MessageBox;
+            None, OK, Cancel, Yes, No.
+            </summary>
+        </member>
+        <member name="M:NetEti.CustomControls.TimerMessageBox.#ctor(System.Windows.Window)">
+            <summary>
+            Standard Konstruktor - setzt Defaults für LifeTimeMilliSeconds,
+            Caption, Text, Buttons, Icon, Result. 
+            </summary>
+            <param name="owner">Besitzendes Window oder (bei Page) null.</param>
+        </member>
+        <member name="M:NetEti.CustomControls.TimerMessageBox.ShowDialog">
+            <summary>
+            Zeigt die TimerMessageBox modal an und gibt ein MessageBoxResult zurück
+            (None, OK, Cancel, Yes, No).
+            </summary>
+            <returns>Das MessageBoxResult: None, OK, Cancel, Yes, No</returns>
+        </member>
+        <member name="M:NetEti.CustomControls.TimerMessageBox.CloseMessageBox">
+            <summary>
+            Kann zum Schließen der MessageBox von außen aufgerufen werden (Thread-safe).
+            </summary>
+            <returns>Das MessageBoxResult: None, OK, Cancel, Yes, No</returns>
+        </member>
+        <member name="M:NetEti.CustomControls.TimerMessageBox.OnPropertyChanged(System.String)">
+            <summary>
+            Löst bei Änderung der Property INotifyPropertyChanged aus.
+            </summary>
+            <param name="propertyName">Name der geänderten Property.</param>
+        </member>
+        <member name="M:NetEti.CustomControls.TimerMessageBox.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+    </members>
+</doc>

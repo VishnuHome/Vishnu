@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>VishnuMessageBox</name>
+    </assembly>
+    <members>
+        <member name="T:VishnuMessageBox.App">
+            <summary>
+            Interaction logic for App.xaml
+            </summary>
+            <summary>
+            App
+            </summary>
+        </member>
+        <member name="M:VishnuMessageBox.App.OnStartup(System.Windows.StartupEventArgs)">
+            <summary>
+            Wird beim Start der Anwendung durchlaufen.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:VishnuMessageBox.App.Main">
+            <summary>
+            Application Entry Point.
+            </summary>
+        </member>
+    </members>
+</doc>

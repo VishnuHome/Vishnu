@@ -8,6 +8,8 @@ using NetEti.ApplicationControl;
 using NetEti.Globals;
 using Vishnu.Interchange;
 using System.Xml.Linq;
+using System.Drawing;
+using System.Windows;
 
 namespace LogicalTaskTree
 {
@@ -42,13 +44,14 @@ namespace LogicalTaskTree
         public void Exec(TreeParameters treeParameters, string nodeId, TreeEvent eventParameters, bool isResetting)
         {
             WorkerArguments args;
+            System.Windows.Point winPoint = treeParameters.GetParentViewAbsoluteScreenPosition();
             if (this.Trigger != null)
             {
-                args = new WorkerArguments(0, treeParameters.ToString(), nodeId, eventParameters, null);
+                args = new WorkerArguments(0, treeParameters.ToString(), nodeId, eventParameters, null, winPoint);
             }
             else
             {
-                args = new WorkerArguments(1, treeParameters.ToString(), nodeId, eventParameters, null);
+                args = new WorkerArguments(1, treeParameters.ToString(), nodeId, eventParameters, null, winPoint);
             }
             if (isResetting)
             {
@@ -269,7 +272,8 @@ namespace LogicalTaskTree
                         workerArguments = workerArguments.Predecessor;
                         workerArguments.CallCounter *= -1; // Ein negativer CallCounter heist Reset. Der Absolutwert entspricht dem bisher höchsten Aufrufwert.
                     }
-                    this.exec(workerArguments.CallCounter, new TreeParameters(workerArguments.TreeInfo, null), workerArguments.NodeInfo, workerArguments.TreeEventInfo);
+                    this.exec(workerArguments.CallCounter, new TreeParameters(workerArguments.TreeInfo, null),
+                        workerArguments.NodeInfo, workerArguments.TreeEventInfo, workerArguments.Position);
                 }
             }
         }
@@ -284,7 +288,9 @@ namespace LogicalTaskTree
         /// <param name="nodeId">Id des Knotens, der diesen Worker besitzt.</param>
         /// <param name="eventParameters">Klasse mit Informationen zum auslösenden Ereignis.</param>
         /// <param name="callCounter">Aufrufzähler (1-n). Bei 0 wird der Worker resettet (Fehler behoben).</param>
-        private void exec(int callCounter, TreeParameters treeParameters, string nodeId, TreeEvent eventParameters)
+        /// <param name="position">Absolute Bildschirmposition des Parent-Controls.</param>
+        private void exec(int callCounter, TreeParameters treeParameters, string nodeId, TreeEvent eventParameters,
+                            System.Windows.Point position)
         {
             try
             {
@@ -300,6 +306,7 @@ namespace LogicalTaskTree
                 {
                     konvertedSlaveParameters = this._slaveParameters.ToString().Replace('\xA0', ' ').Replace('\x09', ' ');
                 }
+                konvertedSlaveParameters = konvertedSlaveParameters.Replace("|", "^^^");
                 string delimiter = "";
                 string resultsString = "";
                 string msg = "";
@@ -331,18 +338,24 @@ namespace LogicalTaskTree
                   .Replace("%Logical%", logicalString).Replace("%Counter%", countString)
                   .Replace("%Result%", resultsString)
                   .Replace("%Exception%", msg);
-                string? strVal = GenericSingletonProvider.GetInstance<AppSettings>().GetStringValue("__NOPPES__", konvertedSlaveParameters);
+                string? strVal = GenericSingletonProvider.GetInstance<AppSettings>()
+                    .GetStringValue("__NOPPES__", konvertedSlaveParameters);
                 if (strVal != null)
                 {
                     konvertedSlaveParameters = strVal;
                 }
                 this._externalProcess.StartInfo.FileName = this._slavePathName;
-                this._externalProcess.StartInfo.Arguments = countString
-                                         + " \"" + treeParameters.Name.Replace("|", "\" \"")
-                                         + "\" \"" + nodeId;
+                this._externalProcess.StartInfo.Arguments = "-Vishnu.EscalationCounter=" + countString
+                                         + " -Vishnu.TreeInfo=" + "\"" + treeParameters.Name.Replace("|", "\" \"") + "\""
+                                         + " -Vishnu.NodeInfo=" + "\"" + nodeId + "\""
+                                         + " -Position=" + "\"" + position.X + ";" + position.Y + "\"";
                 if (!this.TransportByFile)
                 {
-                    this._externalProcess.StartInfo.Arguments += "\" \"" + konvertedSlaveParameters.Replace(" ", " ").Replace("|", "\" \"") + "\"";
+                    // string tmpStr = konvertedSlaveParameters.Replace(" ", " ");
+                    // tmpStr = tmpStr.Replace("^^^", "\" \"");
+                    string tmpStr = konvertedSlaveParameters.Replace("^^^", "\" \"");
+                    // this._externalProcess.StartInfo.Arguments += " \"" + tmpStr + "\"";
+                    this._externalProcess.StartInfo.Arguments += " " + tmpStr;
                     // Der 1. Replace ersetzt Leerzeichen durch geschützte Leerzeichen (255).
                 }
                 else
@@ -360,6 +373,11 @@ namespace LogicalTaskTree
                 if (!this._dontExecute)
                 {
                     this._externalProcess.Start();
+                    if (GenericSingletonProvider.GetInstance<AppSettings>().GetValue<bool>("DebugMode", false))
+                    {
+                        InfoController.Say(
+                            String.Format($"Vishnu.WorkerShell Parameter: {this._externalProcess.StartInfo.Arguments}."));
+                    }
                 }
                 this.WorkerState = NodeWorkerState.Valid;
             }
@@ -391,21 +409,26 @@ namespace LogicalTaskTree
         #endregion private members
     }
 
-    class WorkerArguments
+    internal class WorkerArguments
     {
         public int CallCounter { get; set; }
         public string TreeInfo { get; set; }
         public string NodeInfo { get; set; }
         public TreeEvent TreeEventInfo { get; set; }
+
+        public System.Windows.Point Position { get; set; }
+
         public WorkerArguments? Predecessor { get; set; }
 
-        public WorkerArguments(int callCounter, string treeInfo, string nodeInfo, TreeEvent treeEventInfo, WorkerArguments? predecessor)
+        public WorkerArguments(int callCounter, string treeInfo, string nodeInfo, TreeEvent treeEventInfo,
+            WorkerArguments? predecessor, System.Windows.Point position)
         {
             this.CallCounter = callCounter;
             this.TreeInfo = treeInfo;
             this.NodeInfo = nodeInfo;
             this.TreeEventInfo = treeEventInfo;
             this.Predecessor = predecessor;
+            this.Position = position;
         }
     }
 }

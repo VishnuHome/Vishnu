@@ -454,7 +454,7 @@ namespace Vishnu.ViewModel
         {
             get
             {
-                return this._myLogicalNode.Id;
+                return this._myLogicalNode?.Id ?? "NULL";
             }
         }
 
@@ -466,7 +466,7 @@ namespace Vishnu.ViewModel
         {
             get
             {
-                return this._myLogicalNode.IsSnapshotDummy;
+                return this._myLogicalNode?.IsSnapshotDummy ?? false;
             }
         }
 
@@ -527,7 +527,7 @@ namespace Vishnu.ViewModel
         {
             get
             {
-                return this._myLogicalNode.UserControlPath;
+                return this._myLogicalNode?.UserControlPath ?? "";
             }
         }
 
@@ -802,7 +802,7 @@ namespace Vishnu.ViewModel
                 }
                 else
                 {
-                    return this._myLogicalNode.Id;
+                    return this._myLogicalNode?.Id ?? "NULL";
                 }
             }
         }
@@ -992,7 +992,7 @@ namespace Vishnu.ViewModel
         /// <param name="lazyLoadChildren">Bei True werden die Kinder erst beim Öffnen des TreeView-Knotens nachgeladen.</param>
         /// <param name="uIMain">Das Root-FrameworkElement zu diesem ViewModel.</param>
         public LogicalNodeViewModel(OrientedTreeViewModelBase logicalTaskTreeViewModel, LogicalNodeViewModel? parent,
-            LogicalNode myLogicalNode, bool lazyLoadChildren, FrameworkElement uIMain)
+            LogicalNode myLogicalNode, bool lazyLoadChildren, FrameworkElement uIMain) : base()
         {
             this.RootLogicalTaskTreeViewModel = logicalTaskTreeViewModel;
             this._treeParams = logicalTaskTreeViewModel.TreeParams;
@@ -1008,7 +1008,7 @@ namespace Vishnu.ViewModel
             this.SubStateLocker = new object();
             this.IsRefreshing = false;
             this.JobInProgress = "";
-            this._myLogicalNode = LogicalNode.UndefinedLogicalNode;
+            this._myLogicalNode = UndefinedLogicalNodeClass.UndefinedLogicalNode;
             this.SetBLNode(myLogicalNode, true);
             this.Visibility = System.Windows.Visibility.Visible;
             this.VisualState = VisualNodeState.None;
@@ -1436,11 +1436,11 @@ namespace Vishnu.ViewModel
         /// <param name="init">Bei false bricht SetBlNode mit false ab, wenn _myLogicalNode == null ist.</param>
         internal bool SetBLNode(LogicalNode node, bool init)
         {
-            if (this._myLogicalNode.GetType() != node.GetType())
+            if (!(this._myLogicalNode is IUndefinedElement) && this._myLogicalNode.GetType() != node.GetType())
             {
                 return false;
             }
-            if (!init && this._myLogicalNode == LogicalNode.UndefinedLogicalNode)
+            if (!init && (this._myLogicalNode is IUndefinedElement))
             {
                 return false;
             }
@@ -1487,7 +1487,7 @@ namespace Vishnu.ViewModel
             {
                 ((IDisposable)this._myLogicalNode).Dispose();
             }
-            this._myLogicalNode = LogicalNode.UndefinedLogicalNode;
+            this._myLogicalNode = UndefinedLogicalNodeClass.UndefinedLogicalNode;
         }
 
         /// <summary>
@@ -1993,7 +1993,7 @@ namespace Vishnu.ViewModel
             this.Children = new();
             this.TreeRefreshLocker = new object();
             this.SubStateLocker = new object();
-            this._myLogicalNode = LogicalNode.UndefinedLogicalNode;
+            this._myLogicalNode = UndefinedLogicalNodeClass.UndefinedLogicalNode;
             this._treeParams = new TreeParameters("", null);
             this.RootLogicalTaskTreeViewModel = new(this._treeParams);
             this.UIMain = new FrameworkElement();

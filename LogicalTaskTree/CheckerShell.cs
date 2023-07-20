@@ -153,7 +153,7 @@ namespace LogicalTaskTree
                 {
                     if (this.CheckerTrigger != null && this.CheckerTrigger.HasTreeEventTrigger)
                     {
-                        if (this.CheckerTrigger.TriggerShellReference.Contains("LogicalResultChanged"))
+                        if (this.CheckerTrigger.TriggerShellReference?.Contains("LogicalResultChanged") == true)
                         {
                             this.ReferencedNodeName = this.CheckerTrigger.ReferencedNodeName;
                         }

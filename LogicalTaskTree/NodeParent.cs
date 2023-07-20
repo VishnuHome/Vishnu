@@ -87,7 +87,7 @@ namespace LogicalTaskTree
                     }
                     catch { }
                 }
-                this.Children[index] = UndefinedLogicalNode;
+                this.Children[index] = UndefinedLogicalNodeClass.UndefinedLogicalNode;
             }
         }
 
@@ -97,10 +97,10 @@ namespace LogicalTaskTree
         /// <param name="index">Der Index, an dem der Child-Knoten freigegeben werden soll.</param>
         public virtual void ReleaseChildAt(int index)
         {
-            if (index < this.Children.Count && this.Children[index] != UndefinedLogicalNode)
+            if (index < this.Children.Count && this.Children[index] != UndefinedLogicalNodeClass.UndefinedLogicalNode)
             {
                 this.UnhookChildEvents(this.Children[index]);
-                this.Children[index] = UndefinedLogicalNode;
+                this.Children[index] = UndefinedLogicalNodeClass.UndefinedLogicalNode;
             }
         }
 
@@ -220,6 +220,32 @@ namespace LogicalTaskTree
                 }
             }
 
+            if (this == this.GetTopRootJobList() && this.GetTopRootJobList().TreeExternalSingleNodes?.Count > 0)
+            {
+                foreach (LogicalNode node in this.GetTopRootJobList().TreeExternalSingleNodes)
+                {
+                    ResultList? part = node.GetResultList();
+                    if (part != null)
+                    {
+                        foreach (string id in part.Keys)
+                        {
+                            // Qualifizierter Zugriff auf die Results wäre zwar schön, ist aber unpragmatisch, da
+                            // ansonsten Checker, die diese Results verwerten, mit der Id des Knotens im Baum
+                            // kompiliert werden müssten.
+                            //if (!resultList.ContainsKey(this.Id + "." + id))
+                            //{
+                            //  resultList.TryAdd(this.Id + "." + id, part[id]); // Auf Concurrent umgestellt
+                            //}
+                            // Konsequenz: Result-Ids müssen über den gesamten Tree eindeutig sein, nur das erste
+                            // Result einer Id wird vermerkt.
+                            if (!resultList.ContainsKey(id))
+                            {
+                                resultList.TryAdd(id, part[id]); // Auf Concurrent umgestellt
+                            }
+                        }
+                    }
+                }
+            }
             return resultList;
         }
 

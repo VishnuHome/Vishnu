@@ -5,7 +5,6 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:base="clr-namespace:Vishnu.Interchange;assembly=Vishnu.Interchange"
-             xmlns:ctrl="clr-namespace:NetEti.CustomControls;assembly=CustomProgressBar"
              xmlns:convert="clr-namespace:Vishnu.WPF_UI.ValueConverter;assembly=Vishnu.WPF_UI"
              xmlns:vm="clr-namespace:Vishnu.ViewModel;assembly=Vishnu.ViewModel"
              xmlns:attached="clr-namespace:Vishnu.WPF_UI.DependencyProperties;assembly=Vishnu.WPF_UI"
@@ -20,7 +19,7 @@
             </ResourceDictionary.MergedDictionaries>
             <convert:NullableBoolToBrush x:Key="nullableBoolToBrush" />
             <convert:NotEmptyToTrue x:Key="notEmptyToTrue" />
-            <DataTemplate DataType="{x:Type vm:SingleNodeViewModel}">
+            <DataTemplate DataType="{x:Type vm:VishnuViewModelBase}">
                 <Border Name="ItemBorder" BorderThickness="1" Background="Transparent" Visibility="{Binding Visibility}">
                     <Border.BorderBrush>
                         <MultiBinding Converter="{StaticResource nullableBoolToBrush, diag:PresentationTraceSources.TraceLevel=High}">

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CheckDate</name>
+    </assembly>
+    <members>
+        <member name="T:CheckDate.CheckDate">
+             <summary>
+             Liefert den aktuellen Zeitpunkt (Datum plus Uhrzeit).
+             Implementiert die Schnittstelle 'INodeChecker' aus 'LogicalTaskTree.dll', über
+             die der LogicalTaskTree von 'Vishnu' den Checker ausführen, dessen Ergebnis
+             abfragen und sich ggf. in das Event 'NodeProgressChanged' einhängen kann.
+             </summary>
+             <remarks>
+             File: CheckDate.cs
+             Autor: Erik Nagel
+            
+             27.05.2013 Erik Nagel: erstellt
+             </remarks>
+        </member>
+        <member name="E:CheckDate.CheckDate.NodeProgressChanged">
+            <summary>
+            Wird ausgelöst, wenn sich der Verarbeitungsfortschritt dieses INodeCheckers
+            geändert hat.
+            </summary>
+        </member>
+        <member name="P:CheckDate.CheckDate.ReturnObject">
+            <summary>
+            Das Ergebnis (aktueller Zeitpunkt). Vergleiche führt Vishnu typgerecht über
+            die Klasse 'NodeResultComparer' aus; bekannte Typen sind: bool, DateTime, String, int, double.
+            Bei Verarbeitung von komplexen eigenen Typen muss die ToString()-Methode des ReturnObjects
+            einen für Vergleiche entsprechend aufbereiteteten String zurückliefern.
+            </summary>
+        </member>
+        <member name="M:CheckDate.CheckDate.Run(System.Object,Vishnu.Interchange.TreeParameters,Vishnu.Interchange.TreeEvent)">
+            <summary>
+            Startet den Checker - wird von einem Knoten im LogicalTaskTree aufgerufen.
+            Checker liefern grundsätzlich true oder false zurück. Darüber hinaus können
+            weiter gehende Informationen über das ReturnObject transportiert werden;
+            Hier wird DateTime.Now über das ReturnObject zurückgegeben.
+            </summary>
+            <param name="checkerParameters">Spezifische Aufrufparameter oder null.</param>
+            <param name="treeParameters">Für den gesamten Tree gültige Parameter oder null.</param>
+            <param name="source">Auslösendes TreeEvent oder null.</param>
+            <returns>True, False oder null</returns>
+        </member>
+        <member name="P:CheckDate.CheckDate.GuidId">
+            <summary>
+            Nur für Debug-Zwecke des Autors, kann ersatzlos wegfallen.
+            </summary>
+        </member>
+        <member name="M:CheckDate.CheckDate.#ctor">
+            <summary>
+            Standard Konstruktor.
+            </summary>
+        </member>
+    </members>
+</doc>

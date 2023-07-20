@@ -4,13 +4,13 @@ using NetEti.ApplicationControl;
 using NetEti.Globals;
 using System;
 using System.IO;
-using Vishnu.Interchange;
 using NetEti.CustomControls;
 using LogicalTaskTree.Provider;
 using System.Reflection;
 using System.Text;
 using Microsoft.VisualBasic.ApplicationServices;
 using Microsoft.Win32;
+using Vishnu.Interchange;
 
 namespace Vishnu
 {
@@ -250,7 +250,7 @@ namespace Vishnu
             this.PrepareStart();
             if (SingleInstanceApplication._appSettings.DemoModus)
             {
-                this._splashWindow.ShowVersion(SingleInstanceApplication._appSettings.ProgrammVersion + "  DEMO-MODUS");
+                this._splashWindow.ShowVersion(SingleInstanceApplication._appSettings.ProgrammVersion + " DEMO");
             }
 
             // Die Business-Logic
@@ -290,7 +290,16 @@ namespace Vishnu
             this._mainWindow.Focus();    // wichtig!
             if (SingleInstanceApplication._appSettings.Autostart)
             {
-                SingleInstanceApplication._businessLogic.Tree.UserRun();
+                Task task = Task.Factory.StartNew(() =>
+                {
+                    int sleepCounter = 0;
+                    while (this._mainWindow.IsRelocating && sleepCounter++ < 50)
+                    {
+                        Thread.Sleep(100);
+                    }
+                    Thread.Sleep(500); // Notwendig, das die Synchronisation selbst auch noch Zeit kostet.
+                    SingleInstanceApplication._businessLogic.Tree.UserRun();
+                });
             }
         }
 

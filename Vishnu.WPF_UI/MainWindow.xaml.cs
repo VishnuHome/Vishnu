@@ -86,6 +86,14 @@ namespace Vishnu.WPF_UI
         }
 
         /// <summary>
+        /// Zeigt an, dass das Hauptfenster gerade seinen Standort wechselt
+        /// und somit noch nicht die korrekte Endposition an Checker und Worker melden kann.
+        /// Wird in App.cs genutzt um beim Start der Applikation auf das erste Positionieren
+        /// des Hauptfensters zu warten, bevor ein Autostart durchgeführt wird.
+        /// </summary>
+        public volatile bool IsRelocating = true;
+
+        /// <summary>
         /// Konstruktor des Haupt-Fensters.
         /// </summary>
         /// <param name="startWithJobs">Bei true wird mit der Jobs-Ansicht gestartet, ansonsten mit der Tree-Ansicht (default: false).</param>
@@ -169,16 +177,20 @@ namespace Vishnu.WPF_UI
         /// </summary>
         public void RecalculateWindowMeasures()
         {
+            double xFactor = 1.0;
+            double yFactor = 1.0;
+            ScreenInfo actScreenInfo = ScreenInfo.GetActualScreenInfo(this);
             if (this.SizeOnVirtualScreen)
             {
                 this.MaxHeight = System.Windows.SystemParameters.VirtualScreenHeight;
                 this.MaxWidth = System.Windows.SystemParameters.VirtualScreenWidth;
                 this.MinLeft = 0;
                 this.MinTop = 0;
+                yFactor = this.MaxHeight / actScreenInfo.WorkingArea.Height;
+                xFactor = this.MaxWidth / actScreenInfo.WorkingArea.Width;
             }
             else
             {
-                ScreenInfo actScreenInfo = ScreenInfo.GetActualScreenInfo(this);
                 this.MaxHeight = actScreenInfo.WorkingArea.Height;
                 this.MaxWidth = actScreenInfo.WorkingArea.Width;
                 this.MinLeft = actScreenInfo.WorkingArea.Left;
@@ -189,15 +201,29 @@ namespace Vishnu.WPF_UI
                 double effectiveHeight = this.ActualHeight + SystemParameters.WindowCaptionHeight;
                 if (this.SizeToContent == System.Windows.SizeToContent.WidthAndHeight)
                 {
-                    double widthDiff = this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Width - this.ActualWidth;
-                    double heightDiff = this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Height - effectiveHeight;
-                    double newLeft = this.Left + (widthDiff / 2.0);
-                    double newTop = this.Top + (heightDiff / 2.0);
-                    //bool bottomBorderViolated = false;
-                    //if (this.Top + this.ActualHeight > this.MaxHeight)
-                    //{
-                    //    bottomBorderViolated = true;
-                    //}
+                    double lastWidth = this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Width;
+                    double lastHeight = this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Height;
+                    double widthDiff = 0;
+                    double heightDiff = 0;
+                    double newLeft = this.Left;
+                    double newTop = this.Top;
+                    if (lastWidth + lastHeight > 0)
+                    {
+                        widthDiff = lastWidth - this.ActualWidth;
+                        heightDiff = lastHeight - effectiveHeight;
+                        newLeft += (widthDiff / 2.0);
+                        newTop += (heightDiff / 2.0);
+                    }
+                    else
+                    {
+                        newLeft = (newLeft + this.ActualWidth / 2) * xFactor - (this.ActualWidth / 2);
+                        newTop = (newTop + effectiveHeight / 2) * yFactor - (effectiveHeight / 2);
+                    }
+                    bool bottomBorderViolated = false;
+                    if (this.Top + this.ActualHeight > this.MaxHeight)
+                    {
+                        bottomBorderViolated = true;
+                    }
                     bool rightBorderViolated = false;
                     if (this.Left + this.ActualWidth > this.MaxWidth)
                     {
@@ -211,10 +237,15 @@ namespace Vishnu.WPF_UI
                     {
                         newTop = this.MaxHeight - effectiveHeight;
                     }
-                    //if (bottomBorderViolated)
-                    //{
+                    if (lastWidth + lastHeight == 0 && this.SizeOnVirtualScreen)
+                    {
+                        this.Left = newLeft;
+                        this.Top = newTop;
+                    }
+                    if (bottomBorderViolated || lastWidth + lastHeight > 0)
+                    {
                         this.Top = newTop >= this.MinTop ? newTop : this.MinTop;
-                    //}
+                    }
                     if (rightBorderViolated)
                     {
                         this.Left = newLeft >= this.MinLeft ? newLeft : this.MinLeft;
@@ -224,6 +255,7 @@ namespace Vishnu.WPF_UI
                 this._tabManualSize[this.MainTabControl.SelectedIndex] = this.SizeToContent == System.Windows.SizeToContent.Manual;
                 this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Width = this.ActualWidth;
                 this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Height = effectiveHeight;
+                this.IsRelocating = false;
             }
         }
 
@@ -439,9 +471,9 @@ namespace Vishnu.WPF_UI
                 {
                     if (this.MainWindowAspects != null)
                     {
-                    this._treeZoomBox.SetScale(this.MainWindowAspects.WindowZoom, this.MainWindowAspects.WindowZoom);
-                    this._treeZoomBox.HorizontalScroll = this.MainWindowAspects.WindowScrollLeft;
-                    this._treeZoomBox.VerticalScroll = this.MainWindowAspects.WindowScrollTop;
+                        this._treeZoomBox.SetScale(this.MainWindowAspects.WindowZoom, this.MainWindowAspects.WindowZoom);
+                        this._treeZoomBox.HorizontalScroll = this.MainWindowAspects.WindowScrollLeft;
+                        this._treeZoomBox.VerticalScroll = this.MainWindowAspects.WindowScrollTop;
                     }
                 }
                 else

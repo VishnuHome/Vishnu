@@ -1,9 +1,25 @@
 ﻿using System.Collections.Generic;
 using System;
 using Vishnu.Interchange;
+using LogicalTaskTree.Provider;
+using NetEti.Globals;
 
 namespace LogicalTaskTree
 {
+    /// <summary>
+    /// Klassendefinition für einen undefinierten Job.
+    /// Ersetzt null, um die elenden null-Warnungen bei der Verwendung von LogicalNodes und JobLists
+    /// zu umgehen, bei denen sichergestellt ist, dass sie zum Zeitpunkt der Verwendung
+    /// ungleich null sind, die aber im Konstruktor sonst noch nicht sinnvoll instanziiert
+    /// werden könnten.
+    /// Bei eventuellen späteren null-Abfragen muss null durch die statische Instanz
+    /// 'UndefinedJob' (siehe weiter unten) ersetzt werden.
+    /// </summary>
+    public class UndefinedJob: Job, IUndefinedElement
+    {
+
+    }
+
     /// <summary>
     /// Konkreter Job für eine Joblist in einem LogicalTaskTree.
     /// </summary>
@@ -16,6 +32,7 @@ namespace LogicalTaskTree
     public class Job
     {
         #region public members
+
         const string DEFAULTJOBLISTUSERCONTROLPATH = @"DefaultNodeControls\JobListUserControl.dll";
         const string DEFAULTJOBCONNECTORUSERCONTROLPATH = @"DefaultNodeControls\JobConnectorUserControl.dll";
         const string DEFAULTNODELISTUSERCONTROLPATH = @"DefaultNodeControls\NodeListUserControl.dll";
@@ -320,6 +337,17 @@ namespace LogicalTaskTree
 
         #endregion tree globals
 
+        /// <summary>
+        /// Statische Instanz für einen undefinierten Job.
+        /// Ersetzt null, um die elenden null-Warnungen bei der Verwendung von LogicalNodes und JobLists
+        /// zu umgehen, bei denen sichergestellt ist, dass sie zum Zeitpunkt der Verwendung
+        /// ungleich null sind, die aber im Konstruktor sonst noch nicht sinnvoll instanziiert
+        /// werden könnten.
+        /// Bei eventuellen späteren null-Abfragen muss null durch diese Instanz ersetzt werden.
+        /// Es kann dann ggf. auf 'is IUndefinedElement' geprüft werden.
+        /// </summary>
+        public static readonly UndefinedJob undefinedJob = new();
+
         #endregion public members
 
         #region internal members
@@ -569,5 +597,4 @@ namespace LogicalTaskTree
         #endregion private members
 
     }
-
 }

@@ -5,31 +5,29 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageId>NetEti.$(AssemblyName)</PackageId>
     <Title>$(AssemblyName) - VievModel für die MVVM-Anwendung Vishnu</Title>
     <Authors>Erik Nagel</Authors>
     <Company>NetEti</Company>
     <Description>Assembly mit dem VievModel für die MVVM-Anwendung Vishnu</Description>
     <Copyright>Copyright © $(Authors) 2012-2023</Copyright>
-    <AssemblyVersion>7.0.0.0</AssemblyVersion>
-    <FileVersion>7.0.0.0</FileVersion>
+    <AssemblyVersion>7.0.1.1</AssemblyVersion>
+    <FileVersion>7.0.1.1</FileVersion>
     <PackageTags>NetEti Vishnu Main View Model</PackageTags>
   </PropertyGroup>
 
  	<PropertyGroup>
    	<VishnuRoot>$(ProjectDir)../../..</VishnuRoot>
    	<AssemblyRoot>$(VishnuRoot)/ReadyBin/Assemblies</AssemblyRoot>
+   	<RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+   	<RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+   	<EnableNETAnalyzers>False</EnableNETAnalyzers>
 	</PropertyGroup>
 	<Import Project="$(ProjectDir)../../AddOn/proj/*" Condition="exists('$(ProjectDir)../../AddOn/proj')" />
 
 	<Choose>
   	<When Condition="!('$(TF_BUILD)' == 'true' Or '$(GITHUB_ACTIONS)' == 'true' Or '$(NETETI_CIB)' == 'true')">
 		  <ItemGroup>
-		    <Reference Include="LogicalTaskTree">
-		      <HintPath>$(AssemblyRoot)/LogicalTaskTree.dll</HintPath>
-		    </Reference>
-		    <Reference Include="Vishnu.Interchange">
-		      <HintPath>$(AssemblyRoot)/Vishnu.Interchange.dll</HintPath>
-		    </Reference>
 		    <Reference Include="NetEti.BasicAppSettings">
 		      <HintPath>$(AssemblyRoot)/NetEti.BasicAppSettings.dll</HintPath>
 		    </Reference>
@@ -55,8 +53,6 @@
   	</When>
     <Otherwise>
 		  <ItemGroup>
-		    <PackageReference Include="LogicalTaskTree" Version="1.0.0" />
-		    <PackageReference Include="Vishnu.Interchange" Version="1.0.0" />
 		    <PackageReference Include="NetEti.BasicAppSettings" Version="1.0.0" />
 		    <PackageReference Include="NetEti.Global" Version="1.0.0" />
 		    <PackageReference Include="NetEti.InfoController" Version="1.0.0" />
@@ -67,5 +63,16 @@
 		  </ItemGroup>
     </Otherwise>
 	</Choose>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\LogicalTaskTree\LogicalTaskTree.csproj" />
+	  <ProjectReference Include="..\Vishnu.Interchange\Vishnu.Interchange.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="WpfAnimatedGif">
+	    <HintPath>$(AssemblyRoot)/WpfAnimatedGif.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
 
 </Project>

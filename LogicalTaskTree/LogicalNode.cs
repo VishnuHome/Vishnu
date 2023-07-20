@@ -12,6 +12,8 @@ using LogicalTaskTree.Provider;
 using System.Text;
 using System.Windows;
 using System.ComponentModel;
+using static LogicalTaskTree.UndefinedLogicalNodeClass;
+using System.Windows.Navigation;
 // using System.Windows.Threading;
 
 namespace LogicalTaskTree
@@ -85,22 +87,33 @@ namespace LogicalTaskTree
     /// ungleich null sind, die aber im Konstruktor sonst noch nicht sinnvoll instanziiert
     /// werden könnten.
     /// Bei eventuellen späteren null-Abfragen muss null durch die statische Instanz
-    /// 'UndefinedLogicalNode' (siehe weiter unten) ersetzt werden.
+    /// 'UndefinedLogicalNode' ersetzt werden.
     /// </summary>
     public class UndefinedLogicalNodeClass : LogicalNode, IUndefinedElement
     {
         /// <summary>
+        /// Statische Instanz für eine undefinierte LogicalNode.
+        /// Ersetzt null, um die elenden null-Warnungen bei der Verwendung von LogicalNodes
+        /// zu umgehen, bei denen sichergestellt ist, dass sie zum Zeitpunkt der Verwendung
+        /// ungleich null sind, die aber im Konstruktor sonst noch nicht sinnvoll instanziiert
+        /// werden könnten.
+        /// Bei eventuellen späteren null-Abfragen muss null durch diese Instanz ersetzt werden.
+        /// Es kann dann ggf. auf 'is IUndefinedElement' geprüft werden.
+        /// </summary>
+        public static readonly UndefinedLogicalNodeClass UndefinedLogicalNode = new();
+
+        /// <summary>
         /// Result für diesen Knoten.
         /// Wirft hier eine NotImplementedException.
         /// </summary>
-        public override Result? LastResult { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public override Result? LastResult { get => null; set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Der logische Zustand eines Knotens; hierum geht es letztendlich in der
         /// gesamten Verarbeitung.
         /// Wirft hier eine NotImplementedException.
         /// </summary>
-        public override bool? Logical { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public override bool? Logical { get => null; set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Anzahl der SingleNodes (letztendlich Checker) am Ende eines (Teil-)Baums.
@@ -126,7 +139,7 @@ namespace LogicalTaskTree
         /// Der Pfad zum aktuell dynamisch zu ladenden UserControl.
         /// Wirft hier eine NotImplementedException.
         /// </summary>
-        public override string UserControlPath { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public override string UserControlPath { get => ""; set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Die eigentliche, Knotentyp-spezifische Verarbeitung.
@@ -151,7 +164,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Standard-Konstruktor.
         /// </summary>
-        public UndefinedLogicalNodeClass() : base("UNDEFINED", null, null, null) { }
+        public UndefinedLogicalNodeClass() : base("UNDEFINED", null, new UndefinedJobListClass(), null) { }
     }
 
     /// <summary>
@@ -166,17 +179,6 @@ namespace LogicalTaskTree
     /// </remarks>
     public abstract class LogicalNode : GenericTree<LogicalNode>, IVishnuNode
     {
-        /// <summary>
-        /// Statische Instanz für eine undefinierte LogicalNode.
-        /// Ersetzt null, um die elenden null-Warnungen bei der Verwendung von LogicalNodes
-        /// zu umgehen, bei denen sichergestellt ist, dass sie zum Zeitpunkt der Verwendung
-        /// ungleich null sind, die aber im Konstruktor sonst noch nicht sinnvoll instanziiert
-        /// werden könnten.
-        /// Bei eventuellen späteren null-Abfragen muss null durch diese Instanz ersetzt werden.
-        /// Es kann dann ggf. auf 'is IUndefinedElement' geprüft werden.
-        /// </summary>
-        public static readonly UndefinedLogicalNodeClass UndefinedLogicalNode = new();
-
         #region events
 
         /// <summary>
@@ -1368,7 +1370,10 @@ namespace LogicalTaskTree
             this.InitNodes = false;
             this.IsGlobal = false;
             this._parentViewLocker = new object();
-            this.SetWorkersState(null);
+            if (!(this is IUndefinedElement))
+            {
+                this.SetWorkersState(null);
+            }
             this.SleepTimeFrom = this.AppSettings.SleepTimeFrom;
             this.SleepTimeTo = this.AppSettings.SleepTimeTo;
         }
@@ -1564,7 +1569,8 @@ namespace LogicalTaskTree
             JobList rootJobList = this.GetTopRootJobList();
             InfoController.Say(String.Format($"#RELOAD# LogicalNode.ReloadBranch Id/Name: {this.IdInfo}, RootJobList: {rootJobList.IdInfo}"));
             TreeParameters shadowTreeParams = new TreeParameters(String.Format($"ShadowTree {LogicalTaskTree.TreeId++}"),
-                this.TreeParams.ParentView) { CheckerDllDirectory = this.TreeParams.CheckerDllDirectory };
+                this.TreeParams.ParentView)
+            { CheckerDllDirectory = this.TreeParams.CheckerDllDirectory };
 
             JobList newBranch = new JobList(shadowTreeParams, new ProductionJobProvider());
             return newBranch;
@@ -2432,10 +2438,13 @@ namespace LogicalTaskTree
             this.State = NodeState.Finished;
             this.LogicalState = this._nextLogicalBreakState;
             this.MarkThreadAsInvalidIfActive(this._starterThread?.GetThread());
-            NodeCheckerBase? checker = ((SingleNode)this).Checker;
-            if (checker != null)
+            if (this is SingleNode)
             {
-                checker.IsInvalid = true;
+                NodeCheckerBase? checker = ((SingleNode)this).Checker;
+                if (checker != null)
+                {
+                    checker.IsInvalid = true;
+                }
             }
             this.ThreadUpdateLastLogicalState(this.LogicalState);
             this.OnNodeProgressFinished(this.Id + "." + this.Name + " | Item", 100, 0);
@@ -2764,8 +2773,8 @@ namespace LogicalTaskTree
                 // 04.05.2019 Nagel+ if (this.RootJobList.IsConrolled && source.Name == "UserRun" && source.SenderId == this.Id)
                 if (source.Name == "UserRun" && source.SenderId == this.Id) // 04.05.2019 Nagel-
                 {
-                        string msg = "Die Startvoraussetzungen für diesen Knoten sind noch nicht gegeben"
-                                   + " oder der Knoten wurde zwischenzeitlich gestoppt.";
+                    string msg = "Die Startvoraussetzungen für diesen Knoten sind noch nicht gegeben"
+                               + " oder der Knoten wurde zwischenzeitlich gestoppt.";
                     if (this.AppSettings.ControlledNodeUserRunDialog == DialogSettings.Question)
                     {
                         msg += "\nSoll der Knoten trotzdem gestartet werden?";

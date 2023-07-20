@@ -284,7 +284,7 @@ namespace LogicalTaskTree.Provider
                                TriggerShell? snapshotTrigger, string? snapshotTriggerName, bool isRootJob, bool isSnapshot, out int subJobDepth)
         {
             string? splashMessageJobName = logicalJobName;
-            if (splashMessageJobName == null)
+            if (String.IsNullOrEmpty(splashMessageJobName))
             {
                 if (Path.GetFileName(jobXML).ToLower() == "jobdescription.xml"
                     || Path.GetFileName(jobXML).ToLower() == "jobsnapshot.xml")
@@ -310,7 +310,7 @@ namespace LogicalTaskTree.Provider
             {
                 XDocument? xmlDoc = new XDocument();
                 xmlLogicalJobName = loadJobXMLFile(jobXML, isRootJob, isSnapshot, ref xmlDoc, ref isDefaultSnapshot);
-                if (logicalJobName == null)
+                if (string.IsNullOrEmpty(logicalJobName))
                 {
                     logicalJobName = xmlLogicalJobName;
                     ConfigurationManager.LoadLocalConfiguration(logicalJobName); // 14.02.2019 Nagel+-

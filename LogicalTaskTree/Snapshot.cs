@@ -498,9 +498,9 @@ namespace LogicalTaskTree
                 {
                     ((IDisposable)node2parse).Dispose();
                 }
-                node2parse = UndefinedLogicalNode;
+                node2parse = UndefinedLogicalNodeClass.UndefinedLogicalNode;
             }
-            if (node2parse == UndefinedLogicalNode)
+            if (node2parse == UndefinedLogicalNodeClass.UndefinedLogicalNode)
             {
                 switch (type)
                 {
@@ -665,7 +665,7 @@ namespace LogicalTaskTree
                     // 06.07.2016 Nagel+ foreach (XElement xLogicalNode in logicalNodes)
                     foreach (XElement xLogicalNode in logicalNodes.ToList()) // 06.07.2016 Nagel-
                     {
-                        LogicalNode subNode2parse = UndefinedLogicalNode;
+                        LogicalNode subNode2parse = UndefinedLogicalNodeClass.UndefinedLogicalNode;
                         string? lastTypeName = null;
                         if (node2parse.Children != null && node2parse.Children.Count > i)
                         {
@@ -756,7 +756,7 @@ namespace LogicalTaskTree
                     if (xresult != null && !String.IsNullOrEmpty(xresult.Value.ToString()))
                     {
                         string encoded = xresult.Value.ToString();
-                        Result? deserializedResult = SerializationUtility.DeserializeObjectFromBase64<Result>(encoded);
+                        Result? deserializedResult = (Result?)SerializationUtility.DeserializeObjectFromBase64String(encoded);
                         (node2parse as SingleNode)?.SetReturnObject(deserializedResult?.ReturnObject);
                     }
                     else

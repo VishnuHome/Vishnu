@@ -7,9 +7,38 @@ using NetEti.ApplicationControl;
 using System.Text;
 using System.Text.RegularExpressions;
 using LogicalTaskTree.Provider;
+using NetEti.Globals;
 
 namespace LogicalTaskTree
 {
+    /// <summary>
+    /// Klassendefinition für eine undefinierte JobList.
+    /// Ersetzt null, um die elenden null-Warnungen bei der Verwendung von LogicalNodes und JobLists
+    /// zu umgehen, bei denen sichergestellt ist, dass sie zum Zeitpunkt der Verwendung
+    /// ungleich null sind, die aber im Konstruktor sonst noch nicht sinnvoll instanziiert
+    /// werden könnten.
+    /// Bei eventuellen späteren null-Abfragen muss null durch die statische Instanz
+    /// 'UndefinedJobList' ersetzt werden.
+    /// </summary>
+    public class UndefinedJobListClass : JobList, IUndefinedElement
+    {
+        /// <summary>
+        /// Statische Instanz für eine undefinierte JobList.
+        /// Ersetzt null, um die elenden null-Warnungen bei der Verwendung von JobLists und LogicalNodes
+        /// zu umgehen, bei denen sichergestellt ist, dass sie zum Zeitpunkt der Verwendung
+        /// ungleich null sind, die aber im Konstruktor sonst noch nicht sinnvoll instanziiert
+        /// werden könnten.
+        /// Bei eventuellen späteren null-Abfragen muss null durch diese Instanz ersetzt werden.
+        /// Es kann dann ggf. auf 'is IUndefinedElement' geprüft werden.
+        /// </summary>
+        public static readonly UndefinedJobListClass UndefinedJobList = new();
+
+        /// <summary>
+        /// Standard-Konstruktor.
+        /// </summary>
+        public UndefinedJobListClass() : base(new TreeParameters("UNDEFINED", null), new JobProviderBase.UndefinedJobProvider()) { }
+    }
+
     /// <summary>
     /// Root eines (Teil-)Baums enes LogicalTaskTree.
     /// Hier werden die Logik, Bedingungen, Status für einen (Teil-)Baum verwaltet.
@@ -589,7 +618,7 @@ namespace LogicalTaskTree
         /// <returns>Array von Workern (oder null)</returns>
         internal WorkerShell[] GetWorkers(string idLogical)
         {
-            if (this.Job.Workers.ContainsCombinedKey(idLogical))
+            if (this.Job?.Workers.ContainsCombinedKey(idLogical) == true)
             {
                 return this.Job.Workers[idLogical] ?? throw new NullReferenceException($"Internal Error: Job.Workers {idLogical}.");
             }
@@ -1104,6 +1133,10 @@ namespace LogicalTaskTree
                 this.BreakWithResult = this.Job.BreakWithResult;
             }
             this.Logger = this.Job.JobLogger;
+            if (this is IUndefinedElement)
+            {
+                return;
+            }
             this.parse();
 
             if (this.Mother != null)
@@ -1221,7 +1254,7 @@ namespace LogicalTaskTree
         // Sucht nach der Instanz des Triggers mit dem Namen 'triggerReference'
         // in allen Triggers (Dictionaries) des aktuellen Jobs und aller übergeordneten Jobs.
         // Der erste Treffer gewinnt.
-        private TriggerShell FindReferencedTrigger(string triggerReference, object? triggerParameters, string ownerId)
+        private TriggerShell? FindReferencedTrigger(string triggerReference, object? triggerParameters, string ownerId)
         {
             JobList jobList = this;
             do
@@ -1229,11 +1262,11 @@ namespace LogicalTaskTree
                 if (jobList.Job.Triggers.ContainsKey(triggerReference) == true)
                 {
                     TriggerShell triggerShell = jobList.Job.Triggers[triggerReference];
-                    string transitiveTriggerReference = triggerShell.GetTriggerReference();
-                    if (transitiveTriggerReference != null)
+                    string? transitiveTriggerReference = triggerShell.GetTriggerReference();
+                    if (!String.IsNullOrEmpty(transitiveTriggerReference))
                     {
                         object? transitiveTriggerParameters = triggerShell.GetTriggerParameters();
-                        TriggerShell transitiveTriggerShell = this.createInternalEventsTrigger(transitiveTriggerReference, transitiveTriggerParameters, ownerId);
+                        TriggerShell? transitiveTriggerShell = this.createInternalEventsTrigger(transitiveTriggerReference, transitiveTriggerParameters, ownerId);
                         triggerShell.SetSlaveTriggerShell(transitiveTriggerShell);
                     }
                     return triggerShell;
@@ -1249,7 +1282,7 @@ namespace LogicalTaskTree
 
         // Erzeugt einen TreeEventTrigger und retourniert eine TriggerShell mit diesem TreeEventTrigger.
         // Retourniert null, wenn triggerReference keine TreeEvent-Namen enthält.
-        private TriggerShell createInternalEventsTrigger(string triggerReference, object? triggerParameters, string ownerId)
+        private TriggerShell? createInternalEventsTrigger(string triggerReference, object? triggerParameters, string ownerId)
         {
 
             if (triggerParameters == null)
@@ -1257,29 +1290,33 @@ namespace LogicalTaskTree
                 throw new ApplicationException(String.Format("Die Referenz '{0}' konnte nicht aufgelöst werden.", triggerReference));
             }
             string internalEvents = TreeEvent.GetInternalEventNamesForUserEventNames(triggerReference);
-            string nodeId = triggerParameters.ToString() ?? "";
-            if (!this.TreeRootJobList.Job.EventTriggers.ContainsKey(internalEvents))
+            if (!String.IsNullOrEmpty(internalEvents))
             {
-                this.TreeRootJobList.Job.EventTriggers.Add(internalEvents, new Dictionary<string, TriggerShell>());
-                this.tryAddEventsToCache(this.TreeRootJobList.TriggerRelevantEventCache, internalEvents);
+                string nodeId = triggerParameters.ToString() ?? "";
+                if (!this.TreeRootJobList.Job.EventTriggers.ContainsKey(internalEvents))
+                {
+                    this.TreeRootJobList.Job.EventTriggers.Add(internalEvents, new Dictionary<string, TriggerShell>());
+                    this.tryAddEventsToCache(this.TreeRootJobList.TriggerRelevantEventCache, internalEvents);
+                }
+                TriggerShell newTriggerShell;
+                TreeEventTrigger newTrigger = new TreeEventTrigger(internalEvents, ownerId, triggerReference, nodeId);
+                newTriggerShell = new TriggerShell(internalEvents, newTrigger);
+                if (!this.TreeRootJobList.Job.EventTriggers[internalEvents].ContainsKey(nodeId))
+                {
+                    this.TreeRootJobList.Job.EventTriggers[internalEvents].Add(nodeId, newTriggerShell);
+                }
+                if (!this.Job.EventTriggers.ContainsKey(internalEvents))
+                {
+                    this.Job.EventTriggers.Add(internalEvents, new Dictionary<string, TriggerShell>());
+                    this.tryAddEventsToCache(this.TreeRootJobList.TriggerRelevantEventCache, internalEvents);
+                }
+                if (!this.Job.EventTriggers[internalEvents].ContainsKey(nodeId))
+                {
+                    this.Job.EventTriggers[internalEvents].Add(nodeId, newTriggerShell);
+                }
+                return this.TreeRootJobList.Job.EventTriggers[internalEvents][nodeId];
             }
-            TriggerShell newTriggerShell;
-            TreeEventTrigger newTrigger = new TreeEventTrigger(internalEvents, ownerId, triggerReference, nodeId);
-            newTriggerShell = new TriggerShell(internalEvents, newTrigger);
-            if (!this.TreeRootJobList.Job.EventTriggers[internalEvents].ContainsKey(nodeId))
-            {
-                this.TreeRootJobList.Job.EventTriggers[internalEvents].Add(nodeId, newTriggerShell);
-            }
-            if (!this.Job.EventTriggers.ContainsKey(internalEvents))
-            {
-                this.Job.EventTriggers.Add(internalEvents, new Dictionary<string, TriggerShell>());
-                this.tryAddEventsToCache(this.TreeRootJobList.TriggerRelevantEventCache, internalEvents);
-            }
-            if (!this.Job.EventTriggers[internalEvents].ContainsKey(nodeId))
-            {
-                this.Job.EventTriggers[internalEvents].Add(nodeId, newTriggerShell);
-            }
-            return this.TreeRootJobList.Job.EventTriggers[internalEvents][nodeId];
+            return null;
         }
 
         private void tryAddEventsToCache(List<string> list, string internalEvents)

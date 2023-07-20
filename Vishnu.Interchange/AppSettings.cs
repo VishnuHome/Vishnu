@@ -825,7 +825,7 @@ namespace Vishnu.Interchange
             /// <returns>Der Ergebnis-String</returns>
             public string? GetStringValue(string key, string? defaultValue)
             {
-                string result = this._parameterReader.ReadParameter(key);
+                string? result = this._parameterReader.ReadParameter(key);
                 return result ?? defaultValue;
             }
 

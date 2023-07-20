@@ -20,6 +20,44 @@ namespace LogicalTaskTree
     {
         #region public members
 
+        /// <summary>
+        /// Klassendefinition für einen undefinierten JobProvider.
+        /// Ersetzt null, um die elenden null-Warnungen bei der Verwendung von LogicalNodes und JobLists
+        /// zu umgehen, bei denen sichergestellt ist, dass sie zum Zeitpunkt der Verwendung
+        /// ungleich null sind, die aber im Konstruktor sonst noch nicht sinnvoll instanziiert
+        /// werden könnten.
+        /// Bei eventuellen späteren null-Abfragen muss null durch die statische Instanz
+        /// 'UndefinedJobProvider' ersetzt werden.
+        /// </summary>
+        public class UndefinedJobProvider : JobProviderBase, IUndefinedElement
+        {
+            #region protected members
+
+            /// <summary>
+            ///   Fügt dem Dictionary LoadedJobPackages das JobPackage
+            ///   mit dem logischen Pfad logicalJobName hinzu.
+            ///   Im Fehlerfall wird einfach nichts hinzugefügt.
+            /// </summary>
+            /// <param name="logicalJobName">Der logische Name des Jobs oder null beim Root-Job.</param>
+            protected override void TryLoadJobPackage(ref string logicalJobName)
+            {
+                // throw new NotImplementedException();
+            }
+
+            #endregion protected members
+
+            /// <summary>
+            /// Statische Instanz für einen undefinierten JobProvider.
+            /// Ersetzt null, um die elenden null-Warnungen bei der Verwendung von LogicalNodes und JobLists
+            /// zu umgehen, bei denen sichergestellt ist, dass sie zum Zeitpunkt der Verwendung
+            /// ungleich null sind, die aber im Konstruktor sonst noch nicht sinnvoll instanziiert
+            /// werden könnten.
+            /// Bei eventuellen späteren null-Abfragen muss null durch diese Instanz ersetzt werden.
+            /// Es kann dann ggf. auf 'is IUndefinedElement' geprüft werden.
+            /// </summary>
+            public static readonly UndefinedJobProvider undefinedJobProvider = new();
+        }
+
         #region IJobProvider implementation
 
         /// <summary>
@@ -30,6 +68,10 @@ namespace LogicalTaskTree
         /// <returns>Instanz des Jobs, der zu dem Namen gehört.</returns>
         public virtual Job GetJob(ref string name)
         {
+            if (this is UndefinedJobProvider)
+            {
+                return new UndefinedJob();
+            }
             if (String.IsNullOrEmpty(name) || !this.LoadedJobPackages.ContainsKey(name))
             {
                 this.TryLoadJobPackage(ref name); // lädt ggf. auch alle SubJobs

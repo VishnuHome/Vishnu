@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System;
 using System.Runtime.Serialization;
+using NetEti.ObjectSerializer;
+
 namespace Vishnu.Interchange
 {
     /// <summary>
@@ -12,41 +14,47 @@ namespace Vishnu.Interchange
     ///
     /// 01.12.2012 Erik Nagel: erstellt
     /// </remarks>
-    [Serializable()]
-    public class Result : ISerializable
+    [DataContract] //[Serializable()]
+    public class Result // : ISerializable
     {
         #region public members
 
         /// <summary>
         /// Eindeutige Kennung des Knotens, zu dem dieses Result gehört.
         /// </summary>
+        [DataMember]
         public string Id { get; set; }
 
         /// <summary>
         /// Das logische Ergebnis der Verarbeitung des Teilbaums dieses Knotens.
         /// </summary>
+        [DataMember]
         public bool? Logical { get; set; }
 
         /// <summary>
         /// Der Verarbeitungszustand des Knotens:
         /// None, Waiting, Working, Finished, Busy (= Waiting | Working) oder CanStart (= None|Finished).
         /// </summary>
+        [DataMember]
         public NodeState? State { get; set; }
 
         /// <summary>
         /// Der Ergebnis-Zustand des Knotens:
         /// None, Done, Fault, Timeout, UserAbort.
         /// </summary>
+        [DataMember]
         public NodeLogicalState? LogicalState { get; set; }
 
         /// <summary>
         /// Zeitpunkt der Entstehung des Results.
         /// </summary>
+        [DataMember]
         public DateTime Timestamp { get; set; }
 
         /// <summary>
         /// Ein eventuelles Rückgabeobjekt des Knoten (Checker).
         /// </summary>
+        [AnonymousDataMember]
         public object? ReturnObject { get; set; }
 
         /// <summary>
@@ -165,7 +173,7 @@ namespace Vishnu.Interchange
     /// <summary>
     /// Typisierte Liste von Results.
     /// </summary>
-    [Serializable]
+    [DataContract]//[Serializable]
     public class ResultDictionary : Dictionary<string, Result?>
     {
         /// <summary>

@@ -33,7 +33,7 @@
                                     }
                                 ]]>
             </x:Code>
-            <DataTemplate DataType="{x:Type vm:VishnuViewModelBase}">
+            <DataTemplate DataType="{x:Type vm:JobListViewModel}">
                 <Border Name="ItemBorder" HorizontalAlignment="Stretch" Padding="5" Background="Transparent" BorderThickness="3" BorderBrush="Transparent"
                         CornerRadius="6" MouseDown="ItemBorder_MouseDown" Visibility="{Binding Visibility}">
                     <Grid Name="MainGrid" HorizontalAlignment="Stretch" ToolTip="{Binding LastExceptions}"
