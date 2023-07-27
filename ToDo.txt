@@ -387,6 +387,7 @@ ERLEDIGT: Externe optionale User-Dll mit globalen User-Parametern laden. Diese D
 					darüber seine Parameter-Ersetzungs-Funktionalität um die globalen User-Parameter.
 					Der Pfad zu der User-Parameter-Dll kann über AppSettings gesetzt werden (UserParameterReader).
 					Demo: ...\PluginProjects\DemoParameterProvider
+ERLEDIGT: Nachladen von ApplicationSettings zur Laufzeit über FileWatcherTrigger auf app.config?
 ERLEDIGT: Dialog-Checker und CanRun-dlls nahe bei dem besitzenden Knoten auf dem Bildschirm darstellen;
 		Die Bildschirmposition wird jetzt nur noch auf Anfrage per Function ermittelt und nicht mehr
 		per LayoutUpdated;
@@ -887,7 +888,7 @@ ERLEDIGT: Fehler in Snapshots nach langer Laufzeit:
 ERLEDIGT: Deutliche Erweiterung der Vishnu-Hilfe.
 ERLEDIGT: Doku: Job-Parameter ergänzen, bekannte Probleme, woher kommt der Name
 ERLEDIGT: Vishnu-Hilfe: Danksagung
-ERLEDIGT: Vishnu-Softwarelizenz
+ERLEDIGT: Vishnu-Softwarelizenz (erster Entwurf)
 
 Stand: 05.07.2021 Version 5.0.2.6 (Documented and tested)
 
@@ -930,10 +931,12 @@ ERLEDIGT: MailTo-Parameter
 ERLEDIGT: Parametertrennung mit Pipe | in Syntax führt zu Fehler in MicroMailer
 ERLEDIGT: Positionierung von UserDialogen ist noch unsauber (verschwindet rechts unten)
 		CheckCanRun, CheckDateDialog
-ERLEDIGT: Vishnu-eigene Meldungen mit korrekter Positionierung
+ERLEDIGT: Meldung mit Mindestbreite in Überschrift-Länge
+ERLEDIGT: Vishnu-eigene Meldungen mit korrekter Positionierung, Zoom-Funktionen und Icons
 ERLEDIGT: Vishnu-Positionierung und Resizing bei Multiscreen-Orientierung
           (-SizeOnVirtualScreen=true)
-ERLEDIGT: Meldung mit Mindestbreite in Überschrift-Länge
+ERLEDIGT: Fehler: UserJob: Die Objekt-Synchronisations-Methode wurde von einem nicht synchronisierten
+          Codeblock aufgerufen.
 
 Stand: 18.07.2023 Version 7.0.1.0 (Hard Core)
 
@@ -989,7 +992,8 @@ Liste von Snapshots mit letzter Ladezeit verfügbar und prüfbar machen
 '#' bei Snapshots überdenken und ggf. abschaffen
 Dynamische multiple logger ermöglichen.
 Veröffentlichungsparameter nach Company auslagern, wenn möglich
-Vishnu-Checker: Parameteraktualisierung im Hintergrund checken
+Vishnu-Checker: Parameteraktualisierung im Hintergrund testen;
+								UserParameter-Reader Parameter-Propagation nach Aktualisierung checken
 Snapshots: Serialisierung von LastRun fehlt
 "Ist behoben" in vorgeschalteten Prozess?
 Masud
@@ -1001,22 +1005,21 @@ TreeEventTrigger Infos vor dem ersten RUN
 Nächsten Lauf bei JobLists anzeigen.
 TrueFalseExceptionChecker Release-Zweig überprüfen
 CopyClickOnceStarter Pfad überprüfen
-Job.EventTriggers.Values Key ist nur die KnotenId, nicht der Pfad
+Job.EventTriggers.Values: Key ist nur die KnotenId, nicht der Pfad
 SMS
 WhatsApp
 Dark Mode und weitere Designs.
 Telegram
+Viber
 Die dynamischen Grids mit quadratischem Zuschnitt aus der Jobs-Ansicht auch in der Tree-Ansicht für mehrere
 	mit AND verknüpfte Knoten unterhalb einer Joblist oder NodeList nutzen. Dadurch würde auch für die Tree-Ansicht
 	bei Gruppen mit vielen AND-Verknüpfungen eine deutlich bessere Bildschirmaufteilung erreicht.
 eigene User-Events
 Vishnu-App
 Vishnu as a Service
-UserParameter-Reader Parameter-Propagation nach Aktualisierung checken
 Vishnu Verwaltungsansicht, Uptime, Parameter, Referenzen, Tree, ProcessId, Aufrufparameter, etc.
 VishnuViewer Verzeichniszugriff optional durch WebApi ersetzen
 Fehler: Vishnu Viewer "Das Verzeichnis UserDirectory\Vishnu\Logs ist ungültig", danach komplett beendet.
-Folgeaufgabe: Bubblen im Tree auch für AnyResultChanged
 NodeList mit Tooltip-Anzeige der untergeordneten Knoten
 ToolTips bei JobLists (auch vertikal) überarbeiten.
 Fehler? JobList zeigt im Tooltip Exceptions in Unterknoten nicht sofort an.
@@ -1027,8 +1030,6 @@ Vishnu-Ladevorgang weiter beschleunigen
 Messaging für Vishnu und Clients
 Zusatzinfos für Checker (Monitore, Mail-Verteiler...)
 Einzelknoten mit vereinfachter Distanz-Darstellung (große Schrift, viel Farbe)
-Fehler: UserJob: Die Objekt-Synchronisations-Methode wurde von einem nicht synchronisierten
-        Codeblock aufgerufen.
 Break Anforderung an Checker weiterleiten.
 Erledigt-Button für Meldungen (Checker?)
 CheckEscalator: bei Run auf den gesamten Tree und grün wird zur OK-Meldung auch noch
@@ -1103,7 +1104,6 @@ aktuelle Castle-Doku für Vishnu und Framework erstellen
 Umfassendes Abfangen und user-freundliches Ausgeben von Fehlern, vor allem bei Fehlern
 		in der XML-Definition von Trees
 Logging abschalten per File-Exists?
-Nachladen von ApplicationSettings zur Laufzeit über FileWatcherTrigger auf app.config?
 Tastensteuerung erweiten - Enter, Escape, ..., Sicherheitsabfragen?
 MVVM.txt überarbeiten
 User Interface für die Erfassung von Jobs
@@ -1803,5 +1803,11 @@ PS > (gci -include *.cs,*.cpp,*.xaml -recurse | select-string .).Count
 PS > cd ..\InPlug
 PS > (gci -include *.cs,*.cpp,*.xaml -recurse | select-string .).Count
 95448
+PS > cd ..\NetEti\InPlug
+PS > (gci -include *.cs,*.cpp,*.xaml -recurse | select-string .).Count
+11058
+------
+213129
+======
 
 .Net 7 migration; version 7.0.1.1
