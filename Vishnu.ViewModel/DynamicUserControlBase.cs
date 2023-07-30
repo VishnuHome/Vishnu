@@ -107,7 +107,9 @@ namespace Vishnu.ViewModel
             // gemeint war, sondern eine der Vishnu-Layoutfunktionen.
             this.MouseRightButtonUp += DynamicUserControlBase_MouseRightButtonUp;
             ContextMenuService.SetIsEnabled(this, false);
-            //this.ContextMenu = (ContextMenu)this.Resources["cmContextMenu"];
+
+            // Focusable = true;
+            // Loaded += (s, e) => Keyboard.Focus(this);
         }
 
         #region IDisposable Implementation

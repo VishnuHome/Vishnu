@@ -36,7 +36,7 @@
             <DataTemplate DataType="{x:Type vm:SnapshotViewModel}">
                 <Border Name="ItemBorder" HorizontalAlignment="Stretch" Padding="5" Background="Transparent" BorderThickness="3"
                         CornerRadius="6" MouseDown="ItemBorder_MouseDown" BorderBrush="Transparent" Visibility="{Binding Visibility}">
-                    <Grid HorizontalAlignment="Stretch" ToolTip="{Binding SnapshotPath}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400">
+                    <Grid HorizontalAlignment="Stretch" ToolTip="{StaticResource cmToolTip}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>

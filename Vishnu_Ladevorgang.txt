@@ -1,7 +1,6 @@
 Vishnu-Ladevorgang
 1. alle Jobs, -SubJobs und Snapshots werden in JobPackages eingelesen.
 
-
 App.cs:
 	SingleInstanceApplication._businessLogic = new LogicalTaskTree.LogicalTaskTree(new TreeParameters("Tree 1", null), new ProductionJobProvider());
 		public LogicalTaskTree(TreeParameters treeParams, IJobProvider jobProvider)
@@ -71,7 +70,7 @@ Prosa:
 			eines neu instanziierten Snapshots selbst.
 				Im Snapshot-Konstruktor: Aufruf von RefreshSnapshot, dort Aufruf von Parse.
 				  Parse lädt das zugehörige XML-File und ruft buildTreeFromRemoteJob.
-				  	buildTreeFromRemoteJob ist für den Snapsot das, was buildParallelTree für die Root-JobList ist.
+				  	buildTreeFromRemoteJob ist für den Snapshot das, was buildParallelTree für die Root-JobList ist.
 				  	Hier werden rekursiv alle Snapshot-Unterelemente (als SnapshotDummies) instanziiert.
 				  	Beim ersten Aufruf werden die Snapshot-Elemente noch nicht mit den Laufzeit-Werten des
 				  	remote-Trees gefüllt, da der gesamte Vishnu-Tree zu diesem Zeitpunkt noch nicht gestartet ist.

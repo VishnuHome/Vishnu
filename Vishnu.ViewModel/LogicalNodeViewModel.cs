@@ -157,6 +157,11 @@ namespace Vishnu.ViewModel
         public ICommand? SizeChangedEventCommand
         { get; set; }
 
+        /// <summary>
+        /// Command für den Copy-Button im ToolTip des Controls.
+        /// </summary>
+        public ICommand CopyToolTipInfoToClipboard { get { return this._btnCopyToolTipInfoToClipboardCommand; } }
+
         #endregion commands
 
         #region ViewModel properties
@@ -521,6 +526,19 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Liefert das Ergebnis von GetToolTipInfo().
+        /// Diese Routine zeigt per Default auf NextRunInfoAndResult,
+        /// kann aber gegebenenfalls überschrieben werden.
+        /// </summary>
+        public string ToolTipInfo
+        {
+            get
+            {
+                return this.GetToolTipInfo();
+            }
+        }
+
+        /// <summary>
         /// Der Pfad zum aktuell dynamisch zu ladenden UserControl.
         /// </summary>
         public string UserControlPath
@@ -856,6 +874,16 @@ namespace Vishnu.ViewModel
         public OrientedTreeViewModelBase RootLogicalTaskTreeViewModel { get; set; }
 
         /// <summary>
+        /// Liefert das Ergebnis für die Property ToolTipInfo.
+        /// Diese Routine zeigt per Default auf NextRunInfoAndResult,
+        /// kann aber gegebenenfalls überschrieben werden.
+        /// </summary>
+        protected virtual string GetToolTipInfo()
+        {
+            return this.NextRunInfoAndResult;
+        }
+
+        /// <summary>
         /// Liefert die für den Knoten gültige, oberste Root-JobList.
         /// </summary>
         /// <returns>Die für den Knoten gültige, oberste Root-JobList.</returns>
@@ -1026,6 +1054,7 @@ namespace Vishnu.ViewModel
             this.ExpandedEventCommand = new RelayCommand(this.HandleExpanderExpandedEvent, this.CanHandleExpanderExpandedEvent);
             this.CollapsedEventCommand = new RelayCommand(this.HandleExpanderCollapsedEvent);
             this.SizeChangedEventCommand = new RelayCommand(this.HandleExpanderSizeChangedEvent);
+            this._btnCopyToolTipInfoToClipboardCommand = new RelayCommand(this.CmdBtnCopy_Executed, this.CmdBtnCopy_CanExecute);
             this.RaisePropertyChanged("RootJobListViewModel");
             this._freeComment = "";
         }
@@ -1979,6 +2008,7 @@ namespace Vishnu.ViewModel
         private string? _hookedTo;
         private string? _jobInProgress;
         private bool _contextMenuCanOpen;
+        private RelayCommand _btnCopyToolTipInfoToClipboardCommand;
 
         // True, wenn die Kinder dieses Knotens noch nicht geladen wurden.
         private bool _hasDummyChild
@@ -1999,7 +2029,17 @@ namespace Vishnu.ViewModel
             this.UIMain = new FrameworkElement();
             this.UIDispatcher = Dispatcher.CurrentDispatcher;
             this._freeComment = "";
+            this._btnCopyToolTipInfoToClipboardCommand = new RelayCommand(this.CmdBtnCopy_Executed, this.CmdBtnCopy_CanExecute);
+        }
 
+        private void CmdBtnCopy_Executed(object? parameter)
+        {
+            Clipboard.SetText(this.GetToolTipInfo());
+        }
+
+        private bool CmdBtnCopy_CanExecute()
+        {
+            return true;
         }
 
         #endregion private members

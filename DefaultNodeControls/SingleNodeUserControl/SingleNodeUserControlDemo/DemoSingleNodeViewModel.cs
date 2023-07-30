@@ -1,6 +1,9 @@
-﻿using NetEti.MVVMini;
+﻿using LogicalTaskTree;
+using NetEti.MVVMini;
 using System;
+using System.DirectoryServices.ActiveDirectory;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Vishnu.Interchange;
 using Vishnu.ViewModel;
@@ -234,6 +237,19 @@ namespace Vishnu.DemoApplications.SingleNodeUserControlDemo
         }
 
         /// <summary>
+        /// Liefert das Ergebnis von GetToolTipInfo().
+        /// Diese Routine zeigt per Default auf NextRunInfoAndResult,
+        /// kann aber gegebenenfalls überschrieben werden.
+        /// </summary>
+        public string ToolTipInfo
+        {
+            get
+            {
+                return this.GetToolTipInfo();
+            }
+        }
+
+        /// <summary>
         /// True zeigt an, dass es sich um einen Knoten innerhalb
         /// eines geladenen Snapshots handelt.
         /// </summary>
@@ -294,9 +310,24 @@ namespace Vishnu.DemoApplications.SingleNodeUserControlDemo
         public ICommand BreakLogicalTaskTree { get { return this._btnBreakTaskTreeRelayCommand; } }
 
         /// <summary>
+        /// Command für den Copy-Button im ToolTip des Controls.
+        /// </summary>
+        public ICommand CopyToolTipInfoToClipboard { get { return this._btnCopyToolTipInfoToClipboardCommand; } }
+
+        /// <summary>
+        /// Liefert das Ergebnis für die Property ToolTipInfo.
+        /// Diese Routine zeigt per Default auf NextRunInfoAndResult,
+        /// kann aber gegebenenfalls überschrieben werden.
+        /// </summary>
+        protected virtual string GetToolTipInfo()
+        {
+            return this.NextRunInfoAndResult;
+        }
+
+        /// <summary>
         /// Standard Konstruktor - setzt alle Demo-Properties.
         /// </summary>
-        public DemoSingleNodeViewModel()
+        public DemoSingleNodeViewModel() : base()
         {
             this._name = "Demo-View";
             this.RaisePropertyChanged(nameof(Name));
@@ -310,6 +341,7 @@ namespace Vishnu.DemoApplications.SingleNodeUserControlDemo
             this._lastRun = DateTime.Now;
             this._btnRunTaskTreeRelayCommand = new RelayCommand(runTaskTreeExecute, canRunTaskTreeExecute);
             this._btnBreakTaskTreeRelayCommand = new RelayCommand(breakTaskTreeExecute, canBreakTaskTreeExecute);
+            this._btnCopyToolTipInfoToClipboardCommand = new RelayCommand(this.CmdBtnCopy_Executed, this.CmdBtnCopy_CanExecute);
             this._returnObject = new ComplexReturnObject()
             {
                 TestProperty1 = "Hallo Welt",
@@ -349,6 +381,7 @@ namespace Vishnu.DemoApplications.SingleNodeUserControlDemo
         private VisualNodeWorkerState _workersState;
         private RelayCommand _btnRunTaskTreeRelayCommand;
         private RelayCommand _btnBreakTaskTreeRelayCommand;
+        private RelayCommand _btnCopyToolTipInfoToClipboardCommand;
         private DateTime _lastRun;
         private bool _isSnapshotDummy;
 
@@ -400,6 +433,16 @@ namespace Vishnu.DemoApplications.SingleNodeUserControlDemo
         }
 
         private bool canBreakTaskTreeExecute()
+        {
+            return true;
+        }
+
+        private void CmdBtnCopy_Executed(object? parameter)
+        {
+            Clipboard.SetText(this.NextRunInfoAndResult);
+        }
+
+        private bool CmdBtnCopy_CanExecute()
         {
             return true;
         }

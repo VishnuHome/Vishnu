@@ -937,8 +937,11 @@ ERLEDIGT: Vishnu-Positionierung und Resizing bei Multiscreen-Orientierung
           (-SizeOnVirtualScreen=true)
 ERLEDIGT: Fehler: UserJob: Die Objekt-Synchronisations-Methode wurde von einem nicht synchronisierten
           Codeblock aufgerufen.
+ERLEDIGT: ToolTips mit Copy-Funktion.
+ERLEDIGT: InPlug/WebScraper: eigene Lösung über Verkürzen und Herunterzählen der Chrome-Version für
+					den Download einer passenden Treiberversion implementiert. 
 
-Stand: 18.07.2023 Version 7.0.1.0 (Hard Core)
+Stand: 30.07.2023 Version 7.0.1.0 (Hard Core)
 
 -------------------------------------------------------------------------------------------------------------
 

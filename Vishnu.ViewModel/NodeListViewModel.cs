@@ -18,6 +18,24 @@ namespace Vishnu.ViewModel
     /// </remarks>
     public class NodeListViewModel : LogicalNodeViewModel
     {
+        #region public members
+
+        #region published members
+
+        #endregion published members
+
+        #endregion public members
+
+        /// <summary>
+        /// Liefert das Ergebnis für die Property ToolTipInfo.
+        /// Diese Routine zeigt per Default auf NextRunInfoAndResult,
+        /// wird aber hier überschrieben.
+        /// </summary>
+        protected override string GetToolTipInfo()
+        {
+            return string.IsNullOrEmpty(this.LastExceptions) ? "alles ok" : this.LastExceptions;
+        }
+
         /// <summary>
         /// Konstruktor - übernimmt das ViewModel des übergeordneten LogicalTaskTree,
         /// den übergeordneten ViewModel-Knoten, den zugeordneten Knoten aus dem LogicalTaskTree,

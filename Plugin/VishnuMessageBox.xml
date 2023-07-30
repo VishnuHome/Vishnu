@@ -12,6 +12,12 @@
             App
             </summary>
         </member>
+        <member name="F:VishnuMessageBox.App.DEFAULTMAXWIDTH">
+            <summary>
+            Wenn keine Zeilenumbrüche mitgegeben werden, wird als Maximalbreite
+            für das Meldungsfenster DEFAULTMAXWIDTH Pixel angesetzt.
+            </summary>
+        </member>
         <member name="M:VishnuMessageBox.App.OnStartup(System.Windows.StartupEventArgs)">
             <summary>
             Wird beim Start der Anwendung durchlaufen.

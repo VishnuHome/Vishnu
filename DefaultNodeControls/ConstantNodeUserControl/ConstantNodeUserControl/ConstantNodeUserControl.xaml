@@ -27,7 +27,7 @@
                             <Binding RelativeSource="{RelativeSource Self}" />
                         </MultiBinding>
                     </Border.BorderBrush>
-                    <Grid Name="MainGrid">
+                    <Grid Name="MainGrid" ToolTip="{StaticResource cmToolTip}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
