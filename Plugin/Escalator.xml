@@ -16,14 +16,15 @@
             
              16.04.2016 Erik Nagel: Erstellt.
              03.07.2021 Erik Nagel: Parameter "#quiet#" implementiert.
+             04.08.2023 Erik Nagel: Im Zuge der Migration auf .Net 7 komplett überarbeitet.
              </remarks>
         </member>
         <member name="M:Escalator.Program.Main(System.String[])">
             <summary>
-             The main entry point for the application.
+            Haupteinstiegspunkt der Anwendung.
             </summary>
         </member>
-        <member name="M:Escalator.Program.exec(System.String,System.Int32,System.String,System.String,System.String,System.Boolean,System.String)">
+        <member name="M:Escalator.Program.exec(System.String,System.Int32,System.String,System.String,System.String,System.Xml.Linq.XElement,System.Boolean,System.String)">
             <summary>
             Hier wird der externe Arbeitsprozess ausgeführt.
             In den TreeParameters oder SlaveParameters (beim Konstruktor übergeben)
@@ -31,12 +32,17 @@
             mehreren Kommandozeilenparametern interpretiert.
             </summary>
             <param name="workerPath">Dateipfad der auszuführenden Exe.</param>
-            <param name="callCounter">Aufrufzähler (1-n oder x*-1). Bei negativem Wert wird der Worker resettet (Fehler behoben). Der Absolutwert zeigt die letzte Eskalationsstufe.</param>
+            <param name="escalationCounter">Aufrufzähler (1 bis n oder -n bis -1).
+            Bei negativem Wert wird der Worker resettet (Fehler behoben).
+            Der Absolutwert zeigt die letzte Eskalationsstufe.</param>
             <param name="treeInfo">Für den gesamten Tree gültige Parameter oder null.</param>
-            <param name="nodeId">Id des Knotens, der diesen Worker besitzt.</param>
+            <param name="nodeInfo">Id des Knotens, der diesen Worker besitzt.</param>
+            <param name="position">Position des übergeordneten Controls.</param>
             <param name="para">String mit Übergabeparametern für den Worker</param>
-            <param name="transportByFile">Bei True werden die Parameter über eie XML-Datei übergeben, ansonsten über die Kommandozeile.</param>
-            <param name="parameterFile">Dateipfad der XML-Datei mit den ursprünglich an den Executor übergebenen Parametern.</param>
+            <param name="transportByFile">Bei True werden die Parameter über eie XML-Datei übergeben,
+            ansonsten über die Kommandozeile.</param>
+            <param name="parameterFile">Dateipfad der XML-Datei mit den ursprünglich an den Executor
+            übergebenen Parametern.</param>
         </member>
     </members>
 </doc>

@@ -2535,7 +2535,6 @@ namespace LogicalTaskTree
                         }
                     }
                 }
-
                 bool workerExecutedOrBreaked = false;
                 foreach (WorkerShell[] workerArray in this.FindEventWorkers(eventName, sender.Id, source.Id, false))
                 {
@@ -2802,7 +2801,6 @@ namespace LogicalTaskTree
         /// <summary>
         /// Prüft, ob ein Knoten direkt gestartet werden soll, auch wenn er getriggert
         /// ist (gilt nicht für TreeEventTrigger). 
-        /// werden kann.
         /// </summary>
         /// <param name="source">Auslösendes TreeEvent oder null.</param>
         /// <returns>True, wenn der Knoten auch direkt gestartet werden soll.</returns>

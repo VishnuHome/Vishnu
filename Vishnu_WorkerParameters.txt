@@ -1,0 +1,21 @@
+C:\Users\micro\Documents\private4\WPF\openVishnu7\VishnuHome\Vishnu\Vishnu\bin\Debug\net7.0-windows\Plugin\Escalator.exe
+-Vishnu.EscalationCounter=1 -Vishnu.TreeInfo="Tree 1" -Vishnu.NodeInfo="Check Escalator" -Position="1107;565" -ParameterFile="C:\Users\micro\AppData\Local\Temp\Vishnu.CheckEscalator\32156\Check Escalator_Exception.para"
+
+
+-Message="%Timestamp%: Die Sartorious-Aktien könnten ohne Verlust verkauft werden." -Caption="Vishnu: Achtung, möglicher Verkaufszeitpunkt!" -MessageNewLine=#
+
+
+Vishnu
+	this.slaveParameters
+	<Parameters Transport="File">
+	  <SubWorkers type="array">
+	    <SubWorker RunCounter="1">
+	      <PhysicalPath>ConsoleMessageBox.exe</PhysicalPath>
+	      <Parameters>Stufe 1 (Run 1) %Timestamp%: %MachineName% %Event% von %Source% in %Sender%|Logical: %Logical% %Exception%|Fehler</Parameters>
+	    </SubWorker>
+	    <SubWorker RunCounter="2">
+	      <PhysicalPath>ConsoleMessageBox.exe</PhysicalPath>
+	      <Parameters>Stufe 2 (Run 2) %Timestamp%: %MachineName% DRINGEND! %Event% von %Source% in %Sender%|Logical: %Logical% %Exception%|Fehler</Parameters>
+	    </SubWorker>
+	  </SubWorkers>
+	</Parameters>

@@ -10,6 +10,7 @@ using Vishnu.Interchange;
 using System.Xml.Linq;
 using System.Drawing;
 using System.Windows;
+using System.Text.RegularExpressions;
 
 namespace LogicalTaskTree
 {
@@ -306,7 +307,6 @@ namespace LogicalTaskTree
                 {
                     konvertedSlaveParameters = this._slaveParameters.ToString().Replace('\xA0', ' ').Replace('\x09', ' ');
                 }
-                konvertedSlaveParameters = konvertedSlaveParameters.Replace("|", "^^^");
                 string delimiter = "";
                 string resultsString = "";
                 string msg = "";
@@ -345,18 +345,14 @@ namespace LogicalTaskTree
                     konvertedSlaveParameters = strVal;
                 }
                 this._externalProcess.StartInfo.FileName = this._slavePathName;
-                this._externalProcess.StartInfo.Arguments = "-Vishnu.EscalationCounter=" + countString
-                                         + " -Vishnu.TreeInfo=" + "\"" + treeParameters.Name.Replace("|", "\" \"") + "\""
+                this._externalProcess.StartInfo.Arguments =
+                                           " -Vishnu.TreeInfo=" + "\"" + treeParameters.Name.Replace("|", "\" \"") + "\""
                                          + " -Vishnu.NodeInfo=" + "\"" + nodeId + "\""
-                                         + " -Position=" + "\"" + position.X + ";" + position.Y + "\"";
+                                         + " -Position=" + "\"" + position.X + ";" + position.Y + "\""
+                                         + " -EscalationCounter=" + countString;
                 if (!this.TransportByFile)
                 {
-                    // string tmpStr = konvertedSlaveParameters.Replace(" ", " ");
-                    // tmpStr = tmpStr.Replace("^^^", "\" \"");
-                    string tmpStr = konvertedSlaveParameters.Replace("^^^", "\" \"");
-                    // this._externalProcess.StartInfo.Arguments += " \"" + tmpStr + "\"";
-                    this._externalProcess.StartInfo.Arguments += " " + tmpStr;
-                    // Der 1. Replace ersetzt Leerzeichen durch geschützte Leerzeichen (255).
+                    this._externalProcess.StartInfo.Arguments += " " + konvertedSlaveParameters;
                 }
                 else
                 {
@@ -368,8 +364,11 @@ namespace LogicalTaskTree
                             eventParameters.SenderId + "_" + eventParameters.Name + ".para");
                     string[] lines = { "<?xml version=\"1.0\" encoding=\"utf-8\"?>", konvertedSlaveParameters };
                     System.IO.File.WriteAllLines(parameterFilePath, lines);
-                    this._externalProcess.StartInfo.Arguments += "\" \"" + parameterFilePath + "\"";
+                    this._externalProcess.StartInfo.Arguments += " -ParameterFile=\"" + parameterFilePath + "\"";
                 }
+                this._externalProcess.StartInfo.Arguments
+                    = Regex.Replace(this._externalProcess.StartInfo.Arguments,
+                      "\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*$)", " ", RegexOptions.IgnoreCase).Trim();
                 if (!this._dontExecute)
                 {
                     this._externalProcess.Start();

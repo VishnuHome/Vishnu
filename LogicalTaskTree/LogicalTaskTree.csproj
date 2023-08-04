@@ -12,8 +12,8 @@
     <Company>NetEti</Company>
     <Description>Haupt-Verarbeitungslogik von Vishnu</Description>
     <Copyright>Copyright © $(Authors) 2012-2023</Copyright>
-    <AssemblyVersion>7.0.1.1</AssemblyVersion>
-    <FileVersion>7.0.1.1</FileVersion>
+    <AssemblyVersion>7.0.1.2</AssemblyVersion>
+    <FileVersion>7.0.1.2</FileVersion>
     <PackageTags>NetEti Vishnu Businesslogic</PackageTags>
   </PropertyGroup>
 

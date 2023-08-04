@@ -53,6 +53,11 @@
             z.B. Name plus ggf. Quellpfad.
             </summary>
         </member>
+        <member name="P:NetEti.ApplicationEnvironment.CommandLineAccess.CommandLine">
+            <summary>
+            Liefert die Kommandozeile als einen String.
+            </summary>
+        </member>
         <member name="M:NetEti.ApplicationEnvironment.CommandLineAccess.#ctor">
             <summary>
             Konstruktor - setzt den internen Reader

@@ -500,11 +500,13 @@ namespace LogicalTaskTree
                 for (int i = 0; i < invocations.Length; i++)
                 {
                     string nodeId = "WorkerShell";
-                    LogicalNode? targetNode = (LogicalNode?)invocations[i].Target;
-                    if (targetNode != null)
+                    if (invocations[i].Target is LogicalNode)
                     {
-                        // nodeId = (invocations[i].Target as LogicalNode).Id;
-                        nodeId = targetNode.Id;
+                        LogicalNode? targetNode = (LogicalNode?)invocations[i].Target;
+                        if (targetNode != null)
+                        {
+                            nodeId = targetNode.Id;
+                        }
                     }
                     invocationStrings[i] = nodeId;
                 }
