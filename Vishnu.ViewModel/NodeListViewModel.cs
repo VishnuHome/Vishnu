@@ -31,6 +31,7 @@ namespace Vishnu.ViewModel
         /// Diese Routine zeigt per Default auf NextRunInfoAndResult,
         /// wird aber hier überschrieben.
         /// </summary>
+        /// <returns>Die im ToolTip anzuzeigende Information.</returns>
         protected override string GetToolTipInfo()
         {
             return string.IsNullOrEmpty(this.LastExceptions) ? "alles ok" : this.LastExceptions;

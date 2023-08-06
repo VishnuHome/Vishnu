@@ -9,6 +9,10 @@ using System.Windows.Input;
 
 namespace ResourceDictionaryCodeBehind
 {
+    /// <summary>
+    /// CodeBehind für VishnuContextHelperResourceDictionary.xaml.
+    /// Steuert das Verhalten der ToolTips.
+    /// </summary>
     public partial class CustomResources : ResourceDictionary
     {
         void whenToolTipOpens(object sender, RoutedEventArgs e)

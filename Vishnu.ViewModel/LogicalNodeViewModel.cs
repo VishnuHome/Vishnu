@@ -878,6 +878,7 @@ namespace Vishnu.ViewModel
         /// Diese Routine zeigt per Default auf NextRunInfoAndResult,
         /// kann aber gegebenenfalls überschrieben werden.
         /// </summary>
+        /// <returns>Die im ToolTip auszugebende Information.</returns>
         protected virtual string GetToolTipInfo()
         {
             return this.NextRunInfoAndResult;
