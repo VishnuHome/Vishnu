@@ -367,6 +367,7 @@ namespace Vishnu.Interchange
         public override void LoadSettings()
         {
             base.LoadSettings();
+            this.RegistryBasePath = @"HKEY_LOCAL_MACHINE\SOFTWARE\Vishnu\";
             this.AppEnvAccessor.UnregisterKey("MainJobName");
             this.AppEnvAccessor.UnregisterKey("WorkingDirectory");
             this.AppEnvAccessor.UnregisterKey("DebugFile");

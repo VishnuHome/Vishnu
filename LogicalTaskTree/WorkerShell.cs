@@ -330,7 +330,9 @@ namespace LogicalTaskTree
                         }
                     }
                 }
-                konvertedSlaveParameters = konvertedSlaveParameters.Replace("%Event%", eventParameters.Name)
+                konvertedSlaveParameters = GenericSingletonProvider.GetInstance<AppSettings>()
+                  .ReplaceWildcards(konvertedSlaveParameters)
+                  .Replace("%Event%", eventParameters.Name)
                   .Replace("%Source%", eventParameters.SourceId)
                   .Replace("%Sender%", eventParameters.SenderId)
                   .Replace("%TreePath%", eventParameters.NodePath)
