@@ -2,7 +2,7 @@
   "profiles": {
     "Vishnu": {
       "commandName": "Project",
-      "commandLineArgs": "-job=\"%Vishnu_Root%\\VishnuHome\\Tests\\TestJobs\\QuickEventsResults\" --Vishnu_Root=../../../../../.. --NoWorkers=false --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true"
+      "commandLineArgs": "-job=\"%Vishnu_Root%\\NetEti\\Jobs\\CheckSpecials\" --Vishnu_Root=../../../../../.. --NoWorkers=false --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true"
     }
   }
 }
