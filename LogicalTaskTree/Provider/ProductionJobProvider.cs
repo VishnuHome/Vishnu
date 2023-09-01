@@ -556,16 +556,7 @@ namespace LogicalTaskTree.Provider
                     {
                         paraString = logicalJobName; // Referenz ggf. umbiegen
                     }
-                    if (paraString != null)
-                    {
-                        jobPackage.Job.JobTrigger
-                            = new TriggerShell(tmpString, paraString, false);
-                    }
-                    else
-                    {
-                        throw new ArgumentException(
-                            "Wenn 'Reference' gesetzt ist, muss auch 'Parameters' gesetzt werden (JobTrigger).");
-                    }
+                    jobPackage.Job.JobTrigger = new TriggerShell(tmpString, paraString, false);
                 }
                 else
                 {

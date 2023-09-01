@@ -296,7 +296,7 @@ namespace LogicalTaskTree
                 {
                     InfoController.Say(String.Format("Node2XML_a: {0}", ex.Message));
                     XElement result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64String(
-                        new Result(ex.GetType().Name, null, NodeState.Finished, NodeLogicalState.Fault, ex))));
+                        new Result(ex.GetType().Name, null, NodeState.Finished, NodeLogicalState.Fault, ex), true)));
                     nodeXML.Add(result);
                 }
             }
@@ -329,19 +329,19 @@ namespace LogicalTaskTree
                     Result? lastResult = ((NodeConnector)node).LastResult;
                     if (lastResult != null)
                     {
-                        result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64String(lastResult)));
+                        result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64String(lastResult, true)));
                     }
                     else
                     {
                         result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64String(
-                            new Result("unset", null, NodeState.Finished, NodeLogicalState.Fault, null))));
+                            new Result("unset", null, NodeState.Finished, NodeLogicalState.Fault, null), true)));
                     }
                 }
                 catch (Exception ex)
                 {
                     InfoController.Say(String.Format("Node2XML_b: {0}", ex.Message));
                     result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64String(
-                        new Result(ex.GetType().Name, null, NodeState.Finished, NodeLogicalState.Fault, ex))));
+                        new Result(ex.GetType().Name, null, NodeState.Finished, NodeLogicalState.Fault, ex), true)));
                 }
                 nodeXML.Add(result);
                 // 11.03.2023 Nagel-
@@ -358,19 +358,19 @@ namespace LogicalTaskTree
                     SingleNode? tmpNode = node as SingleNode;
                     if (tmpNode != null && tmpNode.LastResult != null)
                     {
-                        result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64String(tmpNode.LastResult)));
+                        result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64String(tmpNode.LastResult, true)));
                     }
                     else
                     {
                         result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64String(
-                            new Result("unset", null, NodeState.Finished, NodeLogicalState.Fault, null))));
+                            new Result("unset", null, NodeState.Finished, NodeLogicalState.Fault, null), true)));
                     }
                 }
                 catch (Exception ex)
                 {
                     InfoController.Say(String.Format("Node2XML_b: {0}", ex.Message));
                     result = new XElement("Result", new XCData(SerializationUtility.SerializeObjectToBase64String(
-                        new Result(ex.GetType().Name, null, NodeState.Finished, NodeLogicalState.Fault, ex))));
+                        new Result(ex.GetType().Name, null, NodeState.Finished, NodeLogicalState.Fault, ex), true)));
                     nodeXML.Add(result);
                 }
                 nodeXML.Add(result);
