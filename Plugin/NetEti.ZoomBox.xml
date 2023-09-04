@@ -123,5 +123,16 @@
             <param name="element">FrameworkElement, dessen VisualTree durchsucht werden soll.</param>
             <returns>Elternelement vom Typ T (und wenn angegeben, mit Name == name) oder null.</returns>
         </member>
+        <member name="M:NetEti.CustomControls.ZoomBox.Dispose(System.Boolean)">
+            <summary>
+            Abschlussarbeiten, Ressourcen freigeben.
+            </summary>
+            <param name="disposing">False, wenn vom eigenen Destruktor aufgerufen.</param>
+        </member>
+        <member name="M:NetEti.CustomControls.ZoomBox.Dispose">
+            <summary>
+            Öffentliche Methode zum Aufräumen.
+            </summary>
+        </member>
     </members>
 </doc>
