@@ -943,6 +943,8 @@ ERLEDIGT: InPlug/WebScraper: eigene Lösung über Verkürzen und Herunterzählen der
 
 Stand: 30.07.2023 Version 7.0.1.0 (Hard Core)
 
+Stand: 04.09.2023 Version 7.0.1.4 (Hard Core tested and stable)
+
 -------------------------------------------------------------------------------------------------------------
 
 ###################

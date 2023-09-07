@@ -240,7 +240,11 @@ namespace Vishnu.ViewModel
             return true;
         }
 
-        private void switchTaskTreeViewExecute(object? parameter)
+        /// <summary>
+        /// Anforderung zur Veränderung der Tree-Ausrichtung (Yin_Yang/F4).
+        /// </summary>
+        /// <param name="parameter">Optionales Parameter-Objekt, hier ungenutzt.</param>
+        public void switchTaskTreeViewExecute(object? parameter)
         {
             switch (this.RootLogicalTaskTreeViewModel.TreeOrientationState)
             {
@@ -262,7 +266,12 @@ namespace Vishnu.ViewModel
             }
         }
 
-        private bool canSwitchTaskTreeViewExecute()
+        /// <summary>
+        /// Prüft, ob die Tree-Ausrichtung verändert werden darf.
+        /// Hier: liefert immer true zurück.
+        /// </summary>
+        /// <returns></returns>
+        public bool canSwitchTaskTreeViewExecute()
         {
             return true;
         }

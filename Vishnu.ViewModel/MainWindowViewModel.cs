@@ -120,12 +120,17 @@ namespace Vishnu.ViewModel
         /// </summary>
         public ICommand BreakJobGroups { get { return this.TreeVM.BreakLogicalTaskTree; } }
 
-
         /// <summary>
         /// Setzt die Fenstergröße unter Berücksichtigung von Maximalgrenzen auf die
         /// Höhe und Breite des Inhalts und die Property SizeToContent auf WidthAndHeight.
         /// </summary>
         public ICommand InitSizeCommand { get { return this._initSizeRelayCommand; } }
+
+        /// <summary>
+        /// Setzt die Fenstergröße unter Berücksichtigung von Maximalgrenzen auf die
+        /// Höhe und Breite des Inhalts und die Property SizeToContent auf WidthAndHeight.
+        /// </summary>
+        public ICommand SwitchTaskTreeViewRoutedCommand { get { return this._switchTaskTreeViewRoutedCommand; } }
 
         /// <summary>
         /// Konstruktor - übernimmt das ViewModel für den LogicalTaskTree und eine Methode des
@@ -142,6 +147,7 @@ namespace Vishnu.ViewModel
             this.TreeVM = logicalTaskTreeViewModel;
             this._dispatcher = Dispatcher;
             this._initSizeRelayCommand = new RelayCommand(initWindowSize);
+            this._switchTaskTreeViewRoutedCommand = new RelayCommand(SwitchTakTreeViewRouted);
             this._flatNodeListFilter = flatNodeListFilter;
             treeParams.ViewModelRoot = this;
             this.TreeParams = treeParams;
@@ -164,12 +170,26 @@ namespace Vishnu.ViewModel
             this.TreeVM.SaveTreeState(windowAspects);
         }
 
+        /// <summary>
+        /// Leitet die Anforderung zur Veränderung der Tree-Ausrichtung (Yin_Yang) an
+        /// das Main-JobListViewModel weiter.
+        /// </summary>
+        /// <param name="parameter">Optionales Parameter-Objekt, hier ungenutzt.</param>
+        public void SwitchTakTreeViewRouted(object? parameter)
+        {
+            if (this.TreeVM.TreeVM.canSwitchTaskTreeViewExecute())
+            {
+                this.TreeVM.TreeVM.switchTaskTreeViewExecute(parameter);
+            }
+        }
+
         #endregion public members
 
         #region private members
 
         private ObservableCollection<JobGroupViewModel> _jobGroupsVM;
         private RelayCommand _initSizeRelayCommand;
+        private RelayCommand _switchTaskTreeViewRoutedCommand;
         private NodeTypes _flatNodeListFilter;
         private string _windowTitle;
 

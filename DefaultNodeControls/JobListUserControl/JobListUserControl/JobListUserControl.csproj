@@ -11,8 +11,8 @@
     <Company>NetEti</Company>
     <Description>$(AssemblyName) - Vishnu-Default-UserControl für eine JobList</Description>
     <Copyright>Copyright © $(Authors) 2015-2023</Copyright>
-    <AssemblyVersion>7.0.1.1</AssemblyVersion>
-    <FileVersion>7.0.1.1</FileVersion>
+    <AssemblyVersion>7.0.1.5</AssemblyVersion>
+    <FileVersion>7.0.1.5</FileVersion>
     <PackageTags>NetEti Vishnu Node Control View</PackageTags>
   </PropertyGroup>
 
@@ -41,9 +41,17 @@
 	</Choose>
 
 	<ItemGroup>
+	  <None Remove="Media\yin_yang.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\..\..\Vishnu.Interchange\Vishnu.Interchange.csproj" />
 	  <ProjectReference Include="..\..\..\Vishnu.ViewModel\Vishnu.ViewModel.csproj" />
 	  <ProjectReference Include="..\..\..\Vishnu.WPF_UI\Vishnu.WPF_UI.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Media\yin_yang.png" />
 	</ItemGroup>
 
 </Project>
