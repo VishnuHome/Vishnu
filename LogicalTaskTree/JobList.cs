@@ -73,7 +73,7 @@ namespace LogicalTaskTree
                 //{
                 //    return this._presetLogicalExpression;
                 //}
-                return this.Job.LogicalExpression;
+                return this.Job?.LogicalExpression ?? "";
             }
             set
             {

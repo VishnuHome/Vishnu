@@ -754,7 +754,22 @@ namespace LogicalTaskTree
         /// <summary>
         /// Der Pfad zum aktuell dynamisch zu ladenden UserControl.
         /// </summary>
-        public abstract string UserControlPath { get; set; }
+        // public abstract string UserControlPath { get; set; }
+        public virtual string UserControlPath
+        {
+            get
+            {
+                return String.Empty;
+            }
+            set
+            {
+                if (value != this._userControlPath)
+                {
+                    this._userControlPath = value;
+                }
+            }
+        }
+
 
         /// <summary>
         /// Ein Sammelstatus für alle zugeordneten Worker.
@@ -1696,7 +1711,11 @@ namespace LogicalTaskTree
                 stringBuilder.AppendLine(String.Format($"    IsSnapshotDummy"));
             }
             stringBuilder.AppendLine(String.Format($"    Path: {this.Path ?? ""}"));
-            stringBuilder.AppendLine(String.Format($"    UserControlPath: {this.UserControlPath}"));
+
+            // No access to public property UserControlPath here! It can lead to stack-overflow due to
+            // access to it in deriving classes (base.UserControlPath).
+            // stringBuilder.AppendLine(String.Format($"    UserControlPath: {this.UserControlPath}"));
+            stringBuilder.AppendLine(String.Format($"    UserControlPath: {this._userControlPath}"));
             if (this.Trigger != null && this.Trigger is TriggerShell)
             {
                 stringBuilder.AppendLine(String.Format(
@@ -2211,6 +2230,7 @@ namespace LogicalTaskTree
         private NodeWorkerState _workersState;
 
         private string? _lockName;
+        private string? _userControlPath;
 
         // Startet asynchron runAsync. Dieser Zwischenschritt wurde nötig, um Timer, auf die mehrere
         // Knoten verweisen, vom run eines Knotens zu entkoppeln (gleichzeitige Ausführung mehrerer runs).
