@@ -270,7 +270,7 @@ namespace Vishnu.ViewModel
         /// Prüft, ob die Tree-Ausrichtung verändert werden darf.
         /// Hier: liefert immer true zurück.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Liefert immer true zurück.</returns>
         public bool canSwitchTaskTreeViewExecute()
         {
             return true;
