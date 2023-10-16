@@ -947,7 +947,13 @@ ERLEDIGT: Umfassende Test erfolgreich abgeschlossen.
 
 Stand: 04.09.2023 Version 7.0.1.4 (Hard Core tested and stable)
 
-Stand: 13.09.2023 Version 7.0.1.6 (Hard Core tested and stable)
+ERLEDIGT: Vishnu_UserChecker_VSIX.vsix und Vishnu_UserView_VSIX.vsix wieder funktionstüchtig gemacht.
+	offen: es folgen bei der Erstellung von neuen Projekten noch Fehlermeldungen, die aber ohne weitere
+	       Auswirkungen bleiben:
+	       			Dem Projekt konnten nicht alle erforderlichen Pakete hinzugefügt werden
+							(englisch: Operation failed because details for project could not be loaded)
+
+Stand: 16.10.2023 Version 7.0.1.6 (Hard Core tested and stable)
 
 -------------------------------------------------------------------------------------------------------------
 
