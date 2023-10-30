@@ -48,7 +48,7 @@ namespace Vishnu.WPF_UI.DependencyProperties
 
     /// <summary>
     /// Converter-Hilfsklasse für BinaryModificationSwitch.
-    /// Konvert OrientationSwitch zu string und umgekehrt.
+    /// Konvertiert OrientationSwitch zu string und umgekehrt.
     /// </summary>
     /// <remarks>
     /// File: BinaryModificationSwitch.cs
@@ -171,7 +171,7 @@ namespace Vishnu.WPF_UI.DependencyProperties
         /// Eine optionale Sammlung von Standardwerten für die Konvertierung.
         /// </summary>
         /// <param name="context">WPF-Kontext.</param>
-        /// <returns>Sammlung von Standardwerten für die Konvertiewrung.</returns>
+        /// <returns>Sammlung von Standardwerten für die Konvertierung.</returns>
         public override TypeConverter.StandardValuesCollection GetStandardValues(
             ITypeDescriptorContext? context)
         {

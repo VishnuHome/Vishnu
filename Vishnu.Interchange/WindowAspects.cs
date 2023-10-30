@@ -10,7 +10,6 @@
     ///
     /// 22.02.2019 Erik Nagel: erstellt
     /// </remarks>
-
     public class WindowAspects
     {
         /// <summary>

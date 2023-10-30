@@ -82,7 +82,7 @@ namespace Vishnu.WPF_UI.ValueConverter
         }
 
         /// <summary>
-        /// Ist nicht implenmentiert.
+        /// Ist nicht implementiert.
         /// </summary>
         /// <param name="value">Instanz vom Typ DynamicUserControl.DynamicUserControlBase.</param>
         /// <param name="targetType">String und object.</param>

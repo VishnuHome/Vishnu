@@ -14,7 +14,7 @@ namespace LogicalTaskTree
     /// <summary>
     /// Endknoten in einem LogicalTaskTree.
     /// Besitzt einen Checker, der die Arbeit macht und ein logisches
-    /// Ergebnis zurückliefert, ggf. auch noch ein Rückgabe-Objekt.
+    /// Ergebnis zurück liefert, ggf. auch noch ein Rückgabe-Objekt.
     /// </summary>
     /// <remarks>
     /// File: SingleNode.cs

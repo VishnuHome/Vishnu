@@ -184,6 +184,7 @@ namespace Vishnu.Interchange
         {
         }
 
+        /*
         /// <summary>
         /// Konstruktor für die Serializable-Funktionalität.
         /// </summary>
@@ -192,6 +193,7 @@ namespace Vishnu.Interchange
         protected ResultDictionary(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
+        */
     }
 
 }

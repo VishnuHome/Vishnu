@@ -436,7 +436,7 @@ namespace Vishnu.WPF_UI
                 WindowScrollLeft = horizontalScroll, // Eigenschaft der beinhalteten ZoomBox
                 WindowScrollTop = verticalScroll, // Eigenschaft der beinhalteten ZoomBox
                 WindowZoom = scaleTransform?.ScaleX ?? 1.0, // Eigenschaft der beinhalteten ZoomBox
-                IsScrollbarVisible = isScrollbarVisible, // True, wenn mindestens eine Scrollbar sichbar ist
+                IsScrollbarVisible = isScrollbarVisible, // True, wenn mindestens eine Scrollbar sichtbar ist
                 ActTabControlTab = this.MainTabControl.SelectedIndex // aktuell ausgewählter Tab im TabControl
             };
             ((MainWindowViewModel)this.DataContext).SaveTreeState(windowAspects);

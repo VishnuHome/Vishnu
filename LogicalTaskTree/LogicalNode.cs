@@ -14,7 +14,6 @@ using System.Windows;
 using System.ComponentModel;
 using static LogicalTaskTree.UndefinedLogicalNodeClass;
 using System.Windows.Navigation;
-// using System.Windows.Threading;
 
 namespace LogicalTaskTree
 {

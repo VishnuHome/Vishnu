@@ -31,16 +31,16 @@ namespace Vishnu.WPF_UI.DependencyProperties
         /// (false=rot, true=grün) einer übergeordneten Border in einem ControlTemplate genutzt):
         /// Nach diversen Fehlversuchen hat sich als einzige gangbare Lösung folgende Vorgehensweise
         /// herauskristallisiert: einem dem ControlTemplate übergeordneten Control oder
-        /// DataTemplate wird die AttachedPropery "LastNotNullLogical" zugeordnet:
+        /// DataTemplate wird die AttachedProperty "LastNotNullLogical" zugeordnet:
         ///     &lt;Expander Name="Exp" Template="{StaticResource ExpanderStyleHeaderCentered}"
         ///                   ...
         ///                   attached:AttachedPropertiesContainer.LastNotNullLogical="{Binding LastNotNullLogical, diag:PresentationTraceSources.TraceLevel=High}"
         ///     &gt;
-        /// Die AttachedPropery "LastNotNullLogical" wird dabei direkt an "LastNotNullLogical" aus
+        /// Die AttachedProperty "LastNotNullLogical" wird dabei direkt an "LastNotNullLogical" aus
         /// dem DataContext, hier "LogicalNodeViewModel" gebunden.
         /// Im untergeordneten ControlTemplate, hier &lt;ControlTemplate TargetType="ToggleButton"&gt;
-        /// in LogicalTaskTreeControlStaticResourceDictionary.xaml werden DataTrigger an das übergeornete
-        /// Control mit Path auf die AttachedPropery "LastNotNullLogical" gebunden:
+        /// in LogicalTaskTreeControlStaticResourceDictionary.xaml werden DataTrigger an das übergeordnete
+        /// Control mit Path auf die AttachedProperty "LastNotNullLogical" gebunden:
         ///    &lt;DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}},
         ///                    Path=(attached:AttachedPropertiesContainer.LastNotNullLogical)}" Value="True"&gt;
         ///        &lt;Setter Property = "Border.BorderBrush" TargetName="ToggleButtonBorder" Value="{StaticResource ItemBorderBrushGreen}" /&gt;

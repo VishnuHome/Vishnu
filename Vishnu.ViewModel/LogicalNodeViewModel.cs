@@ -191,7 +191,7 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
-        /// Nur beim Rootnode False.
+        /// Nur bei der Root-Node False.
         /// </summary>
         public bool HasParent
         {
@@ -491,7 +491,7 @@ namespace Vishnu.ViewModel
         /// Merkfeld für den letzten Zustand von Logical, der nicht null war;
         /// Wird benötigt, damit Worker nur dann gestartet werden, und die 
         /// Anzeige wechselt, wenn sich der Zustand von Logical signifikant
-        /// geändert hat und nicht jedesmal, wenn der Checker arbeitet (Logical = null).
+        /// geändert hat und nicht jedes mal, wenn der Checker arbeitet (Logical = null).
         /// </summary>
         public bool? LastNotNullLogical
         {
@@ -1389,12 +1389,12 @@ namespace Vishnu.ViewModel
         #region internal members
 
         /// <summary>
-        /// Dient zum Serren der Verarbeitung während eines laufenden Tree-Refreshs.
+        /// Dient zum Sperren der Verarbeitung während eines laufenden Tree-Refreshs.
         /// </summary>
         internal object TreeRefreshLocker;
 
         /// <summary>
-        /// Dient zum Serren der Verarbeitung während subStateChanged.
+        /// Dient zum Sperren der Verarbeitung während subStateChanged.
         /// </summary>
         internal object SubStateLocker;
 

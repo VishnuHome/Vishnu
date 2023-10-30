@@ -525,7 +525,7 @@ namespace Vishnu
         }
 
         // Wird in jedem Fall beim Beenden von Vishnu durchlaufen.
-        // Versucht noch, Aufräumarbeiten auszuführen, endet aber u.U. aprupt
+        // Versucht noch, Aufräumarbeiten auszuführen, endet aber u.U. abrupt
         // ohne fertig zu werden.
         private static void OnProcessExit(object? sender, EventArgs e)
         {

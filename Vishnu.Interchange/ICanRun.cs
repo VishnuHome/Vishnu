@@ -14,11 +14,11 @@
         /// <summary>
         /// Wird von Vishnu vor jedem Run eines Checkers, Workers oder vor
         /// Start eines Triggers aufgerufen.
-        /// Returnt true, wenn der Run/Start ausgewführt werden kann.
+        /// Returnt true, wenn der Run/Start ausgeführt werden kann.
         /// </summary>
         /// <param name="parameters">Aufrufparameter des Benutzers.</param>
         /// <param name="treeParameters">Interne Parameter des Trees.</param>
-        /// <param name="source">Aufrufewndes TreeEvent.</param>
+        /// <param name="source">Aufrufendes TreeEvent.</param>
         /// <returns>True, wenn der Run/Start ausgeführt werden kann.</returns>
         bool CanRun(ref object? parameters, TreeParameters treeParameters, TreeEvent source);
     }

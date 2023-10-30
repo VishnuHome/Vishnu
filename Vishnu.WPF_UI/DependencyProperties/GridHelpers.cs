@@ -32,20 +32,20 @@ namespace Vishnu.WPF_UI.DependencyProperties
                 new PropertyMetadata(-1, RowCountChanged));
 
         /// <summary>
-        /// Returns the actual RowCout of a given Grid.
+        /// Returns the actual RowCount of a given Grid.
         /// </summary>
         /// <param name="obj">Grid as DependencyObject.</param>
-        /// <returns>Actual RowCout of the given Grid.</returns>
+        /// <returns>Actual RowCount of the given Grid.</returns>
         public static int GetRowCount(DependencyObject obj)
         {
             return (int)obj.GetValue(RowCountProperty);
         }
 
         /// <summary>
-        /// Sets the RowCout of a given Grid to the given value.
+        /// Sets the RowCount of a given Grid to the given value.
         /// </summary>
         /// <param name="obj">Grid as DependencyObject.</param>
-        /// <param name="value">New RowCout for the given Grid.</param>
+        /// <param name="value">New RowCount for the given Grid.</param>
         public static void SetRowCount(DependencyObject obj, int value)
         {
             obj.SetValue(RowCountProperty, value);
@@ -85,20 +85,20 @@ namespace Vishnu.WPF_UI.DependencyProperties
                 new PropertyMetadata(-1, ColumnCountChanged));
 
         /// <summary>
-        /// Returns the actual ColumnCout of a given Grid.
+        /// Returns the actual ColumnCount of a given Grid.
         /// </summary>
         /// <param name="obj">Grid as DependencyObject.</param>
-        /// <returns>Actual ColumnCout of the given Grid.</returns>
+        /// <returns>Actual ColumnCount of the given Grid.</returns>
         public static int GetColumnCount(DependencyObject obj)
         {
             return (int)obj.GetValue(ColumnCountProperty);
         }
 
         /// <summary>
-        /// Sets the ColumnCout of a given Grid to the given value.
+        /// Sets the ColumnCount of a given Grid to the given value.
         /// </summary>
         /// <param name="obj">Grid as DependencyObject.</param>
-        /// <param name="value">New ColumnCout for the given Grid.</param>
+        /// <param name="value">New ColumnCount for the given Grid.</param>
         public static void SetColumnCount(DependencyObject obj, int value)
         {
             obj.SetValue(ColumnCountProperty, value);

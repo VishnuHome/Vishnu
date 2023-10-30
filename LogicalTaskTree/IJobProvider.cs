@@ -1,5 +1,4 @@
-﻿
-namespace LogicalTaskTree
+﻿namespace LogicalTaskTree
 {
     /// <summary>
     /// Interface für Lieferanten von Jobs für JobList-Knoten

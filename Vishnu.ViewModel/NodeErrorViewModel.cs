@@ -32,7 +32,7 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
-        /// Konstruktor - übernímmt das übergeordnete ViewModel
+        /// Konstruktor - übernimmt das übergeordnete ViewModel
         /// und den Pfad zur Dll, die nicht geladen werden konnte.
         /// </summary>
         /// <param name="parentViewModel">Das übergeordnete ViewModel.</param>

@@ -11,7 +11,7 @@ namespace LogicalTaskTree
     /// <summary>
     /// Statische Klasse für die Speicherung von JobList-Zuständen auf User-Anforderung.
     /// Es wird für jede JobList gespeichert, ob sie in der Bildschirmdarstellung
-    /// zusammengefalt ist (collapsed) oder ihre Unterknoten sichtbar sind.
+    /// zusammengefaltet ist (collapsed) oder ihre Unterknoten sichtbar sind.
     /// </summary>
     /// <remarks>
     /// File: ConfigurationManager.cs

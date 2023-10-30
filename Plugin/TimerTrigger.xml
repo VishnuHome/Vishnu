@@ -63,13 +63,13 @@
         <member name="P:TimerTrigger.TimerTrigger._firstRun">
             <summary>
             Definierter Zeitpunkt für den ersten Start
-            des zugeorneten INodeWorker oder null.
+            des zugeordneten INodeWorker oder null.
             </summary>
         </member>
         <member name="P:TimerTrigger.TimerTrigger._interval">
             <summary>
             Intervall für den wiederholten Start (Run)
-            der zugeorneten INodeWorker oder null.
+            der zugeordneten INodeWorker oder null.
             </summary>
         </member>
     </members>

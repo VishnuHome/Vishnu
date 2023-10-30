@@ -187,7 +187,7 @@ namespace Vishnu.ViewModel
 
 
     /// <summary>
-    /// Liefert oder setzt die Zeilennnummer des zugehörigen Controls
+    /// Liefert oder setzt die Zeilennummer des zugehörigen Controls
     /// in einer quadratischen Matrix.
     /// Dieser Wert wird zu einem geeigneten Zeitpunkt in die Property GridRow geschoben,
     /// um die WPF-GUI zu informieren.

@@ -53,7 +53,7 @@ namespace Vishnu.WPF_UI
         }
 
         // Überschreibt OnPreviewMouseWheel für die Implementierung
-        // der erweiterten Mausrad-Funtionen.
+        // der erweiterten Mausrad-Funktionen.
         // Mausrad gedreht:
         //   bei gedrückter Umschalt-Taste wird horizontal gescrollt,
         //   ansonsten vertikal.

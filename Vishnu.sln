@@ -44,11 +44,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SingleNodeUserControlDemo",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapshotUserControl", "DefaultNodeControls\SnapshotUserControl\SnapshotUserControl\SnapshotUserControl.csproj", "{2B9501E8-513F-4288-8616-7A1E9C4BCF97}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Projektmappenelemente", "{01697F04-7BE4-40B6-9FE8-A383E052171E}"
-	ProjectSection(SolutionItems) = preProject
-		Plugin\_vishnu_plugins_ = Plugin\_vishnu_plugins_
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
