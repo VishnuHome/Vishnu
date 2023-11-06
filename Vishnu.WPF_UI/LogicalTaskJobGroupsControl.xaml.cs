@@ -24,6 +24,7 @@ namespace Vishnu.WPF_UI
         /// </summary>
         public LogicalTaskJobGroupsControl()
         {
+            this.Name = "LogicalTaskTreeJobGroupsControl"; // 05.11.2023 Nagel+- for debugging purposes
             InitializeComponent();
         }
 

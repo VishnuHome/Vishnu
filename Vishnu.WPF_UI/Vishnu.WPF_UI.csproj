@@ -79,6 +79,7 @@
     <None Remove="Media\pauseTree.png" />
     <None Remove="Media\play.png" />
     <None Remove="Media\reloadTree.png" />
+    <None Remove="Media\research.png" />
     <None Remove="Media\running_man.png" />
     <None Remove="Media\self_distract.png" />
     <None Remove="Media\stopwatch.png" />
@@ -121,6 +122,7 @@
     <Resource Include="Media\pauseTree.png" />
     <Resource Include="Media\play.png" />
     <Resource Include="Media\reloadTree.png" />
+    <Resource Include="Media\research.png" />
     <Resource Include="Media\running_man.png" />
     <Resource Include="Media\self_distract.png" />
     <Resource Include="Media\stopwatch.png" />

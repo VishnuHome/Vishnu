@@ -11,6 +11,7 @@
              xmlns:attached="clr-namespace:Vishnu.WPF_UI.DependencyProperties;assembly=Vishnu.WPF_UI"
              xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
              mc:Ignorable="d" 
+             x:Name="JobListUserControlXaml"
              d:DesignHeight="300" d:DesignWidth="300">
     <vm:DynamicUserControlBase.Resources>
         <ResourceDictionary>

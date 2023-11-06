@@ -114,6 +114,19 @@
                 </Button>
             </MenuItem.Header>
         </MenuItem>
+        <MenuItem Name="ShowLogTaskTree" Style="{StaticResource MenuItemTemplate}">
+            <MenuItem.Header>
+                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
+                        Command="{Binding ShowLogLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../Media/research.png" Width="15" Height="15" Margin="0,0,5,0"/>
+                            <TextBlock Text="Show Log" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </MenuItem.Header>
+        </MenuItem>
         <MenuItem Name="PauseResumeTaskTree" Style="{StaticResource MenuItemTemplate}">
             <MenuItem.Header>
                 <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"

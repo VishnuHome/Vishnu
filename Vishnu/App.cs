@@ -282,6 +282,7 @@ namespace Vishnu
             InfoController.GetInfoPublisher().Publish(new SplashScreenMessage("starting UI"));
             this._splashWindow.FinishAndClose();
             //this._mainWindow.Topmost = true; // nicht erforderlich
+            this.MainWindow.Name = "MainWindow"; // 05.11.2023 Nagel+- for debug purposes
             this._mainWindow.Show();
             //this._mainWindow.Topmost = false; // nicht erforderlich
             //this._mainWindow.BringIntoView(); geht nicht

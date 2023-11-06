@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Vishnu.Interchange;
 
 namespace Vishnu.ViewModel
@@ -330,6 +331,34 @@ namespace Vishnu.ViewModel
         {
             bool canLog = true;
             return canLog;
+        }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        public override bool CanShowLogExecute()
+        {
+            bool canShowLog = true;
+            return canShowLog;
+        }
+
+        /// <summary>
+        /// Öffnet die Logdatei im Standardeditor asynchron über ShowLogTaskTree.
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
+        public override void ShowLogExecute(object? parameter)
+        {
+            _ = this.ShowLogTaskTree();
+        }
+
+        /// <summary>
+        /// Öffnet die Logdatei im Standardeditor.
+        /// </summary>
+        /// <returns>Task.</returns>
+        public async Task ShowLogTaskTree()
+        {
+            await Task.Run(() => LogicalTaskTreeManager.ShowLogTaskTree());
         }
 
         #endregion context menu

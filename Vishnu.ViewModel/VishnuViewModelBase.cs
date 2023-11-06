@@ -32,6 +32,11 @@ namespace Vishnu.ViewModel
         public ICommand LogLogicalTaskTree { get { return this._btnLogTaskTreeRelayCommand; } }
 
         /// <summary>
+        /// Command für das ContextMenuItem "Show Log" im ContextMenu für das "MainGrid" des Controls.
+        /// </summary>
+        public ICommand ShowLogLogicalTaskTree { get { return this._btnShowLogTaskTreeRelayCommand; } }
+
+        /// <summary>
         /// Command für das ContextMenuItem "Pause Tree" im ContextMenu für das "MainGrid" des Controls.
         /// </summary>
         public ICommand PauseResumeLogicalTaskTree { get { return this._btnPauseResumeTaskTreeRelayCommand; } }
@@ -273,6 +278,23 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Ist zum Anzeigen des Vishnu-Logs vorgesehen.
+        /// Kann dafür an geeigneter Stelle überschrieben werden.
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter oder null.</param>
+        public virtual void ShowLogExecute(object? parameter) { }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist, hier immer false.
+        /// Kann an geeigneter Stelle überschrieben werden.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        public virtual bool CanShowLogExecute()
+        {
+            return false;
+        }
+
+        /// <summary>
         /// Wechselschalter - hält den Tree an oder lässt ihn weiterlaufen.
         /// </summary>
         /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
@@ -307,6 +329,7 @@ namespace Vishnu.ViewModel
         {
             this._btnReloadTaskTreeRelayCommand = new RelayCommand(ReloadTaskTreeExecute, CanReloadTaskTreeExecute);
             this._btnLogTaskTreeRelayCommand = new RelayCommand(LogTaskTreeExecute, CanLogTaskTreeExecute);
+            this._btnShowLogTaskTreeRelayCommand = new RelayCommand(ShowLogExecute, CanShowLogExecute);
             this._btnPauseResumeTaskTreeRelayCommand = new RelayCommand(PauseResumeTaskTreeExecute, CanPauseResumeTaskTreeExecute);
             this._visualTreeCacheBreaker = Guid.NewGuid().ToString();
             this.IsRendered = false;
@@ -345,6 +368,7 @@ namespace Vishnu.ViewModel
 
         private RelayCommand _btnReloadTaskTreeRelayCommand;
         private RelayCommand _btnLogTaskTreeRelayCommand;
+        private RelayCommand _btnShowLogTaskTreeRelayCommand;
         private RelayCommand _btnPauseResumeTaskTreeRelayCommand;
         private Result? _result;
         private object? _userDataContext;

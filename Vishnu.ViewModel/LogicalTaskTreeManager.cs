@@ -1,7 +1,9 @@
 ﻿using LogicalTaskTree;
 using NetEti.ApplicationControl;
+using NetEti.CustomControls;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -69,6 +71,21 @@ namespace Vishnu.ViewModel
             InfoController.GetInfoPublisher().Publish(rootJobListViewModel, Environment.NewLine
                 + "-------------------------------------------------------------------------------------------------------------------------------", InfoType.NoRegex);
             InfoController.FlushAll();
+        }
+
+        /// <summary>
+        /// Öffnet die Logdatei im Standardeditor.
+        /// </summary>
+        public static void ShowLogTaskTree()
+        {
+            InfoController.GetInfoController().Show();
+        }
+
+        public static void ShowHelp()
+        {
+            try { Process.Start("Vishnu_doc.chm", ""); }
+            catch (Exception ex)
+            { MessageBox.Show(ex.Message, "Kann die Hilfe-Datei nicht aufrufen.", MessageBoxButton.OK, MessageBoxImage.Error); }
         }
 
         static LogicalTaskTreeManager()
@@ -1300,7 +1317,11 @@ namespace Vishnu.ViewModel
                         allReferencedObjects.Add(logicalNode.Trigger);
                     }
                 }
-                SingleNode? singleNode = (SingleNode?)logicalNode;
+                SingleNode? singleNode = null;
+                if (logicalNode is SingleNode)
+                {
+                    singleNode = (SingleNode?)logicalNode;
+                }
                 if (singleNode?.Checker != null && singleNode.Checker.CheckerTrigger != null)
                 {
                     if (!allReferencedObjects.Contains(singleNode.Checker.CheckerTrigger))
@@ -1308,7 +1329,11 @@ namespace Vishnu.ViewModel
                         allReferencedObjects.Add(singleNode.Checker.CheckerTrigger);
                     }
                 }
-                Job? job = ((JobList?)logicalNode)?.Job;
+                Job? job = null;
+                if (logicalNode is JobList)
+                {
+                    job = ((JobList?)logicalNode)?.Job;
+                }
                 if (job != null)
                 {
                     if (job.JobTrigger != null)

@@ -976,7 +976,7 @@ namespace Vishnu.ViewModel
             this.JobInProgress = "ReloadTaskTree";
             await Task.Run(() => ReloadTaskTreeAsync());
             this.JobInProgress = "";
-            _ = this.ResetContextMenu();
+            // 05.11.2023 Nagel+- _ = this.ResetContextMenu();
         }
 
         /// <summary>
@@ -1007,7 +1007,38 @@ namespace Vishnu.ViewModel
             this.JobInProgress = "LogTaskTree";
             await Task.Run(() => LogicalTaskTreeManager.LogTaskTree(this, false));
             this.JobInProgress = "";
-            _ = this.ResetContextMenu();
+            // 06.11.2023 Nagel+- _ = this.ResetContextMenu();
+        }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        public override bool CanShowLogExecute()
+        {
+            bool canShowLog = true;
+            return canShowLog;
+        }
+
+        /// <summary>
+        /// Öffnet die Logdatei im Standardeditor asynchron über ShowLogTaskTree.
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
+        public override void ShowLogExecute(object? parameter)
+        {
+            _ = this.ShowLogTaskTree();
+        }
+
+        /// <summary>
+        /// Öffnet die Logdatei im Standardeditor.
+        /// </summary>
+        /// <returns>Task.</returns>
+        public async Task ShowLogTaskTree()
+        {
+            this.JobInProgress = "LogTaskTree";
+            await Task.Run(() => LogicalTaskTreeManager.ShowLogTaskTree());
+            this.JobInProgress = "";
+            // 06.11.2023 Nagel+- _ = this.ResetContextMenu();
         }
 
         #endregion context menu
@@ -1739,29 +1770,30 @@ namespace Vishnu.ViewModel
             }
             if (shadowJobList != null)
             {
-                // Das DummyLogicalTaskTree-ViewModel
-                DummyLogicalTaskTreeViewModel dummyLogicalTaskTreeViewModel = new DummyLogicalTaskTreeViewModel(shadowJobList.TreeParams);
-                JobListViewModel shadowTopRootJobListViewModel = new JobListViewModel(dummyLogicalTaskTreeViewModel, null, shadowJobList, false,
-                    new FrameworkElement());
-                // DEBUG: 23.02.2021 Nagel+
-                // LogicalTaskTreeManager.LogTaskTree(shadowTopRootJobListViewModel);
-                // Thread.Sleep(1005);
-                // DEBUG: 23.02.2021 Nagel-
-                if (shadowTopRootJobListViewModel != null)
-                {
-                    shadowTopRootJobListViewModel.SetChildOrientation(this.StartTreeOrientation);
-                    shadowTopRootJobListViewModel.ExpandTree(shadowTopRootJobListViewModel, false);
-                    JobListViewModel treeTopRootJobListViewModel = this.GetTopRootJobListViewModel() ?? (JobListViewModel)this;
+                Application.Current.Dispatcher.Invoke((Action)delegate {
+                    // Das DummyLogicalTaskTree-ViewModel
+                    DummyLogicalTaskTreeViewModel dummyLogicalTaskTreeViewModel = new DummyLogicalTaskTreeViewModel(shadowJobList.TreeParams);
+                    JobListViewModel shadowTopRootJobListViewModel = new JobListViewModel(dummyLogicalTaskTreeViewModel, null, shadowJobList, false,
+                        new FrameworkElement());
+                    // DEBUG: 23.02.2021 Nagel+
+                    // LogicalTaskTreeManager.LogTaskTree(shadowTopRootJobListViewModel);
+                    // Thread.Sleep(1005);
+                    // DEBUG: 23.02.2021 Nagel-
+                    if (shadowTopRootJobListViewModel != null)
+                    {
+                        shadowTopRootJobListViewModel.SetChildOrientation(this.StartTreeOrientation);
+                        shadowTopRootJobListViewModel.ExpandTree(shadowTopRootJobListViewModel, false);
+                        JobListViewModel treeTopRootJobListViewModel = this.GetTopRootJobListViewModel() ?? (JobListViewModel)this;
 
-                    LogicalTaskTreeManager.MergeTaskTrees(treeTopRootJobListViewModel,
-                        shadowTopRootJobListViewModel, this.UIDispatcher);
+                        LogicalTaskTreeManager.MergeTaskTrees(treeTopRootJobListViewModel,
+                            shadowTopRootJobListViewModel, this.UIDispatcher);
 
-                    shadowTopRootJobListViewModel.Dispose();
+                        shadowTopRootJobListViewModel.Dispose();
 
-                    _ = this.LogTaskTree();
-                    Thread.Sleep(10);
-
-                }
+                        _ = this.LogTaskTree();
+                        Thread.Sleep(10);
+                    }
+                });
             }
         }
 
@@ -1770,7 +1802,8 @@ namespace Vishnu.ViewModel
         /// </summary>
         private async Task ResetContextMenu()
         {
-            await Task.Run(() => CloseAndFreeContextMenu());
+            // 06.11.2023 Nagel+ await Task.Run(() => CloseAndFreeContextMenu());
+            await Task.Delay(100); // 06.11.2023 Nagel-
         }
 
         private void CloseAndFreeContextMenu()
