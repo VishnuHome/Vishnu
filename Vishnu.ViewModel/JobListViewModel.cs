@@ -28,7 +28,6 @@ namespace Vishnu.ViewModel
 
         #region published members
 
-
         /// <summary>
         /// Bei true befindet sich der Job in aktivem, gleich gestartetem Zustand.
         /// </summary>
@@ -102,11 +101,6 @@ namespace Vishnu.ViewModel
         /// </summary>
         public ICommand BreakLogicalTaskTree { get { return this._btnBreakTaskTreeRelayCommand; } }
 
-        /// <summary>
-        /// Command für das Umschalten der Tree-Darstellung.
-        /// </summary>
-        public ICommand SwitchTaskTreeView { get { return this._btnSwitchTaskTreeViewRelayCommand; } }
-
         #endregion published members
 
         /// <summary>
@@ -124,7 +118,6 @@ namespace Vishnu.ViewModel
             this._btnRunTaskTreeRelayCommand = new RelayCommand(runTaskTreeExecute, canRunTaskTreeExecute);
             this._btnRunOrBreakTaskTreeRelayCommand = new RelayCommand(runOrBreakTaskTreeExecute, canRunOrBreakTaskTreeExecute);
             this._btnBreakTaskTreeRelayCommand = new RelayCommand(breakTaskTreeExecute, canBreakTaskTreeExecute);
-            this._btnSwitchTaskTreeViewRelayCommand = new RelayCommand(switchTaskTreeViewExecute, canSwitchTaskTreeViewExecute);
             this._myLogicalNode.NodeStateChanged -= this.treeElementStateChanged;
             this._myLogicalNode.NodeStateChanged += this.treeElementStateChanged;
         }
@@ -192,7 +185,6 @@ namespace Vishnu.ViewModel
         private RelayCommand _btnRunTaskTreeRelayCommand;
         private RelayCommand _btnRunOrBreakTaskTreeRelayCommand;
         private RelayCommand _btnBreakTaskTreeRelayCommand;
-        private RelayCommand _btnSwitchTaskTreeViewRelayCommand;
 
         private void runTaskTreeExecute(object? parameter)
         {
@@ -237,42 +229,6 @@ namespace Vishnu.ViewModel
         {
             bool canStart = this._myLogicalNode.CanTreeStart;
             //return !canStart;
-            return true;
-        }
-
-        /// <summary>
-        /// Anforderung zur Veränderung der Tree-Ausrichtung (Yin_Yang/F4).
-        /// </summary>
-        /// <param name="parameter">Optionales Parameter-Objekt, hier ungenutzt.</param>
-        public void switchTaskTreeViewExecute(object? parameter)
-        {
-            switch (this.RootLogicalTaskTreeViewModel.TreeOrientationState)
-            {
-                case TreeOrientation.AlternatingHorizontal:
-                    this.RootLogicalTaskTreeViewModel.TreeOrientationState = TreeOrientation.Horizontal;
-                    break;
-                case TreeOrientation.Vertical:
-                    this.RootLogicalTaskTreeViewModel.TreeOrientationState = TreeOrientation.AlternatingVertical;
-                    break;
-                case TreeOrientation.Horizontal:
-                    this.RootLogicalTaskTreeViewModel.TreeOrientationState = TreeOrientation.Vertical;
-                    break;
-                case TreeOrientation.AlternatingVertical:
-                    this.RootLogicalTaskTreeViewModel.TreeOrientationState = TreeOrientation.AlternatingHorizontal;
-                    break;
-                default:
-                    this.RootLogicalTaskTreeViewModel.TreeOrientationState = TreeOrientation.AlternatingHorizontal;
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Prüft, ob die Tree-Ausrichtung verändert werden darf.
-        /// Hier: liefert immer true zurück.
-        /// </summary>
-        /// <returns>Liefert immer true zurück.</returns>
-        public bool canSwitchTaskTreeViewExecute()
-        {
             return true;
         }
 

@@ -1676,7 +1676,7 @@ namespace LogicalTaskTree
                                 case "EQ":
                                     mother.nPlus = mother.nOperands - 1;
                                     mother.nMinus = mother.nOperands + 1;
-                                    mother.IsResultDependant = true;
+                                    mother.IsResultDependent = true;
                                     break;
                                 case "TR10":
                                 case "TR20":

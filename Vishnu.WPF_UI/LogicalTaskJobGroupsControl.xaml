@@ -18,8 +18,8 @@
     <vm:DynamicUserControlBase.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Assets/LogicalTaskJobGroupsControlResourceDictionary.xaml" />
                 <ResourceDictionary Source="Assets/LogicalTaskTreeControlStaticResourceDictionary.xaml" />
+                <ResourceDictionary Source="Assets/LogicalTaskJobGroupsControlResourceDictionary.xaml" />
                 <ResourceDictionary Source="Assets/GlassButton.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <convert:NullableBoolToBrush x:Key="nullableBoolToBrush" />

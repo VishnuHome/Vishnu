@@ -53,7 +53,7 @@ namespace LogicalTaskTree
         /// Prozentwert für den Anteil der beendeten SingleNodes
         /// (letztendlich Checker) am Ende eines (Teil-)Baums.
         /// In einer NodeList wird dieser bei jeder Anfrage on the fly
-        /// rekursiv ermittellt.
+        /// rekursiv ermittelt.
         /// Achtung: dieser Wert ist, ebenso wie SingleNodes, verhundertfacht
         /// (<see cref="SingleNode.SingleNodes"/>).
         /// </summary>

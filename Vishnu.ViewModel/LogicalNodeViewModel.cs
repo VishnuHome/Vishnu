@@ -869,11 +869,6 @@ namespace Vishnu.ViewModel
         #endregion published members
 
         /// <summary>
-        /// ViewModel des übergeordneten LogicalTaskTree.
-        /// </summary>
-        public OrientedTreeViewModelBase RootLogicalTaskTreeViewModel { get; set; }
-
-        /// <summary>
         /// Liefert das Ergebnis für die Property ToolTipInfo.
         /// Diese Routine zeigt per Default auf NextRunInfoAndResult,
         /// kann aber gegebenenfalls überschrieben werden.
@@ -911,25 +906,7 @@ namespace Vishnu.ViewModel
 
         #region context menu
 
-        /// <summary>
-        /// Indicates that a ui-trigerred background progress is actually running.
-        /// </summary>
-        public string? JobInProgress
-        {
-            get
-            {
-                return this._jobInProgress;
-            }
-            private set
-            {
-                if (this._jobInProgress != value)
-                {
-                    this._jobInProgress = value;
-                    this.RaisePropertyChanged("JobInProgress");
-                }
-            }
-        }
-
+        /*
         /// <summary>
         /// Indicates that a ui-trigerred background progress is actually running.
         /// </summary>
@@ -948,6 +925,7 @@ namespace Vishnu.ViewModel
                 }
             }
         }
+        */
 
         /// <summary>
         /// Liefert true, wenn die Funktion ausführbar ist.
@@ -1035,7 +1013,7 @@ namespace Vishnu.ViewModel
         /// <returns>Task.</returns>
         public async Task ShowLogTaskTree()
         {
-            this.JobInProgress = "LogTaskTree";
+            this.JobInProgress = "ShowLogTaskTree";
             await Task.Run(() => LogicalTaskTreeManager.ShowLogTaskTree());
             this.JobInProgress = "";
             // 06.11.2023 Nagel+- _ = this.ResetContextMenu();
@@ -1806,12 +1784,14 @@ namespace Vishnu.ViewModel
             await Task.Delay(100); // 06.11.2023 Nagel-
         }
 
+        /*
         private void CloseAndFreeContextMenu()
         {
             this.ContextMenuCanOpen = false;
             Thread.Sleep(300);
             this.ContextMenuCanOpen = true;
         }
+        */
 
         /// <summary>
         /// Speichert die Bildschirmposition des zugehörigen
@@ -2040,8 +2020,6 @@ namespace Vishnu.ViewModel
         private volatile bool _isTreePaused;
         private TreeParameters _treeParams;
         private string? _hookedTo;
-        private string? _jobInProgress;
-        private bool _contextMenuCanOpen;
         private RelayCommand _btnCopyToolTipInfoToClipboardCommand;
 
         // True, wenn die Kinder dieses Knotens noch nicht geladen wurden.

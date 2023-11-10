@@ -14,8 +14,12 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Assets/LogicalTaskTreeControlResourceDictionary.xaml" />
+                <ResourceDictionary Source="Assets/LogicalTaskTreeControlStaticResourceDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <!--<ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Assets/LogicalTaskJobGroupsControlResourceDictionary.xaml" />
+                <ResourceDictionary Source="Assets/LogicalTaskTreeControlResourceDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>-->
         </ResourceDictionary>
     </Window.Resources>
     <Window.Style>

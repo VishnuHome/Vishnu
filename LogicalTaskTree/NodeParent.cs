@@ -48,7 +48,7 @@ namespace LogicalTaskTree
         /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
         public NodeParent(string id, LogicalNode? mother, JobList? rootJobList, TreeParameters treeParams) : base(id, mother, rootJobList, treeParams)
         {
-            this.IsResultDependant = false;
+            this.IsResultDependent = false;
             this.LastSingleNodesFinishedLocker = new object();
             this.ThreadRefreshParentNodeLocker = new object();
             this.SubNodeStateChangedLocker = new object();
@@ -111,7 +111,7 @@ namespace LogicalTaskTree
         /// des logischen Ergebnisses (LastNotNullLogical) eines seiner Kinder erfolgen soll
         /// (Default), oder bei jeder Result-Veränderung eines seiner Kinder.
         /// </summary>
-        internal bool IsResultDependant { get; set; }
+        internal bool IsResultDependent { get; set; }
 
         /// <summary>
         /// Speichert den Kindknoten und hängt sich in die Events des Kindknoten ein.
@@ -366,7 +366,7 @@ namespace LogicalTaskTree
         /// <param name="result">Neues Result des Kind-Knotens.</param>
         protected virtual void SubNodeResultChanged(LogicalNode sender, Result? result)
         {
-            if (this.IsResultDependant)
+            if (this.IsResultDependent)
             {
                 this.SubNodeLastNotNullLogicalChanged(sender, null, Guid.Empty);
             }

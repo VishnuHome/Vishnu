@@ -41,6 +41,11 @@ namespace Vishnu.ViewModel
         /// </summary>
         public ICommand PauseResumeLogicalTaskTree { get { return this._btnPauseResumeTaskTreeRelayCommand; } }
 
+        /// <summary>
+        /// Command für das Umschalten der Tree-Darstellung.
+        /// </summary>
+        public ICommand SwitchTaskTreeView { get { return this._btnSwitchTaskTreeViewRelayCommand; } }
+
         #region IVishnuViewModel
 
         /// <summary>
@@ -244,6 +249,25 @@ namespace Vishnu.ViewModel
         #region context menu
 
         /// <summary>
+        /// Indicates that a ui-triggered background progress is actually running.
+        /// </summary>
+        public string? JobInProgress
+        {
+            get
+            {
+                return this._jobInProgress;
+            }
+            set
+            {
+                if (this._jobInProgress != value)
+                {
+                    this._jobInProgress = value;
+                    this.RaisePropertyChanged("JobInProgress");
+                }
+            }
+        }
+
+        /// <summary>
         /// Ist zum Neu-Laden des Trees an geeigneter Stelle nach Änderung
         /// der JobDescriptions vorgesehen. Kann dafür überschrieben werden.
         /// </summary>
@@ -320,17 +344,60 @@ namespace Vishnu.ViewModel
             return true;
         }
 
+        /// <summary>
+        /// Anforderung zur Veränderung der Tree-Ausrichtung (Yin_Yang/F4).
+        /// </summary>
+        /// <param name="parameter">Optionales Parameter-Objekt, hier ungenutzt.</param>
+        public void switchTaskTreeViewExecute(object? parameter)
+        {
+            switch (this.RootLogicalTaskTreeViewModel.TreeOrientationState)
+            {
+                case TreeOrientation.AlternatingHorizontal:
+                    this.RootLogicalTaskTreeViewModel.TreeOrientationState = TreeOrientation.Horizontal;
+                    break;
+                case TreeOrientation.Vertical:
+                    this.RootLogicalTaskTreeViewModel.TreeOrientationState = TreeOrientation.AlternatingVertical;
+                    break;
+                case TreeOrientation.Horizontal:
+                    this.RootLogicalTaskTreeViewModel.TreeOrientationState = TreeOrientation.Vertical;
+                    break;
+                case TreeOrientation.AlternatingVertical:
+                    this.RootLogicalTaskTreeViewModel.TreeOrientationState = TreeOrientation.AlternatingHorizontal;
+                    break;
+                default:
+                    this.RootLogicalTaskTreeViewModel.TreeOrientationState = TreeOrientation.AlternatingHorizontal;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Prüft, ob die Tree-Ausrichtung verändert werden darf.
+        /// Hier: liefert immer true zurück.
+        /// </summary>
+        /// <returns>Liefert immer true zurück.</returns>
+        public bool canSwitchTaskTreeViewExecute()
+        {
+            return true;
+        }
+
         #endregion context menu
+
+        /// <summary>
+        /// ViewModel des übergeordneten LogicalTaskTree.
+        /// </summary>
+        public OrientedTreeViewModelBase RootLogicalTaskTreeViewModel { get; set; }
 
         /// <summary>
         /// Konstruktor - setzt den VisualTreeCacheBreaker.
         /// </summary>
         public VishnuViewModelBase()
         {
+            this.RootLogicalTaskTreeViewModel = new OrientedTreeViewModelBase();
             this._btnReloadTaskTreeRelayCommand = new RelayCommand(ReloadTaskTreeExecute, CanReloadTaskTreeExecute);
             this._btnLogTaskTreeRelayCommand = new RelayCommand(LogTaskTreeExecute, CanLogTaskTreeExecute);
             this._btnShowLogTaskTreeRelayCommand = new RelayCommand(ShowLogExecute, CanShowLogExecute);
             this._btnPauseResumeTaskTreeRelayCommand = new RelayCommand(PauseResumeTaskTreeExecute, CanPauseResumeTaskTreeExecute);
+            this._btnSwitchTaskTreeViewRelayCommand = new RelayCommand(switchTaskTreeViewExecute, canSwitchTaskTreeViewExecute);
             this._visualTreeCacheBreaker = Guid.NewGuid().ToString();
             this.IsRendered = false;
         }
@@ -370,6 +437,8 @@ namespace Vishnu.ViewModel
         private RelayCommand _btnLogTaskTreeRelayCommand;
         private RelayCommand _btnShowLogTaskTreeRelayCommand;
         private RelayCommand _btnPauseResumeTaskTreeRelayCommand;
+        private RelayCommand _btnSwitchTaskTreeViewRelayCommand;
+        private string? _jobInProgress;
         private Result? _result;
         private object? _userDataContext;
         private FrameworkElement? _parentView;

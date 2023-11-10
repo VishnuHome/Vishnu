@@ -17,6 +17,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Assets/LogicalTaskTreeControlStaticResourceDictionary.xaml" />
                 <ResourceDictionary Source="Assets/LogicalTaskTreeControlResourceDictionary.xaml" />
                 <ResourceDictionary Source="Assets/GlassButton.xaml"/>
             </ResourceDictionary.MergedDictionaries>

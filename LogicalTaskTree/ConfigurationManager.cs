@@ -27,7 +27,7 @@ namespace LogicalTaskTree
         /// Speichert die aktuelle Konfiguration im LocalConfigurationDirectory.
         /// Die aktuelle Konfiguration enthält die relevanten aktuellen UI-Eigenschaften (WindowAspects)
         /// und für jedes LogicalNodeViewModel, ob sein Knoten in der Bildschirmdarstellung
-        /// zusammengefalt ist (collapsed) oder dessen Unterknoten sichtbar sind.
+        /// zusammengefaltet ist (collapsed) oder dessen Unterknoten sichtbar sind.
         /// </summary>
         /// <param name="tree">Root-LogicalNodeViewModel des zu speichernden (Teil-)Trees.</param>
         /// <param name="treeOrientationState">Aktuelle Ausrichtung des LogicalTaskTree<br></br>
@@ -87,7 +87,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Lädt die aktuelle Konfiguration aus LocalConfigurationPath.
         /// Die aktuelle Konfiguration speichert für jedes LogicalNodeViewModel,
-        /// ob sein Knoten in der Bildschirmdarstellung zusammengefalt ist (collapsed)
+        /// ob sein Knoten in der Bildschirmdarstellung zusammengefaltet ist (collapsed)
         /// oder dessen Unterknoten sichtbar sind.
         /// Die Sichtbarkeit der Knoten kann dann gemäß der geladenen
         /// Konfiguration wiederhergestellt werden.

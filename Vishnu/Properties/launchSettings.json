@@ -2,7 +2,7 @@
   "profiles": {
     "Vishnu": {
       "commandName": "Project",
-      "commandLineArgs": "-job=\"%Vishnu_Root%\\VishnuHome\\Tests\\TestJobs\\SingleNode\" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true"
+      "commandLineArgs": "-job=\"%Vishnu_Root%\\VishnuHome\\Tests\\TestJobs\\Tests\\SingleConstantNode\" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=true --FlatNodeListFilter=JobConnector|NodeConnector|NodeList"
     }
   }
 }

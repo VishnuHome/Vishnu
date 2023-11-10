@@ -146,9 +146,6 @@ Danke Peter Bromberg.
 Dank an Jason Tyler auf stackoverflow.
 
 Dank auch an die vielen weiteren Software-Entwickler/innen, die ihr Wissen mit uns allen geteilt haben.<br/>
-Beispielhaft für viele:<br/>
-[Thomas Claudius Huber](https://www.thomasclaudiushuber.com/)<br/>
-und [Scott Hanselman](https://www.hanselman.com/)
 
 Last but not least geht mein Dank an die Teams von Microsoft für ihre Express- und Community-Editions.
 

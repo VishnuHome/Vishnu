@@ -23,7 +23,7 @@ namespace LogicalTaskTree
 
         /// <summary>
         /// Der logische Zustand eines Knotens. In einer NodeList wird dieser
-        /// bei jeder Anfrage on the fly rekursiv ermittellt:
+        /// bei jeder Anfrage on the fly rekursiv ermittelt:
         /// True wird dann zurückgegeben, wenn die Anzahl der Kinder mit Logical=True
         /// größer als die Schranke nPlus ist und kleiner als die Schranke n- ist und
         /// auch durch die noch nicht fertigen Kinder nicht mehr >= n- werden kann.
@@ -51,7 +51,7 @@ namespace LogicalTaskTree
                     if (countResults > 0)
                     {
                         //if (!(new[] { "LT", "LE", "NE", "EQ", "GE", "GT", "XOR" }).Contains(this.Name))
-                        if (!this.IsResultDependant && this.Name != "XOR")
+                        if (!this.IsResultDependent && this.Name != "XOR")
                         {
                             int countPositiveResults = this.CountPositiveResults;
                             if (countPositiveResults > this.nPlus)
@@ -91,7 +91,7 @@ namespace LogicalTaskTree
                                     this.ThreadUpdateLastLogical(CountPositiveResults % 2 != 0);
                                 }
                             }
-                        } // if (!this.IsResultDependant)
+                        } // if (!this.IsResultDependent)
                     } // if (countResults > 0)
                     if (this.LastLogical != this.LastReturnedLogical)
                     {
@@ -109,7 +109,7 @@ namespace LogicalTaskTree
 
         /// <summary>
         /// Der Verarbeitungszustand eines Knotens. In einer NodeList wird dieser
-        /// bei jeder Anfrage on the fly rekursiv ermittellt.
+        /// bei jeder Anfrage on the fly rekursiv ermittelt.
         /// </summary>
         public override NodeState State
         {
@@ -186,7 +186,7 @@ namespace LogicalTaskTree
 
         /// <summary>
         /// Der Ergebnis-Zustand eines Knotens. In einer NodeList wird dieser
-        /// bei jeder Anfrage on the fly rekursiv ermittellt.
+        /// bei jeder Anfrage on the fly rekursiv ermittelt.
         /// </summary>
         public override NodeLogicalState LogicalState
         {
@@ -275,7 +275,7 @@ namespace LogicalTaskTree
         /// Prozentwert für den Anteil der beendeten SingleNodes
         /// (letztendlich Checker) am Ende eines (Teil-)Baums.
         /// In einer NodeList wird dieser bei jeder Anfrage on the fly
-        /// rekursiv ermittellt.
+        /// rekursiv ermittelt.
         /// Achtung: dieser Wert ist, ebenso wie SingleNodes, verhundertfacht
         /// (<see cref="SingleNode.SingleNodes"/>).
         /// </summary>

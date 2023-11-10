@@ -18,6 +18,17 @@ namespace Vishnu.WPF_UI
     /// </remarks>
     public partial class LogicalTaskJobGroupsControl : DynamicUserControlBase
     {
+        /*
+         * 
+        /// <summary>
+        /// Standard Konstruktor.
+        /// </summary>
+        public LogicalTaskJobGroupsControl()
+        {
+            InitializeComponent();
+        }
+        */
+
         /// <summary>
         /// Konstruktor: erzeugt eine Instanz von LogicalTaskTreeViewModel
         /// und setzt den DataContext darauf.
@@ -74,7 +85,7 @@ namespace Vishnu.WPF_UI
 
         private ScrollViewer? _scrollViewer;
 
-        // Scrollt in dem Control horizontal. Wird über Shift+Mousewheel ausgelöst.
+        // Scrollt in dem Control horizontal. Wird über Shift+Mouse wheel ausgelöst.
         // Greift, wenn das einzelne Control so groß wird, dass unterhalb des Expanders
         // ein horizontaler Scrollbalken entsteht.
         private void horizontalScroll(MouseWheelEventArgs e)
@@ -94,7 +105,7 @@ namespace Vishnu.WPF_UI
             }
         }
 
-        // Scrollt in dem Control vertikal. Wird über Mousewheel ausgelöst.
+        // Scrollt in dem Control vertikal. Wird über Mouse wheel ausgelöst.
         // Greift, wenn das einzelne Control so groß wird, dass unterhalb des Expanders
         // ein vertikaler Scrollbalken entsteht.
         private void verticalScroll(MouseWheelEventArgs e)
@@ -115,6 +126,5 @@ namespace Vishnu.WPF_UI
         }
 
         #endregion scroll
-
     }
 }

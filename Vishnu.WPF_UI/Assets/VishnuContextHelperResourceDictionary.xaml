@@ -53,7 +53,7 @@
                                             </MultiBinding>
                                         </DataTrigger.Binding>
                                         <DataTrigger.EnterActions>
-                                            <BeginStoryboard Name="ReloadTaskTreeJobInProgressStoryBoard">
+                                            <BeginStoryboard Name="JobInProgressStoryBoard">
                                                 <Storyboard BeginTime="00:00:00" RepeatBehavior="Forever" AutoReverse="True"
                                                         Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)">
                                                     <ColorAnimation From="WhiteSmoke" To="SeaGreen" Duration="0:0:0.5"/>
@@ -61,7 +61,7 @@
                                             </BeginStoryboard>
                                         </DataTrigger.EnterActions>
                                         <DataTrigger.ExitActions>
-                                            <StopStoryboard BeginStoryboardName="ReloadTaskTreeJobInProgressStoryBoard" />
+                                            <StopStoryboard BeginStoryboardName="JobInProgressStoryBoard" />
                                         </DataTrigger.ExitActions>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -87,20 +87,6 @@
                 </Button>
             </MenuItem.Header>
         </MenuItem>
-        <MenuItem Name="ReloadTaskTree" Style="{StaticResource MenuItemTemplate}">
-            <MenuItem.Header>
-                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
-                        Command="{Binding ReloadLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="../Media/reloadTree.png" Width="15" Height="15" Margin="0,0,5,0"
-                                   Grid.Column="0" Grid.Row="0" />
-                            <TextBlock Text="Reload Tree" Grid.Column="1" Grid.Row="0" />
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-            </MenuItem.Header>
-        </MenuItem>
         <MenuItem Name="LogTaskTree" Style="{StaticResource MenuItemTemplate}">
             <MenuItem.Header>
                 <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
@@ -109,6 +95,19 @@
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../Media/dumpTree.png" Width="15" Height="15" Margin="0,0,5,0"/>
                             <TextBlock Text="Log Tree" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem Name="ReloadTaskTree" Style="{StaticResource MenuItemTemplate}">
+            <MenuItem.Header>
+                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
+                        Command="{Binding ReloadLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../Media/reloadTree.png" Width="15" Height="15" Margin="0,0,5,0" />
+                            <TextBlock Text="Reload Tree" />
                         </StackPanel>
                     </Button.Content>
                 </Button>

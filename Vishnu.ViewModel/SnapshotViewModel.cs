@@ -93,11 +93,6 @@ namespace Vishnu.ViewModel
         /// </summary>
         public ICommand RefreshSnapshot { get { return this._btnRefreshSnapshotRelayCommand; } }
 
-        /// <summary>
-        /// Command für das Umschalten der Tree-Darstellung.
-        /// </summary>
-        public ICommand SwitchTaskTreeView { get { return this._btnSwitchTaskTreeViewRelayCommand; } }
-
         #endregion published members
 
         /// <summary>
@@ -135,33 +130,6 @@ namespace Vishnu.ViewModel
         }
 
         private bool canRefreshSnapshotExecute()
-        {
-            return true;
-        }
-
-        private void switchTaskTreeViewExecute(object? parameter)
-        {
-            switch (this.RootLogicalTaskTreeViewModel.TreeOrientationState)
-            {
-                case TreeOrientation.AlternatingHorizontal:
-                    this.RootLogicalTaskTreeViewModel.TreeOrientationState = TreeOrientation.Horizontal;
-                    break;
-                case TreeOrientation.Vertical:
-                    this.RootLogicalTaskTreeViewModel.TreeOrientationState = TreeOrientation.AlternatingVertical;
-                    break;
-                case TreeOrientation.Horizontal:
-                    this.RootLogicalTaskTreeViewModel.TreeOrientationState = TreeOrientation.Vertical;
-                    break;
-                case TreeOrientation.AlternatingVertical:
-                    this.RootLogicalTaskTreeViewModel.TreeOrientationState = TreeOrientation.AlternatingHorizontal;
-                    break;
-                default:
-                    this.RootLogicalTaskTreeViewModel.TreeOrientationState = TreeOrientation.AlternatingHorizontal;
-                    break;
-            }
-        }
-
-        private bool canSwitchTaskTreeViewExecute()
         {
             return true;
         }

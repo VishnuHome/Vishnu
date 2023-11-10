@@ -72,6 +72,15 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Dummy-Konstruktor.
+        /// </summary>
+        public OrientedTreeViewModelBase()
+        {
+            this.TreeParams = new("dummy", null);
+            this.MainLogicalNodeView = new List<JobListViewModel>();
+        }
+
+        /// <summary>
         /// ItemsSource für die TreeView in LogicalTaskTreeControl.
         /// </summary>
         public List<JobListViewModel> MainLogicalNodeView { get; protected set; }

@@ -363,7 +363,6 @@ namespace Vishnu
 
             Statistics.RegexFilter = SingleInstanceApplication._appSettings.StatisticsFileRegexFilter;
             SingleInstanceApplication._statisticsLogger = new Logger(statisticsFilePathName);
-            SingleInstanceApplication._statisticsLogger.MaxBufferLineCount = 1; // Statistics puffert selber
             InfoController.GetInfoSource().RegisterInfoReceiver(SingleInstanceApplication._statisticsLogger, new InfoType[] { InfoType.Statistics });
 
             if (SingleInstanceApplication._appSettings.FatalInitializationException != null)
