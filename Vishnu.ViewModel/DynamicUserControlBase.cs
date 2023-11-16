@@ -251,6 +251,15 @@ namespace Vishnu.ViewModel
             }
         }
 
+        /// <summary>
+        /// Setzt den konkreten DataContext für das ContextMenu.
+        /// Kann überschrieben werden (Beispiel: LogicalTaskJobGroupsControl.xaml.cs).
+        /// </summary>
+        protected virtual void SetContextMenuDataContext()
+        {
+            this.ContextMenu.DataContext = this.DataContext;
+        }
+
         private void contentControl_Loaded(object sender, RoutedEventArgs e)
         {
             this.Loaded -= contentControl_Loaded;
@@ -267,8 +276,9 @@ namespace Vishnu.ViewModel
 
             ContextMenu contextMenu = (ContextMenu)this.Resources["cmContextMenu"];
             contextMenu.Loaded += ContextMenu_Loaded;
-            contextMenu.DataContext = this.DataContext;
             this.ContextMenu = contextMenu;
+            // 16.11.2023 Erik Nagel+ contextMenu.DataContext = this.DataContext;
+            this.SetContextMenuDataContext(); // 16.11.2023 Erik Nagel-
 
             Dispatcher.BeginInvoke(new Action<ContentControl>(this.waitForContentRendered),
                 System.Windows.Threading.DispatcherPriority.Background /* geht nicht: Normal, ApplicationIdle */, new object[] { (ContentControl)e.Source});

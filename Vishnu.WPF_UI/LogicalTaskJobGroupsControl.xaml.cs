@@ -18,17 +18,6 @@ namespace Vishnu.WPF_UI
     /// </remarks>
     public partial class LogicalTaskJobGroupsControl : DynamicUserControlBase
     {
-        /*
-         * 
-        /// <summary>
-        /// Standard Konstruktor.
-        /// </summary>
-        public LogicalTaskJobGroupsControl()
-        {
-            InitializeComponent();
-        }
-        */
-
         /// <summary>
         /// Konstruktor: erzeugt eine Instanz von LogicalTaskTreeViewModel
         /// und setzt den DataContext darauf.
@@ -62,6 +51,14 @@ namespace Vishnu.WPF_UI
             {
                 this._scrollViewer.PreviewMouseWheel += this.mouseWheelDispatcher;
             }
+        }
+
+        /// <summary>
+        /// Setzt den konkreten DataContext für das ContextMenu.
+        /// </summary>
+        protected override void SetContextMenuDataContext()
+        {
+            this.ContextMenu.DataContext = ((MainWindowViewModel)this.DataContext).JobGroupsVM; // 16.11.2023 Erik Nagel +-
         }
 
         // Überschreibt OnPreviewMouseWheel für die Implementierung
@@ -126,5 +123,6 @@ namespace Vishnu.WPF_UI
         }
 
         #endregion scroll
+
     }
 }

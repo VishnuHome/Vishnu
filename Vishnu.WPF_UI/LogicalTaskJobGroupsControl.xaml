@@ -18,8 +18,8 @@
     <vm:DynamicUserControlBase.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Assets/LogicalTaskTreeControlStaticResourceDictionary.xaml" />
                 <ResourceDictionary Source="Assets/LogicalTaskJobGroupsControlResourceDictionary.xaml" />
+                <ResourceDictionary Source="Assets/LogicalTaskTreeControlStaticResourceDictionary.xaml" />
                 <ResourceDictionary Source="Assets/GlassButton.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <convert:NullableBoolToBrush x:Key="nullableBoolToBrush" />
@@ -28,7 +28,10 @@
             <convert:VisualNodeStateToBitmapImage x:Key="visualNodeStateToBitmapImage" />
             <convert:NotEmptyToTrue x:Key="notEmptyToTrue" />
             <convert:Path2UserControlBase x:Key="path2UserControlBase" />
-            <HierarchicalDataTemplate DataType="{x:Type vm:JobGroupViewModel}" ItemsSource="{Binding GroupJobList.Children}">
+            <HierarchicalDataTemplate 
+                        DataType="{x:Type vm:JobGroupViewModel}" 
+                        ItemsSource="{Binding GroupJobList.Children}"
+                    >
                 <!-- ScrollViewer x:Name="ItemScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" -->
                     <Border Name="ItemBorder" HorizontalAlignment="Stretch" BorderThickness="3" CornerRadius="6" Margin="1">
                         <Border.BorderBrush>

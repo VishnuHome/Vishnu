@@ -297,6 +297,16 @@ namespace Vishnu.ViewModel
         #region context menu
 
         /// <summary>
+        /// Prüft, ob die Tree-Ausrichtung verändert werden darf.
+        /// Hier: liefert immer false zurück.
+        /// </summary>
+        /// <returns>Liefert immer false zurück.</returns>
+        public override bool canSwitchTaskTreeViewExecute()
+        {
+            return false;
+        }
+
+        /// <summary>
         /// Lädt den Tree nach Änderung der JobDescriptions neu.
         /// </summary>
         /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>

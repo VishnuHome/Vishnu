@@ -375,7 +375,7 @@ namespace Vishnu.ViewModel
         /// Hier: liefert immer true zurück.
         /// </summary>
         /// <returns>Liefert immer true zurück.</returns>
-        public bool canSwitchTaskTreeViewExecute()
+        public virtual bool canSwitchTaskTreeViewExecute()
         {
             return true;
         }
