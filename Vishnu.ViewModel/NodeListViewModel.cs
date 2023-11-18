@@ -34,7 +34,11 @@ namespace Vishnu.ViewModel
         /// <returns>Die im ToolTip anzuzeigende Information.</returns>
         protected override string GetToolTipInfo()
         {
-            return string.IsNullOrEmpty(this.LastExceptions) ? "alles ok" : this.LastExceptions;
+            if (string.IsNullOrEmpty(this.LastExceptions))
+            {
+                return base.GetToolTipInfo();
+            }
+            return this.LastExceptions;
         }
 
         /// <summary>

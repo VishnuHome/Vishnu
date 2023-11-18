@@ -237,19 +237,6 @@ namespace Vishnu.DemoApplications.SingleNodeUserControlDemo
         }
 
         /// <summary>
-        /// Liefert das Ergebnis von GetToolTipInfo().
-        /// Diese Routine zeigt per Default auf NextRunInfoAndResult,
-        /// kann aber gegebenenfalls überschrieben werden.
-        /// </summary>
-        public string ToolTipInfo
-        {
-            get
-            {
-                return this.GetToolTipInfo();
-            }
-        }
-
-        /// <summary>
         /// True zeigt an, dass es sich um einen Knoten innerhalb
         /// eines geladenen Snapshots handelt.
         /// </summary>
@@ -308,21 +295,6 @@ namespace Vishnu.DemoApplications.SingleNodeUserControlDemo
         /// Command für den Break-Button im LogicalTaskTreeControl.
         /// </summary>
         public ICommand BreakLogicalTaskTree { get { return this._btnBreakTaskTreeRelayCommand; } }
-
-        /// <summary>
-        /// Command für den Copy-Button im ToolTip des Controls.
-        /// </summary>
-        public ICommand CopyToolTipInfoToClipboard { get { return this._btnCopyToolTipInfoToClipboardCommand; } }
-
-        /// <summary>
-        /// Liefert das Ergebnis für die Property ToolTipInfo.
-        /// Diese Routine zeigt per Default auf NextRunInfoAndResult,
-        /// kann aber gegebenenfalls überschrieben werden.
-        /// </summary>
-        protected virtual string GetToolTipInfo()
-        {
-            return this.NextRunInfoAndResult;
-        }
 
         /// <summary>
         /// Standard Konstruktor - setzt alle Demo-Properties.

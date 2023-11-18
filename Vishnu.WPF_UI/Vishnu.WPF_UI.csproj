@@ -68,6 +68,7 @@
     <None Remove="Media\checkmark.png" />
     <None Remove="Media\checkmark_small.png" />
     <None Remove="Media\DALL_E_Tree.png" />
+    <None Remove="Media\dna.png" />
     <None Remove="Media\dumpTree.png" />
     <None Remove="Media\empty.png" />
     <None Remove="Media\empty_flag.png" />
@@ -111,6 +112,7 @@
     <Resource Include="Media\checkmark.png" />
     <Resource Include="Media\checkmark_small.png" />
     <Resource Include="Media\DALL_E_Tree.png" />
+    <Resource Include="Media\dna.png" />
     <Resource Include="Media\dumpTree.png" />
     <Resource Include="Media\empty.png" />
     <Resource Include="Media\empty_flag.png" />

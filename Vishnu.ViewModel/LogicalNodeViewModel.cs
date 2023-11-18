@@ -157,11 +157,6 @@ namespace Vishnu.ViewModel
         public ICommand? SizeChangedEventCommand
         { get; set; }
 
-        /// <summary>
-        /// Command für den Copy-Button im ToolTip des Controls.
-        /// </summary>
-        public ICommand CopyToolTipInfoToClipboard { get { return this._btnCopyToolTipInfoToClipboardCommand; } }
-
         #endregion commands
 
         #region ViewModel properties
@@ -526,19 +521,6 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
-        /// Liefert das Ergebnis von GetToolTipInfo().
-        /// Diese Routine zeigt per Default auf NextRunInfoAndResult,
-        /// kann aber gegebenenfalls überschrieben werden.
-        /// </summary>
-        public string ToolTipInfo
-        {
-            get
-            {
-                return this.GetToolTipInfo();
-            }
-        }
-
-        /// <summary>
         /// Der Pfad zum aktuell dynamisch zu ladenden UserControl.
         /// </summary>
         public string UserControlPath
@@ -874,7 +856,7 @@ namespace Vishnu.ViewModel
         /// kann aber gegebenenfalls überschrieben werden.
         /// </summary>
         /// <returns>Die im ToolTip auszugebende Information.</returns>
-        protected virtual string GetToolTipInfo()
+        protected override string GetToolTipInfo()
         {
             return this.NextRunInfoAndResult;
         }
@@ -1019,6 +1001,39 @@ namespace Vishnu.ViewModel
             // 06.11.2023 Nagel+- _ = this.ResetContextMenu();
         }
 
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        public override bool CanShowSettingsExecute()
+        {
+            bool canShowSettings = true;
+            return canShowSettings;
+        }
+
+        /// <summary>
+        /// Gibt die Vishnu-Parameter im NotePad-Editor aus.
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter oder null.</param>
+        public override void ShowSettingsExecute(object? parameter)
+        {
+            _ = this.ShowSettingsTaskTree();
+        }
+
+        /// <summary>
+        /// Gibt die Vishnu-Parameter im NotePad-Editor aus.
+        /// </summary>
+        /// <returns>Task.</returns>
+        public async Task ShowSettingsTaskTree()
+        {
+            
+            this.JobInProgress = "ShowSettingsTaskTree";
+            await Task.Run(() => LogicalTaskTreeManager.ShowSettingsTaskTree(
+                GenericSingletonProvider.GetInstance<AppSettings>().GetParametersSources()));
+            this.JobInProgress = "";
+            // 06.11.2023 Nagel+- _ = this.ResetContextMenu();
+        }
+
         #endregion context menu
 
         /// <summary>
@@ -1064,7 +1079,6 @@ namespace Vishnu.ViewModel
             this.ExpandedEventCommand = new RelayCommand(this.HandleExpanderExpandedEvent, this.CanHandleExpanderExpandedEvent);
             this.CollapsedEventCommand = new RelayCommand(this.HandleExpanderCollapsedEvent);
             this.SizeChangedEventCommand = new RelayCommand(this.HandleExpanderSizeChangedEvent);
-            this._btnCopyToolTipInfoToClipboardCommand = new RelayCommand(this.CmdBtnCopy_Executed, this.CmdBtnCopy_CanExecute);
             this.RaisePropertyChanged("RootJobListViewModel");
             this._freeComment = "";
         }
@@ -2020,7 +2034,6 @@ namespace Vishnu.ViewModel
         private volatile bool _isTreePaused;
         private TreeParameters _treeParams;
         private string? _hookedTo;
-        private RelayCommand _btnCopyToolTipInfoToClipboardCommand;
 
         // True, wenn die Kinder dieses Knotens noch nicht geladen wurden.
         private bool _hasDummyChild
@@ -2041,17 +2054,6 @@ namespace Vishnu.ViewModel
             this.UIMain = new FrameworkElement();
             this.UIDispatcher = Dispatcher.CurrentDispatcher;
             this._freeComment = "";
-            this._btnCopyToolTipInfoToClipboardCommand = new RelayCommand(this.CmdBtnCopy_Executed, this.CmdBtnCopy_CanExecute);
-        }
-
-        private void CmdBtnCopy_Executed(object? parameter)
-        {
-            Clipboard.SetText(this.GetToolTipInfo());
-        }
-
-        private bool CmdBtnCopy_CanExecute()
-        {
-            return true;
         }
 
         #endregion private members

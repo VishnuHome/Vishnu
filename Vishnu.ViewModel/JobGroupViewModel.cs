@@ -1,9 +1,11 @@
 ﻿using LogicalTaskTree;
 using NetEti.ApplicationControl;
+using NetEti.Globals;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Vishnu.Interchange;
 
@@ -233,6 +235,47 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Liefert das Ergebnis für die Property ToolTipInfo.
+        /// Diese Routine zeigt per Default auf NextRunInfoAndResult,
+        /// wird aber hier überschrieben.
+        /// </summary>
+        /// <returns>Die im ToolTip anzuzeigende Information.</returns>
+        protected override string GetToolTipInfo()
+        {
+            if (String.IsNullOrEmpty(this.LastExceptions))
+            {
+                return base.GetToolTipInfo();
+            }
+            return this.LastExceptions;
+        }
+
+        /// <summary>
+        /// Listet in einem String mögliche Exceptions der Child-Knoten
+        /// durch Zeilenumbruch getrennt auf.
+        /// </summary>
+        public string LastExceptions
+        {
+            get
+            {
+                StringBuilder info = new StringBuilder("");
+                string delimiter = "";
+                foreach (LogicalNodeViewModel viewModel in this._flatNodeViewModelList)
+                {
+                    try
+                    {
+                        if (!String.IsNullOrEmpty(viewModel.LastExceptions))
+                        {
+                            info.Append(delimiter + viewModel.Id + ": " + viewModel.LastExceptions);
+                        }
+                    }
+                    catch { }
+                    delimiter = Environment.NewLine;
+                }
+                return info.ToString();
+            }
+        }
+
+        /// <summary>
         /// Berechnet die Anzahl Zeilen und Spalten für ein möglichst quadratisches Grid
         /// abhängig von der Gesamtanzahl darzustellender Controls bzw. deren ViewModels.
         /// Weist außerdem jedem ViewModel eines einzelnen Controls seine Zeilen- und Spaltennummer zu.
@@ -312,7 +355,9 @@ namespace Vishnu.ViewModel
         /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
         public override void ReloadTaskTreeExecute(object? parameter)
         {
+            this.JobInProgress = "ReloadTaskTree";
             _ = this.GroupJobList.ReloadTaskTree();
+            this.JobInProgress = "";
         }
 
         /// <summary>
@@ -330,7 +375,9 @@ namespace Vishnu.ViewModel
         /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
         public override void LogTaskTreeExecute(object? parameter)
         {
+            this.JobInProgress = "LogTaskTree";
             LogicalTaskTreeManager.LogTaskTree(this.GroupJobList, false);
+            this.JobInProgress = "";
         }
 
         /// <summary>
@@ -368,7 +415,41 @@ namespace Vishnu.ViewModel
         /// <returns>Task.</returns>
         public async Task ShowLogTaskTree()
         {
+            this.JobInProgress = "ShowLogTaskTree";
             await Task.Run(() => LogicalTaskTreeManager.ShowLogTaskTree());
+            this.JobInProgress = "";
+        }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        public override bool CanShowSettingsExecute()
+        {
+            bool canShowSettings = true;
+            return canShowSettings;
+        }
+
+        /// <summary>
+        /// Gibt die Vishnu-Parameter im NotePad-Editor aus.
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter oder null.</param>
+        public override void ShowSettingsExecute(object? parameter)
+        {
+            _ = this.ShowSettingsTaskTree();
+        }
+
+        /// <summary>
+        /// Gibt die Vishnu-Parameter im NotePad-Editor aus.
+        /// </summary>
+        /// <returns>Task.</returns>
+        public async Task ShowSettingsTaskTree()
+        {
+            this.JobInProgress = "ShowSettingsTaskTree";
+            await Task.Run(() => LogicalTaskTreeManager.ShowSettingsTaskTree(
+                GenericSingletonProvider.GetInstance<AppSettings>().GetParametersSources()));
+            this.JobInProgress = "";
+            // 06.11.2023 Nagel+- _ = this.ResetContextMenu();
         }
 
         #endregion context menu

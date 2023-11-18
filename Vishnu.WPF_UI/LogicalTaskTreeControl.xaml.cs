@@ -14,8 +14,8 @@ namespace Vishnu.WPF_UI
     public partial class LogicalTaskTreeControl : UserControl
     {
         /// <summary>
-        /// Konstruktor: erzeugt eine Instanz von LogicalTaskTreeViewModel
-        /// und setzt den DataContext darauf.
+        /// Konstruktor: erzeugt eine Instanz von LogicalTaskTreeControl
+        /// und ruft InitializeComponent().
         /// </summary>
         public LogicalTaskTreeControl()
         {

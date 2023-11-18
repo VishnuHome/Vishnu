@@ -957,9 +957,10 @@ Stand: 16.10.2023 Version 7.0.1.6 (Hard Core tested and stable)
 
 ERLEDIGT: Bugfix: Kontext-Menü funktionierte nach dem zweiten Aufruf nicht mehr - behoben.
 ERLEDIGT: Kontext-Menü: Show Log implementiert.
-	Folgeaufgabe: auch die Vishnu-AppSettings mit einbinden
+	ERLEDIGT: Folgeaufgabe: auch die Vishnu-AppSettings mit einbinden (eigener Punkt: Show Settings)
+ERLEDIGT: Kontext-Menü und ToolTip auch für die Job-Ansicht realisiert.
 
-Stand: 30.10.2023 Version 8.0.0.0 (Discovery)
+Stand: 17.11.2023 Version 8.0.2.0 (Discovery)
 
 -------------------------------------------------------------------------------------------------------------
 

@@ -1,11 +1,13 @@
 ﻿using LogicalTaskTree;
 using NetEti.ApplicationControl;
 using NetEti.CustomControls;
+using NetEti.FileTools;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -79,6 +81,24 @@ namespace Vishnu.ViewModel
         public static void ShowLogTaskTree()
         {
             InfoController.GetInfoController().Show();
+        }
+
+        /// <summary>
+        /// Gibt die Vishnu-Parameter im NotePad-Editor aus.
+        /// </summary>
+        public static void ShowSettingsTaskTree(SortedDictionary<string, string> settings)
+        {
+            EditorCaller editorCaller = new EditorCaller();
+            List<string>? content = new List<string>();
+
+            foreach (string parameter in settings.Keys)
+            {
+                if (parameter != "__NOPPES__")
+                {
+                    content.Add(parameter + ": " + settings[parameter]);
+                }
+            }
+            editorCaller.Edit(Path.Combine(Environment.GetEnvironmentVariable("TEMP") ?? "", "VishnuSettings.log"), content);
         }
 
         public static void ShowHelp()

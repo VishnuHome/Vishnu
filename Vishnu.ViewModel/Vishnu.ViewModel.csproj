@@ -40,6 +40,9 @@
 		    <Reference Include="NetEti.Logging">
 		      <HintPath>$(AssemblyRoot)/NetEti.Logging.dll</HintPath>
 		    </Reference>
+		    <Reference Include="NetEti.QuickEdit">
+		      <HintPath>$(AssemblyRoot)/NetEti.QuickEdit.dll</HintPath>
+		    </Reference>
 		    <Reference Include="NetEti.MultiScreen">
 		      <HintPath>$(AssemblyRoot)/NetEti.MultiScreen.dll</HintPath>
 		    </Reference>
@@ -57,6 +60,7 @@
 		    <PackageReference Include="NetEti.Global" Version="1.0.0" />
 		    <PackageReference Include="NetEti.InfoController" Version="1.0.0" />
 		    <PackageReference Include="NetEti.Logging" Version="1.0.0" />
+		    <PackageReference Include="NetEti.QuickEdit" Version="1.0.0" />
 		    <PackageReference Include="NetEti.MultiScreen" Version="1.0.0" />
 		    <PackageReference Include="NetEti.MVVMini" Version="1.0.0" />
 		    <PackageReference Include="NetEti.TimerMessageBox" Version="1.0.0" />

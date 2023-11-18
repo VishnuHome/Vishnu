@@ -87,6 +87,7 @@
 		    <PackageReference Include="NetEti.MVVMini" Version="1.0.0" />
 		    <PackageReference Include="NetEti.InfoController" Version="1.0.0" />
 		    <PackageReference Include="NetEti.Logging" Version="1.0.0" />
+		    <PackageReference Include="NetEti.QuickEdit" Version="1.0.0" />
 		  </ItemGroup>
     </Otherwise>
 	</Choose>
@@ -107,6 +108,9 @@
   </ItemGroup>
 
 	<ItemGroup>
+	  <Reference Include="NetEti.QuickEdit">
+	    <HintPath>..\..\..\ReadyBin\Assemblies\NetEti.QuickEdit.dll</HintPath>
+	  </Reference>
 	  <Reference Include="WpfAnimatedGif">
 	    <HintPath>$(AssemblyRoot)/WpfAnimatedGif.dll</HintPath>
 	  </Reference>

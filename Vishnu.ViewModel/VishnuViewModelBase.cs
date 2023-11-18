@@ -37,6 +37,11 @@ namespace Vishnu.ViewModel
         public ICommand ShowLogLogicalTaskTree { get { return this._btnShowLogTaskTreeRelayCommand; } }
 
         /// <summary>
+        /// Command für das ContextMenuItem "Show Log" im ContextMenu für das "MainGrid" des Controls.
+        /// </summary>
+        public ICommand ShowSettingsLogicalTaskTree { get { return this._btnShowSettingsTaskTreeRelayCommand; } }
+
+        /// <summary>
         /// Command für das ContextMenuItem "Pause Tree" im ContextMenu für das "MainGrid" des Controls.
         /// </summary>
         public ICommand PauseResumeLogicalTaskTree { get { return this._btnPauseResumeTaskTreeRelayCommand; } }
@@ -45,6 +50,11 @@ namespace Vishnu.ViewModel
         /// Command für das Umschalten der Tree-Darstellung.
         /// </summary>
         public ICommand SwitchTaskTreeView { get { return this._btnSwitchTaskTreeViewRelayCommand; } }
+
+        /// <summary>
+        /// Command für den Copy-Button im ToolTip des Controls.
+        /// </summary>
+        public ICommand CopyToolTipInfoToClipboard { get { return this._btnCopyToolTipInfoToClipboardCommand; } }
 
         #region IVishnuViewModel
 
@@ -196,14 +206,14 @@ namespace Vishnu.ViewModel
         }
 
 
-    /// <summary>
-    /// Liefert oder setzt die Zeilennummer des zugehörigen Controls
-    /// in einer quadratischen Matrix.
-    /// Dieser Wert wird zu einem geeigneten Zeitpunkt in die Property GridRow geschoben,
-    /// um die WPF-GUI zu informieren.
-    /// </summary>
-    /// <returns>Die Zeilennummer des zugehörigen Controls in einer quadratischen Matrix.</returns>
-    public int RowNumber;
+        /// <summary>
+        /// Liefert oder setzt die Zeilennummer des zugehörigen Controls
+        /// in einer quadratischen Matrix.
+        /// Dieser Wert wird zu einem geeigneten Zeitpunkt in die Property GridRow geschoben,
+        /// um die WPF-GUI zu informieren.
+        /// </summary>
+        /// <returns>Die Zeilennummer des zugehörigen Controls in einer quadratischen Matrix.</returns>
+        public int RowNumber;
 
         /// <summary>
         /// Liefert oder setzt die Spaltennummer des zugehörigen Controls
@@ -229,6 +239,19 @@ namespace Vishnu.ViewModel
         public virtual string GetDebugNodeInfos()
         {
             return this.VisualTreeCacheBreaker;
+        }
+
+        /// <summary>
+        /// Liefert das Ergebnis von GetToolTipInfo().
+        /// Diese Routine zeigt per Default auf NextRunInfoAndResult,
+        /// kann aber gegebenenfalls überschrieben werden.
+        /// </summary>
+        public string ToolTipInfo
+        {
+            get
+            {
+                return this.GetToolTipInfo();
+            }
         }
 
         #region IVishnuRenderWatcher Implementation
@@ -319,6 +342,23 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Ist zum Anzeigen der Vishnu-Parameter vorgesehen.
+        /// Kann dafür an geeigneter Stelle überschrieben werden.
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter oder null.</param>
+        public virtual void ShowSettingsExecute(object? parameter) { }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist, hier immer false.
+        /// Kann an geeigneter Stelle überschrieben werden.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist, hier immer false.</returns>
+        public virtual bool CanShowSettingsExecute()
+        {
+            return false;
+        }
+
+        /// <summary>
         /// Wechselschalter - hält den Tree an oder lässt ihn weiterlaufen.
         /// </summary>
         /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
@@ -382,6 +422,20 @@ namespace Vishnu.ViewModel
 
         #endregion context menu
 
+        #region ToolTip
+
+        private void CmdBtnCopy_Executed(object? parameter)
+        {
+            Clipboard.SetText(this.GetToolTipInfo());
+        }
+
+        private bool CmdBtnCopy_CanExecute()
+        {
+            return true;
+        }
+
+        #endregion ToolTip
+
         /// <summary>
         /// ViewModel des übergeordneten LogicalTaskTree.
         /// </summary>
@@ -396,8 +450,10 @@ namespace Vishnu.ViewModel
             this._btnReloadTaskTreeRelayCommand = new RelayCommand(ReloadTaskTreeExecute, CanReloadTaskTreeExecute);
             this._btnLogTaskTreeRelayCommand = new RelayCommand(LogTaskTreeExecute, CanLogTaskTreeExecute);
             this._btnShowLogTaskTreeRelayCommand = new RelayCommand(ShowLogExecute, CanShowLogExecute);
+            this._btnShowSettingsTaskTreeRelayCommand = new RelayCommand(ShowSettingsExecute, CanShowSettingsExecute);
             this._btnPauseResumeTaskTreeRelayCommand = new RelayCommand(PauseResumeTaskTreeExecute, CanPauseResumeTaskTreeExecute);
             this._btnSwitchTaskTreeViewRelayCommand = new RelayCommand(switchTaskTreeViewExecute, canSwitchTaskTreeViewExecute);
+            this._btnCopyToolTipInfoToClipboardCommand = new RelayCommand(this.CmdBtnCopy_Executed, this.CmdBtnCopy_CanExecute);
             this._visualTreeCacheBreaker = Guid.NewGuid().ToString();
             this.IsRendered = false;
         }
@@ -433,11 +489,24 @@ namespace Vishnu.ViewModel
         /// <param name="parentView">Das Parent-Control.</param>
         protected virtual void ParentViewToBL(FrameworkElement parentView) { }
 
+        /// <summary>
+        /// Liefert das Ergebnis für die Property ToolTipInfo.
+        /// Diese Routine zeigt per Default auf NextRunInfoAndResult,
+        /// kann aber gegebenenfalls überschrieben werden.
+        /// </summary>
+        /// <returns>Die im ToolTip auszugebende Information.</returns>
+        protected virtual string GetToolTipInfo()
+        {
+            return "-- Status: ok --";
+        }
+
         private RelayCommand _btnReloadTaskTreeRelayCommand;
         private RelayCommand _btnLogTaskTreeRelayCommand;
         private RelayCommand _btnShowLogTaskTreeRelayCommand;
+        private RelayCommand _btnShowSettingsTaskTreeRelayCommand;
         private RelayCommand _btnPauseResumeTaskTreeRelayCommand;
         private RelayCommand _btnSwitchTaskTreeViewRelayCommand;
+        private RelayCommand _btnCopyToolTipInfoToClipboardCommand;
         private string? _jobInProgress;
         private Result? _result;
         private object? _userDataContext;

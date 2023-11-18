@@ -42,7 +42,7 @@
                         </Border.BorderBrush>
                         <!--Grid Name="MainGrid" HorizontalAlignment="Stretch" ToolTip="{Binding GroupJobList.LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400"
                           ContextMenu="{StaticResource cmContextMenu}"-->
-                        <Grid Name="MainGrid" HorizontalAlignment="Stretch" ToolTip="{Binding GroupJobList.LastExceptions}" ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="1400">
+                    <Grid Name="MainGrid" HorizontalAlignment="Stretch" ToolTip="{StaticResource cmToolTip}">
                             <Grid.RowDefinitions>
                                 <RowDefinition />
                             </Grid.RowDefinitions>
