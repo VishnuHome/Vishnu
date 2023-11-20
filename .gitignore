@@ -13,12 +13,13 @@
 _Archiv/
 _Develop/
 _Mock/
+_private/
 ..bfg-report/
 
 Job_und_Snapshot_Pfade.txt
 devenvErrorLog.txt
 copyErrorLog.txt
-
+launchSettings.json
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
