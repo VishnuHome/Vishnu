@@ -955,10 +955,14 @@ ERLEDIGT: Vishnu_UserChecker_VSIX.vsix und Vishnu_UserView_VSIX.vsix wieder funk
 
 Stand: 16.10.2023 Version 7.0.1.6 (Hard Core tested and stable)
 
+ERLEDIGT: Context-Menü schließt nicht automatisch nach dem ersten Funktionsaufruf (Reload).
+		Das Problem hat sich dadurch erledigt, dass Kontextmenüs jetzt genau dann schließen,
+		wenn die Maus den Menübereich verlässt.
 ERLEDIGT: Bugfix: Kontext-Menü funktionierte nach dem zweiten Aufruf nicht mehr - behoben.
 ERLEDIGT: Kontext-Menü: Show Log implementiert.
 	ERLEDIGT: Folgeaufgabe: auch die Vishnu-AppSettings mit einbinden (eigener Punkt: Show Settings)
 ERLEDIGT: Kontext-Menü und ToolTip auch für die Job-Ansicht realisiert.
+ERLEDIGT: JobControllerTest\JobControllerLoop funktionierte nicht
 
 Stand: 17.11.2023 Version 8.0.2.0 (Discovery)
 
@@ -991,14 +995,11 @@ Hinweise:
 ###################
 
 --- TODO ----------------------------------------------------------------------------------------------------
-Fehler: übergeordneter Knoten bleibt manchmal auf Gelb (CheckTreeEventTriggerMinimal)
-        Nur, wenn kein Log aktiv ist und auch nicht im Debug.
 Neuer Parameter: Log-Flushtime
 CheckDependentNodeLogic: SubJobs testen
 Reload von Checker-dlls testen; UncachedCheckers testen
 
 Reload auf Root-JobList geht noch nicht
-Context-Menü schließt nicht automatisch nach dem ersten Funktionsaufruf (Reload).
 In Listenansicht Shift-Expand und Ctrl-Expand einbauen
 Fehler: wenn im Snapshot ein Teilbaum mit Exception auf false (oder true?) - von Exception weg - geht,
         werden der früheren Exception übergeordnete Strukturknoten (NodeList) nicht von gelb auf Farbe gesetzt.
@@ -1160,9 +1161,13 @@ Vishnu.Interchange entschlacken
 MainWindowViewModel von den anderen ViewModels separieren
 Namenswirrwar bei den ViewModelProperties bereinigen (Result)
 
+-------------------------------------------------------------------------------------------------------------
+--- Friedhof der unwiederholbaren Experimente ---
+Fehler: übergeordneter Knoten bleibt manchmal auf Gelb (CheckTreeEventTriggerMinimal)
+        Nur, wenn kein Log aktiv ist und auch nicht im Debug.
 Fehler: CheckTreeEventTriggerMinimal, FalseTrueNodeListError: True, Exception, True => Balken oben gelb statt grün
-Fehler: CheckTreeEventTwoJobConnectors: True, Exception, True => direkte JobReferenz ok, TriggerEventMirrorChecker: Exception bleibt
-Fehler: JobControllerTest\JobControllerLoop geht nicht
+Fehler: CheckTreeEventTwoJobConnectors: True, Exception, 
+				True => direkte JobReferenz ok, TriggerEventMirrorChecker: Exception bleibt
 
 
 -------------------------------------------------------------------------------------------------------------
