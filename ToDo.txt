@@ -967,6 +967,7 @@ ERLEDIGT: Der Zusatz "(registered)" wurde im Log unter Umständen mehrfach angeze
 ERLEDIGT: Positionierung bei mehreren Bildschirmen für Hauptfenster und Meldungen überarbeitet.
 ERLEDIGT: Funktion "LogMemory" beim Aufruf von "Pause Tree" hinzugefügt.
 ERLEDIGT: Parameter "AbortingAllowed" hinzugefügt.
+ERLEDIGT: Worker wurden bei existierenden NodeConnectoren auf SingleNodes mehrfach gestartet - korrigiert.
 
 Stand: 15.01.2024 Version 8.0.4.0 (Discovery)
 

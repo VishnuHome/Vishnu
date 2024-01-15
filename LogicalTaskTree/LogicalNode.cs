@@ -2590,7 +2590,8 @@ namespace LogicalTaskTree
         {
             lock (LogicalNode._eventLocker)
             {
-                if (!(source is NodeConnector))
+                // 15.01.2024 Nagel+ if (!(source is NodeConnector))
+                if (!((source is NodeConnector) || (this is NodeConnector))) // 15.01.2024 Nagel-
                 {
                     bool workerExecutedOrBreaked = false;
                     // Verarbeitung für "Alles wieder ok"-Meldung an noch laufende Worker.
