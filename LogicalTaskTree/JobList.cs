@@ -965,8 +965,8 @@ namespace LogicalTaskTree
 
         /// <summary>
         /// Überschriebene RUN-Logik.
-        /// Für NodeList bedeutet das: Einhängen in die Events
-        /// und weitergabe des Aufrufs an die Kinder.
+        /// Für JobList bedeutet das: Starten eventueller TreeExternals
+        /// und Weitergabe des Aufrufs an NodeList (dort an die Kinder).
         /// Diese Routine wird asynchron ausgeführt.
         /// </summary>
         /// <param name="source">Bei abhängigen Checkern das auslösende TreeEvent.</param>

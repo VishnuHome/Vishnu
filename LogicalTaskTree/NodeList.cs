@@ -747,12 +747,13 @@ namespace LogicalTaskTree
         /// <summary>
         /// Überschriebene RUN-Logik.
         /// Für NodeList bedeutet das: Einhängen in die Events
-        /// und weitergabe des Aufrufs an die Kinder.
+        /// und Weitergabe des Aufrufs an die Kinder.
         /// Diese Routine wird asynchron ausgeführt.
         /// </summary>
         /// <param name="source">Bei abhängigen Checkern das auslösende TreeEvent.</param>
         protected override void DoRun(TreeEvent? source)
         {
+            base.DoRun(source); // Springt direkt in LogicalNode.DoRun, da NodeParent DoRun nicht überschreibt.
             if (source != null && source.Name != "UserRun" && this.TriggeredRunDelay > 0)
             {
                 Thread.Sleep(this.TriggeredRunDelay);

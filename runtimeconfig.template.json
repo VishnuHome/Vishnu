@@ -1,0 +1,9 @@
+{
+    "configProperties": {
+      "System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization": false,
+      "System.GC.Server": true,
+      "System.GC.HeapCount": 12,
+      "System.GC.Concurrent": true,
+      "Switch.System.Windows.Media.EnableHardwareAccelerationInRdp": true
+    }
+}

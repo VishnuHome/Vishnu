@@ -50,7 +50,7 @@ namespace Vishnu.Interchange
         public static readonly UndefinedTreeEventClass UndefinedTreeEvent = new();
 
         /// <summary>
-        /// Mappt einen normalisierten String mit entsprechendeninternen Ereignis-Namen
+        /// Mappt einen normalisierten String mit entsprechenden internen Ereignis-Namen
         /// auf einen String mit durch Pipe ('|') getrennte Benutzer-freundliche Ereignis-Namen.
         /// </summary>
         /// <param name="internalEventNames">String mit durch '|' getrennten Programm-seitigen Event-Namen.</param>
@@ -99,7 +99,7 @@ namespace Vishnu.Interchange
 
         /// <summary>
         /// Mappt einen String mit durch Pipe ('|') getrennte Benutzer-freundliche Ereignis-Namen
-        /// auf einen normalisierten String mit entsprechendenb internen Ereignis-Namen.
+        /// auf einen normalisierten String mit entsprechenden internen Ereignis-Namen.
         /// </summary>
         /// <param name="userEventNames">String mit durch '|' getrennten Benutzer-freundlichen Event-Namen.</param>
         /// <returns>Der normalisierte String mit durch '|' getrennten entsprechenden Programm-seitigen Event-Namen.</returns>
@@ -300,44 +300,44 @@ namespace Vishnu.Interchange
 
         // Achtung, die internalEventNames müssen so gewählt werden, dass sie sich nicht gegenseitig enthalten.
         private static Dictionary<string, string> _userEventNames_internalEventNames
-              = new Dictionary<string, string>() {
-        {"LOGICALCHANGED", "LastLogicalChanged"},
-        {"RESULTCHANGED", "LastResultChanged"},
-        {"ANYRESULTCHANGED", "AnyResultHasChanged"},
-        {"LOGICALRESULTCHANGED", "LastNotNullLogicalChanged"},
-        {"TRUE", "LastNotNullLogicalToTrue"},
-        {"FALSE", "LastNotNullLogicalToFalse"},
-        {"ANYLOGICALRESULTCHANGED", "AnyLastNotNullLogicalHasChanged"},
-        {"STATECHANGED", "LogicalStateChanged"},
-        {"PROGRESSCHANGED", "ProgressChanged"},
-        {"PARAMETERSRELOADED", "ParametersReloaded"},
-        {"USERSTART", "UserRun"},
-        {"USERBREAK", "UserBreak"},
-        {"STARTED", "Started"},
-        {"BREAKED", "Breaked"},
-        {"FINISHED", "Finished"},
-        {"EXCEPTION", "AnyException"}
-              };
+            = new Dictionary<string, string>() {
+                {"LOGICALCHANGED", "LastLogicalChanged"},
+                {"RESULTCHANGED", "LastResultChanged"},
+                {"ANYRESULTCHANGED", "AnyResultHasChanged"},
+                {"LOGICALRESULTCHANGED", "LastNotNullLogicalChanged"},
+                {"TRUE", "LastNotNullLogicalToTrue"},
+                {"FALSE", "LastNotNullLogicalToFalse"},
+                {"ANYLOGICALRESULTCHANGED", "AnyLastNotNullLogicalHasChanged"},
+                {"STATECHANGED", "LogicalStateChanged"},
+                {"PROGRESSCHANGED", "ProgressChanged"},
+                {"PARAMETERSRELOADED", "ParametersReloaded"},
+                {"USERSTART", "UserRun"},
+                {"USERBREAK", "UserBreak"},
+                {"STARTED", "Started"},
+                {"BREAKED", "Breaked"},
+                {"FINISHED", "Finished"},
+                {"EXCEPTION", "AnyException"}
+            };
 
         private static Dictionary<string, string> _internalEventNames_userEventNames
-          = new Dictionary<string, string>() {
-        {"LASTLOGICALCHANGED", "LogicalChanged"},
-        {"LASTRESULTCHANGED", "ResultChanged"},
-        {"ANYRESULTHASCHANGED", "AnyResultChanged"},
-        {"LASTNOTNULLLOGICALCHANGED", "LogicalResultChanged"},
-        {"LASTNOTNULLLOGICALTOTRUE", "True"},
-        {"LASTNOTNULLLOGICALTOFALSE", "False"},
-        {"ANYLASTNOTNULLLOGICALHASCHANGED", "AnyLogicalResultChanged"},
-        {"LOGICALSTATECHANGED", "StateChanged"},
-        {"PROGRESSCHANGED", "ProgressChanged"},
-        {"PARAMETERSRELOADED", "ParametersReloaded"},
-        {"USERRUN", "UserStart"},
-        {"USERBREAK", "UserBreak"},
-        {"STARTED", "Started"},
-        {"BREAKED", "Breaked"},
-        {"FINISHED", "Finished"},
-        {"ANYEXCEPTION", "Exception"}
-          };
+            = new Dictionary<string, string>() {
+                {"LASTLOGICALCHANGED", "LogicalChanged"},
+                {"LASTRESULTCHANGED", "ResultChanged"},
+                {"ANYRESULTHASCHANGED", "AnyResultChanged"},
+                {"LASTNOTNULLLOGICALCHANGED", "LogicalResultChanged"},
+                {"LASTNOTNULLLOGICALTOTRUE", "True"},
+                {"LASTNOTNULLLOGICALTOFALSE", "False"},
+                {"ANYLASTNOTNULLLOGICALHASCHANGED", "AnyLogicalResultChanged"},
+                {"LOGICALSTATECHANGED", "StateChanged"},
+                {"PROGRESSCHANGED", "ProgressChanged"},
+                {"PARAMETERSRELOADED", "ParametersReloaded"},
+                {"USERRUN", "UserStart"},
+                {"USERBREAK", "UserBreak"},
+                {"STARTED", "Started"},
+                {"BREAKED", "Breaked"},
+                {"FINISHED", "Finished"},
+                {"ANYEXCEPTION", "Exception"}
+            };
 
         private static Dictionary<string, string> _internalEventNamesToUserEventNamesCache = new Dictionary<string, string>();
         private static Dictionary<string, string> _userEventNamesToInternalEventNamesCache = new Dictionary<string, string>();

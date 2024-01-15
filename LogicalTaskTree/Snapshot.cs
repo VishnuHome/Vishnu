@@ -8,6 +8,7 @@ using System.Threading;
 using Vishnu.Interchange;
 using NetEti.ObjectSerializer;
 using LogicalTaskTree.Provider;
+using System.Windows;
 
 namespace LogicalTaskTree
 {
@@ -394,6 +395,15 @@ namespace LogicalTaskTree
         /// <param name="source">Auslösendes TreeEvent oder null.</param>
         protected override void DoRun(TreeEvent? source)
         {
+            // Hier wird TreeParams.ParentView direkt vor dem Run gesetzt.
+            // Achtung: eine direkte Zuweisung geht wegen Thread-übergreifendem Zugriff schief!
+            // Hinweis: ParentView ist bei Knoten, die aktuell auf dem Bildschirm nicht dargestellt
+            // werden, nicht gefüllt (null).
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                this.TreeParams.ParentView = this.ParentView;
+            }));
+
             this.RefreshSnapshot();
             if (this.Trigger != null)
             {

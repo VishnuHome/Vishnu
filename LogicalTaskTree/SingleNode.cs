@@ -491,6 +491,7 @@ namespace LogicalTaskTree
         /// <param name="source">Auslösendes TreeEvent oder null.</param>
         protected override void DoRun(TreeEvent? source)
         {
+            base.DoRun(source);
             if (source != null && source.Name != "UserRun" && this.TriggeredRunDelay > 0)
             {
                 Thread.Sleep(this.TriggeredRunDelay);
@@ -511,7 +512,6 @@ namespace LogicalTaskTree
             Exception? runException = null;
             try
             {
-                this.TreeParams.ParentView = this.ParentView;
                 this._lastSucceeded = 0;
                 this.OnNodeProgressStarted(this, new ProgressChangedEventArgs(0, null));
                 if (this.Checker != null)

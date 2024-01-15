@@ -78,7 +78,7 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
-        /// Das Parent-Control.
+        /// Das Control zu diesem ViewModel.
         /// </summary>
         public FrameworkElement? ParentView
         {

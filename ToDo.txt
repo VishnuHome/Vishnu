@@ -963,8 +963,12 @@ ERLEDIGT: Kontext-Menü: Show Log implementiert.
 	ERLEDIGT: Folgeaufgabe: auch die Vishnu-AppSettings mit einbinden (eigener Punkt: Show Settings)
 ERLEDIGT: Kontext-Menü und ToolTip auch für die Job-Ansicht realisiert.
 ERLEDIGT: JobControllerTest\JobControllerLoop funktionierte nicht
+ERLEDIGT: Der Zusatz "(registered)" wurde im Log unter Umständen mehrfach angezeigt.
+ERLEDIGT: Positionierung bei mehreren Bildschirmen für Hauptfenster und Meldungen überarbeitet.
+ERLEDIGT: Funktion "LogMemory" beim Aufruf von "Pause Tree" hinzugefügt.
+ERLEDIGT: Parameter "AbortingAllowed" hinzugefügt.
 
-Stand: 17.11.2023 Version 8.0.2.0 (Discovery)
+Stand: 15.01.2024 Version 8.0.4.0 (Discovery)
 
 -------------------------------------------------------------------------------------------------------------
 
@@ -995,6 +999,16 @@ Hinweise:
 ###################
 
 --- TODO ----------------------------------------------------------------------------------------------------
+Fehler: Tree anhalten, dann Break => Deadlock
+Tests ohne AddOn, alles leermachen (delete_binaries), ReadyBin löschen
+openVishnu7 mit VS2022 pre, Vishnu5 mit VS2022 pre
+free mini tetris
+NetWorkMappingsRefresher debuggen
+Demodaten für alle Xaml
+nächster Lauf nach Datumswechsel checken
+Rootverzeichnisse bereinigen
+diese Datei ("ToDo.txt") auf GitHub prüfen und ggf. bereinigen
+
 Neuer Parameter: Log-Flushtime
 CheckDependentNodeLogic: SubJobs testen
 Reload von Checker-dlls testen; UncachedCheckers testen

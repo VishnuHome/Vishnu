@@ -472,7 +472,7 @@ namespace LogicalTaskTree
             return (INodeChecker?)this._assemblyLoader.DynamicLoadObjectOfTypeFromAssembly(slavePathName, typeof(INodeChecker));
         }
 
-        // Kapselt eine Exe in eine Klasseninstanz, die InodeChecker implementiert.
+        // Kapselt eine Exe in eine Klasseninstanz, die INodeChecker implementiert.
         private INodeChecker? dynamicLoadSlaveExe(string program)
         {
             try

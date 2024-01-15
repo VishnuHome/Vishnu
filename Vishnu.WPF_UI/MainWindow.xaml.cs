@@ -123,6 +123,7 @@ namespace Vishnu.WPF_UI
 
             this.MainTabControl.SelectionChanged += MainTabControl_SelectionChanged;
 
+            // Funktioniert nicht:
             // Registrieren des the Bubble Event Handlers 
             //      this.AddHandler(CustomControls.ZoomTreeView.TreeElementStateChangedEvent,
             // new RoutedEventHandler(TreeElementStateChangedEventHandler));
@@ -131,12 +132,14 @@ namespace Vishnu.WPF_UI
             //    .Select(x => x.EventArgs)
             //    .Throttle(TimeSpan.FromMilliseconds(200));
 
+            // Funktioniert auch nicht (feuert bei komplexer Grafik zu früh):
             //IDisposable SizeChangedSubscription = ObservableSizeChanges
             //    .ObserveOn(SynchronizationContext.Current)
             //    .Subscribe(x =>
             //    {
             //      sizeHasChanged(x);
             //    });
+
             // Lösung: absichtlich über DispatcherTimer mit niedriger Priorität (DispatcherPriority.Input). Dadurch soll verhindert werden,
             //         dass der Timer feuert, bevor ein komplexer Grafik-Aufbau abgeschlossen ist.
             this._sizeChangedTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(100), DispatcherPriority.Input, this.sizeHasChanged, this.Dispatcher);
@@ -170,6 +173,111 @@ namespace Vishnu.WPF_UI
             this.RecalculateWindowMeasures();
         }
 
+        /// <summary>
+        /// Setzt die Fenstergröße unter Berücksichtigung von Maximalgrenzen auf die
+        /// Höhe und Breite des Inhalts und die Property SizeToContent auf WidthAndHeight.
+        /// Zentriert das Window dann neu relativ zur letzten Position.
+        /// </summary>
+        public void RecalculateWindowMeasures()
+        {
+            double lastWidth = this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Width;
+            double lastHeight = this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Height;
+            ScreenInfo actScreenInfo = ScreenInfo.GetActualScreenInfo(this);
+            if (lastWidth + lastHeight == 0 && this.MainWindowAspects != null)
+            {
+                // actScreenInfo = ScreenInfo.GetAllScreenInfos(this)[MainWindowAspects.ActScreenIndex];
+                if (this.MainWindowAspects.ActScreenIndex != ScreenInfo.GetActualScreenInfoIndex(this))
+                {
+                    // 09.01.2024 Nagel+- TEST
+                    throw new ApplicationException("this.MainWindowAspects.ActScreenIndex != ScreenInfo.GetActualScreenInfoIndex(this)");
+                }
+            }
+            double xFactor = 1.0;
+            double yFactor = 1.0;
+            if (this.SizeOnVirtualScreen)
+            {
+                this.MaxHeight = System.Windows.SystemParameters.VirtualScreenHeight;
+                this.MaxWidth = System.Windows.SystemParameters.VirtualScreenWidth;
+                this.MinLeft = 0;
+                this.MinTop = 0;
+                yFactor = this.MaxHeight / actScreenInfo.WorkingArea.Height;
+                xFactor = this.MaxWidth / actScreenInfo.WorkingArea.Width;
+            }
+            else
+            {
+                this.MaxHeight = actScreenInfo.WorkingArea.Height;
+                this.MaxWidth = actScreenInfo.WorkingArea.Width;
+                this.MinLeft = actScreenInfo.Bounds.Left;
+                this.MinTop = actScreenInfo.Bounds.Top;
+            }
+            if (this.WindowState == WindowState.Normal && this._contentRendered)
+            {
+                double effectiveHeight = this.ActualHeight + SystemParameters.WindowCaptionHeight;
+                if (this.SizeToContent == System.Windows.SizeToContent.WidthAndHeight)
+                {
+                    double widthDiff = 0;
+                    double heightDiff = 0;
+                    double newLeft = this.Left;
+                    double newTop = this.Top;
+                    if (lastWidth + lastHeight > 0)
+                    {
+                        widthDiff = lastWidth - this.ActualWidth;
+                        heightDiff = lastHeight - effectiveHeight;
+                        newLeft += (widthDiff / 2.0);
+                        newTop += (heightDiff / 2.0);
+                    }
+                    else
+                    {
+                        if (this.MainWindowAspects != null)
+                        {
+                            lastWidth = this.MainWindowAspects.WindowWidth;
+                            lastHeight = this.MainWindowAspects.WindowHeight + SystemParameters.WindowCaptionHeight;
+                            widthDiff = lastWidth - this.ActualWidth;
+                            heightDiff = lastHeight - effectiveHeight;
+                        }
+                        newLeft = (newLeft + this.ActualWidth / 2) * xFactor - (this.ActualWidth / 2);
+                        newTop = (newTop + effectiveHeight / 2) * yFactor - (effectiveHeight / 2);
+                        newLeft += (widthDiff / 2.0);
+                        newTop += (heightDiff / 2.0);
+                    }
+                    if (newLeft + this.ActualWidth > this.MinLeft + this.MaxWidth)
+                    {
+                        newLeft = this.MinLeft + this.MaxWidth - this.ActualWidth;
+                    }
+                    if (newTop + this.ActualHeight > this.MinTop + this.MaxHeight)
+                    {
+                        newTop = this.MinTop + this.MaxHeight - this.ActualHeight;
+                    }
+                    if (newLeft < this.MinLeft)
+                    {
+                        newLeft = this.MinLeft;
+                    }
+                    if (newTop < this.MinTop)
+                    {
+                        newTop = this.MinTop;
+                    }
+                    if (newLeft > actScreenInfo.Bounds.Right - 35)
+                    {
+                        throw new ArithmeticException("newLeft > actScreenInfo.Bounds.Right - 35"); // 09.01.2024 Nagel+- TEST
+                        // newLeft = actScreenInfo.Bounds.Right - 35;
+                    }
+                    if (newTop > actScreenInfo.Bounds.Bottom - 35)
+                    {
+                        throw new ArithmeticException("newTop > actScreenInfo.Bounds.Bottom - 35"); // 09.01.2024 Nagel+- TEST
+                        // newTop = actScreenInfo.Bounds.Bottom - 35;
+                    }
+                    this.Left = newLeft;
+                    this.Top = newTop;
+                    effectiveHeight = this.ActualHeight + SystemParameters.WindowCaptionHeight;
+                }
+                this._tabManualSize[this.MainTabControl.SelectedIndex] = this.SizeToContent == System.Windows.SizeToContent.Manual;
+                this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Width = this.ActualWidth;
+                this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Height = effectiveHeight;
+                this.IsRelocating = false;
+            }
+        }
+
+        /* // 07.01.2024 Nagel+
         /// <summary>
         /// Setzt die Fenstergröße unter Berücksichtigung von Maximalgrenzen auf die
         /// Höhe und Breite des Inhalts und die Property SizeToContent auf WidthAndHeight.
@@ -257,7 +365,7 @@ namespace Vishnu.WPF_UI
                 this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Height = effectiveHeight;
                 this.IsRelocating = false;
             }
-        }
+        } */ // 07.01.2024 Nagel-
 
         /// <summary>
         /// Centers Window on Screen.
@@ -293,13 +401,13 @@ namespace Vishnu.WPF_UI
             if (this.MainWindowAspects != null)
             {
                 this.WindowStartupLocation = WindowStartupLocation.Manual;
-                this.Left = this.MainWindowAspects.WindowLeft;
-                this.Top = this.MainWindowAspects.WindowTop;
                 if (this.MainWindowAspects.WindowWidth > 0 && this.MainWindowAspects.WindowHeight > 0)
                 {
                     this.SizeToContent = SizeToContent.Manual;
                     this.Width = this.MainWindowAspects.WindowWidth;
                     this.Height = this.MainWindowAspects.WindowHeight;
+                    this.Left = this.MainWindowAspects.WindowCenterX - MainWindowAspects.WindowWidth / 2;
+                    this.Top = this.MainWindowAspects.WindowCenterY - MainWindowAspects.WindowHeight / 2;
                 }
                 this.FirstSelectedIndex = this.MainWindowAspects.ActTabControlTab;
             }
@@ -429,15 +537,16 @@ namespace Vishnu.WPF_UI
             //MessageBox.Show("The \"" + command + "\" command has been invoked. ");
             WindowAspects windowAspects = new WindowAspects()
             {
-                WindowLeft = this.Left,
-                WindowTop = this.Top,
                 WindowWidth = this.ActualWidth,
                 WindowHeight = this.ActualHeight,
+                WindowCenterX = this.Left + this.ActualWidth / 2,
+                WindowCenterY = this.Top + this.ActualHeight / 2,
                 WindowScrollLeft = horizontalScroll, // Eigenschaft der beinhalteten ZoomBox
                 WindowScrollTop = verticalScroll, // Eigenschaft der beinhalteten ZoomBox
                 WindowZoom = scaleTransform?.ScaleX ?? 1.0, // Eigenschaft der beinhalteten ZoomBox
                 IsScrollbarVisible = isScrollbarVisible, // True, wenn mindestens eine Scrollbar sichtbar ist
-                ActTabControlTab = this.MainTabControl.SelectedIndex // aktuell ausgewählter Tab im TabControl
+                ActTabControlTab = this.MainTabControl.SelectedIndex, // aktuell ausgewählter Tab im TabControl
+                ActScreenIndex = ScreenInfo.GetActualScreenInfoIndex(this)
             };
             ((MainWindowViewModel)this.DataContext).SaveTreeState(windowAspects);
         }

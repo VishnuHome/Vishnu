@@ -14,6 +14,9 @@ using System.Windows;
 using System.ComponentModel;
 using static LogicalTaskTree.UndefinedLogicalNodeClass;
 using System.Windows.Navigation;
+using System.Diagnostics;
+using System.Windows.Threading;
+using System.Windows.Shell;
 
 namespace LogicalTaskTree
 {
@@ -1135,7 +1138,45 @@ namespace LogicalTaskTree
                 LogicalNode.OnAllNodesStateChanged();
                 Thread.Sleep(HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
                 LogicalNode.IsTreePaused = true;
+
+                // 02.12.2023 Nagel+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                LogMemory();
+                // 02.12.2023 Nagel-
             }
+        }
+
+        private static void LogMemory()
+        {
+            long totalMemory = GC.GetTotalMemory(true);
+            GCMemoryInfo memInfo = GC.GetGCMemoryInfo();
+            long finalizationPendingCount = memInfo.FinalizationPendingCount;
+            long fragmentedBytes = memInfo.FragmentedBytes;
+            long heapSizeBytes = memInfo.HeapSizeBytes;
+            long highMemoryLoadThresholdBytes = memInfo.HighMemoryLoadThresholdBytes;
+            long memoryLoadBytes = memInfo.MemoryLoadBytes;
+            long pinnedObjectsCount = memInfo.PinnedObjectsCount;
+            long promotedBytes = memInfo.PromotedBytes;
+            long totalAvailableMemoryBytes = memInfo.TotalAvailableMemoryBytes;
+            long totalCommittedBytesOfManagedHeap = memInfo.TotalCommittedBytes;
+            Process proc = Process.GetCurrentProcess();
+            long privateMemorySize64 = proc.PrivateMemorySize64;
+            // 17.12.2023 Nagel+ DEBUG
+            InfoController.GetInfoPublisher().Publish(null,
+               String.Format("#MemoryUsage# \r\n"
+                        + "totalMemory: {0}, totalAvailableMemoryBytes: {1}, heapSizeBytes: {2}\r\n"
+                        + "memoryLoadBytes: {3}, totalCommittedBytesOfManagedHeap: {4}, privateMemorySize64: {10}\r\n"
+                        + "promotedBytes: {5}, pinnedObjectsCount: {6}, finalizationPendingCount: {7}\r\n"
+                        + "fragmentedBytes: {8}, highMemoryLoadThresholdBytes: {9}"
+                        , totalMemory, totalAvailableMemoryBytes, heapSizeBytes
+                        , memoryLoadBytes, totalCommittedBytesOfManagedHeap
+                        , promotedBytes, pinnedObjectsCount, finalizationPendingCount
+                        , fragmentedBytes, highMemoryLoadThresholdBytes, privateMemorySize64
+                ), InfoType.Debug
+            );
+            // 17.12.2023 Nagel- DEBUG
         }
 
         /// <summary>
@@ -1617,6 +1658,7 @@ namespace LogicalTaskTree
             this._nextLogicalBreakState = userBreak ? NodeLogicalState.UserAbort : NodeLogicalState.None;
             if (this._nodeCancellationTokenSource != null && !this._nodeCancellationTokenSource.IsCancellationRequested)
             {
+                LogThis("#Multithreading# _nodeCancellationTokenSource.Cancel()"); // 05.01.2024 Nagel+- TEST
                 this._nodeCancellationTokenSource.Cancel();
             }
             else
@@ -1755,7 +1797,21 @@ namespace LogicalTaskTree
             return this.ToString().GetHashCode();
         }
 
-        private const int HOLDEDTREELOOPSLEEPTIMEMILLISECONDS = 10;
+        /// <summary>
+        /// Hierüber kann eine Ableitung von LogicalNode ihren eigenen Thread
+        /// zum Abbruch veranlassen.
+        /// </summary>
+        /// <summary>
+        /// Sucht in der aktuellen JobList und allen übergeodneten JobLists
+        /// nach der (Single)Node mit der übergebenen 'nodeId'.
+        /// Der erste Treffer gewinnt.
+        /// </summary>
+        /// <param name="nodeId">Die Id der zu suchenden SingleNode.</param>
+        /// <returns>Die gefundene LogicalNode oder null.</returns>
+        public virtual LogicalNode? FindNodeById(string nodeId)
+        {
+            return this.RootJobList.FindNodeById(nodeId);
+        }
 
         #endregion public members
 
@@ -1777,10 +1833,11 @@ namespace LogicalTaskTree
         /// </summary>
         internal string? UserBreakedNodePath { get; set; }
 
+        /* // 13.01.2024 Nagel+ auskommentiert
         /// <summary>
-        /// Setzt für diesen Knoten von außen die Instanz der Basisklasse für SingleNodeViewModels.
+        /// Übergibt diesem Knoten das Mutterelement im Tree.
         /// </summary>
-        /// <param name="parentView"></param>
+        /// <param name="parentView">Mutterelement im Tree für diesen Knoten.</param>
         internal void ThreadUpdateParentView(FrameworkElement parentView)
         {
             lock (this._parentViewLocker)
@@ -1788,6 +1845,7 @@ namespace LogicalTaskTree
                 this.ParentView = parentView;
             }
         }
+        */ // 13.01.2024 Nagel-
 
         /// <summary>
         /// Sucht nach zuständigen WorkerShells mit deren zugeordneten Worker-Arrays für ein Event.
@@ -1976,22 +2034,21 @@ namespace LogicalTaskTree
         /// muss überschrieben werden.
         /// </summary>
         /// <param name="source">Auslösendes TreeEvent oder null.</param>
-        protected abstract void DoRun(TreeEvent? source);
-
-        /// <summary>
-        /// Hierüber kann eine Ableitung von LogicalNode ihren eigenen Thread
-        /// zum Abbruch veranlassen.
-        /// </summary>
-        /// <summary>
-        /// Sucht in der aktuellen JobList und allen übergeodneten JobLists
-        /// nach der (Single)Node mit der übergebenen 'nodeId'.
-        /// Der erste Treffer gewinnt.
-        /// </summary>
-        /// <param name="nodeId">Die Id der zu suchenden SingleNode.</param>
-        /// <returns>Die gefundene LogicalNode oder null.</returns>
-        public virtual LogicalNode? FindNodeById(string nodeId)
+        protected virtual void DoRun(TreeEvent? source)
         {
-            return this.RootJobList.FindNodeById(nodeId);
+            this.SetTreeParamsParentView();
+        }
+
+        private void SetTreeParamsParentView()
+        {
+            // Hier wird TreeParams.ParentView direkt vor dem Run gesetzt.
+            // Achtung: eine direkte Zuweisung geht wegen Thread-übergreifendem Zugriff schief!
+            // Hinweis: ParentView ist bei Knoten, die aktuell auf dem Bildschirm nicht dargestellt
+            // werden, nicht gefüllt (null).
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                this.TreeParams.ParentView = this.ParentView;
+            }));
         }
 
         /// <summary>
@@ -2192,9 +2249,11 @@ namespace LogicalTaskTree
 
         #region private members
 
-        const long COUNTSUNTILSLEEP = 10000;
-        const int SLEEPMILLISECONDS = 10;
-        const int MAXWAITINGLOOPS = 20;
+        private const long COUNTSUNTILSLEEP = 10000;
+        private const int SLEEPMILLISECONDS = 10;
+        private const int MAXWAITINGLOOPS = 20;
+        private const int HOLDEDTREELOOPSLEEPTIMEMILLISECONDS = 10;
+
 
         private static long _countdownToSleep = COUNTSUNTILSLEEP;
         private static ConcurrentDictionary<Thread, bool> _invalidThreads;
@@ -2258,6 +2317,14 @@ namespace LogicalTaskTree
                 }
                 this.IsRunRequired = true;
                 // InfoController.GetInfoPublisher().Publish(this, String.Format($"3. {this.NameId}.RunAsyncAsync {source.SourceId}/{source.SenderId} ({source.Name})"), InfoType.NoRegex);
+                if (this._starterThread != null)
+                {
+                    LogThis(String.Format($"#Multithreading# IsAlive: {this._starterThread.IsAlive}, IsThreadValid: {this.IsThreadValid(this._starterThread.GetThread())}")); // 02.01.2024 Nagel+- TEST
+                }
+                else
+                {
+                    LogThis(String.Format($"#Multithreading# _starterThread is null")); // 02.01.2024 Nagel+- TEST
+                }
                 if (this._starterThread == null || !(this._starterThread.IsAlive && this.IsThreadValid(this._starterThread.GetThread())))
                 {
                     // this.asyncCheckerTask = new Task(() => this.runAsync(source));
@@ -2267,32 +2334,52 @@ namespace LogicalTaskTree
                     {
                         // this._starterThread.Abort();
                         // Warnung	SYSLIB0006	"Thread.Abort()" ist veraltet: "Thread.Abort is not supported and throws PlatformNotSupportedException."
-                        this._starterThread.Abort(); // neue Methode Abortable.Abort()
+                        if (this.AppSettings.AbortingAllowed)
+                        {
+                            LogThis("#Multithreading# calling abort"); // 29.11.2023 Nagel+- TEST
+                            this._starterThread.Abort(); // neue Methode Abortable.Abort()
+                        }
+                        else
+                        {
+                            LogThis("#Multithreading# not aborting, instead waiting"); // 29.11.2023 Nagel+- TEST
+                        }
                         this._starterThread = null;
                     }
                     this._starterThread = new Abortable((te) =>
                     {
                         Thread.CurrentThread.Name = "tryRunAsyncWhileIsRunRequired";
-                        // InfoController.GetInfoPublisher().Publish(this, String.Format($"4. {this.NameId}.RunAsyncAsync {source.SourceId}/{source.SenderId} ({source.Name})"), InfoType.NoRegex);
                         this.TryRunAsyncWhileIsRunRequired((TreeEvent?)te);
                     });
-                    _starterThread.SetApartmentState(ApartmentState.STA); // Ist wegen WPF-Checkern erforderlich.
-                    _starterThread.IsBackground = true;
+                    this._starterThread.SetApartmentState(ApartmentState.STA); // Ist wegen WPF-Checkern erforderlich.
+                    this._starterThread.IsBackground = true;
                     try
                     {
                         // new NetEti.ProcessTools.Threader(_starterThread, this.CancellationToken).Start(source);
+                        LogThis("#Multithreading# starting Thread"); // 29.11.2023 Nagel+- TEST
                         _starterThread.Start(source);
                     }
                     catch (InvalidOperationException) { }
                 }
                 else
                 {
+                    // _starterThread != null
+                    // this._starterThread.IsAlive && this.IsThreadValid(this._starterThread.GetThread()))
+
+                    /* 05.01.2024 Nagel+
                     if (!this.IsThreadValid(this._starterThread.GetThread()))
                     {
+                        // Dieser Teil kann niemals erreicht werden! (05.01.2024 Nagel)
                         this.ThreadUpdateLastState(NodeState.Null);
                         this.State = NodeState.Waiting;
+                        LogThis("#Multithreading# NodeState.Waiting"); // 29.11.2023 Nagel+- TEST
                         this.OnNodeStateChanged();
                     }
+                    else
+                    {
+                        LogThis("#Multithreading# not NodeState.Waiting"); // 29.11.2023 Nagel+- TEST
+                    }
+                    */ // 05.01.2024 Nagel-
+                    LogThis("#Multithreading# not triggered, still running"); // 05.01.2024 Nagel+-
                 }
             }
         }
@@ -2345,12 +2432,14 @@ namespace LogicalTaskTree
                 if ((this.CancellationToken.IsCancellationRequested)
                   || (this.LastLogicalState == NodeLogicalState.UserAbort))
                 {
+                    LogThis("#Multithreading# is cancelling"); // 29.11.2023 Nagel+- TEST
                     break;
                 }
                 if ((this.State & NodeState.CanStart) > 0 && !(this.LogicalState == NodeLogicalState.Start))
                 {
                     this.IsRunRequired = false;
                     // this.RunAsync(this.LastExecutingTreeEvent); // 13.08.2018
+                    LogThis("#Multithreading# calling RunAsync"); // 29.11.2023 Nagel+- TEST
                     this.RunAsync(source);
                 }
                 if (this.IsRunRequired)
@@ -2358,23 +2447,43 @@ namespace LogicalTaskTree
                     Thread.Sleep(this.AppSettings.TryRunAsyncSleepTime);
                     if (waitingLoopCounter++ > MAXWAITINGLOOPS)
                     {
-                        if (this is NodeParent || this.LogicalState == NodeLogicalState.Done)
+                        if (this is NodeParent || this.LogicalState == NodeLogicalState.Done
+                            || this.LogicalState == NodeLogicalState.UserAbort)
                         {
+                            LogThis("#Multithreading# timeout: NodeParent or Aborted"); // 29.11.2023 Nagel+- TEST
                             this.State = NodeState.None; // TODO: State-Mischmasch sauber lösen.
                         }
                         else
                         {
                             // Hier nur loggen, kein Abbruch mit Exception.
-                            InfoController.GetInfoPublisher().Publish(this,
-                                String.Format($"InternalError Id/Name: {this.IdInfo}, State: {this.State}, LogicalState: {this.LogicalState}"),
-                                InfoType.NoRegex
-                            );
+                            LogThis("#Multithreading# timeout: InternalError"); // 29.11.2023 Nagel+- ausgelagert
                             this.State = NodeState.InternalError;
+                            this.IsRunRequired = false; //  06.01.2024 Nagel+-
                         }
                     }
                 }
             } while (this.IsRunRequired);
         }
+
+        // 02.12.2023 Nagel+
+        private void LogThis(string signature, bool statistics = true)
+        {
+            // 04.12.2023 Nagel+
+            // return;
+            // 04.12.2023 Nagel-
+            if (!statistics)
+            {
+                InfoController.GetInfoPublisher().Publish(this,
+                   String.Format($"Id/Name: {this.IdInfo,-30}, State: {this.State.ToString(),-15}, LogicalState: {this.LogicalState.ToString(),-10} {signature}"),
+                   InfoType.Debug
+                );
+            }
+            else
+            {
+                Statistics.Inc(String.Format($"Id/Name: {this.IdInfo,-30}, State: {this.State.ToString(),-15}," + $" LogicalState: {this.LogicalState.ToString(),-10} {signature}"));
+            }
+        }
+        // 02.12.2023 Nagel-
 
         /// <summary>
         /// Action für den Run eines (Teil-)Baums.
@@ -2385,7 +2494,7 @@ namespace LogicalTaskTree
             {
                 int emergencyHalt = 0;
                 while ((this.State & (NodeState.CanStart | NodeState.Working)) == 0
-                  && !this.CancellationToken.IsCancellationRequested) // Warten wegen NodeConnectoren
+                  && !this.CancellationToken.IsCancellationRequested) // Warten wegen NodeConnector
                 { // Achtung: wichtig ist, dass auch NodeState.Working abgeprüft wird, da sonst DialogChecker auf Exceptions laufen.
                     Thread.Sleep(SLEEPMILLISECONDS);
                     if (++emergencyHalt > 100)
@@ -2563,6 +2672,15 @@ namespace LogicalTaskTree
                         TreeEvent treeEvent = new TreeEvent(TreeEvent.GetUserEventNamesForInternalEventNames(eventName),
                           source.Id, sender.Id, this.Name, this.Path, source.LastNotNullLogical, source.LastLogicalState,
                           source.GetResultsFromResultList(), source.GetResultsFromEnvironment());
+                        this.SetTreeParamsParentView(); // 14.01.2024 Nagel+-
+
+                        //string parentView = this.ParentView == null ? "null" : "not null";
+                        //string treeParamsParentView = this.TreeParams.ParentView == null ? "null" : "not null";
+                        //InfoController.GetInfoPublisher().Publish(this,
+                        //    String.Format("#Position# calling worker.Exec this.Id: {0}, this.ParentView: {1} this.TreeParams.ParentView: {2}",
+                        //    this.Id, parentView, treeParamsParentView),
+                        //    InfoType.Debug);
+
                         worker.Exec(this.TreeParams, this.Id, treeEvent, false);
                         if (worker.WorkerState != NodeWorkerState.Invalid)
                         {

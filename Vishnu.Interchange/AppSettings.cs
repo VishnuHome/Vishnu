@@ -56,6 +56,13 @@ namespace Vishnu.Interchange
         #region Properties (alphabetic)
 
         /// <summary>
+        /// Bei True werden Knoten, die nicht auf kooperativen Cancel reagieren (können)
+        /// durch "Abort()" hart abgebrochen.
+        /// Default: true.
+        /// </summary>
+        public bool AbortingAllowed { get; set; }
+
+        /// <summary>
         /// Bei True werden Null-Ergebnisse von Checkern wie True oder False-Ergebnisse behandelt.
         /// Sie setzen dann z.B. Exceptions zurück, was bei erneutem Auftreten dieser Exceptions
         /// zu erneutem Auslösen von Workern führt.
@@ -471,6 +478,7 @@ namespace Vishnu.Interchange
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugin"),
                 AppDomain.CurrentDomain.BaseDirectory
             };
+            this.AbortingAllowed = this.GetValue<bool>("AbortingAllowed", true);
             this.AcceptNullResults = this.GetValue<bool>("AcceptNullResults", false);
             string lastUserAssemblyDirectoryDefault = "UserAssemblies";
             string? vishnu_root = this.GetStringValue("Vishnu_Root", null);

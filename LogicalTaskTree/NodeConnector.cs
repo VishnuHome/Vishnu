@@ -313,10 +313,15 @@ namespace LogicalTaskTree
         /// <returns>True, wenn gestartet wurde.</returns>
         public override void UserRun()
         {
+            /* // 13.01.2024 Nagel+ auskommentiert
             if (this.ParentView != null)
             {
                 this.ThreadUpdateParentView(this.ParentView); // temporär auf die ParentView des aktuellen NodeConnectors umschießen.
             }
+            */ // 13.01.2024 Nagel-
+
+
+
             if (!(this._node is NodeConnector))
             {
                 if (this._node?.LastResult != null)
@@ -380,6 +385,7 @@ namespace LogicalTaskTree
         /// <param name="source">Auslösendes TreeEvent oder null.</param>
         protected override void DoRun(TreeEvent? source)
         {
+            base.DoRun(source); // Springt direkt in LogicalNode.DoRun, da NodeParent DoRun nicht überschreibt.
             // hier keine Funktion - nur in der referenzierten SingleNode.
         }
 

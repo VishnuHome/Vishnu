@@ -96,7 +96,7 @@ namespace Vishnu.ViewModel
                 if (disposing)
                 {
                     // Aufräumarbeiten durchführen und dann beenden.
-                    if (this.Children?.Count > 0)
+                    if (this.Children.Count > 0)
                     {
                         foreach (LogicalNodeViewModel logicalNodeViewModel in this.Children)
                         {
@@ -109,6 +109,7 @@ namespace Vishnu.ViewModel
                                 catch { }
                             }
                         }
+                        /* 04.12.2023 Nagel+
                         // Der BusinessLogic-Knoten darf hier nur freigegeben aber nicht
                         // komplett ausgenullt werden.
                         // Derselbe BusinessLogic-Knoten kann von mehreren Generationen ViewModels
@@ -119,7 +120,20 @@ namespace Vishnu.ViewModel
                             this.ReleaseBLNode();
                         }
                         catch { }
+                        */ //04.12.2023 Nagel-
                     }
+                    // 04.12.2023 Nagel+
+                    // Der BusinessLogic-Knoten darf hier nur freigegeben aber nicht
+                    // komplett ausgenullt werden.
+                    // Derselbe BusinessLogic-Knoten kann von mehreren Generationen ViewModels
+                    // referenziert werden!
+                    try
+                    {
+                        // falsch, s.o. this.UnsetBLNode();
+                        this.ReleaseBLNode();
+                    }
+                    catch { }
+                    // 04.12.2023 Nagel-
                 }
                 this._disposed = true;
             }
@@ -909,10 +923,10 @@ namespace Vishnu.ViewModel
         }
         */
 
-        /// <summary>
-        /// Liefert true, wenn die Funktion ausführbar ist.
-        /// </summary>
-        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+                    /// <summary>
+                    /// Liefert true, wenn die Funktion ausführbar ist.
+                    /// </summary>
+                    /// <returns>True, wenn die Funktion ausführbar ist.</returns>
         public override bool CanReloadTaskTreeExecute()
         {
             return true; // !(this._myLogicalNode is NodeConnector); // && this._myLogicalNode.CanTreeStart;
@@ -1808,13 +1822,13 @@ namespace Vishnu.ViewModel
         */
 
         /// <summary>
-        /// Speichert die Bildschirmposition des zugehörigen
-        /// Controls in der Geschäftslogik.
+        /// Speichert eine Referenz auf das zugehörige
+        /// Control in der Geschäftslogik.
         /// </summary>
         /// <param name="parentView">Das zugehörige Control.</param>
         protected override void ParentViewToBL(FrameworkElement parentView)
         {
-            this._myLogicalNode.ParentView = this.ParentView;
+            this._myLogicalNode.ParentView = parentView;
         }
 
         /// <summary>
@@ -1894,11 +1908,7 @@ namespace Vishnu.ViewModel
                             this.VisualState = VisualNodeState.None;
                             break;
                         case NodeState.Triggered:
-                            if (this._myLogicalNode.LogicalState == NodeLogicalState.UserAbort)
-                            {
-                                this.VisualState = VisualNodeState.Aborted;
-                            }
-                            else
+                            if (this._myLogicalNode.LogicalState != NodeLogicalState.UserAbort)
                             {
                                 if (this._myLogicalNode.Trigger != null && this._myLogicalNode.Trigger is TriggerShell
                                   && ((TriggerShell)this._myLogicalNode.Trigger).HasTreeEventTrigger)
@@ -1910,10 +1920,16 @@ namespace Vishnu.ViewModel
                                     this.VisualState = VisualNodeState.Scheduled;
                                 }
                             }
+                            else
+                            {
+                                this.VisualState = VisualNodeState.Aborted;
+                            }
                             break;
+                        /* 05.01.2024 Nagel+ // wird nie erreicht, da NodeState.Waiting nie gesetzt wird
                         case NodeState.Waiting:
                             this.VisualState = VisualNodeState.Waiting;
                             break;
+                        */ // 05.01.2024 Nagel-
                         case NodeState.Working:
                             this.VisualState = VisualNodeState.Working;
                             break;

@@ -44,17 +44,13 @@ namespace LogicalTaskTree
                 Directory.CreateDirectory(localConfigurationDirectory);
             }
             string localConfigurationPath = Path.Combine(localConfigurationDirectory ?? "", tree.Id + "_Configuration.xml");
-            //foreach (System.Windows.Window win in System.Windows.Application.Current.Windows)
-            //{
-            //    string name = win.Name;
-            //}
             XElement xmlTree = ConfigurationManager.Tree2XML(tree);
             XElement configXml = new XElement("Configuration");
             configXml.Add(new XElement("Path", localConfigurationPath),
                           new XElement("Timestamp", DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss")),
                           new XElement("StartTreeOrientation", treeOrientationState.ToString()),
-                          new XElement("WindowLeft", windowAspects.WindowLeft.ToString()),
-                          new XElement("WindowTop", windowAspects.WindowTop.ToString()),
+                          new XElement("WindowCenterX", windowAspects.WindowCenterX.ToString()),
+                          new XElement("WindowCenterY", windowAspects.WindowCenterY.ToString()),
                           new XElement("WindowWidth", windowAspects.WindowWidth.ToString()),
                           new XElement("WindowHeight", windowAspects.WindowHeight.ToString()),
                           new XElement("WindowScrollLeft", windowAspects.WindowScrollLeft.ToString()),
@@ -62,6 +58,7 @@ namespace LogicalTaskTree
                           new XElement("WindowZoom", windowAspects.WindowZoom.ToString()),
                           new XElement("IsScrollbarVisible", windowAspects.IsScrollbarVisible.ToString()),
                           new XElement("ActTabControlTab", windowAspects.ActTabControlTab.ToString()),
+                          new XElement("ActScreenIndex", windowAspects.ActScreenIndex.ToString()),
                           xmlTree);
             XDocument? xmlDoc = new XDocument();
             xmlDoc.Add(configXml);
@@ -115,10 +112,12 @@ namespace LogicalTaskTree
                             = (TreeOrientation)Enum.Parse(typeof(TreeOrientation), startTreeOrientation.Value);
                     }
 
-                    XElement? xWindowLeft = xDoc.Descendants(nameSpace + "WindowLeft")?.FirstOrDefault();
-                    double windowLeft = String.IsNullOrEmpty(xWindowLeft?.Value) ? 0.0 : Convert.ToDouble(xWindowLeft.Value);
-                    XElement? xWindowTop = xDoc.Descendants(nameSpace + "WindowTop")?.FirstOrDefault();
-                    double windowTop = String.IsNullOrEmpty(xWindowTop?.Value) ? 0.0 : Convert.ToDouble(xWindowTop.Value);
+                    XElement? xWindowCenter = xDoc.Descendants(nameSpace + "WindowCenterX")?.FirstOrDefault();
+                    double windowCenterX =
+                        String.IsNullOrEmpty(xWindowCenter?.Value) ? 0.0 : Convert.ToDouble(xWindowCenter.Value);
+                    XElement? yWindowCenter = xDoc.Descendants(nameSpace + "WindowCenterY")?.FirstOrDefault();
+                    double windowCenterY =
+                        String.IsNullOrEmpty(yWindowCenter?.Value) ? 0.0 : Convert.ToDouble(yWindowCenter.Value);
                     XElement? xWindowWidth = xDoc.Descendants(nameSpace + "WindowWidth")?.FirstOrDefault();
                     double windowWidth = String.IsNullOrEmpty(xWindowWidth?.Value) ? 0.0 : Convert.ToDouble(xWindowWidth.Value);
                     XElement? xWindowHeight = xDoc.Descendants(nameSpace + "WindowHeight")?.FirstOrDefault();
@@ -133,18 +132,21 @@ namespace LogicalTaskTree
                     bool isScrollbarVisible = String.IsNullOrEmpty(xIsScrollbarVisible?.Value) ? true : Convert.ToBoolean(xIsScrollbarVisible.Value);
                     XElement? xActTabControlTab = xDoc.Descendants(nameSpace + "ActTabControlTab")?.FirstOrDefault();
                     int actTabControlTab = String.IsNullOrEmpty(xActTabControlTab?.Value) ? 0 : Convert.ToInt32(xActTabControlTab.Value);
+                    XElement? xActScreenIndex = xDoc.Descendants(nameSpace + "ActScreenIndex")?.FirstOrDefault();
+                    int actScreenIndex = String.IsNullOrEmpty(xActScreenIndex?.Value) ? 0 : Convert.ToInt32(xActScreenIndex.Value);
                     GenericSingletonProvider.GetInstance<AppSettings>().VishnuWindowAspects
                         = new WindowAspects()
                         {
-                            WindowLeft = windowLeft,
-                            WindowTop = windowTop,
+                            WindowCenterX = windowCenterX,
+                            WindowCenterY = windowCenterY,
                             WindowWidth = windowWidth,
                             WindowHeight = windowHeight,
                             WindowScrollLeft = windowScrollLeft,
                             WindowScrollTop = windowScrollTop,
                             WindowZoom = windowZoom,
                             IsScrollbarVisible = isScrollbarVisible,
-                            ActTabControlTab = actTabControlTab
+                            ActTabControlTab = actTabControlTab,
+                            ActScreenIndex = actScreenIndex
                         };
 
                     ConfigurationManager._nodeConfiguration.Clear();
