@@ -81,9 +81,12 @@ namespace Vishnu.Interchange
         }
 
         /// <summary>
-        /// Absolute Bildschirmposition der Mitte des beinhaltenden Controls.
+        /// Absolute Bildschirmposition der Mitte des zugehörigen Controls.
         /// </summary>
-        /// <returns>Absolute Bildschirmposition der Mitte des Parent-Controls.</returns>
+        /// <param name="frameworkElement">Das Element, dessen Position ermittelt werden soll.</param>
+        /// <param name="failOnErrors">Bei false (default) wird bei NullReferenceException eine Ersatzposition zurück geliefert.</param>
+        /// <returns>Absolute Bildschirmposition der Mitte des zugehörigen Controls.</returns>
+        /// <exception cref="NullReferenceException">Tritt auf, wenn das Element selbst nicht sichtbar ist.</exception>
         public static Point GetFrameworkElementAbsoluteScreenPosition(
             FrameworkElement? frameworkElement, bool failOnErrors = false)
         {

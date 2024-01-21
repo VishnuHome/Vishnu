@@ -969,13 +969,17 @@ ERLEDIGT: Funktion "LogMemory" beim Aufruf von "Pause Tree" hinzugefügt.
 ERLEDIGT: Parameter "AbortingAllowed" hinzugefügt.
 
 Stand: 15.01.2024 Version 8.0.4.0 (Discovery)
+
 ERLEDIGT: Komplettüberarbeitung der Positionierung von Fenstern, WPF-Dialog-Checkern und Meldungen
           auf einem und mehreren Bildschirmen.
           Dabei Berücksichtigung verschiedener Bildschirmauflösungen und Skalierungen.
 ERLEDIGT: Worker wurden bei existierenden NodeConnectoren auf SingleNodes mehrfach gestartet.
 ERLEDIGT: Fehler: Tree anhalten, dann Run oder Break => Deadlock.
 
-Stand: 19.01.2024 Version 8.1.0.0 (Discovery)
+Stand: 21.01.2024 Version 8.1.0.0 (Progress)
+
+Stand: 13.02.2024 Version 8.2.0.0 (Arrival)
+
 -------------------------------------------------------------------------------------------------------------
 
 ###################
