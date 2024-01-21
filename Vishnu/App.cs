@@ -258,7 +258,7 @@ namespace Vishnu
             // App._businessLogic = new LogicalTaskTree.LogicalTaskTree(new TreeParameters("Tree 1", null), new MixedTestJobProvider());
 
             // Die für den gesamten Tree gültigen Parameter
-            TreeParameters treeParameters = new TreeParameters(String.Format($"Tree {++LogicalTaskTree.LogicalTaskTree.TreeId}"), null);
+            TreeParameters treeParameters = new TreeParameters(String.Format($"Tree {++LogicalTaskTree.LogicalTaskTree.TreeId}"));
 
             // Der Produktions-JobProvider mit extern über XML definierten Jobs:
             SingleInstanceApplication._businessLogic = new LogicalTaskTree.LogicalTaskTree(treeParameters, new ProductionJobProvider());

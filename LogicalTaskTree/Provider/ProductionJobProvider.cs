@@ -59,7 +59,7 @@ namespace LogicalTaskTree.Provider
                 catch (Exception ex)
                 {
                     throw new ApplicationException(String.Format($"Ladefehler auf {jobXml} ({Directory.GetCurrentDirectory()}" +
-                        $" {(System.Reflection.Assembly.GetExecutingAssembly().Location)})\r\n{ex.Message}"));
+                    $" {(System.Reflection.Assembly.GetExecutingAssembly().Location)})\r\n{ex.Message}"));
                 }
             }
         }

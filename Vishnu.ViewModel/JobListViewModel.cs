@@ -194,6 +194,10 @@ namespace Vishnu.ViewModel
 
         private bool canRunTaskTreeExecute()
         {
+            if (LogicalNode.IsTreeFlushing || LogicalNode.IsTreePaused)
+            {
+                return false;
+            }
             return true;
         }
 
@@ -216,7 +220,11 @@ namespace Vishnu.ViewModel
             // bool canStart = this._myLogicalNode.CanTreeStart; // Falsch, da der Button die Bedeutung wechselt
             // und daher immer gestartet werden können muss.
             // return canStart;
-            return true; // so ist's korrekt!
+            if (LogicalNode.IsTreeFlushing || LogicalNode.IsTreePaused)
+            {
+                return false;
+            }
+            return true;
         }
 
         private void breakTaskTreeExecute(object? parameter)
@@ -227,8 +235,12 @@ namespace Vishnu.ViewModel
 
         private bool canBreakTaskTreeExecute()
         {
-            bool canStart = this._myLogicalNode.CanTreeStart;
+            //bool canStart = this._myLogicalNode.CanTreeStart;
             //return !canStart;
+            if (LogicalNode.IsTreeFlushing || LogicalNode.IsTreePaused)
+            {
+                return false;
+            }
             return true;
         }
 

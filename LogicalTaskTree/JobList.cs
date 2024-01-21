@@ -36,7 +36,7 @@ namespace LogicalTaskTree
         /// <summary>
         /// Standard-Konstruktor.
         /// </summary>
-        public UndefinedJobListClass() : base(new TreeParameters("UNDEFINED", null),
+        public UndefinedJobListClass() : base(new TreeParameters("UNDEFINED"),
             new JobProviderBase.UndefinedJobProvider()) { }
     }
 

@@ -1,6 +1,7 @@
 ﻿using NetEti.ApplicationControl;
 using NetEti.MultiScreen;
 using System;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Threading;
 using System.Xml.Linq;
@@ -20,6 +21,28 @@ namespace Vishnu.Interchange
     public class TreeParameters
     {
         /// <summary>
+        /// Die absolute Bildschirmposition der Mitte des beinhaltenden Controls.
+        /// </summary>
+        public Point LastParentViewAbsoluteScreenPosition
+        {
+            get
+            {
+                if (_lastParentViewAbsoluteScreenPosition == null)
+                {
+                    _lastParentViewAbsoluteScreenPosition = GetParentViewAbsoluteScreenPosition();
+                }
+                return (Point)_lastParentViewAbsoluteScreenPosition;
+            }
+            set
+            {
+                if (value != _lastParentViewAbsoluteScreenPosition)
+                {
+                    _lastParentViewAbsoluteScreenPosition = value;
+                }
+            }
+        }
+
+        /// <summary>
         /// Name des Trees.
         /// </summary>
         public string Name { get; set; }
@@ -32,76 +55,46 @@ namespace Vishnu.Interchange
         /// <summary>
         /// Das zugehörige Control.
         /// </summary>
-        public FrameworkElement? ParentView { get; set; }
+        public FrameworkElement? ParentView {
+            get
+            {
+                return this._parentView;
+            }
+            set
+            {
+                this._parentView = value;
+                this._lastParentViewAbsoluteScreenPosition =
+                    GetParentViewAbsoluteScreenPosition();
+            }
+        }
 
         /// <summary>
-        /// Absolute Bildschirmposition des beinhaltenden Controls.
+        /// Absolute Bildschirmposition der Mitte des beinhaltenden Controls.
         /// </summary>
         /// <returns>Absolute Bildschirmposition der Mitte des Parent-Controls.</returns>
         public virtual Point GetParentViewAbsoluteScreenPosition()
         {
-            if (this.ParentView == null)
-            {
-                // Tritt auf, wenn der feuernde Knoten selbst nicht sichtbar ist,
-                // also außerhalb des Bildschirms (clipping) oder in einem collapsed SubJob.
-                return GetFallbackScreenPosition();
-            }
-            if (!this.ParentView.Dispatcher.CheckAccess())
-            {
-                return (Point)this.ParentView.Dispatcher.Invoke(new Func<Point>(GetParentViewAbsoluteScreenPosition),
-                    DispatcherPriority.Normal);
-            }
-            Rect rect = this.ParentView.GetAbsolutePlacement();
-            if (!rect.IsEmpty)
-            {
-                Point point = new Point(rect.Left, rect.Top);
-                return NetEti.MultiScreen.ScreenInfo.ClipToAllScreens(point, 50, 150);
-            }
-            else
-            {
-                // kann vorkommen: -job=%Vishnu_Root%/VishnuHome/Tests/TestJobs/HeavyDuty/check_Treshold_50_100
-                //                 --StartWithJobs=true
-                //                 dann sofort ins 'Logical Task Tree'-Fenster umschalten und z.B. Node2 neu starten.
-                // Zusatzhinweis:  die DispatcherPriority bei this.ParentView.Dispatcher.Invoke zu ändern, bringt nichts!
-                return GetFallbackScreenPosition();
-            }
+            return WindowAspects.GetFrameworkElementAbsoluteScreenPosition(
+                this.ParentView, false);
         }
 
         /// <summary>
-        /// Notfallroutine - wird angesprungen, wenn für den aktuellen Knoten
-        /// keine Bildschirmposition ermittelt werden kann.
-        /// Liefert die zum MainWindow relative Position auf dem aktuellen Bisldschirm.
-        /// </summary>
-        /// <returns>Zum MainWindow relative Position auf dem aktuellen Bisldschirm.</returns>
-        public virtual Point GetFallbackScreenPosition()
-        {
-            /*
-            // Zweitbeste Lösung: auf dem aktuellen Bildschirm zentrieren:
-            ScreenInfo mainWindowScreenInfo = ScreenInfo.GetMainWindowScreenInfo();
-            Point center = 
-                new Point(mainWindowScreenInfo.Bounds.X + mainWindowScreenInfo.WorkingArea.Width / 2.0,
-                mainWindowScreenInfo.Bounds.Y + mainWindowScreenInfo.WorkingArea.Height / 2.0);
-            */
-
-            // Besser: relativ zum MainWindow zentrieren:
-            Rect actMainWindowMeasures = WindowAspects.GetMainWindowMeasures();
-            double left = actMainWindowMeasures.Left;
-            double top = actMainWindowMeasures.Top;
-            double width = actMainWindowMeasures.Width;
-            double height = actMainWindowMeasures.Height;
-            Point point = new Point(left + width / 2.0, top + height / 2.0);
-            return NetEti.MultiScreen.ScreenInfo.ClipToAllScreens(point, 50, 150);
-        }
-
-        /// <summary>
-        /// Konstruktor - übernimmt das Parent-Control.
+        /// Konstruktor - übernimmt den logischen Namen des Trees und das Parent-Control.
         /// </summary>
         /// <param name="name">Der logische Name des Trees.</param>
         /// <param name="parentView">Das Parent-Control.</param>
-        public TreeParameters(string name, FrameworkElement? parentView)
+        public TreeParameters(string name, FrameworkElement? parentView) : this(name)
+        {
+            this.ParentView = parentView; // Wird von JobList.ReloadBranch() aufgerufen.
+        }
+
+        /// <summary>
+        /// Konstruktor - übernimmt den logischen Namen des Trees.
+        /// </summary>
+        /// <param name="name">Der logische Name des Trees.</param>
+        public TreeParameters(string name)
         {
             this.Name = name;
-            this.ParentView = parentView; // hier immer null, wird später gesetzt.
         }
 
         /// <summary>
@@ -158,6 +151,9 @@ namespace Vishnu.Interchange
             return (ScreenInfo)Application.Current.Dispatcher.Invoke(
                 new Func<ScreenInfo>(ThreadAccessMainWindowScreenInfoOnGuiDispatcher), DispatcherPriority.Normal);
         }
+
+        private FrameworkElement? _parentView;
+        private Point? _lastParentViewAbsoluteScreenPosition;
 
         /// <summary>
         /// Liefert threadsafe Position und Maße das MainWindow.

@@ -10,6 +10,8 @@ using NetEti.CustomControls;
 using System.Windows.Media;
 using System.Collections.Generic;
 using System.Windows.Media.TextFormatting;
+using NetEti.ApplicationControl;
+using System.Security.Cryptography.Xml;
 
 namespace Vishnu.WPF_UI
 {
@@ -189,7 +191,11 @@ namespace Vishnu.WPF_UI
                 if (this.MainWindowAspects.ActScreenIndex != ScreenInfo.GetActualScreenInfoIndex(this))
                 {
                     // 09.01.2024 Nagel+- TEST
-                    throw new ApplicationException("this.MainWindowAspects.ActScreenIndex != ScreenInfo.GetActualScreenInfoIndex(this)");
+                    // throw new ApplicationException(
+                    // "this.MainWindowAspects.ActScreenIndex != ScreenInfo.GetActualScreenInfoIndex(this)");
+                    InfoController.GetInfoPublisher().Publish(this,
+                        "Gespeicherte Bildschirmdaten konnten nicht wiederhergestellt werden,"
+                        + " der adressierte Bildschirm ist aktuell nicht verfügbar.", InfoType.NoRegex);
                 }
             }
             double xFactor = 1.0;

@@ -45,7 +45,7 @@ namespace LogicalTaskTree
         public void Exec(TreeParameters treeParameters, string nodeId, TreeEvent eventParameters, bool isResetting)
         {
             WorkerArguments args;
-            System.Windows.Point winPoint = treeParameters.GetParentViewAbsoluteScreenPosition();
+            System.Windows.Point winPoint = treeParameters.LastParentViewAbsoluteScreenPosition;
             if (this.Trigger != null)
             {
                 args = new WorkerArguments(0, treeParameters.ToString(), nodeId, eventParameters, null, winPoint);
@@ -273,7 +273,7 @@ namespace LogicalTaskTree
                         workerArguments = workerArguments.Predecessor;
                         workerArguments.CallCounter *= -1; // Ein negativer CallCounter heist Reset. Der Absolutwert entspricht dem bisher höchsten Aufrufwert.
                     }
-                    this.exec(workerArguments.CallCounter, new TreeParameters(workerArguments.TreeInfo, null),
+                    this.exec(workerArguments.CallCounter, new TreeParameters(workerArguments.TreeInfo),
                         workerArguments.NodeInfo, workerArguments.TreeEventInfo, workerArguments.Position);
                 }
             }

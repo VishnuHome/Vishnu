@@ -1332,7 +1332,8 @@ namespace LogicalTaskTree
             this.IsSnapshotDummy = true;
             this.Id = "Dummy";
             this.Name = "Dummy";
-            this.TreeParams = treeParams;
+            // 18.01.2024 Nagel+ this.TreeParams = treeParams;
+            this.TreeParams = new TreeParameters(treeParams.Name); // 18.01.2024 Nagel- entkoppeln
             this.AppSettings = GenericSingletonProvider.GetInstance<AppSettings>();
             this.DebugMode = this.AppSettings.DebugMode;
             this.RootJobList = rootJobList;
@@ -1383,11 +1384,12 @@ namespace LogicalTaskTree
             this.Mother = mother;
             if (treeParams != null)
             {
-                this.TreeParams = treeParams;
+                // 18.01.2024 Nagel+ this.TreeParams = treeParams;
+                this.TreeParams = new TreeParameters(treeParams.Name); // 18.01.2024 Nagel- entkoppeln
             }
             else
             {
-                this.TreeParams = new TreeParameters("undefined", null);
+                this.TreeParams = new TreeParameters("undefined");
             }
             if (rootJobList != null)
             {
@@ -1731,7 +1733,9 @@ namespace LogicalTaskTree
         public JobList TreeRootJobList;
 
         /// <summary>
-        /// Zusätzliche Parameter, die für den gesamten Tree Gültigkeit haben oder null.
+        /// Zusätzliche Parameter, einige, die für den gesamten Tree
+        /// Gültigkeit haben und einige knotenspezifische Parameter
+        /// oder null.
         /// </summary>
         public TreeParameters TreeParams { get; private set; }
 

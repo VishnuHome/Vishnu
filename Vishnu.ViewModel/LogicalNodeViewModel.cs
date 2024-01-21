@@ -2065,7 +2065,7 @@ namespace Vishnu.ViewModel
             this.TreeRefreshLocker = new object();
             this.SubStateLocker = new object();
             this._myLogicalNode = UndefinedLogicalNodeClass.UndefinedLogicalNode;
-            this._treeParams = new TreeParameters("", null);
+            this._treeParams = new TreeParameters("");
             this.RootLogicalTaskTreeViewModel = new(this._treeParams);
             this.UIMain = new FrameworkElement();
             this.UIDispatcher = Dispatcher.CurrentDispatcher;

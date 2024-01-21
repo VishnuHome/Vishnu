@@ -283,6 +283,10 @@ namespace Vishnu.ViewModel
         private bool canRunTaskTreeExecute()
         {
             //bool canStart = this._myLogicalNode.CanTreeStart;
+            if (LogicalNode.IsTreeFlushing || LogicalNode.IsTreePaused)
+            {
+                return false;
+            }
             return true;
         }
 
@@ -317,6 +321,10 @@ namespace Vishnu.ViewModel
         private bool canRunOrBreakTaskTreeExecute()
         {
             //bool canStart = this._myLogicalNode.CanTreeStart;
+            if (LogicalNode.IsTreeFlushing || LogicalNode.IsTreePaused)
+            {
+                return false;
+            }
             return true;
         }
 
@@ -335,8 +343,12 @@ namespace Vishnu.ViewModel
 
         private bool canBreakTaskTreeExecute()
         {
-            bool canStart = this._myLogicalNode.CanTreeStart;
+            //bool canStart = this._myLogicalNode.CanTreeStart;
             //return !canStart;
+            if (LogicalNode.IsTreeFlushing || LogicalNode.IsTreePaused)
+            {
+                return false;
+            }
             return true;
         }
 

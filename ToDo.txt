@@ -967,10 +967,15 @@ ERLEDIGT: Der Zusatz "(registered)" wurde im Log unter Umständen mehrfach angeze
 ERLEDIGT: Positionierung bei mehreren Bildschirmen für Hauptfenster und Meldungen überarbeitet.
 ERLEDIGT: Funktion "LogMemory" beim Aufruf von "Pause Tree" hinzugefügt.
 ERLEDIGT: Parameter "AbortingAllowed" hinzugefügt.
-ERLEDIGT: Worker wurden bei existierenden NodeConnectoren auf SingleNodes mehrfach gestartet - korrigiert.
 
 Stand: 15.01.2024 Version 8.0.4.0 (Discovery)
+ERLEDIGT: Komplettüberarbeitung der Positionierung von Fenstern, WPF-Dialog-Checkern und Meldungen
+          auf einem und mehreren Bildschirmen.
+          Dabei Berücksichtigung verschiedener Bildschirmauflösungen und Skalierungen.
+ERLEDIGT: Worker wurden bei existierenden NodeConnectoren auf SingleNodes mehrfach gestartet.
+ERLEDIGT: Fehler: Tree anhalten, dann Run oder Break => Deadlock.
 
+Stand: 19.01.2024 Version 8.1.0.0 (Discovery)
 -------------------------------------------------------------------------------------------------------------
 
 ###################
@@ -1000,8 +1005,18 @@ Hinweise:
 ###################
 
 --- TODO ----------------------------------------------------------------------------------------------------
-Fehler: Tree anhalten, dann Break => Deadlock
+Fehler: Nach dem Umschalten zum Jobs-Tab und zurück positioniert Vishnu das Tree-Fenster nicht mehr korrekt.
+	-job="%Vishnu_Root%\ReadyBin\Vishnu.bin\Jobs\CheckServers" --Vishnu_Root=../../../../../.. --NoWorkers=true
+	--DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false
+	-Autostart=true -StartWithJobs=false --FlatNodeListFilter=JobConnector|NodeConnector|NodeList
+	--NoWorkers=false --AbortingAllowed=false
+	in Extensions.cs System.NullReferenceException bei
+     Matrix matrix = PresentationSource.FromVisual(element).CompositionTarget.TransformToDevice;
+
 Tests ohne AddOn, alles leermachen (delete_binaries), ReadyBin löschen
+CheckWeatherHistory zeigt am 21.01.2024 (und auch vorerst an den Folgetagen)
+	in SaasFee bis inklusive 12:00 Uhr Mittags noch Nachtsymbole an.
+	Ist das ein Fehler oder ein Feature (Sonnenstunden/Bergabdeckung)?
 openVishnu7 mit VS2022 pre, Vishnu5 mit VS2022 pre
 free mini tetris
 NetWorkMappingsRefresher debuggen
@@ -1188,6 +1203,22 @@ Fehler: CheckTreeEventTwoJobConnectors: True, Exception,
 -------------------------------------------------------------------------------------------------------------
 Allgemeinere Ideen, etc.
 -------------------------------------------------------------------------------------------------------------
+Vishnu als Signal/Interrupt-gesteuertes System
+	Motivation: die klassische Checker-Ansteuerung erfolgt über Polling durch TimerTrigger.
+		Das verursacht eine vergleichsweise hohe Systemlast.
+		Besser sind oft Trigger, die auf bestimmte Signale hin feuern, wie FileWatcherTrigger
+		und auch TreeEventTrigger.
+	Idee zur Realisierung: analog zum FileWatcherTrigger einen neuen Trigger entwickeln,
+		Arbeitstitel: SignalApiTrigger. Dieser Trigger exportiert ein Interface, welches
+		von einem externen Signalgeber implementiert werden muss, Arbeitstitel: ISignalApi.
+		Dieses Interface muss zumindest einEvent veröffentlichen, in das sich der Trigger
+		einhängen kann.	Zusätzlich muss dieser Trigger einen externen Signalgeber als Slave
+		übergeben	bekommen.
+Knoten, der immer neu gestartet wird, wenn er greade zuende gelaufen ist.
+	Idee zur Realisierung: Der betroffene Knoten toucht immer, wenn er zuende gelaufen
+		ist, eine Steuerdatei. Der Knoten wird dabei durch einen FileWatcherTrigger gestartet,
+		der seinerseits eben diese Steuerdatei beobachtet.
+	
 -------------------------------------------------------------------------------------------------------------
 Integration Tests über asynchrones Logging und KI-Logauswertung
 	Grad der Ähnlichkeiten ermitteln (grün, gelb, rot)
@@ -1411,7 +1442,7 @@ Ziel: Realisierung einer Reaktion auf Ereignisse, deren Ursache weggefallen ist.
   Es scheint, als folgt aus den Vorüberlegungen die Notwendigkeit für ein gesondertes
   Vishnu-Admin-Tool.
   
-  Wie wird verhindert, dass ein beliebeiger User Vishnu Jobs mit echten Checkern ausführen
+  Wie wird verhindert, dass ein beliebiger User Vishnu Jobs mit echten Checkern ausführen
   darf? Job-spezifisch? Knoten-spezifisch?
   Wie wird geregelt, welche Knoten ein User über Snapshot/Viewer starten darf?
   Wie wird geregelt, welche Snapshots ein Benutzer sehen darf? Job-spezifisch, Knoten-spezifisch,
@@ -1423,6 +1454,12 @@ Ziel: Realisierung einer Reaktion auf Ereignisse, deren Ursache weggefallen ist.
 -------------------------------------------------------------------------------------------------
  User-Parameter -job="...\DemoJobs\Simple\ShowRefCheckTreeEventTriggerSnapshot" -UserAssemblyDirectory="...\UserAssemblies" -SingleInstance=false
  
+-job="%Vishnu_Root%\ReadyBin\Vishnu.bin\TestJobs\CheckDateDialog" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --FlatNodeListFilter=JobConnector|NodeConnector|NodeList --NoWorkers=false --AbortingAllowed=false
+
+-job="%Vishnu_Root%\ReadyBin\Vishnu.bin\TestJobs\Tests\TwoDialogNodes" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --FlatNodeListFilter=JobConnector|NodeConnector|NodeList --NoWorkers=false --AbortingAllowed=false
+
+-job="%Vishnu_Root%\ReadyBin\Vishnu.bin\Jobs\CheckAll" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --FlatNodeListFilter=JobConnector|NodeConnector|NodeList --NoWorkers=false --AbortingAllowed=false
+
 -------------------------------------------------------------------------------------------------
 
 Job
