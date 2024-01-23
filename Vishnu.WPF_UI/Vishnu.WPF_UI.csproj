@@ -76,6 +76,7 @@
     <None Remove="Media\finish_flag.png" />
     <None Remove="Media\flash.png" />
     <None Remove="Media\flash_bang.png" />
+    <None Remove="Media\help.png" />
     <None Remove="Media\historical.png" />
     <None Remove="Media\pauseTree.png" />
     <None Remove="Media\play.png" />
@@ -120,6 +121,7 @@
     <Resource Include="Media\finish_flag.png" />
     <Resource Include="Media\flash.png" />
     <Resource Include="Media\flash_bang.png" />
+    <Resource Include="Media\help.png" />
     <Resource Include="Media\historical.png" />
     <Resource Include="Media\pauseTree.png" />
     <Resource Include="Media\play.png" />

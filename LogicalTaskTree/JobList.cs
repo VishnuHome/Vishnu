@@ -41,7 +41,7 @@ namespace LogicalTaskTree
     }
 
     /// <summary>
-    /// Root eines (Teil-)Baums enes LogicalTaskTree.
+    /// Root eines (Teil-)Baums eines LogicalTaskTree.
     /// Hier werden die Logik, Bedingungen, Status für einen (Teil-)Baum verwaltet.
     /// Diese Klasse wird von außen mit der Logik und den Details
     /// (Worker, Namen, boolescher Ausdruck, etc.) bestückt.

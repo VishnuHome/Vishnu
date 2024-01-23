@@ -1209,7 +1209,8 @@ Allgemeinere Ideen, etc.
 -------------------------------------------------------------------------------------------------------------
 Vishnu als Signal/Interrupt-gesteuertes System
 	Motivation: die klassische Checker-Ansteuerung erfolgt über Polling durch TimerTrigger.
-		Das verursacht eine vergleichsweise hohe Systemlast.
+		Dies ist in einer Vielzahl von Aufgabenstellung ein praktikables Vorgehen.
+		Allerdings verursacht es eine vergleichsweise hohe Systemlast und ist in letzter Konsequenz auch ungenau.
 		Besser sind oft Trigger, die auf bestimmte Signale hin feuern, wie FileWatcherTrigger
 		und auch TreeEventTrigger.
 	Idee zur Realisierung: analog zum FileWatcherTrigger einen neuen Trigger entwickeln,

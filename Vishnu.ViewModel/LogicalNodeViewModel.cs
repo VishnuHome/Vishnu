@@ -1828,6 +1828,7 @@ namespace Vishnu.ViewModel
         /// <param name="parentView">Das zugehörige Control.</param>
         protected override void ParentViewToBL(FrameworkElement parentView)
         {
+            // Dies ist die einzige Zuweisung zur LogicalNode.ParentView.
             this._myLogicalNode.ParentView = parentView;
         }
 
