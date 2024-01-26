@@ -12,6 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 using Vishnu.Interchange;
 
@@ -98,14 +99,53 @@ namespace Vishnu.ViewModel
                     content.Add(parameter + ": " + settings[parameter]);
                 }
             }
-            editorCaller.Edit(Path.Combine(Environment.GetEnvironmentVariable("TEMP") ?? "", "VishnuSettings.log"), content);
+            editorCaller.Edit(System.IO.Path.Combine(Environment.GetEnvironmentVariable("TEMP") ?? "", "VishnuSettings.log"), content);
         }
 
-        public static void ShowHelp()
+        /// <summary>
+        /// Zeigt die Vishnu Onlinehilfe an.
+        /// </summary>
+        /// <param name="redirected">True, wenn schon vorher die lokale CHM-Datei versucht wurde; Default: false</param>
+        public static void ShowVishnuOnlineHelp(bool redirected = false)
+        {
+            try { Process.Start("VishnuHelpBrowser.exe"); }
+            catch (Exception ex)
+            {
+                if (!redirected)
+                {
+                    MessageBox.Show(ex.Message, "Kann die Vishnu Onlinehilfe nicht aufrufen, versuche die lokale Hilfe ...",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    ShowLocalVishnuHelp(redirected=true);
+                }
+                else
+                {
+                    MessageBox.Show(ex.Message, "Kann die Vishnu Onlinehilfe nicht aufrufen, gebe auf.",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Zeigt die lokale Vishnu Hilfe (chm) an.
+        /// </summary>
+        /// <param name="redirected">True, wenn schon vorher die Onlinehilfe versucht wurde; Default: false</param>
+        public static void ShowLocalVishnuHelp(bool redirected = false)
         {
             try { Process.Start("Vishnu_doc.chm", ""); }
             catch (Exception ex)
-            { MessageBox.Show(ex.Message, "Kann die Hilfe-Datei nicht aufrufen.", MessageBoxButton.OK, MessageBoxImage.Error); }
+            {
+                if (!redirected)
+                {
+                    MessageBox.Show(ex.Message, "Kann die lokale Vishnu Hilfe nicht aufrufen, versuche die online Hilfe ...",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    ShowVishnuOnlineHelp(redirected = true);
+                }
+                else
+                {
+                    MessageBox.Show(ex.Message, "Kann die lokale Vishnu Hilfe nicht aufrufen, gebe auf.",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         static LogicalTaskTreeManager()
@@ -1575,7 +1615,7 @@ namespace Vishnu.ViewModel
                         foreach (WorkerShell keyKeyTreeWorker in rootJobList.Job.WorkersDictionary[key][keyKey])
                         {
                             // Exe
-                            stringBuilder.Append(delimiter3 + Path.GetFileName(keyKeyTreeWorker.SlavePathName));
+                            stringBuilder.Append(delimiter3 + System.IO.Path.GetFileName(keyKeyTreeWorker.SlavePathName));
                             delimiter3 = ", ";
                         }
                     }

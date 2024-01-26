@@ -8,6 +8,9 @@ using NetEti.ApplicationControl;
 using System.Windows.Threading;
 using System.DirectoryServices.ActiveDirectory;
 using System.Windows;
+using LogicalTaskTree;
+using System.Windows.Xps;
+using System.Threading.Tasks;
 
 namespace Vishnu.ViewModel
 {
@@ -127,6 +130,11 @@ namespace Vishnu.ViewModel
         public ICommand InitSizeCommand { get { return this._initSizeRelayCommand; } }
 
         /// <summary>
+        /// Ruft die Vishnu Onlinehilfe auf.
+        /// </summary>
+        public ICommand ShowVishnuHelpCommand { get { return this._showVishnuHelpRelayCommand; } }
+
+        /// <summary>
         /// Setzt die Fenstergröße unter Berücksichtigung von Maximalgrenzen auf die
         /// Höhe und Breite des Inhalts und die Property SizeToContent auf WidthAndHeight.
         /// </summary>
@@ -147,6 +155,7 @@ namespace Vishnu.ViewModel
             this.TreeVM = logicalTaskTreeViewModel;
             this._dispatcher = Dispatcher;
             this._initSizeRelayCommand = new RelayCommand(initWindowSize);
+            this._showVishnuHelpRelayCommand = new RelayCommand(showVishnuHelpExecute, canShowVishnuHelpExecute);
             this._switchTaskTreeViewRoutedCommand = new RelayCommand(SwitchTakTreeViewRouted);
             this._flatNodeListFilter = flatNodeListFilter;
             treeParams.ViewModelRoot = this;
@@ -189,6 +198,7 @@ namespace Vishnu.ViewModel
 
         private ObservableCollection<JobGroupViewModel> _jobGroupsVM;
         private RelayCommand _initSizeRelayCommand;
+        private RelayCommand _showVishnuHelpRelayCommand;
         private RelayCommand _switchTaskTreeViewRoutedCommand;
         private NodeTypes _flatNodeListFilter;
         private string _windowTitle;
@@ -219,6 +229,25 @@ namespace Vishnu.ViewModel
                 }
             }
             return selectedJobGroups;
+        }
+
+        private void showVishnuHelpExecute(object? parameter)
+        {
+            _ = this.ShowVishnuHelpTask();
+        }
+
+        private bool canShowVishnuHelpExecute()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Zeigt die Vishnu Onlinehilfe an.
+        /// </summary>
+        /// <returns>Task.</returns>
+        public async Task ShowVishnuHelpTask()
+        {
+            await Task.Run(() => LogicalTaskTreeManager.ShowVishnuOnlineHelp());
         }
 
         #endregion private members

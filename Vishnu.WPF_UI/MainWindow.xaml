@@ -41,6 +41,7 @@
     <Window.InputBindings>
         <KeyBinding Command="{x:Static local:MainWindow.SaveWindowAspectsAndCallViewModelLogicCommand}"
                     Key="S" Modifiers="Control" />
+        <KeyBinding Command="{Binding Path=ShowVishnuHelpCommand, diag:PresentationTraceSources.TraceLevel=High}" Key="F1" />
         <KeyBinding Command="{Binding Path=InitSizeCommand, diag:PresentationTraceSources.TraceLevel=High}" Key="F3" />
         <KeyBinding Command="{Binding Path=SwitchTaskTreeViewRoutedCommand, diag:PresentationTraceSources.TraceLevel=High}" Key="F4" />
     </Window.InputBindings>

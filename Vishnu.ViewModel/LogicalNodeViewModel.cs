@@ -1863,6 +1863,7 @@ namespace Vishnu.ViewModel
         /// <param name="eventId">Eine optionale GUID für Logging-Zwecke.</param>
         protected virtual void subLastNotNullLogicalChanged(LogicalNode sender, bool? lastNotNullLogical, Guid eventId)
         {
+            // TODO: ThreadExceptions (nur im Debugger?) untersuchen.
             this.RaisePropertyChanged("LastNotNullLogical");
         }
 

@@ -2,6 +2,7 @@
 using NetEti.ApplicationControl;
 using NetEti.MVVMini;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Vishnu.Interchange;
@@ -37,9 +38,14 @@ namespace Vishnu.ViewModel
         public ICommand ShowLogLogicalTaskTree { get { return this._btnShowLogTaskTreeRelayCommand; } }
 
         /// <summary>
-        /// Command für das ContextMenuItem "Show Log" im ContextMenu für das "MainGrid" des Controls.
+        /// Command für das ContextMenuItem "Show Settings" im ContextMenu für das "MainGrid" des Controls.
         /// </summary>
         public ICommand ShowSettingsLogicalTaskTree { get { return this._btnShowSettingsTaskTreeRelayCommand; } }
+
+        /// <summary>
+        /// Command für das ContextMenuItem "Show Vishnu Help" im ContextMenu für das "MainGrid" des Controls.
+        /// </summary>
+        public ICommand ShowVishnuHelp { get { return this._btnShowVishnuHelpRelayCommand; } }
 
         /// <summary>
         /// Command für das ContextMenuItem "Pause Tree" im ContextMenu für das "MainGrid" des Controls.
@@ -359,6 +365,36 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Zeigt die Vishnu Onlinehilfe an.
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter oder null.</param>
+        public virtual void ShowVishnuHelpExecute(object? parameter)
+        {
+            _ = this.ShowVishnuHelpTask();
+        }
+
+        /// <summary>
+        /// Zeigt die Vishnu Onlinehilfe an.
+        /// </summary>
+        /// <returns>Task.</returns>
+        public async Task ShowVishnuHelpTask()
+        {
+            this.JobInProgress = "ShowVishnuHelp";
+            await Task.Run(() => LogicalTaskTreeManager.ShowVishnuOnlineHelp());
+            this.JobInProgress = "";
+            // 06.11.2023 Nagel+- _ = this.ResetContextMenu();
+        }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist, hier immer true.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist, hier immer true.</returns>
+        public virtual bool CanShowVishnuHelpExecute()
+        {
+            return true;
+        }
+
+        /// <summary>
         /// Wechselschalter - hält den Tree an oder lässt ihn weiterlaufen.
         /// </summary>
         /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
@@ -451,6 +487,7 @@ namespace Vishnu.ViewModel
             this._btnLogTaskTreeRelayCommand = new RelayCommand(LogTaskTreeExecute, CanLogTaskTreeExecute);
             this._btnShowLogTaskTreeRelayCommand = new RelayCommand(ShowLogExecute, CanShowLogExecute);
             this._btnShowSettingsTaskTreeRelayCommand = new RelayCommand(ShowSettingsExecute, CanShowSettingsExecute);
+            this._btnShowVishnuHelpRelayCommand = new RelayCommand(ShowVishnuHelpExecute, CanShowVishnuHelpExecute);
             this._btnPauseResumeTaskTreeRelayCommand = new RelayCommand(PauseResumeTaskTreeExecute, CanPauseResumeTaskTreeExecute);
             this._btnSwitchTaskTreeViewRelayCommand = new RelayCommand(switchTaskTreeViewExecute, canSwitchTaskTreeViewExecute);
             this._btnCopyToolTipInfoToClipboardCommand = new RelayCommand(this.CmdBtnCopy_Executed, this.CmdBtnCopy_CanExecute);
@@ -504,6 +541,7 @@ namespace Vishnu.ViewModel
         private RelayCommand _btnLogTaskTreeRelayCommand;
         private RelayCommand _btnShowLogTaskTreeRelayCommand;
         private RelayCommand _btnShowSettingsTaskTreeRelayCommand;
+        private RelayCommand _btnShowVishnuHelpRelayCommand;
         private RelayCommand _btnPauseResumeTaskTreeRelayCommand;
         private RelayCommand _btnSwitchTaskTreeViewRelayCommand;
         private RelayCommand _btnCopyToolTipInfoToClipboardCommand;
