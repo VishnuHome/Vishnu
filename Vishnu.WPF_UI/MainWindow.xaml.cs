@@ -37,8 +37,8 @@ namespace Vishnu.WPF_UI
         /// großer Bildschirm behandelt, ansonsten zählt für
         /// Größen- und Positionsänderungen der Bildschirm, auf dem
         /// sich das MainWindow hauptsächlich befindet (ActualScreen).
-        /// Default: false; muss von außen nach Instanziierung gesetzt
-        /// werden.
+        /// Wird aktuell (02.02.2024) intern immer auf true gesetzt! Vormals default: false;
+        /// Muss von außen nach Instanziierung gesetzt werden.
         /// </summary>
         public bool SizeOnVirtualScreen { get; set; }
 
@@ -99,7 +99,7 @@ namespace Vishnu.WPF_UI
         /// Konstruktor des Haupt-Fensters.
         /// </summary>
         /// <param name="startWithJobs">Bei true wird mit der Jobs-Ansicht gestartet, ansonsten mit der Tree-Ansicht (default: false).</param>
-        /// <param name="sizeOnVirtualScreen">Bei true wird über mehrere Bildschirme hinweg skaliert, ansonsten auf einen Bildschirm (default: false).</param>
+        /// <param name="sizeOnVirtualScreen">Stillgelegter Parameter! Bei true wird über mehrere Bildschirme hinweg skaliert, ansonsten auf einen Bildschirm (aktuell: immer true!).</param>
         /// <param name="mainWindowStartAspects">Eventuell vorher gespeicherte Darstellungseigenschaften des Vishnu-MainWindow oder Defaults.</param>
         public MainWindow(bool startWithJobs, bool sizeOnVirtualScreen, WindowAspects? mainWindowStartAspects) : base()
         {
@@ -206,16 +206,18 @@ namespace Vishnu.WPF_UI
                 this.MaxWidth = System.Windows.SystemParameters.VirtualScreenWidth;
                 this.MinLeft = 0;
                 this.MinTop = 0;
-                yFactor = this.MaxHeight / actScreenInfo.WorkingArea.Height;
-                xFactor = this.MaxWidth / actScreenInfo.WorkingArea.Width;
+                // 28.01.2024 Nagel Test+- yFactor = this.MaxHeight / actScreenInfo.WorkingArea.Height;
+                // 28.01.2024 Nagel Test+- xFactor = this.MaxWidth / actScreenInfo.WorkingArea.Width;
             }
-            else
-            {
-                this.MaxHeight = actScreenInfo.WorkingArea.Height;
-                this.MaxWidth = actScreenInfo.WorkingArea.Width;
-                this.MinLeft = actScreenInfo.Bounds.Left;
-                this.MinTop = actScreenInfo.Bounds.Top;
-            }
+            //else
+            //{
+            //    this.MaxHeight = actScreenInfo.WorkingArea.Height;
+            //    this.MaxWidth = actScreenInfo.WorkingArea.Width;
+            //    this.MinLeft = actScreenInfo.Bounds.Left;
+            //    this.MinTop = actScreenInfo.Bounds.Top;
+            //}
+            AppSettings.MaxHeight = this.MaxHeight;
+            AppSettings.MaxWidth = this.MaxWidth;
             if (this.WindowState == WindowState.Normal && this._contentRendered)
             {
                 double effectiveHeight = this.ActualHeight + SystemParameters.WindowCaptionHeight;
@@ -262,15 +264,15 @@ namespace Vishnu.WPF_UI
                     {
                         newTop = this.MinTop;
                     }
-                    if (newLeft > actScreenInfo.Bounds.Right - 35)
+                    if (newLeft > this.MaxWidth - 50)
                     {
-                        throw new ArithmeticException("newLeft > actScreenInfo.Bounds.Right - 35"); // 09.01.2024 Nagel+- TEST
-                        // newLeft = actScreenInfo.Bounds.Right - 35;
+                        // throw new ArithmeticException("newLeft > this.MaxWidth - 50");
+                        newLeft = this.MaxWidth - 50;
                     }
-                    if (newTop > actScreenInfo.Bounds.Bottom - 35)
+                    if (newTop > MaxHeight - 35)
                     {
-                        throw new ArithmeticException("newTop > actScreenInfo.Bounds.Bottom - 35"); // 09.01.2024 Nagel+- TEST
-                        // newTop = actScreenInfo.Bounds.Bottom - 35;
+                        // throw new ArithmeticException("newTop > this.MaxHeight - 35");
+                        newTop = this.MaxHeight - 35;
                     }
                     this.Left = newLeft;
                     this.Top = newTop;
@@ -484,14 +486,14 @@ namespace Vishnu.WPF_UI
                 this.MinLeft = 0;
                 this.MinTop = 0;
             }
-            else
-            {
-                ScreenInfo actScreenInfo = ScreenInfo.GetActualScreenInfo(this);
-                this.MaxHeight = actScreenInfo.WorkingArea.Height;
-                this.MaxWidth = actScreenInfo.WorkingArea.Width;
-                this.MinLeft = actScreenInfo.WorkingArea.Left;
-                this.MinTop = actScreenInfo.WorkingArea.Top;
-            }
+            //else
+            //{
+            //    ScreenInfo actScreenInfo = ScreenInfo.GetActualScreenInfo(this);
+            //    this.MaxHeight = actScreenInfo.WorkingArea.Height;
+            //    this.MaxWidth = actScreenInfo.WorkingArea.Width;
+            //    this.MinLeft = actScreenInfo.WorkingArea.Left;
+            //    this.MinTop = actScreenInfo.WorkingArea.Top;
+            //}
 
             if (windowHeight > this.MaxHeight)
             {

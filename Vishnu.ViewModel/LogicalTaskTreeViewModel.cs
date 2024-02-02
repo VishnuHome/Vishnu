@@ -180,13 +180,40 @@ namespace Vishnu.ViewModel
             });
             if (this._uIMain is Window)
             {
+
+                // Hier wird direkt vor dem Run TreeParams.LastParentViewAbsoluteScreenPosition neu gesetzt.
+                // Hintergrund: Der Benutzer kann in der Zwischenzeit das MainWindow verschoben haben.
+                // Achtung: eine direkte Zuweisung geht wegen Thread-übergreifendem Zugriff schief!
+                // Hinweis: ParentView ist bei Knoten, die aktuell auf dem Bildschirm nicht dargestellt
+                // werden, nicht gefüllt (null).
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    if (this._uIMain != null)
+                    {
+                        // TODO: Beim Hin- Und Herschalten zwischen Tree-und Jobs-Ansicht
+                        // wird die korrekte Anfangsposition nicht gehalten (Stand 22.01.2024 Nagel).
+                        Point lastParentViewAbsoluteScreenPosition =
+                            WindowAspects.GetFrameworkElementAbsoluteScreenPosition(this._uIMain, false);
+                        if (lastParentViewAbsoluteScreenPosition.X > AppSettings.MaxWidth - 50)
+                        {
+                            lastParentViewAbsoluteScreenPosition.X = AppSettings.MaxWidth - 50;
+                        }
+                        if (lastParentViewAbsoluteScreenPosition.Y > AppSettings.MaxHeight - 35)
+                        {
+                            lastParentViewAbsoluteScreenPosition.Y = AppSettings.MaxHeight - 35;
+                        }
+                        this.TreeParams.LastParentViewAbsoluteScreenPosition =
+                            lastParentViewAbsoluteScreenPosition;
+                    }
+                }));
                 new TimerMessageBox(this._uIMain as Window)
                 {
                     Buttons = MessageBoxButtons.None,
                     LifeTimeMilliSeconds = 2000,
                     Icon = MessageBoxIcons.Working,
                     Caption = "Verarbeitung läuft ...",
-                    Text = "Die aktuelle Bildschirmdarstellung wird gespeichert."
+                    Text = "Die aktuelle Bildschirmdarstellung wird gespeichert.",
+                    Position = this.TreeParams.LastParentViewAbsoluteScreenPosition
                 }.Show();
             }
             else

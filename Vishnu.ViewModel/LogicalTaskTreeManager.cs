@@ -2,6 +2,7 @@
 using NetEti.ApplicationControl;
 using NetEti.CustomControls;
 using NetEti.FileTools;
+using NetEti.Globals;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,9 +13,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
+using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Vishnu.Interchange;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Vishnu.ViewModel
 {
@@ -65,7 +70,7 @@ namespace Vishnu.ViewModel
 
             List<string> allTreeInfos = new List<string>();
             object? result1 = rootJobListViewModel?.Traverse(ListTreeElement, allTreeInfos);
-            string bigMessage = String.Join(System.Environment.NewLine, allTreeInfos);
+            string bigMessage = string.Join(System.Environment.NewLine, allTreeInfos);
             InfoController.GetInfoPublisher().Publish(rootJobListViewModel, Environment.NewLine
                 + header, InfoType.NoRegex);
             Thread.Sleep(100);
@@ -103,23 +108,43 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Zeigt die Vishnu Hilfe an.
+        /// Wenn der Parameter "HelpPreference" gleich "local" gesetzt ist,
+        /// wird versucht lokal "Vishnu_doc.de.chm" zu laden,
+        /// andernfalls wird versucht, die Vishnu Onlinehilfe zu laden.
+        /// </summary>
+        public static void ShowVishnuHelp()
+        {
+            if (GenericSingletonProvider.GetInstance<AppSettings>().HelpPreference == "local")
+            {
+                ShowLocalVishnuHelp();
+            }
+            else
+            {
+                ShowVishnuOnlineHelp();
+            }
+        }
+
+        /// <summary>
         /// Zeigt die Vishnu Onlinehilfe an.
         /// </summary>
         /// <param name="redirected">True, wenn schon vorher die lokale CHM-Datei versucht wurde; Default: false</param>
         public static void ShowVishnuOnlineHelp(bool redirected = false)
         {
-            try { Process.Start("VishnuHelpBrowser.exe"); }
+            string vishnuHelpBrowserPath = System.IO.Path.Combine(
+                GenericSingletonProvider.GetInstance<AppSettings>().UserAssemblyDirectory, "VishnuHelpBrowser.exe");
+            try { Process.Start(vishnuHelpBrowserPath); }
             catch (Exception ex)
             {
                 if (!redirected)
                 {
-                    MessageBox.Show(ex.Message, "Kann die Vishnu Onlinehilfe nicht aufrufen, versuche die lokale Hilfe ...",
+                    System.Windows.MessageBox.Show(ex.Message, "Kann die Vishnu Onlinehilfe nicht aufrufen, versuche die lokale Hilfe ...",
                         MessageBoxButton.OK, MessageBoxImage.Error);
                     ShowLocalVishnuHelp(redirected=true);
                 }
                 else
                 {
-                    MessageBox.Show(ex.Message, "Kann die Vishnu Onlinehilfe nicht aufrufen, gebe auf.",
+                    System.Windows.MessageBox.Show(ex.Message, "Kann die Vishnu Onlinehilfe nicht aufrufen, gebe auf.",
                         MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -131,21 +156,31 @@ namespace Vishnu.ViewModel
         /// <param name="redirected">True, wenn schon vorher die Onlinehilfe versucht wurde; Default: false</param>
         public static void ShowLocalVishnuHelp(bool redirected = false)
         {
-            try { Process.Start("Vishnu_doc.chm", ""); }
-            catch (Exception ex)
-            {
-                if (!redirected)
+            string vishnuDocPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(
+                GenericSingletonProvider.GetInstance<AppSettings>().VishnuSourceRoot, @"Vishnu_doc.de.chm"));
+            System.Windows.Forms.Help.ShowHelp(null, vishnuDocPath);
+
+            // Der Teil unten funktioniert nicht, sondern wirft folgende Exception:
+            // An error occurred trying to start process
+            // 'C:\Users\micro\Documents\private4\WPF\openVishnu8\Vishnu_doc.de.chm' with working directory ...
+            // The specified executable is not a valid application for this OS platform.
+            /*
+            try { Process.Start(vishnuDocPath); }
+                catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "Kann die lokale Vishnu Hilfe nicht aufrufen, versuche die online Hilfe ...",
+                    if (!redirected)
+                    {
+                        System.Windows.MessageBox.Show(ex.Message, "Kann die lokale Vishnu Hilfe nicht aufrufen, versuche die online Hilfe ...",
                         MessageBoxButton.OK, MessageBoxImage.Error);
                     ShowVishnuOnlineHelp(redirected = true);
                 }
                 else
                 {
-                    MessageBox.Show(ex.Message, "Kann die lokale Vishnu Hilfe nicht aufrufen, gebe auf.",
+                    System.Windows.MessageBox.Show(ex.Message, "Kann die lokale Vishnu Hilfe nicht aufrufen, gebe auf.",
                         MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+            */
         }
 
         static LogicalTaskTreeManager()
@@ -371,7 +406,7 @@ namespace Vishnu.ViewModel
             }
             else
             {
-                throw new ApplicationException(String.Format($"Unerwarteter Suchfehler auf {expandableNode.Path}."));
+                throw new ApplicationException(string.Format($"Unerwarteter Suchfehler auf {expandableNode.Path}."));
             }
 
             return null; // Bricht die Rekursion für diesen Zweig ab.
@@ -395,8 +430,8 @@ namespace Vishnu.ViewModel
 
                 // throw new ApplicationException("Der Top-Job kann nicht im laufenden Betrieb ausgetauscht werden.");
                 // TODO: dies auch ermöglichen. Ansatz: oberhalb des Top-Knoten schon beim Laden der JobDescription.xml einen Pseudo-Knoten erzeugen.
-                MessageBox.Show("Der oberste Job kann nicht im laufenden Betrieb geändert werden.", "Hinweis", MessageBoxButton.OK, MessageBoxImage.Hand);
-                InfoController.Say(String.Format($"#RELOAD# Not transferring Root-Node {shadowNodeVM.Path} from ShadowTree to Tree."));
+                System.Windows.MessageBox.Show("Der oberste Job kann nicht im laufenden Betrieb geändert werden.", "Hinweis", MessageBoxButton.OK, MessageBoxImage.Hand);
+                InfoController.Say(string.Format($"#RELOAD# Not transferring Root-Node {shadowNodeVM.Path} from ShadowTree to Tree."));
                 return;
             }
 
@@ -591,7 +626,7 @@ namespace Vishnu.ViewModel
             }
             if (nodeIndex < 0)
             {
-                throw new ApplicationException(String.Format($"Parent-Index nicht gefunden, Knoten: {activeNode.Path}"));
+                throw new ApplicationException(string.Format($"Parent-Index nicht gefunden, Knoten: {activeNode.Path}"));
             }
             return nodeIndex;
         }
@@ -703,13 +738,13 @@ namespace Vishnu.ViewModel
             LogicalNodeViewModel activeTreeVM = LogicalTaskTreeManager._activeVMFinder[treeJobList.IdPath];
             JobList activeJobList = (JobList)activeTreeVM.GetLogicalNode();
 
-            List<String> keys;
+            List<string> keys;
             try
             {
                 keys = new List<string>(activeJobList.Job.EventTriggers.Keys);
                 foreach (string key in keys)
                 {
-                    List<String> keyKeys = new List<string>(activeJobList.Job.EventTriggers[key].Keys);
+                    List<string> keyKeys = new List<string>(activeJobList.Job.EventTriggers[key].Keys);
                     foreach (string keyKey in keyKeys)
                     {
                         // if (changingNode.Id == keyKey)
@@ -759,7 +794,7 @@ namespace Vishnu.ViewModel
                 keys = new List<string>(activeJobList.Job.WorkersDictionary.Keys);
                 foreach (string key in keys)
                 {
-                    List<String> keyKeys = new List<string>(activeJobList.Job.WorkersDictionary[key].Keys);
+                    List<string> keyKeys = new List<string>(activeJobList.Job.WorkersDictionary[key].Keys);
                     foreach (string keyKey in keyKeys)
                     {
                         if (changingNode.Id == keyKey)
@@ -1107,7 +1142,7 @@ namespace Vishnu.ViewModel
             }
             catch (Exception ex1)
             {
-                InfoController.Say(String.Format($"#RELOAD# RemoveOldJobListGlobals Exception 1: {ex1.Message}."));
+                InfoController.Say(string.Format($"#RELOAD# RemoveOldJobListGlobals Exception 1: {ex1.Message}."));
                 throw;
             }
             try
@@ -1476,7 +1511,7 @@ namespace Vishnu.ViewModel
         /// <returns>Die bisher gefüllte Stringlist mit Knoteninformationen.</returns>
         private static object? ListTreeElement(int depth, IExpandableNode expandableNode, object? userObject)
         {
-            string depthString = depth > 0 ? new String(' ', depth * 4) : "";
+            string depthString = depth > 0 ? new string(' ', depth * 4) : "";
             List<string> allTreeInfos = (List<string>?)userObject ?? new List<string>();
             LogicalNodeViewModel logicalNodeViewModel = (LogicalNodeViewModel)expandableNode;
             string viewModelToStringReducedSpaces = Regex.Replace(logicalNodeViewModel.ToString().Replace(Environment.NewLine, ", "), @"\s{2,}", " ");
@@ -1577,7 +1612,7 @@ namespace Vishnu.ViewModel
             JobList rootJobList = (JobList)rootJobListVM.GetLogicalNode();
             if (rootJobList != null)
             {
-                stringBuilder = new StringBuilder(depthString + String.Format($"--- Globals von {rootJobList.NameId} ---"));
+                stringBuilder = new StringBuilder(depthString + string.Format($"--- Globals von {rootJobList.NameId} ---"));
                 List<string> keys;
                 stringBuilder.Append(Environment.NewLine + depthString + "EventTriggers" + Environment.NewLine);
                 keys = new List<string>(rootJobList.Job.EventTriggers.Keys);
@@ -1710,13 +1745,13 @@ namespace Vishnu.ViewModel
                     delimiter = ", ";
                 }
 
-                stringBuilder.AppendLine(Environment.NewLine + depthString + $"----------------" + new String('-', rootJobList.NameId.Length) + "----");
+                stringBuilder.AppendLine(Environment.NewLine + depthString + $"----------------" + new string('-', rootJobList.NameId.Length) + "----");
             }
             else
             {
-                stringBuilder = new StringBuilder(depthString + String.Format($"--- Globals von {rootJobListVM.Name} ---"));
+                stringBuilder = new StringBuilder(depthString + string.Format($"--- Globals von {rootJobListVM.Name} ---"));
                 allTreeInfos.Add(depthString + "NOTHING" + Environment.NewLine);
-                stringBuilder.AppendLine(Environment.NewLine + depthString + $"----------------" + new String('-', rootJobListVM.Name.Length) + "----");
+                stringBuilder.AppendLine(Environment.NewLine + depthString + $"----------------" + new string('-', rootJobListVM.Name.Length) + "----");
             }
             allTreeInfos.Add(stringBuilder.ToString());
         }

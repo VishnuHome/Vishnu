@@ -11,9 +11,9 @@
     <Authors>Erik Nagel</Authors>
     <Company>NetEti</Company>
     <Description>Haupt-Verarbeitungslogik von Vishnu</Description>
-    <Copyright>Copyright © $(Authors) 2012-2023</Copyright>
-    <AssemblyVersion>8.1.0.0</AssemblyVersion>
-    <FileVersion>8.1.0.0</FileVersion>
+    <Copyright>Copyright © $(Authors) 2012-$([System.DateTime]::Now.Year)</Copyright>
+    <AssemblyVersion>8.1.6.0</AssemblyVersion>
+    <FileVersion>8.1.6.0</FileVersion>
     <PackageTags>NetEti Vishnu Businesslogic</PackageTags>
   </PropertyGroup>
 
@@ -29,6 +29,9 @@
 	<Choose>
   	<When Condition="!('$(TF_BUILD)' == 'true' Or '$(GITHUB_ACTIONS)' == 'true' Or '$(NETETI_CIB)' == 'true')">
 		  <ItemGroup>
+		    <Reference Include="NetEti.AppEnvReader">
+		      <HintPath>$(AssemblyRoot)/NetEti.AppEnvReader.dll</HintPath>
+		    </Reference>
 		    <Reference Include="NetEti.BasicAppSettings">
 		      <HintPath>$(AssemblyRoot)/NetEti.BasicAppSettings.dll</HintPath>
 		    </Reference>
@@ -63,6 +66,7 @@
   	</When>
     <Otherwise>
 		  <ItemGroup>
+		    <PackageReference Include="NetEti.AppEnvReader" Version="1.0.0" />
 		    <PackageReference Include="NetEti.BasicAppSettings" Version="1.0.0" />
 		    <PackageReference Include="NetEti.ExpressionParser" Version="1.0.0" />
 		    <PackageReference Include="NetEti.Global" Version="1.0.0" />

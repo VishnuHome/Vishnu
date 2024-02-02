@@ -46,6 +46,14 @@ namespace LogicalTaskTree
         {
             WorkerArguments args;
             System.Windows.Point winPoint = treeParameters.LastParentViewAbsoluteScreenPosition;
+            if (winPoint.X > AppSettings.MaxWidth - 50)
+            {
+                winPoint.X = AppSettings.MaxWidth - 50;
+            }
+            if (winPoint.Y > AppSettings.MaxHeight - 35)
+            {
+                winPoint.Y = AppSettings.MaxHeight - 35;
+            }
             if (this.Trigger != null)
             {
                 args = new WorkerArguments(0, treeParameters.ToString(), nodeId, eventParameters, null, winPoint);

@@ -380,7 +380,7 @@ namespace Vishnu.ViewModel
         public async Task ShowVishnuHelpTask()
         {
             this.JobInProgress = "ShowVishnuHelp";
-            await Task.Run(() => LogicalTaskTreeManager.ShowVishnuOnlineHelp());
+            await Task.Run(() => LogicalTaskTreeManager.ShowVishnuHelp());
             this.JobInProgress = "";
             // 06.11.2023 Nagel+- _ = this.ResetContextMenu();
         }

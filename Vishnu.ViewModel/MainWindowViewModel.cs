@@ -247,7 +247,7 @@ namespace Vishnu.ViewModel
         /// <returns>Task.</returns>
         public async Task ShowVishnuHelpTask()
         {
-            await Task.Run(() => LogicalTaskTreeManager.ShowVishnuOnlineHelp());
+            await Task.Run(() => LogicalTaskTreeManager.ShowVishnuHelp());
         }
 
         #endregion private members

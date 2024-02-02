@@ -10,9 +10,9 @@
     <Authors>Erik Nagel</Authors>
     <Company>NetEti</Company>
     <Description>$(AssemblyName) - Vishnu-Default-UserControl für  einen JobConnector</Description>
-    <Copyright>Copyright © $(Authors) 2015-2023</Copyright>
-    <AssemblyVersion>8.0.0.0</AssemblyVersion>
-    <FileVersion>8.0.0.0</FileVersion>
+    <Copyright>Copyright © $(Authors) 2015-$([System.DateTime]::Now.Year)</Copyright>
+    <AssemblyVersion>8.1.6.0</AssemblyVersion>
+    <FileVersion>8.1.6.0</FileVersion>
     <PackageTags>NetEti Vishnu Node Control View</PackageTags>
   </PropertyGroup>
 

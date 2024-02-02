@@ -2064,8 +2064,18 @@ namespace LogicalTaskTree
                 {
                     // TODO: Beim Hin- Und Herschalten zwischen Tree-und Jobs-Ansicht
                     // wird die korrekte Anfangsposition nicht gehalten (Stand 22.01.2024 Nagel).
-                    this.TreeParams.LastParentViewAbsoluteScreenPosition =
+                    Point lastParentViewAbsoluteScreenPosition =
                         WindowAspects.GetFrameworkElementAbsoluteScreenPosition(this.ParentView, false);
+                    if (lastParentViewAbsoluteScreenPosition.X > AppSettings.MaxWidth - 50)
+                    {
+                        lastParentViewAbsoluteScreenPosition.X = AppSettings.MaxWidth - 50;
+                    }
+                    if (lastParentViewAbsoluteScreenPosition.Y > AppSettings.MaxHeight - 35)
+                    {
+                        lastParentViewAbsoluteScreenPosition.Y = AppSettings.MaxHeight - 35;
+                    }
+                    this.TreeParams.LastParentViewAbsoluteScreenPosition =
+                        lastParentViewAbsoluteScreenPosition;
                 }
             }));
         }

@@ -230,7 +230,9 @@ namespace Vishnu
                 {
                     SingleInstanceApplication.doVishnuCleanup();
                 }
-                System.Windows.MessageBox.Show(exceptionString, "Exception", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show(exceptionString, "Exception",
+                    MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK,
+                    System.Windows.MessageBoxOptions.DefaultDesktopOnly);
                 //Application.Current.Shutdown(-1);            // die auskommentierten
                 //Dispatcher.BeginInvoke((Action)delegate()    // Versuche
                 //{                                            // funktionieren
@@ -246,7 +248,6 @@ namespace Vishnu
                 SingleInstanceApplication._appSettings.UserParametersReloaded += ParameterReader_ParametersReloaded;
                 SingleInstanceApplication._appSettings.InitUserParameterReader();
             }
-
             this.PrepareStart();
             if (SingleInstanceApplication._appSettings.DemoModus)
             {

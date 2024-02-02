@@ -9,18 +9,18 @@ using System.Windows;
 namespace Vishnu.Interchange
 {
     /// <summary>
+    /// Erbt allgemeingültige Einstellungen von BasicAppSettings oder davon abgeleiteten
+    /// Klassen und fügt anwendungsspezifische Properties hinzu.
     /// Holt Applikationseinstellungen aus verschiedenen Quellen:
     /// Kommandozeile, Vishnu.exe.config (app.config), Vishnu.exe.config.user, Environment, Registry.
-    /// - anwendungsspezifisch -
-    /// Erbt allgemeingültige Einstellungen von BasicAppSettings oder davon abgeleiteten
-    /// Klassen und fügt anwendungsspezifische Properties hinzu.<br></br>
     /// <seealso cref="BasicAppSettings"/>
     /// </summary>
     /// <remarks>
-    /// File: AppSettings.cs<br></br>
-    /// Autor: Erik Nagel, NetEti<br></br>
-    ///<br></br>
-    /// 11.10.2013 Erik Nagel: erstellt<br></br>
+    /// File: AppSettings.cs
+    /// Autor: Erik Nagel, NetEti
+    ///
+    /// 11.10.2013 Erik Nagel: erstellt.
+    /// 28.01.2024 Erik Nagel: Property VishnuRoot hinzugefügt.
     /// </remarks>
     public sealed class AppSettings : BasicAppSettings
     {
@@ -136,6 +136,13 @@ namespace Vishnu.Interchange
         public NodeTypes FlatNodeListFilter { get; set; }
 
         /// <summary>
+        /// Die bevorzugte Vishnu-Hilfe (wird über F1 oder das Kontext-Menü geladen):
+        ///     "online": die Vishnu-Hilfe wird aus dem Internet geladen (default);
+        ///     "local": die Vishnu-Hilfe wird als .chm lokal geladen.
+        /// </summary>
+        public string HelpPreference { get; set; }
+
+        /// <summary>
         /// Bei True werden alle durch EventTrigger getriggerten Knoten
         /// neu initialisiert, wenn der Anwender irgendeinen Knoten startet.
         /// Experimentell, Default: false.
@@ -169,7 +176,7 @@ namespace Vishnu.Interchange
 
         /// <summary>
         /// Liste von Verzeichnissen, in denen nach zu ladenden Jobs
-        /// gesucht werden soll.
+        /// gesucht werden soll. Wird durch die Vishnu-Logik gefüllt.
         /// </summary>
         public Stack<string> JobDirPathes;
 
@@ -219,6 +226,18 @@ namespace Vishnu.Interchange
                 this.AppEnvAccessor.RegisterKeyValue("MainJobName", this._mainJobName);
             }
         }
+
+        /// <summary>
+        /// Wird programmintern als Merkfeld für die aktuelle maximale Bildschirmhöhe genutzt.
+        /// Wird von MainWindow.xaml.cs gesetzt.
+        /// </summary>
+        public static double MaxHeight { get; set; }
+
+        /// <summary>
+        /// Wird programmintern als Merkfeld für die aktuelle maximale Bildschirmbreite genutzt.
+        /// Wird von MainWindow.xaml.cs gesetzt.
+        /// </summary>
+        public static double MaxWidth { get; set; }
 
         /// <summary>
         /// Bei True werden definierte Worker nicht aufgerufen.
@@ -339,6 +358,32 @@ namespace Vishnu.Interchange
         public string? UserParameterReaderPath { get; set; }
 
         /// <summary>
+        /// Das Vishnu-Rootverzeichnis zur Laufzeit.
+        /// Im Gegensatz zum optionalen Environment-Setting "Vishnu_Root" wird
+        /// diese Property, wenn sie nicht von außen als Parameter gesetzt wird,
+        /// durch die Vishnu-Programmlogik gefüllt, so dass sie immer so gut, wie
+        /// möglich gesetzt ist und somit auch von außen über "%VishnuRoot%"
+        /// genutzt werden kann.
+        /// Während "Vishnu_Root", sofern es gesetzt wurde, immer das Root-Verzeichnis
+        /// der Vishnu-Entwicklung bezeichnet, zeigt "VishnuRoot" bevorzugt auf
+        /// das Verzeichnis, in dem sich die gestartete Vishnu.exe befindet
+        /// ("ApplicationRootPath").
+        /// Nur, wenn sich auf gleicher Hierarchiestufe, wie "ApplicationRootPath"
+        /// kein Verzeichnis "UserAssemblies" befindet, wird "VishnuRoot", wenn nicht
+        /// von außen mitgegeben, so gut es geht, durch die Vishnu-Programmlogik auf
+        /// das das Root-Verzeichnis der Vishnu-Entwicklung gesetzt.
+        /// </summary>
+        public string VishnuRoot { get; private set; }
+
+        /// <summary>
+        /// VishnuSourceRoot bezeichnet immer das Root-Verzeichnis der Vishnu-Entwicklung.
+        /// Wenn im Programm-Environment kein Verzeichnis "Vishnu_Root" gesetzt wurde,
+        /// wird VishnuSourceRoot so gut es geht, durch die Vishnu-Programmlogik auf
+        /// das das Root-Verzeichnis der Vishnu-Entwicklung gesetzt.
+        /// </summary>
+        public string VishnuSourceRoot { get; private set; }
+
+        /// <summary>
         /// Datenklasse mit wesentlichen Darstellungsmerkmalen des Vishnu-MainWindow.
         /// </summary>
         public WindowAspects? VishnuWindowAspects { get; set; }
@@ -383,9 +428,9 @@ namespace Vishnu.Interchange
             this.AppEnvAccessor.UnregisterKey("DebugFile");
             this.AppEnvAccessor.UnregisterKey("StatisticsFile");
 
-            this.RootJobPackagePath = this.GetStringValue("Job", this.GetStringValue("1", null));
+            this.RootJobPackagePath = this.ReplaceWildcards(this.GetStringValue("Job", this.GetStringValue("1", String.Empty)) ?? String.Empty);
             this.RootJobXmlName = "jobdescription.xml";
-            if (this.RootJobPackagePath != null)
+            if (!String.IsNullOrEmpty(this.RootJobPackagePath))
             {
                 if (this.RootJobPackagePath.ToLower().EndsWith(".xml"))
                 {
@@ -465,7 +510,6 @@ namespace Vishnu.Interchange
             {
                 this.WorkingDirectory = tmpDirectory;
             }
-
             this.AppEnvAccessor.RegisterKeyValue("WorkingDirectory", this.WorkingDirectory);
             this.SearchDirectory = this.GetStringValue("SearchDirectory", this.WorkingDirectory)?.TrimEnd(Path.DirectorySeparatorChar);
             string defaultDebugFile = this.WorkingDirectory + Path.DirectorySeparatorChar + this.ApplicationName + @".log";
@@ -480,22 +524,62 @@ namespace Vishnu.Interchange
             };
             this.AbortingAllowed = this.GetValue<bool>("AbortingAllowed", true);
             this.AcceptNullResults = this.GetValue<bool>("AcceptNullResults", false);
-            string lastUserAssemblyDirectoryDefault = "UserAssemblies";
-            string? vishnu_root = this.GetStringValue("Vishnu_Root", null);
-            if (vishnu_root != null)
+
+            // Ermittlung der Properties VishnuRoot und UserAssemblyDirectory zur Laufzeit.
+            string userAssemblyDirectoryCandidate = Path.Combine(this.ApplicationRootPath, @"../UserAssemblies");
+            string relativeVishnuRoot = String.Empty;
+            string? vr = this.GetStringValue("VishnuRoot", null);
+            if (vr != null)
             {
-                lastUserAssemblyDirectoryDefault = 
-                    Path.Combine(vishnu_root, "ReadyBin", "UserAssemblies");
+                this.VishnuRoot = vr;
             }
+            else
+            {
+                if (Directory.Exists(userAssemblyDirectoryCandidate))
+                {
+                    this.VishnuRoot = this.ApplicationRootPath;
+                    relativeVishnuRoot = this.ApplicationRootPath;
+                    this.VishnuRoot = this.GetStringValue("Vishnu_Root", relativeVishnuRoot)
+                        ?? throw new ArgumentNullException("VishnuRoot darf hier nicht null sein.");
+                    this.VishnuSourceRoot = Path.Combine(this.ApplicationRootPath, @"../..");
+                }
+                else
+                {
+                    if (!this.IsFrameworkAssembly)
+                    {
+                        relativeVishnuRoot = Path.Combine(this.ApplicationRootPath, @"../../../../../..");
+                    }
+                    else
+                    {
+                        relativeVishnuRoot = Path.Combine(this.ApplicationRootPath, @"../../../../..");
+                    }
+                    this.VishnuRoot = this.GetStringValue("Vishnu_Root", relativeVishnuRoot)
+                        ?? throw new ArgumentNullException("VishnuRoot darf hier nicht null sein.");
+                    this.VishnuSourceRoot = VishnuRoot;
+                    userAssemblyDirectoryCandidate =
+                        Path.Combine(this.VishnuRoot, "ReadyBin", "UserAssemblies");
+                }
+            }
+            if (!Directory.Exists(userAssemblyDirectoryCandidate))
+            {
+                userAssemblyDirectoryCandidate =
+                    Path.Combine(this.VishnuRoot, "ReadyBin", "UserAssemblies");
+            }
+            this.AppEnvAccessor.RegisterKeyValue("VishnuRoot", Path.GetFullPath(this.VishnuRoot));
+            AppSettingsRegistry.RememberParameterSource("VishnuRoot", "Logic", Path.GetFullPath(this.VishnuRoot));
+            this.AppEnvAccessor.RegisterKeyValue("VishnuSourceRoot", Path.GetFullPath(this.VishnuSourceRoot));
+            AppSettingsRegistry.RememberParameterSource("VishnuSourceRoot", "Logic", Path.GetFullPath(this.VishnuSourceRoot));
             this.UserAssemblyDirectory = this.GetStringValue("UserAssemblyDirectory",
-                this.GetStringValue("Vishnu_UserAssemblies", lastUserAssemblyDirectoryDefault)) ?? lastUserAssemblyDirectoryDefault;
+                this.GetStringValue("Vishnu_UserAssemblies", userAssemblyDirectoryCandidate)) ?? userAssemblyDirectoryCandidate;
             if (!this.AssemblyDirectories.Contains(this.UserAssemblyDirectory))
             {
                 this.AssemblyDirectories.Insert(0, this.UserAssemblyDirectory);
                 this.AppEnvAccessor.RegisterKeyValue("UserAssemblyDirectory", this.UserAssemblyDirectory);
             }
+
             this.UserParameterReaderPath = this.GetStringValue("UserParameterReaderPath", null);
-            this.StartTreeOrientation = (TreeOrientation)Enum.Parse(typeof(TreeOrientation), this.GetStringValue("StartTreeOrientation", "AlternatingHorizontal") ?? "AlternatingHorizontal");
+            this.StartTreeOrientation = (TreeOrientation)Enum.Parse(typeof(TreeOrientation), 
+                this.GetStringValue("StartTreeOrientation", "AlternatingHorizontal") ?? "AlternatingHorizontal");
             this.StartWithJobs = this.GetValue<bool>("StartWithJobs", false);
             string? userCheckerArrayString = this.GetStringValue("UncachedCheckers", null);
             if (userCheckerArrayString != null)
@@ -569,13 +653,15 @@ namespace Vishnu.Interchange
             {
                 this.Autostart = this.GetValue<bool>("Autostart", false);
             }
-            this.SizeOnVirtualScreen = this.GetValue<bool>("SizeOnVirtualScreen", false);
+            // 02.02.2024 Nagel+ vorläufig immer true. this.SizeOnVirtualScreen = this.GetValue<bool>("SizeOnVirtualScreen", false);
+            this.SizeOnVirtualScreen = true; // 02.02.2024 Nagel-
             this.LoadJobDialog = this.GetValue<bool>("LoadJobDialog", false);
             this.LogicalChangedDelay = this.GetValue<int>("LogicalChangedDelay", 0);
             this.LogicalChangedDelayPower = this.GetValue<double>("LogicalChangedDelayPower", 0);
             this.BreakTreeBeforeStart = this.GetValue<bool>("BreakTreeBeforeStart", false);
             this.InitAtUserRun = this.GetValue<bool>("InitAtUserRun", false);
             this.TryRunAsyncSleepTime = this.GetValue<int>("TryRunAsyncSleepTime", 100);
+            this.HelpPreference = (this.GetStringValue("HelpPreference", "online") ?? "online").Trim().ToLower();
             string? tmpUnlock = this.GetStringValue("XUnlock", "");
             this.XUnlock = new SecureString();
             if (tmpUnlock != null)

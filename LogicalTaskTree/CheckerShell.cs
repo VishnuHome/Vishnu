@@ -445,6 +445,19 @@ namespace LogicalTaskTree
                     try
                     {
                         treeParameters.CheckerDllDirectory = Path.GetDirectoryName(this._slavePathName);
+                        /*
+                        // 28.01.2024 Nagel: Test+
+                        System.Windows.Point? p;
+                        try
+                        {
+                            p = treeParameters.LastParentViewAbsoluteScreenPosition;
+                        }
+                        catch (Exception ex)
+                        {
+                            throw;
+                        }
+                        // 28.01.2024 Nagel: Test-
+                        */
                         string cp = this._checkerParameters?.ToString() ?? "";
                         rtn = this._slave.Run(GenericSingletonProvider.GetInstance<AppSettings>()
                             .ReplaceWildcards(cp), treeParameters, source);

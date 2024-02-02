@@ -974,9 +974,25 @@ ERLEDIGT: Komplettüberarbeitung der Positionierung von Fenstern, WPF-Dialog-Chec
           auf einem und mehreren Bildschirmen.
           Dabei Berücksichtigung verschiedener Bildschirmauflösungen und Skalierungen.
 ERLEDIGT: Worker wurden bei existierenden NodeConnectoren auf SingleNodes mehrfach gestartet.
-ERLEDIGT: Fehler: Tree anhalten, dann Run oder Break => Deadlock.
+ERLEDIGT: Speichern-Meldung zentrierte noch auf dem Screen.
+ERLEDIGT: Automatisierung des Copyright Gültigkeitsendes.
+ERLEDIGT: Die Vishnu-Hilfe wurde über F1 und im Kontext-Menü integriert.
+ERLEDIGT: Neuer Vishnu-Parameter: HelpPreference
+            online: Es wird bevorzugt die Onlinehilfe geladen. Dies ist die Voreinstellung.
+          	local: Es wird bevorzugt die lokale Hilfe geladen.
+ERLEDIGT: Die "Plugin"-Verzeichnisse unterhalb von "VishnuHome/Vishnu" und "ReadyBin/Vishnu.bin" wurden abgeschafft;
+          betroffene User-Assemblies wurden bei den anderen User-Assemblies integriert
+ERLEDIGT: Der Parameter UserAssemblyDirectory sollte in den allermeisten Fällen obsolet geworden sein.
+          User-Assemblies werden jetzt bei Standard-Verzeichnisstrukturen
+          sowohl beim Vishnu-Debugging, als auch aus ...\Ready.bin\Vishnu.Bin heraus gefunden.
+ERLEDIGT: Die Suche nach Jobs wurde verbessert. Es genügt jetzt, die dem Job direkt	übergeordneten
+          Verzeichnisse mit anzugeben; Also zum Beispiel: DemoJobs\CheckServers,
+          anstelle von %VishnuSourceRoot%\VishnuHome\Documentation\DemoJobs\CheckServers.
+ERLEDIGT: Bugfix: Worker wurden bei existierenden NodeConnectoren auf SingleNodes mehrfach gestartet.
+ERLEDIGT: Bugfix: UserRun oder UserBreak auf einen Knoten bei pausiertem Tree führte zum Deadlock.
+ERLEDIGT: Tests ohne AddOn, alles leermachen (delete_binaries), ReadyBin löschen
 
-Stand: 21.01.2024 Version 8.1.0.0 (Progress)
+Stand: 21.01.2024 Version 8.1.6.0 (Progress)
 
 Stand: 13.02.2024 Version 8.2.0.0 (Arrival)
 
@@ -1009,15 +1025,8 @@ Hinweise:
 ###################
 
 --- TODO ----------------------------------------------------------------------------------------------------
-Fehler: Nach dem Umschalten zum Jobs-Tab und zurück positioniert Vishnu das Tree-Fenster nicht mehr korrekt.
-	-job="%Vishnu_Root%\ReadyBin\Vishnu.bin\Jobs\CheckServers" --Vishnu_Root=../../../../../.. --NoWorkers=true
-	--DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false
-	-Autostart=true -StartWithJobs=false --FlatNodeListFilter=JobConnector|NodeConnector|NodeList
-	--NoWorkers=false --AbortingAllowed=false
-	in Extensions.cs System.NullReferenceException bei
-     Matrix matrix = PresentationSource.FromVisual(element).CompositionTarget.TransformToDevice;
-
-Tests ohne AddOn, alles leermachen (delete_binaries), ReadyBin löschen
+Cooperatives Cancelling komplett implementieren (auch Checker).
+Aktuelle Size wird noch nicht in Messages und UserControls übernommen
 CheckWeatherHistory zeigt am 21.01.2024 (und auch vorerst an den Folgetagen)
 	in SaasFee bis inklusive 12:00 Uhr Mittags noch Nachtsymbole an.
 	Ist das ein Fehler oder ein Feature (Sonnenstunden/Bergabdeckung)?
@@ -1206,6 +1215,12 @@ Fehler: CheckTreeEventTwoJobConnectors: True, Exception,
 
 -------------------------------------------------------------------------------------------------------------
 Allgemeinere Ideen, etc.
+-------------------------------------------------------------------------------------------------------------
+MultiScreen Überabeitung
+1. Es wird nur moch mit SizeOnVirtualScreen = true gearbeitet; der Parameter wird stillgelegt.
+2. Der Rest sollte eigentlich schon egal sein.
+3. Ob die einzelnen Bildschirme unterschiedliche Maße und Auflösungen haben, liegt in der Verantwortung des Anwenders.
+   Ebenso, ob sie über Windows-Systemeinstellung logisch richtig angeordnet wurden (links=links, oben=onben, ...).
 -------------------------------------------------------------------------------------------------------------
 Vishnu als Signal/Interrupt-gesteuertes System
 	Motivation: die klassische Checker-Ansteuerung erfolgt über Polling durch TimerTrigger.
@@ -1457,14 +1472,24 @@ Ziel: Realisierung einer Reaktion auf Ereignisse, deren Ursache weggefallen ist.
   
   
 -------------------------------------------------------------------------------------------------
- User-Parameter -job="...\DemoJobs\Simple\ShowRefCheckTreeEventTriggerSnapshot" -UserAssemblyDirectory="...\UserAssemblies" -SingleInstance=false
+Vishnu.exe -job="...\DemoJobs\Simple\ShowRefCheckTreeEventTriggerSnapshot" -UserAssemblyDirectory="...\UserAssemblies" -SingleInstance=false
  
--job="%Vishnu_Root%\ReadyBin\Vishnu.bin\TestJobs\CheckDateDialog" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --FlatNodeListFilter=JobConnector|NodeConnector|NodeList --NoWorkers=false --AbortingAllowed=false
+Vishnu.exe -job="%Vishnu_Root%\ReadyBin\Vishnu.bin\TestJobs\CheckDateDialog" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --FlatNodeListFilter=JobConnector|NodeConnector|NodeList --NoWorkers=false --AbortingAllowed=false
 
--job="%Vishnu_Root%\ReadyBin\Vishnu.bin\TestJobs\Tests\TwoDialogNodes" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --FlatNodeListFilter=JobConnector|NodeConnector|NodeList --NoWorkers=false --AbortingAllowed=false
+Vishnu.exe -job="%Vishnu_Root%\VishnuHome\Tests\TestJobs\Tests\TwoDialogNodes" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --FlatNodeListFilter=JobConnector|NodeConnector|NodeList --NoWorkers=false --AbortingAllowed=false
 
--job="%Vishnu_Root%\ReadyBin\Vishnu.bin\Jobs\CheckAll" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --FlatNodeListFilter=JobConnector|NodeConnector|NodeList --NoWorkers=false --AbortingAllowed=false
+Vishnu.exe -job="%Vishnu_Root%\ReadyBin\Vishnu.bin\TestJobs\Tests\TwoDialogNodes" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --FlatNodeListFilter=JobConnector|NodeConnector|NodeList --NoWorkers=false --AbortingAllowed=false
 
+Vishnu.exe -job="%Vishnu_Root%\ReadyBin\Vishnu.bin\Jobs\CheckAll" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --FlatNodeListFilter=JobConnector|NodeConnector|NodeList --NoWorkers=false --AbortingAllowed=false
+
+Vishnu.exe -job="%Vishnu_Root%\VishnuHome\Tests\TestJobs\Tests\TwoDialogNodes" --Vishnu_Root=../../../../../.. --DebugMode=true -Autostart=true -StartWithJobs=false --FlatNodeListFilter=JobConnector|NodeConnector|NodeList --NoWorkers=false --AbortingAllowed=false --HelpPreference="local" --SizeOnVirtualScreen=false
+
+Vishnu.exe -job="%Vishnu_Root%\VishnuHome\Tests\TestJobs\Tests\TwoDialogNodes" --DebugMode=true -Autostart=true -StartWithJobs=false --FlatNodeListFilter=JobConnector|NodeConnector|NodeList --NoWorkers=false --AbortingAllowed=false --HelpPreference="local" --SizeOnVirtualScreen=false
+
+falsch wegen Pipe-Symbol in der Kommandozeile:
+	Vishnu.exe --FlatNodeListFilter=JobConnector|NodeConnector|NodeList -job="%Vishnu_Root%\VishnuHome\Tests\TestJobs\Tests\TwoDialogNodes" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --NoWorkers=false --AbortingAllowed=false
+korrekt mit Anführungszeichen:
+	Vishnu.exe --FlatNodeListFilter="JobConnector|NodeConnector|NodeList" -job="%Vishnu_Root%\VishnuHome\Tests\TestJobs\Tests\TwoDialogNodes" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --NoWorkers=false --AbortingAllowed=false
 -------------------------------------------------------------------------------------------------
 
 Job
@@ -1895,3 +1920,53 @@ PS > (gci -include *.cs,*.cpp,*.xaml -recurse | select-string .).Count
 ======
 
 .Net 7 migration; version 7.0.1.1
+
+
+            //   1. Zuerst wird die Property VishnuRoot vorbelegt.
+            //      1.1 Wurde VishnuRoot in irgendeiner Weise als Parameter übergeben, wird dieser
+            //          Parameter in die Property übernommen und das Hilfsfeld vishnuRootUserSet auf true
+            //          gesetzt.
+            //      1.2 Anderenfalls wird VishnuRoot mit  eine mögliche Environment-Vorbelegung Vishnu_Root oder, wenn
+            //          diese leer ist oder nicht existiert relativeVishnuRoot in die Property VishnuRoot
+            //          übernommen und das Hilfsfeld vishnuRootUserSet verbleibt auf false.
+            //      1.1 Dazu wird eine Hilfsvariable relativeVishnuRoot relativ zum aktuellen
+            //          ApplicationRootPath (Verzeichnis mit der Vishnu.exe) gesetzt.
+            //          1.1.1 Hierbei wird noch differenziert, ob es sich um eine .Net Framework-Variante
+            //                oder eine .Net (Core, 5-8, ...) Anwendung handelt (ein Rückschritt mehr).
+            //   2. Nun wird eine Hilfsvariable "vishnuRootTemp" vorerst auf "ApplicationRootPath" gesetzt.
+            //   3. Dann wird eine Vorbelegung für das Verzeichnis mit den User-Assemblies 
+            //      ("userAssemblyDirectoryCandidate") gesetzt.
+            //      2.1 Dafür wird versucht, ein Verzeichnis "UserAssemblies" auf der gleichen Ebene
+            //          wie "vishnuRootTemp" (momentan ApplicationRootPath) zu finden
+            //          (oberste Priorität hat immer ein mögliches Verzeichnis relativ zur Vishnu.exe).
+            //          2.1.1 Existiert dieses Verzeichnis, wird es als "userAssemblyDirectoryCandidate"
+            //                übernommen.
+            //          2.1.2 Existiert es nicht, wird die Hilfsvariable "vishnuRootTemp" auf "VishnuRoot"
+            //                (das Rootverzeichnis für die Vishnu-Entwicklung) gesetzt.
+            //                Dann wird entsprechend der Vishnu Standard-Verzeichnisstruktur 
+            //                "<vishnuRootTemp>/ReadyBin/UserAssemblies" als "userAssemblyDirectoryCandidate"
+            //                übernommen.
+            //   4. Zuletzt wird über den Schlüssel "UserAssemblyDirectory" nach einer Parametrisierung
+            //      für das Verzeichnis mit den User-Assemblies gesucht.
+            //      3.1 Existiert zu diesem Schlüssel ein Wert ungleich null, wird dieser der Property
+            //          "UserAssemblyDirectory" final zugewiesen.
+            //      3.2 Existiert zu diesem Schlüssel kein Wert ungleich null, wird mit dem Schlüssel
+            //          "Vishnu_UserAssemblies" im Programm-Environment nach einer möglichen
+            //          Vorbelegung gesucht.
+            //          3.2.1 Existiert zu diesem Schlüssel ein Wert ungleich null, wird dieser der
+            //                Property "UserAssemblyDirectory" final zugewiesen.
+            //          3.2.2 Existiert zu diesem Schlüssel kein Wert ungleich null, wird die
+            //                ursprünglich ermittelte Vorbelegung "userAssemblyDirectoryCandidate"
+            //                der Property "UserAssemblyDirectory" final zugewiesen.
+
+            // Ermittlung der Properties VishnuRoot und UserAssemblyDirectory zur Laufzeit.
+            // 1. Vorbelegung der Hilfsvariable "userAssemblyDirectoryCandidate" mit einem möglichen
+            //    Verzeichnis "UserAssemblies" auf derselben Hierarchiestufe des Verzeichnisses
+            //    mit der Vishnu.exe. Ein solches Verzeichnis soll vor allen anderen Möglichkeiten
+            //    Priorität haben.
+            //    
+
+
+Vishnu.exe --FlatNodeListFilter="JobConnector|NodeConnector|NodeList" -job="TestJobs\Tests\TwoDialogNodes" --NoWorkers=true --DebugMode=true --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --NoWorkers=false --AbortingAllowed=false
+2024.02.01 13:40:17 System  Job: Wert: TestJobs\Tests\TwoDialogNodes, Quelle: CommandLine
+2024.02.01 13:40:17 System  JobDirectory: Wert: C:\Users\micro\Documents\private4\WPF\openVishnu8\ReadyBin\Vishnu.bin\TestJobs\Tests\TwoDialogNodes, Quelle: registered (registered)

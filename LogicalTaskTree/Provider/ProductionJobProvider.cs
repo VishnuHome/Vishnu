@@ -22,6 +22,7 @@ namespace LogicalTaskTree.Provider
     ///   Autor: Erik Nagel
     ///   12.10.2013 Erik Nagel: erstellt
     ///   27.10.2017 Erik Nagel: Bessere Auflösung gezippter Jobs mit SubJobs.
+    ///   01.02.2024 Erik Nagel: AppSettings.JobDirPathes um "Documentation" und "Tests" erweitert.
     /// </remarks>
     public class ProductionJobProvider : JobProviderBase
     {
@@ -37,9 +38,10 @@ namespace LogicalTaskTree.Provider
             if (String.IsNullOrEmpty(logicalJobName))
             {
                 this._appSettings.JobDirPathes = new Stack<string>();
-                this._appSettings.JobDirPathes.Push("");
+                this._appSettings.JobDirPathes.Push(Path.Combine(this._appSettings.VishnuSourceRoot, "VishnuHome/Tests"));
+                this._appSettings.JobDirPathes.Push(Path.Combine(this._appSettings.VishnuSourceRoot, "VishnuHome/Documentation"));
                 this._appSettings.JobDirPathes.Push(this._appSettings.ApplicationRootPath);
-                //this._appSettings.JobDirPathes.Push(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
+                this._appSettings.JobDirPathes.Push("");
                 string rootJobPackageTmp = this._appSettings.RootJobPackagePath ?? this._appSettings.ApplicationRootPath;
                 if (this._appSettings.RootJobXmlName.ToLower() != "jobdescription.xml")
                 {
@@ -193,6 +195,10 @@ namespace LogicalTaskTree.Provider
                 }
                 jobXML = unpackIfPacked(tmpPath, isRootJob);
                 _resolvedJobDir = Path.GetDirectoryName(replaceWildcardsNPathes(jobXML, _appSettings.JobDirPathes.ToArray())) ?? "";
+                if (isRootJob)
+                {
+                    this._appSettings.AppEnvAccessor.RegisterKeyValue("JobDirectory", Path.GetFullPath(_resolvedJobDir));
+                }
                 _appSettings.JobDirPathes.Push(_resolvedJobDir);
                 if (!_appSettings.AssemblyDirectories.Contains(Path.Combine(_resolvedJobDir, "Plugin")))
                 {
@@ -1225,6 +1231,7 @@ namespace LogicalTaskTree.Provider
                 {
                     foreach (string tmpDirectory in searchDirectories)
                     {
+                        // InfoController.GetInfoPublisher().Publish("#JobSearch# '" + tmpDirectory + "'");
                         if (tmpDirectory != "")
                         {
                             if (isPathServerReachable(tmpDirectory) && Directory.Exists(tmpDirectory))
