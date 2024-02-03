@@ -33,16 +33,6 @@ namespace Vishnu.WPF_UI
             "SaveWindowAspectsAndCallViewModelLogicCommand", typeof(MainWindow));
 
         /// <summary>
-        /// Bei true werden mehrere Bildschirme als ein einziger
-        /// großer Bildschirm behandelt, ansonsten zählt für
-        /// Größen- und Positionsänderungen der Bildschirm, auf dem
-        /// sich das MainWindow hauptsächlich befindet (ActualScreen).
-        /// Wird aktuell (02.02.2024) intern immer auf true gesetzt! Vormals default: false;
-        /// Muss von außen nach Instanziierung gesetzt werden.
-        /// </summary>
-        public bool SizeOnVirtualScreen { get; set; }
-
-        /// <summary>
         /// Ganz links auf dem aktuellen Screen.
         /// </summary>
         public double MinLeft { get; set; }
@@ -99,11 +89,9 @@ namespace Vishnu.WPF_UI
         /// Konstruktor des Haupt-Fensters.
         /// </summary>
         /// <param name="startWithJobs">Bei true wird mit der Jobs-Ansicht gestartet, ansonsten mit der Tree-Ansicht (default: false).</param>
-        /// <param name="sizeOnVirtualScreen">Stillgelegter Parameter! Bei true wird über mehrere Bildschirme hinweg skaliert, ansonsten auf einen Bildschirm (aktuell: immer true!).</param>
         /// <param name="mainWindowStartAspects">Eventuell vorher gespeicherte Darstellungseigenschaften des Vishnu-MainWindow oder Defaults.</param>
-        public MainWindow(bool startWithJobs, bool sizeOnVirtualScreen, WindowAspects? mainWindowStartAspects) : base()
+        public MainWindow(bool startWithJobs, WindowAspects? mainWindowStartAspects) : base()
         {
-            this.SizeOnVirtualScreen = sizeOnVirtualScreen;
             this.MainWindowAspects = mainWindowStartAspects;
 
             this.DataContext = this;
@@ -200,22 +188,12 @@ namespace Vishnu.WPF_UI
             }
             double xFactor = 1.0;
             double yFactor = 1.0;
-            if (this.SizeOnVirtualScreen)
-            {
-                this.MaxHeight = System.Windows.SystemParameters.VirtualScreenHeight;
-                this.MaxWidth = System.Windows.SystemParameters.VirtualScreenWidth;
-                this.MinLeft = 0;
-                this.MinTop = 0;
-                // 28.01.2024 Nagel Test+- yFactor = this.MaxHeight / actScreenInfo.WorkingArea.Height;
-                // 28.01.2024 Nagel Test+- xFactor = this.MaxWidth / actScreenInfo.WorkingArea.Width;
-            }
-            //else
-            //{
-            //    this.MaxHeight = actScreenInfo.WorkingArea.Height;
-            //    this.MaxWidth = actScreenInfo.WorkingArea.Width;
-            //    this.MinLeft = actScreenInfo.Bounds.Left;
-            //    this.MinTop = actScreenInfo.Bounds.Top;
-            //}
+            this.MaxHeight = System.Windows.SystemParameters.VirtualScreenHeight;
+            this.MaxWidth = System.Windows.SystemParameters.VirtualScreenWidth;
+            this.MinLeft = 0;
+            this.MinTop = 0;
+            // 28.01.2024 Nagel Test+- yFactor = this.MaxHeight / actScreenInfo.WorkingArea.Height;
+            // 28.01.2024 Nagel Test+- xFactor = this.MaxWidth / actScreenInfo.WorkingArea.Width;
             AppSettings.MaxHeight = this.MaxHeight;
             AppSettings.MaxWidth = this.MaxWidth;
             if (this.WindowState == WindowState.Normal && this._contentRendered)
@@ -285,96 +263,6 @@ namespace Vishnu.WPF_UI
             }
         }
 
-        /* // 07.01.2024 Nagel+
-        /// <summary>
-        /// Setzt die Fenstergröße unter Berücksichtigung von Maximalgrenzen auf die
-        /// Höhe und Breite des Inhalts und die Property SizeToContent auf WidthAndHeight.
-        /// Zentriert das Window dann neu relativ zur letzten Position.
-        /// </summary>
-        public void RecalculateWindowMeasures()
-        {
-            double xFactor = 1.0;
-            double yFactor = 1.0;
-            ScreenInfo actScreenInfo = ScreenInfo.GetActualScreenInfo(this);
-            if (this.SizeOnVirtualScreen)
-            {
-                this.MaxHeight = System.Windows.SystemParameters.VirtualScreenHeight;
-                this.MaxWidth = System.Windows.SystemParameters.VirtualScreenWidth;
-                this.MinLeft = 0;
-                this.MinTop = 0;
-                yFactor = this.MaxHeight / actScreenInfo.WorkingArea.Height;
-                xFactor = this.MaxWidth / actScreenInfo.WorkingArea.Width;
-            }
-            else
-            {
-                this.MaxHeight = actScreenInfo.WorkingArea.Height;
-                this.MaxWidth = actScreenInfo.WorkingArea.Width;
-                this.MinLeft = actScreenInfo.WorkingArea.Left;
-                this.MinTop = actScreenInfo.WorkingArea.Top;
-            }
-            if (this.WindowState == WindowState.Normal && this._contentRendered)
-            {
-                double effectiveHeight = this.ActualHeight + SystemParameters.WindowCaptionHeight;
-                if (this.SizeToContent == System.Windows.SizeToContent.WidthAndHeight)
-                {
-                    double lastWidth = this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Width;
-                    double lastHeight = this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Height;
-                    double widthDiff = 0;
-                    double heightDiff = 0;
-                    double newLeft = this.Left;
-                    double newTop = this.Top;
-                    if (lastWidth + lastHeight > 0)
-                    {
-                        widthDiff = lastWidth - this.ActualWidth;
-                        heightDiff = lastHeight - effectiveHeight;
-                        newLeft += (widthDiff / 2.0);
-                        newTop += (heightDiff / 2.0);
-                    }
-                    else
-                    {
-                        newLeft = (newLeft + this.ActualWidth / 2) * xFactor - (this.ActualWidth / 2);
-                        newTop = (newTop + effectiveHeight / 2) * yFactor - (effectiveHeight / 2);
-                    }
-                    bool bottomBorderViolated = false;
-                    if (this.Top + this.ActualHeight > this.MaxHeight)
-                    {
-                        bottomBorderViolated = true;
-                    }
-                    bool rightBorderViolated = false;
-                    if (this.Left + this.ActualWidth > this.MaxWidth)
-                    {
-                        rightBorderViolated = true;
-                    }
-                    if (newLeft + this.ActualWidth > this.MaxWidth)
-                    {
-                        newLeft = this.MaxWidth - this.ActualWidth;
-                    }
-                    if (newTop + this.ActualHeight > this.MaxHeight)
-                    {
-                        newTop = this.MaxHeight - effectiveHeight;
-                    }
-                    if (lastWidth + lastHeight == 0 && this.SizeOnVirtualScreen)
-                    {
-                        this.Left = newLeft;
-                        this.Top = newTop;
-                    }
-                    if (bottomBorderViolated || lastWidth + lastHeight > 0)
-                    {
-                        this.Top = newTop >= this.MinTop ? newTop : this.MinTop;
-                    }
-                    if (rightBorderViolated)
-                    {
-                        this.Left = newLeft >= this.MinLeft ? newLeft : this.MinLeft;
-                    }
-                    effectiveHeight = this.ActualHeight + SystemParameters.WindowCaptionHeight;
-                }
-                this._tabManualSize[this.MainTabControl.SelectedIndex] = this.SizeToContent == System.Windows.SizeToContent.Manual;
-                this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Width = this.ActualWidth;
-                this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Height = effectiveHeight;
-                this.IsRelocating = false;
-            }
-        } */ // 07.01.2024 Nagel-
-
         /// <summary>
         /// Centers Window on Screen.
         /// </summary>
@@ -387,7 +275,6 @@ namespace Vishnu.WPF_UI
 
         #region private members
 
-        // 14.10.2015 Erik Nagel+ wieder aktiviert. TEST: 11.10.2015 Erik Nagel+- deaktiviert.
         private System.Timers.Timer _forceScreenRefreshTimer;
         private bool _contentRendered;
         private DispatcherTimer? _sizeChangedTimer;
@@ -479,21 +366,10 @@ namespace Vishnu.WPF_UI
         {
             double windowWidth = this.Width;
             double windowHeight = this.Height + SystemParameters.WindowCaptionHeight;
-            if (this.SizeOnVirtualScreen)
-            {
-                this.MaxHeight = System.Windows.SystemParameters.VirtualScreenHeight;
-                this.MaxWidth = System.Windows.SystemParameters.VirtualScreenWidth;
-                this.MinLeft = 0;
-                this.MinTop = 0;
-            }
-            //else
-            //{
-            //    ScreenInfo actScreenInfo = ScreenInfo.GetActualScreenInfo(this);
-            //    this.MaxHeight = actScreenInfo.WorkingArea.Height;
-            //    this.MaxWidth = actScreenInfo.WorkingArea.Width;
-            //    this.MinLeft = actScreenInfo.WorkingArea.Left;
-            //    this.MinTop = actScreenInfo.WorkingArea.Top;
-            //}
+            this.MaxHeight = System.Windows.SystemParameters.VirtualScreenHeight;
+            this.MaxWidth = System.Windows.SystemParameters.VirtualScreenWidth;
+            this.MinLeft = 0;
+            this.MinTop = 0;
 
             if (windowHeight > this.MaxHeight)
             {

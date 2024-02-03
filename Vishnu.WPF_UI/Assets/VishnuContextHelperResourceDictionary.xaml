@@ -77,19 +77,6 @@
     </Style>
     <ContextMenu Name="cmContextMenu" x:Key="cmContextMenu">
         <Separator />
-        <MenuItem Name="SwitchTaskTreeView" Style="{StaticResource MenuItemTemplate}">
-            <MenuItem.Header>
-                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
-                        Command="{Binding SwitchTaskTreeView, diag:PresentationTraceSources.TraceLevel=High}">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="../Media/yin_yang.png" Width="15" Height="15" Margin="0,0,5,0" />
-                            <TextBlock Text="Change Tree-Orientation" />
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-            </MenuItem.Header>
-        </MenuItem>
         <MenuItem Name="ShowVishnuHelp" Style="{StaticResource MenuItemTemplate}">
             <MenuItem.Header>
                 <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
@@ -97,46 +84,7 @@
                     <Button.Content>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../Media/help.png" Width="15" Height="15" Margin="0,0,5,0"/>
-                            <TextBlock Text="Show Vishnu Help" />
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-            </MenuItem.Header>
-        </MenuItem>
-        <MenuItem Name="ReloadTaskTree" Style="{StaticResource MenuItemTemplate}">
-            <MenuItem.Header>
-                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
-                        Command="{Binding ReloadLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="../Media/reloadTree.png" Width="15" Height="15" Margin="0,0,5,0" />
-                            <TextBlock Text="Reload Tree" />
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-            </MenuItem.Header>
-        </MenuItem>
-        <MenuItem Name="LogTaskTree" Style="{StaticResource MenuItemTemplate}">
-            <MenuItem.Header>
-                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
-                        Command="{Binding LogLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="../Media/dumpTree.png" Width="15" Height="15" Margin="0,0,5,0"/>
-                            <TextBlock Text="Log Tree" />
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-            </MenuItem.Header>
-        </MenuItem>
-        <MenuItem Name="ShowLogTaskTree" Style="{StaticResource MenuItemTemplate}">
-            <MenuItem.Header>
-                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
-                        Command="{Binding ShowLogLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="../Media/research.png" Width="15" Height="15" Margin="0,0,5,0"/>
-                            <TextBlock Text="Show Log" />
+                            <TextBlock Text="Vishnu Hilfe (F1)" />
                         </StackPanel>
                     </Button.Content>
                 </Button>
@@ -149,7 +97,59 @@
                     <Button.Content>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../Media/dna.png" Width="15" Height="15" Margin="0,0,5,0"/>
-                            <TextBlock Text="Show Settings" />
+                            <TextBlock Text="Einstellungen" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem Name="ShowLogTaskTree" Style="{StaticResource MenuItemTemplate}">
+            <MenuItem.Header>
+                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
+                        Command="{Binding ShowLogLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../Media/research.png" Width="15" Height="15" Margin="0,0,5,0"/>
+                            <TextBlock Text="Vishnu Logdatei" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem Name="SwitchTaskTreeView" Style="{StaticResource MenuItemTemplate}">
+            <MenuItem.Header>
+                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
+                        Command="{Binding SwitchTaskTreeView, diag:PresentationTraceSources.TraceLevel=High}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../Media/yin_yang.png" Width="15" Height="15" Margin="0,0,5,0" />
+                            <TextBlock Text="Tree-Ausrichtung (F4)" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem Name="ReloadTaskTree" Style="{StaticResource MenuItemTemplate}">
+            <MenuItem.Header>
+                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
+                        Command="{Binding ReloadLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../Media/reloadTree.png" Width="15" Height="15" Margin="0,0,5,0" />
+                            <TextBlock Text="Tree neu laden" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem Name="LogTaskTree" Style="{StaticResource MenuItemTemplate}">
+            <MenuItem.Header>
+                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
+                        Command="{Binding LogLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../Media/dumpTree.png" Width="15" Height="15" Margin="0,0,5,0"/>
+                            <TextBlock Text="Tree loggen" />
                         </StackPanel>
                     </Button.Content>
                 </Button>
@@ -176,10 +176,10 @@
                             <TextBlock Name="PauseTreeText">
                                 <TextBlock.Style>
                                     <Style TargetType="{x:Type TextBlock}">
-                                        <Setter Property="Text" Value="Pause Tree" />
+                                        <Setter Property="Text" Value="Tree anhalten" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsTreePaused, diag:PresentationTraceSources.TraceLevel=High}" Value="True">
-                                                <Setter Property="Text" Value="Resume Tree" />
+                                                <Setter Property="Text" Value="Tree laufen lassen" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>

@@ -262,15 +262,6 @@ namespace Vishnu.Interchange
         public string RootJobXmlName { get; set; }
 
         /// <summary>
-        /// Bei true werden mehrere Bildschirme als ein einziger
-        /// großer Bildschirm behandelt, ansonsten zählt für
-        /// Größen- und Positionsänderungen der Bildschirm, auf dem
-        /// sich das MainWindow hauptsächlich befindet (ActualScreen).
-        /// Default: false.
-        /// </summary>
-        public bool SizeOnVirtualScreen { get; set; }
-
-        /// <summary>
         /// Beginn einer vom User definierten Ruhezeit für Vishnu-Akteure (Checker).
         /// </summary>
         public TimeSpan SleepTimeFrom { get; set; }
@@ -653,8 +644,6 @@ namespace Vishnu.Interchange
             {
                 this.Autostart = this.GetValue<bool>("Autostart", false);
             }
-            // 02.02.2024 Nagel+ vorläufig immer true. this.SizeOnVirtualScreen = this.GetValue<bool>("SizeOnVirtualScreen", false);
-            this.SizeOnVirtualScreen = true; // 02.02.2024 Nagel-
             this.LoadJobDialog = this.GetValue<bool>("LoadJobDialog", false);
             this.LogicalChangedDelay = this.GetValue<int>("LogicalChangedDelay", 0);
             this.LogicalChangedDelayPower = this.GetValue<double>("LogicalChangedDelayPower", 0);
