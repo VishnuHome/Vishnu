@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Windows.Media.TextFormatting;
 using NetEti.ApplicationControl;
 using System.Security.Cryptography.Xml;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Vishnu.WPF_UI
 {
@@ -31,6 +32,16 @@ namespace Vishnu.WPF_UI
         public static RoutedUICommand SaveWindowAspectsAndCallViewModelLogicCommand =
         new RoutedUICommand("SaveWindowAspectsAndCallViewModelLogicCommand",
             "SaveWindowAspectsAndCallViewModelLogicCommand", typeof(MainWindow));
+
+        /// <summary>
+        /// Bei true werden mehrere Bildschirme als ein einziger
+        /// großer Bildschirm behandelt, ansonsten zählt für
+        /// Größen- und Positionsänderungen der Bildschirm, auf dem
+        /// sich das MainWindow hauptsächlich befindet (ActualScreen).
+        /// Wird aktuell (02.02.2024) intern immer auf true gesetzt! Vormals default: false;
+        /// Muss von außen nach Instanziierung gesetzt werden.
+        /// </summary>
+        public bool SizeOnVirtualScreen { get; set; }
 
         /// <summary>
         /// Ganz links auf dem aktuellen Screen.
@@ -89,9 +100,11 @@ namespace Vishnu.WPF_UI
         /// Konstruktor des Haupt-Fensters.
         /// </summary>
         /// <param name="startWithJobs">Bei true wird mit der Jobs-Ansicht gestartet, ansonsten mit der Tree-Ansicht (default: false).</param>
+        /// <param name="sizeOnVirtualScreen">Stillgelegter Parameter! Bei true wird über mehrere Bildschirme hinweg skaliert, ansonsten auf einen Bildschirm (aktuell: immer true!).</param>
         /// <param name="mainWindowStartAspects">Eventuell vorher gespeicherte Darstellungseigenschaften des Vishnu-MainWindow oder Defaults.</param>
-        public MainWindow(bool startWithJobs, WindowAspects? mainWindowStartAspects) : base()
+        public MainWindow(bool startWithJobs, bool sizeOnVirtualScreen, WindowAspects? mainWindowStartAspects) : base()
         {
+            this.SizeOnVirtualScreen = sizeOnVirtualScreen;
             this.MainWindowAspects = mainWindowStartAspects;
 
             this.DataContext = this;
@@ -188,14 +201,25 @@ namespace Vishnu.WPF_UI
             }
             double xFactor = 1.0;
             double yFactor = 1.0;
-            this.MaxHeight = System.Windows.SystemParameters.VirtualScreenHeight;
-            this.MaxWidth = System.Windows.SystemParameters.VirtualScreenWidth;
-            this.MinLeft = 0;
-            this.MinTop = 0;
+            if (this.SizeOnVirtualScreen)
+            {
+                this.MaxHeight = System.Windows.SystemParameters.VirtualScreenHeight;
+                this.MaxWidth = System.Windows.SystemParameters.VirtualScreenWidth;
+                this.MinLeft = 0;
+                this.MinTop = 0;
+                // 28.01.2024 Nagel Test+- yFactor = this.MaxHeight / actScreenInfo.WorkingArea.Height;
+                // 28.01.2024 Nagel Test+- xFactor = this.MaxWidth / actScreenInfo.WorkingArea.Width;
+            }
+            else
+            {
+                this.MaxHeight = actScreenInfo.WorkingArea.Height;
+                this.MaxWidth = actScreenInfo.WorkingArea.Width;
+                this.MinLeft = actScreenInfo.Bounds.Left;
+                this.MinTop = actScreenInfo.Bounds.Top;
+            }
             // 28.01.2024 Nagel Test+- yFactor = this.MaxHeight / actScreenInfo.WorkingArea.Height;
             // 28.01.2024 Nagel Test+- xFactor = this.MaxWidth / actScreenInfo.WorkingArea.Width;
-            AppSettings.MaxHeight = this.MaxHeight;
-            AppSettings.MaxWidth = this.MaxWidth;
+            AppSettings.ActScreenBounds = actScreenInfo.Bounds;
             if (this.WindowState == WindowState.Normal && this._contentRendered)
             {
                 double effectiveHeight = this.ActualHeight + SystemParameters.WindowCaptionHeight;
@@ -242,15 +266,13 @@ namespace Vishnu.WPF_UI
                     {
                         newTop = this.MinTop;
                     }
-                    if (newLeft > this.MaxWidth - 50)
+                    if (newLeft > this.MinLeft + this.MaxWidth - 50)
                     {
-                        // throw new ArithmeticException("newLeft > this.MaxWidth - 50");
-                        newLeft = this.MaxWidth - 50;
+                        newLeft = this.MinLeft + this.MaxWidth - 50;
                     }
-                    if (newTop > MaxHeight - 35)
+                    if (newTop > this.MinTop + MaxHeight - 35)
                     {
-                        // throw new ArithmeticException("newTop > this.MaxHeight - 35");
-                        newTop = this.MaxHeight - 35;
+                        newTop = this.MinTop + this.MaxHeight - 35;
                     }
                     this.Left = newLeft;
                     this.Top = newTop;
@@ -327,16 +349,16 @@ namespace Vishnu.WPF_UI
                 }
                 if (!this.MainWindowAspects.IsScrollbarVisible)
                 {
-                    this.ForceRecalculateWindowMeasures(null);
+                    // 09.02.2024 Nagel+- Test: this.ForceRecalculateWindowMeasures(null);
                 }
                 else
                 {
-                    this.RecalculateWindowMeasures();
+                    // 09.02.2024 Nagel+- Test: this.RecalculateWindowMeasures();
                 }
             }
             else
             {
-                this.RecalculateWindowMeasures();
+                // 09.02.2024 Nagel+- Test: this.RecalculateWindowMeasures();
             }
         }
 
@@ -366,11 +388,21 @@ namespace Vishnu.WPF_UI
         {
             double windowWidth = this.Width;
             double windowHeight = this.Height + SystemParameters.WindowCaptionHeight;
-            this.MaxHeight = System.Windows.SystemParameters.VirtualScreenHeight;
-            this.MaxWidth = System.Windows.SystemParameters.VirtualScreenWidth;
-            this.MinLeft = 0;
-            this.MinTop = 0;
-
+            if (this.SizeOnVirtualScreen)
+            {
+                this.MaxHeight = System.Windows.SystemParameters.VirtualScreenHeight;
+                this.MaxWidth = System.Windows.SystemParameters.VirtualScreenWidth;
+                this.MinLeft = 0;
+                this.MinTop = 0;
+            }
+            else
+            {
+                ScreenInfo actScreenInfo = ScreenInfo.GetActualScreenInfo(this);
+                this.MaxHeight = actScreenInfo.WorkingArea.Height;
+                this.MaxWidth = actScreenInfo.WorkingArea.Width;
+                this.MinLeft = actScreenInfo.WorkingArea.Left;
+                this.MinTop = actScreenInfo.WorkingArea.Top;
+            }
             if (windowHeight > this.MaxHeight)
             {
                 windowHeight = this.MaxHeight;

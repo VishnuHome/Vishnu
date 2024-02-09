@@ -85,4 +85,10 @@
 	  <ProjectReference Include="..\Vishnu.Interchange\Vishnu.Interchange.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Reference Include="NetEti.MultiScreen">
+	    <HintPath>..\..\..\ReadyBin\Assemblies\NetEti.MultiScreen.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
 </Project>

@@ -9,6 +9,7 @@ using Vishnu.Interchange;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NetEti.CustomControls;
+using NetEti.MultiScreen;
 
 namespace Vishnu.ViewModel
 {
@@ -192,15 +193,17 @@ namespace Vishnu.ViewModel
                     {
                         // TODO: Beim Hin- Und Herschalten zwischen Tree-und Jobs-Ansicht
                         // wird die korrekte Anfangsposition nicht gehalten (Stand 22.01.2024 Nagel).
+                        ScreenInfo actScreenInfo = ScreenInfo.GetMainWindowScreenInfo();
+                        AppSettings.ActScreenBounds = actScreenInfo.Bounds;
                         Point lastParentViewAbsoluteScreenPosition =
                             WindowAspects.GetFrameworkElementAbsoluteScreenPosition(this._uIMain, false);
-                        if (lastParentViewAbsoluteScreenPosition.X > AppSettings.MaxWidth - 50)
+                        if (lastParentViewAbsoluteScreenPosition.X > AppSettings.ActScreenBounds.Right - 50)
                         {
-                            lastParentViewAbsoluteScreenPosition.X = AppSettings.MaxWidth - 50;
+                            lastParentViewAbsoluteScreenPosition.X = AppSettings.ActScreenBounds.Bottom - 50;
                         }
-                        if (lastParentViewAbsoluteScreenPosition.Y > AppSettings.MaxHeight - 35)
+                        if (lastParentViewAbsoluteScreenPosition.Y > AppSettings.ActScreenBounds.Right - 35)
                         {
-                            lastParentViewAbsoluteScreenPosition.Y = AppSettings.MaxHeight - 35;
+                            lastParentViewAbsoluteScreenPosition.Y = AppSettings.ActScreenBounds.Bottom - 35;
                         }
                         this.TreeParams.LastParentViewAbsoluteScreenPosition =
                             lastParentViewAbsoluteScreenPosition;

@@ -228,16 +228,10 @@ namespace Vishnu.Interchange
         }
 
         /// <summary>
-        /// Wird programmintern als Merkfeld für die aktuelle maximale Bildschirmhöhe genutzt.
+        /// Wird programmintern als Merkfeld für die aktuellen Bildschirmgrenzen genutzt.
         /// Wird von MainWindow.xaml.cs gesetzt.
         /// </summary>
-        public static double MaxHeight { get; set; }
-
-        /// <summary>
-        /// Wird programmintern als Merkfeld für die aktuelle maximale Bildschirmbreite genutzt.
-        /// Wird von MainWindow.xaml.cs gesetzt.
-        /// </summary>
-        public static double MaxWidth { get; set; }
+        public static Rect ActScreenBounds { get; set; }
 
         /// <summary>
         /// Bei True werden definierte Worker nicht aufgerufen.
@@ -260,6 +254,15 @@ namespace Vishnu.Interchange
         /// Default: JobDescription.xml.
         /// </summary>
         public string RootJobXmlName { get; set; }
+
+        /// <summary>
+        /// Bei true werden mehrere Bildschirme als ein einziger
+        /// großer Bildschirm behandelt, ansonsten zählt für
+        /// Größen- und Positionsänderungen der Bildschirm, auf dem
+        /// sich das MainWindow hauptsächlich befindet (ActualScreen).
+        /// Default: false.
+        /// </summary>
+        public bool SizeOnVirtualScreen { get; set; }
 
         /// <summary>
         /// Beginn einer vom User definierten Ruhezeit für Vishnu-Akteure (Checker).
@@ -644,6 +647,7 @@ namespace Vishnu.Interchange
             {
                 this.Autostart = this.GetValue<bool>("Autostart", false);
             }
+            this.SizeOnVirtualScreen = this.GetValue<bool>("SizeOnVirtualScreen", false);
             this.LoadJobDialog = this.GetValue<bool>("LoadJobDialog", false);
             this.LogicalChangedDelay = this.GetValue<int>("LogicalChangedDelay", 0);
             this.LogicalChangedDelayPower = this.GetValue<double>("LogicalChangedDelayPower", 0);

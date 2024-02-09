@@ -17,6 +17,7 @@ using System.Windows.Navigation;
 using System.Diagnostics;
 using System.Windows.Threading;
 using System.Windows.Shell;
+using NetEti.MultiScreen;
 
 namespace LogicalTaskTree
 {
@@ -2062,17 +2063,20 @@ namespace LogicalTaskTree
             {
                 if (this.ParentView != null)
                 {
+                    ScreenInfo actScreenInfo = ScreenInfo.GetMainWindowScreenInfo();
+                    AppSettings.ActScreenBounds = actScreenInfo.Bounds;
+
                     // TODO: Beim Hin- Und Herschalten zwischen Tree-und Jobs-Ansicht
                     // wird die korrekte Anfangsposition nicht gehalten (Stand 22.01.2024 Nagel).
                     Point lastParentViewAbsoluteScreenPosition =
                         WindowAspects.GetFrameworkElementAbsoluteScreenPosition(this.ParentView, false);
-                    if (lastParentViewAbsoluteScreenPosition.X > AppSettings.MaxWidth - 50)
+                    if (lastParentViewAbsoluteScreenPosition.X > AppSettings.ActScreenBounds.Right - 50)
                     {
-                        lastParentViewAbsoluteScreenPosition.X = AppSettings.MaxWidth - 50;
+                        lastParentViewAbsoluteScreenPosition.X = AppSettings.ActScreenBounds.Right - 50;
                     }
-                    if (lastParentViewAbsoluteScreenPosition.Y > AppSettings.MaxHeight - 35)
+                    if (lastParentViewAbsoluteScreenPosition.Y > AppSettings.ActScreenBounds.Bottom - 35)
                     {
-                        lastParentViewAbsoluteScreenPosition.Y = AppSettings.MaxHeight - 35;
+                        lastParentViewAbsoluteScreenPosition.Y = AppSettings.ActScreenBounds.Bottom - 35;
                     }
                     this.TreeParams.LastParentViewAbsoluteScreenPosition =
                         lastParentViewAbsoluteScreenPosition;

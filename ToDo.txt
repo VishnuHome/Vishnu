@@ -973,7 +973,6 @@ Stand: 15.01.2024 Version 8.0.4.0 (Discovery)
 ERLEDIGT: Komplettüberarbeitung der Positionierung von Fenstern, WPF-Dialog-Checkern und Meldungen
           auf einem und mehreren Bildschirmen.
           Dabei Berücksichtigung verschiedener Bildschirmauflösungen und Skalierungen.
-ERLEDIGT: Worker wurden bei existierenden NodeConnectoren auf SingleNodes mehrfach gestartet.
 ERLEDIGT: Speichern-Meldung zentrierte noch auf dem Screen.
 ERLEDIGT: Automatisierung des Copyright Gültigkeitsendes.
 ERLEDIGT: Die Vishnu-Hilfe wurde über F1 und im Kontext-Menü integriert.
@@ -1026,10 +1025,15 @@ Hinweise:
 
 --- TODO ----------------------------------------------------------------------------------------------------
 Cooperatives Cancelling komplett implementieren (auch Checker).
-Aktuelle Size wird noch nicht in Messages und UserControls übernommen
+Speichern der Bildschirmdarstellung (Strg-s) mit in das Kontextmenü aufnehmen.
+Aktuelle Size wird noch nicht in Messages und UserControls übernommen.
 CheckWeatherHistory zeigt am 21.01.2024 (und auch vorerst an den Folgetagen)
 	in SaasFee bis inklusive 12:00 Uhr Mittags noch Nachtsymbole an.
 	Ist das ein Fehler oder ein Feature (Sonnenstunden/Bergabdeckung)?
+SizeOnVirtualScreen wieder einführen: bei false Größe und Position bei mehreren Bildschirmen
+	trotzdem auf einen beschränken (Umschalten in die Jobs-Ansicht und zurück).
+%VishnuSourceRoot% in ...\Vishnu\Vishnu\bin\Debug\net8.0-windows7.0\ und ...\ReadyBin\Vishnu.bin
+	verhindern (Snapshots umleiten).
 openVishnu7 mit VS2022 pre, Vishnu5 mit VS2022 pre
 free mini tetris
 NetWorkMappingsRefresher debuggen

@@ -65,9 +65,8 @@ namespace Vishnu.Interchange
                 if (value != null && this._parentView != value)
                 {
                     this._parentView = value;
-                    this._lastParentViewAbsoluteScreenPosition =
-                        GetParentViewAbsoluteScreenPosition();
                 }
+                this._lastParentViewAbsoluteScreenPosition = GetParentViewAbsoluteScreenPosition();
             }
         }
 
