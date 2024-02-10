@@ -2063,8 +2063,8 @@ namespace LogicalTaskTree
             {
                 if (this.ParentView != null)
                 {
-                    ScreenInfo actScreenInfo = ScreenInfo.GetMainWindowScreenInfo();
-                    AppSettings.ActScreenBounds = actScreenInfo.Bounds;
+                    // 10.02.2024 Erik Nagel auskommentiert+ ScreenInfo actScreenInfo = ScreenInfo.GetMainWindowScreenInfo();
+                    // 10.02.2024 Erik Nagel auskommentiert- AppSettings.ActScreenBounds = actScreenInfo.Bounds;
 
                     // TODO: Beim Hin- Und Herschalten zwischen Tree-und Jobs-Ansicht
                     // wird die korrekte Anfangsposition nicht gehalten (Stand 22.01.2024 Nagel).

@@ -193,7 +193,8 @@ namespace Vishnu.ViewModel
                     {
                         // TODO: Beim Hin- Und Herschalten zwischen Tree-und Jobs-Ansicht
                         // wird die korrekte Anfangsposition nicht gehalten (Stand 22.01.2024 Nagel).
-                        ScreenInfo actScreenInfo = ScreenInfo.GetMainWindowScreenInfo();
+                        ScreenInfo actScreenInfo = ScreenInfo.GetMainWindowScreenInfo()
+                            ?? throw new NullReferenceException("ScreenInfo darf hier nicht null sein.");
                         AppSettings.ActScreenBounds = actScreenInfo.Bounds;
                         Point lastParentViewAbsoluteScreenPosition =
                             WindowAspects.GetFrameworkElementAbsoluteScreenPosition(this._uIMain, false);

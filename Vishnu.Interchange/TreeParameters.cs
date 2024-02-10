@@ -148,10 +148,10 @@ namespace Vishnu.Interchange
         /// Liefert threadsafe Position und Maße das MainWindow.
         /// </summary>
         /// <returns>Bildschirminformationen zum MainWindow.</returns>
-        public ScreenInfo ThreadAccessMainWindowScreenInfo()
+        public ScreenInfo? ThreadAccessMainWindowScreenInfo()
         {
-            return (ScreenInfo)Application.Current.Dispatcher.Invoke(
-                new Func<ScreenInfo>(ThreadAccessMainWindowScreenInfoOnGuiDispatcher), DispatcherPriority.Normal);
+            return (ScreenInfo?)Application.Current.Dispatcher.Invoke(
+                new Func<ScreenInfo?>(ThreadAccessMainWindowScreenInfoOnGuiDispatcher), DispatcherPriority.Normal);
         }
 
         private FrameworkElement? _parentView;
@@ -161,7 +161,7 @@ namespace Vishnu.Interchange
         /// Liefert threadsafe Position und Maße das MainWindow.
         /// </summary>
         /// <returns>Bildschirminformationen zum MainWindow.</returns>
-        private ScreenInfo ThreadAccessMainWindowScreenInfoOnGuiDispatcher()
+        private ScreenInfo? ThreadAccessMainWindowScreenInfoOnGuiDispatcher()
         {
             Window mainWindow = Application.Current.MainWindow;
             return ScreenInfo.GetActualScreenInfo(mainWindow);

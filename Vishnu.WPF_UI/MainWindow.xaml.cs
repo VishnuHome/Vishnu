@@ -125,6 +125,7 @@ namespace Vishnu.WPF_UI
             this._lastWindowMeasures = new Rect[this.MainTabControl.Items.Count];
 
             this.MainTabControl.SelectionChanged += MainTabControl_SelectionChanged;
+            this.LocationChanged += MainWindow_LocationChanged;
 
             // Funktioniert nicht:
             // Registrieren des the Bubble Event Handlers 
@@ -164,6 +165,15 @@ namespace Vishnu.WPF_UI
             this._forceScreenRefreshTimer.Enabled = true;
         }
 
+        private void MainWindow_LocationChanged(object? sender, EventArgs e)
+        {
+            ScreenInfo? actScreenInfo = ScreenInfo.GetMainWindowScreenInfo();
+            if (actScreenInfo != null)
+            {
+                AppSettings.ActScreenBounds = actScreenInfo.Bounds;
+            }
+        }
+
         /// <summary>
         /// Setzt die Fenstergröße unter Berücksichtigung von Maximalgrenzen auf die
         /// Höhe und Breite des Inhalts und die Property SizeToContent auf WidthAndHeight.
@@ -185,7 +195,12 @@ namespace Vishnu.WPF_UI
         {
             double lastWidth = this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Width;
             double lastHeight = this._lastWindowMeasures[this.MainTabControl.SelectedIndex].Height;
-            ScreenInfo actScreenInfo = ScreenInfo.GetActualScreenInfo(this);
+            ScreenInfo? tmpScreenInfo = ScreenInfo.GetActualScreenInfo(this);
+            if (tmpScreenInfo == null)
+            {
+                return;
+            }
+            ScreenInfo actScreenInfo = tmpScreenInfo;
             if (lastWidth + lastHeight == 0 && this.MainWindowAspects != null)
             {
                 // actScreenInfo = ScreenInfo.GetAllScreenInfos(this)[MainWindowAspects.ActScreenIndex];
@@ -397,7 +412,8 @@ namespace Vishnu.WPF_UI
             }
             else
             {
-                ScreenInfo actScreenInfo = ScreenInfo.GetActualScreenInfo(this);
+                ScreenInfo actScreenInfo = ScreenInfo.GetActualScreenInfo(this)
+                    ?? throw new NullReferenceException("ScreenInfo darf hier nicht null sein.");
                 this.MaxHeight = actScreenInfo.WorkingArea.Height;
                 this.MaxWidth = actScreenInfo.WorkingArea.Width;
                 this.MinLeft = actScreenInfo.WorkingArea.Left;

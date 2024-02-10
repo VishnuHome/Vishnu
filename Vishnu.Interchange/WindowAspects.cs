@@ -62,7 +62,7 @@ namespace Vishnu.Interchange
         /// Der Index des Screens, in dem zum Zeitpunkt des Abspeicherns
         /// das MainWindow angezeigt wird.
         /// </summary>
-        public int ActScreenIndex { get; set; }
+        public int? ActScreenIndex { get; set; }
 
         /// <summary>
         /// 0: Tree-Ansicht, 1: Jobs-Ansicht.
