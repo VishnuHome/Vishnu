@@ -364,16 +364,14 @@ namespace Vishnu.WPF_UI
                 }
                 if (!this.MainWindowAspects.IsScrollbarVisible)
                 {
-                    // 09.02.2024 Nagel+- Test: this.ForceRecalculateWindowMeasures(null);
+                    // 11.02.2024 Nagel: notwendig, sonst entstehen doch Scrollbars.
+                    this.ForceRecalculateWindowMeasures(null);
                 }
-                else
-                {
-                    // 09.02.2024 Nagel+- Test: this.RecalculateWindowMeasures();
-                }
-            }
-            else
-            {
-                // 09.02.2024 Nagel+- Test: this.RecalculateWindowMeasures();
+                // 11.02.2024 Nagel+- Test: auskommentiert
+                //else
+                //{
+                //    this.RecalculateWindowMeasures();
+                //}
             }
         }
 

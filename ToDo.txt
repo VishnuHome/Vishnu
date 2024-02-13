@@ -993,6 +993,9 @@ ERLEDIGT: Tests ohne AddOn, alles leermachen (delete_binaries), ReadyBin löschen
 
 Stand: 21.01.2024 Version 8.1.6.0 (Progress)
 
+SizeOnVirtualScreen wieder einführen: bei false Größe und Position bei mehreren Bildschirmen
+	trotzdem auf einen beschränken (Umschalten in die Jobs-Ansicht und zurück).
+
 Stand: 13.02.2024 Version 8.2.0.0 (Arrival)
 
 -------------------------------------------------------------------------------------------------------------
@@ -1027,13 +1030,11 @@ Hinweise:
 Cooperatives Cancelling komplett implementieren (auch Checker).
 Speichern der Bildschirmdarstellung (Strg-s) mit in das Kontextmenü aufnehmen.
 Aktuelle Size wird noch nicht in Messages und UserControls übernommen.
+Icon für die Vishnu-Hilfe.
+Icon für Vishnu-Meldungen verbessern.
 CheckWeatherHistory zeigt am 21.01.2024 (und auch vorerst an den Folgetagen)
 	in SaasFee bis inklusive 12:00 Uhr Mittags noch Nachtsymbole an.
 	Ist das ein Fehler oder ein Feature (Sonnenstunden/Bergabdeckung)?
-SizeOnVirtualScreen wieder einführen: bei false Größe und Position bei mehreren Bildschirmen
-	trotzdem auf einen beschränken (Umschalten in die Jobs-Ansicht und zurück).
-%VishnuSourceRoot% in ...\Vishnu\Vishnu\bin\Debug\net8.0-windows7.0\ und ...\ReadyBin\Vishnu.bin
-	verhindern (Snapshots umleiten).
 openVishnu7 mit VS2022 pre, Vishnu5 mit VS2022 pre
 free mini tetris
 NetWorkMappingsRefresher debuggen
@@ -1974,3 +1975,4 @@ PS > (gci -include *.cs,*.cpp,*.xaml -recurse | select-string .).Count
 Vishnu.exe --FlatNodeListFilter="JobConnector|NodeConnector|NodeList" -job="TestJobs\Tests\TwoDialogNodes" --NoWorkers=true --DebugMode=true --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --NoWorkers=false --AbortingAllowed=false
 2024.02.01 13:40:17 System  Job: Wert: TestJobs\Tests\TwoDialogNodes, Quelle: CommandLine
 2024.02.01 13:40:17 System  JobDirectory: Wert: C:\Users\micro\Documents\private4\WPF\openVishnu8\ReadyBin\Vishnu.bin\TestJobs\Tests\TwoDialogNodes, Quelle: registered (registered)
+-job="TestJobs/Tests/TwoDialogNodes" --DebugMode=true -Autostart=true -StartWithJobs=false --FlatNodeListFilter="JobConnector|NodeConnector|NodeList" --NoWorkers=false --AbortingAllowed=false --HelpPreference="local"
