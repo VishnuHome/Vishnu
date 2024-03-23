@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using Vishnu.ViewModel;
+﻿using Vishnu.ViewModel;
 using NetEti.ApplicationControl;
 using NetEti.Globals;
 using System;
@@ -8,30 +7,51 @@ using NetEti.CustomControls;
 using LogicalTaskTree.Provider;
 using System.Reflection;
 using System.Text;
-using Microsoft.VisualBasic.ApplicationServices;
-using Microsoft.Win32;
+using Microsoft.Win32; // wegen Registry-Zugriff
 using Vishnu.Interchange;
+using System.Security.Policy;
+using System.Windows.Threading;
+using System.Diagnostics;
 
 namespace Vishnu
 {
     /// <summary>
+    /// Hauptklasse für den Start der WPF-Anwendung.
     /// Enthält die statische "Main"-Methode.
-    /// Hier startet als erstes der nicht-WPF Teil der Anwendung.
+    /// App.cs ersetzt App.xaml und App.xaml.cs einer klassischen WPF-Anwendung.
     /// </summary>
-    public class EntryPoint
+    /// <remarks>
+    ///
+    /// 04.03.2013 Erik Nagel: erstellt.
+    /// 14.12.2013 Erik Nagel: Erfolgreicher Memorycheck (memory.txt). 
+    /// 14.07.2016 Erik Nagel: Der Pfad "DebugFile" kann jetzt in Vishnu.exe.config.user überschrieben werden. 
+    /// 28.10.2017 Erik Nagel: Implementierung von IsSingleInstance, 
+    ///            von App.xaml.cs in App.cs umbenannt und App.xaml rausgeschmissen.
+    /// 23.06.2019 Erik Nagel: Aufräumen aus OnProcessExit in mainWindow_Closed und
+    ///            AppDomain.CurrentDomain.UnhandledException gezogen, da OnProcessExit
+    ///            u.U. nicht mehr ganz durchlaufen wird, sondern z.B. bei Close des MainWindows über "X"
+    ///            rechts oben abrupt abbricht.
+    /// 02.03.2024 Erik Nagel: Komplett Überarbeitet und auf Mutex umgestellt, da das Aktivieren einer schon
+    ///            laufenden Vishnu.Instanz ab .Net 6.0 (eventuell schon früher) nicht mehr funktionierte.
+    ///            Dabei die Referenzen auf Microsoft.VisualBasic wieder entfernt und künstliches Beenden
+    ///            der Anwendung im Fehlerfall über Environment.Exit(-1) rausgeschmissen.
+    ///            Außerdem wurde weitestgehend auf statische Routinen umgestellt.
+    ///            Die Startsequenz wurde dabei erheblich gestrafft und deutlich übersichtlicher.
+    /// </remarks>
+    public class App : System.Windows.Application
     {
-        /// <summary>
-        /// Statischer Entry-Point - hier startet die Anwendung.
-        /// </summary>
-        /// <param name="args">Kommandozeilen-Argumente.</param>
-        [STAThread]
-        public static void Main(string[] args)
-        {
-            SetAddRemoveProgramsIcon();
-            SingleInstanceManager manager = new SingleInstanceManager();
-            manager.Run(args);
-        }
+        #region variables
 
+        private static App? _mainWpfApp;
+        private static Mutex? _mutex;
+        private static AppSettings? _appSettings;
+        private static Logger? _logger;
+        private static Logger? _statisticsLogger;
+        private static LogicalTaskTree.LogicalTaskTree? _businessLogic;
+        private static SplashWindow? _splashWindow;
+        private static bool _cleanupStarted;
+        private static WPF_UI.MainWindow? _mainWindow;
+        private static ViewerAsWrapper? _splashScreenMessageReceiver;
 
         private static bool IsNetworkDeployed
         {
@@ -48,6 +68,297 @@ namespace Vishnu
             {
                 // return System.Deployment.Application.ApplicationDeployment.CurrentDeployment.IsFirstRun;
                 return false;
+            }
+        }
+
+        #endregion variables
+
+        #region main
+
+        /// <summary>
+        /// Statischer Entry-Point - hier startet die Anwendung.
+        /// </summary>
+        /// <param name="args">Kommandozeilen-Argumente.</param>
+        [STAThread]
+        public static void Main(string[] args)
+        {
+            InstallAppDomainExceptionHandling();
+            App._appSettings = GenericSingletonProvider.GetInstance<AppSettings>()
+                ?? throw new ApplicationException("AppSettings konnten nicht instanziiert werden.");
+            bool isSingleInstance = GenericSingletonProvider.GetInstance<AppSettings>().SingleInstance;
+            if (!isSingleInstance)
+            {
+                RunApplication(App._appSettings);
+            }
+            else
+            {
+                _mutex = new Mutex(true, "Vishnu {DC42D2AB-59ED-4098-B159-730FFC63E88C}");
+                if (!_mutex.WaitOne(0, false))
+                {
+                    // MessageBox.Show("Die Anwendung läuft schon, sende Nachricht.");
+                    // Special thanks to Matt Davis, https://stackoverflow.com/users/51170/matt-davis
+                    // send our Win32 message to make the currently running instance
+                    // jump on top of all the other windows
+                    Messaging.PostMessage((IntPtr)Messaging.HWND_BROADCAST,
+                        Messaging.WM_SHOWME, IntPtr.Zero, IntPtr.Zero);
+                }
+                else
+                {
+                    RunApplication(App._appSettings);
+                }
+            }
+            if (App._appSettings.KillChildProcessesOnApplicationExit)
+            {
+                ProcessWorker.FinishChildProcesses(Process.GetCurrentProcess());
+            }
+            // MessageBox.Show("Vishnu beendet sich.");
+            // An dieser Stelle wäre die Anwendung ohne zusätzliche Aktionen und auch ohne
+            // irgendwelche Fehlermeldungen normal beendet.
+            // Allerdings tritt in WPF im nachfolgenden AppDomainExit des Runtime-Systems sporadisch
+            // eine Exception auf, die sich dort nicht mehr abfangen lässt, die Anwendung ist ja
+            // eigentlich schon beendet:
+            //   System.ComponentModel.Win32Exception (1816): Nicht genügend Quoten verfügbar,
+            //   um diesen Befehl zu verarbeiten.
+            //   at MS.Win32.ManagedWndProcTracker.HookUpDefWindowProc(IntPtr hwnd)
+            //   at MS.Win32.ManagedWndProcTracker.OnAppDomainProcessExit()
+            // Siehe auch: https://github.com/dotnet/roslyn/issues/9247
+            // Trotz intensiver Recherche konnte ich bisher keinen Workaround, geschweige denn eine
+            // Lösung finden.
+            // Inzwischen habe ich für mich folgenden Workaround entwickelt:
+            // WPF-AppDomain-Exit wird gar nicht erst durchlaufen, sondern in der Routine
+            // "App.AssistedSuicide" eine externe Exe aufgerufen, welche diese Anwendung
+            // hart beendet (killt). Ist zwar "dirty coding", funktioniert aber bisher einwandfrei.
+            App.AssistedSuicide();
+        }
+
+        /// <summary>
+        /// Dieses Event wird durch app.Run() getriggert.
+        /// </summary>
+        /// <param name="e">Eventparameter.</param>
+        protected override void OnStartup(System.Windows.StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            // Das nachfolgende Setzen von OnExplicitShutdown oderOnMainWindowClose ist essenziell:
+            // Wenn die aktuelle Bildschirmeinstellung über Strg-s gespeichert wird,
+            // erscheint für kurze Zeit eine TimerMessageBox. Wenn sich diese schließt
+            // und OnMainWindowClose nicht gesetzt wurde, haut es die ganze app runter.
+            // Ich habe mich für OnExplicitShutdown entschieden, um hier klar die Kontrolle zu behalten.
+            // Thanks again to Rachel Lim (https://rachel53461.wordpress.com).
+            // https://stackoverflow.com/questions/7661315/wpf-closing-child-closes-parent-window
+
+            this.ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown;
+
+            // 11.03.2024 Erik Nagel+- Test: Setzen des HandleDispatcherRequestProcessingFailure-Handlers
+            this.Dispatcher.UnhandledException += HandleDispatcherRequestProcessingFailure;
+        }
+
+        private void HandleDispatcherRequestProcessingFailure(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            // Behandeln des Fehlers
+            Console.WriteLine("Fehlermeldung: " + e.Exception.Message);
+            e.Handled = true;
+
+            // Optionale Aktion: Fehler dem Benutzer anzeigen
+            MessageBox.Show("Ein Fehler ist aufgetreten. Die Anwendung wird fortgesetzt.",
+               "Fehler", System.Windows.Forms.MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private static void RunApplication(AppSettings appSettings)
+        {
+            SetAddRemoveProgramsIcon();
+            App._cleanupStarted = false;
+            App._splashWindow = SplashWindow.StartSplashWindow();
+            App._splashScreenMessageReceiver = new ViewerAsWrapper(App.handleSplashScreenMessages);
+            InfoController.GetInfoSource().RegisterInfoReceiver(App._splashScreenMessageReceiver,
+                typeof(SplashScreenMessage), new[] { InfoType.Info });
+            InfoController.GetInfoPublisher().Publish(new SplashScreenMessage("initialisiere das System"));
+
+            App._splashWindow.ShowVersion(appSettings.ProgrammVersion);
+            if (appSettings.FatalInitializationException == null)
+            {
+                appSettings.UserParametersReloaded += ParameterReader_ParametersReloaded;
+                appSettings.InitUserParameterReader();
+            }
+            App.PrepareStart(appSettings);
+            if (appSettings.DemoModus)
+            {
+                App._splashWindow.ShowVersion(appSettings.ProgrammVersion + " DEMO");
+            }
+            App.VishnuRun(appSettings);
+        }
+
+        // Die Business-Logic
+        private static void VishnuRun(AppSettings appSettings)
+        {
+            // Die für den gesamten Tree gültigen Parameter
+            TreeParameters treeParameters = 
+                new TreeParameters(String.Format($"Tree {++LogicalTaskTree.LogicalTaskTree.TreeId}"));
+
+            // Der Produktion-JobProvider mit extern über XML definierten Jobs:
+            App._businessLogic = new LogicalTaskTree.LogicalTaskTree(treeParameters, new ProductionJobProvider());
+
+            // Das Main-Window
+            App._mainWindow = 
+                new WPF_UI.MainWindow(appSettings.StartWithJobs,
+                    appSettings.SizeOnVirtualScreen, appSettings.VishnuWindowAspects);
+            App._mainWindow.Closed += MainWindow_Closed;
+
+            // Das LogicalTaskTree-ViewModel
+            LogicalTaskTreeViewModel logicalTaskTreeViewModel = new LogicalTaskTreeViewModel(
+                App._businessLogic, App._mainWindow, appSettings.StartTreeOrientation,
+                appSettings.FlatNodeListFilter, treeParameters);
+
+            // Das Main-ViewModel
+            MainWindowViewModel mainWindowViewModel
+                = new MainWindowViewModel(logicalTaskTreeViewModel, App._mainWindow.ForceRecalculateWindowMeasures,
+                appSettings.FlatNodeListFilter, appSettings.DemoModus ? "-DEMO-" : "", treeParameters);
+
+            // Verbinden von Main-Window mit Main-ViewModel
+            App._mainWindow.DataContext = mainWindowViewModel;
+
+            InfoController.GetInfoPublisher().Publish(new SplashScreenMessage("starte UI"));
+            //---------------------------------------------------------------------------------
+            // Hier erfolgt der klassische WPF-Start.
+            App._mainWpfApp = new(); // Übrigens auch notwendig für System.Windows.Application.Current.
+            App._mainWpfApp.InitializeComponent(); // Übernimmt das MainWindow.
+            App._mainWpfApp.MainWindow.Show();
+            App._splashWindow?.FinishAndClose();
+            App._mainWpfApp.AutostartIfSet(appSettings);
+            App._mainWpfApp.Run();
+            // Kurze Info: Hinter app.Run() wartet dieser Teil der Anwendung. Das funktioniert
+            //             aber nur, wenn vor app.Run die Zuweisung von App._mainWindow auf
+            //             die Instanzvariable app.MainWindow erfolgt war, ansonsten rasselt
+            //             das Programm hier durch und beendet sich.
+            //---------------------------------------------------------------------------------
+        }
+
+        /// <summary>
+        /// InitializeComponent
+        /// </summary>
+        public void InitializeComponent()
+        {
+            // this.StartupUri = new System.Uri("MainWindow.xaml", System.UriKind.Relative);
+            // this.StartupUri =
+            //     new System.Uri("pack://application:,,,/Vishnu.WPF_UI;component/MainWindow.xaml",
+            //                    System.UriKind.Absolute);
+            this.MainWindow = App._mainWindow;
+        }
+
+        #endregion main
+
+        #region helpers
+
+        private static void MainWindow_Closed(object? sender, EventArgs e)
+        {
+            _mutex?.ReleaseMutex();
+            _mutex?.Dispose();
+
+            if (!App._cleanupStarted)
+            {
+                App.DoVishnuCleanup();
+            }
+            //// 17.03.2024 Erik Nagel: Test+
+            //System.Windows.Application.Current.Dispatcher.ShutdownFinished += (s, a) =>
+            //{
+            //    MessageBox.Show("ShutdownFinished");
+            //};
+            //// 17.03.2024 Erik Nagel: Test-
+            System.Windows.Application.Current.Dispatcher.InvokeShutdown();
+        }
+
+        private static void InstallAppDomainExceptionHandling()
+        {
+            AppDomain.CurrentDomain.UnhandledException += (object sender, System.UnhandledExceptionEventArgs args) =>
+            {
+                string exceptionString;
+#if DEBUG
+                exceptionString = ((Exception)args.ExceptionObject).ToString(); // Exception für später retten.
+#else
+                exceptionString = ((Exception)args.ExceptionObject).Message; // Exception für später retten.
+#endif
+                if (App._splashWindow != null)
+                {
+                    try
+                    {
+                        App._splashWindow.FinishAndClose();
+                    }
+                    catch { }
+                }
+                try
+                {
+                    App._logger?.Log(exceptionString);
+                }
+                catch { };
+                if (!App._cleanupStarted)
+                {
+                    App.DoVishnuCleanup();
+                }
+                MessageBox.Show(exceptionString, "Exception",
+                    System.Windows.Forms.MessageBoxButtons.OK, MessageBoxIcon.Error,
+                    MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
+            };
+        }
+
+        private static void PrepareStart(AppSettings appSettings)
+        {
+            App.SetupLogging();
+
+            if (!App.CheckCanRun())
+            {
+                throw new ApplicationException("Vishnu ist vorübergehend gesperrt worden."
+                             + Environment.NewLine + " Bitte wenden Sie sich an die Administration.");
+            }
+            App.CopyJobsIfNecessary();
+            if (!appSettings.AppConfigUserLoaded == true)
+            {
+                string userCfgDir = Path.GetDirectoryName(appSettings.AppConfigUser) ?? "";
+                if (!Directory.Exists(userCfgDir))
+                {
+                    Directory.CreateDirectory(userCfgDir);
+                }
+                File.Copy(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "Vishnu.exe.config.user.default"),
+                          Path.Combine(userCfgDir, "Vishnu.exe.config.user"), true);
+                appSettings.LoadSettings();
+            }
+            if (String.IsNullOrEmpty(appSettings.MainJobName))
+            {
+                throw new ArgumentException("Es wurde keine Job-Definition angegeben.");
+            }
+            App.CopyClickOnceStarter();
+        }
+
+        private static void SetupLogging()
+        {
+            // Globales Logging installieren:
+            // Beispiele - der Suchbegriff steht jeweils zwischen ":" und ")":
+            //     string loggingRegexFilter = @"(?:loadChildren)";
+            //     string loggingRegexFilter = @"(?:Waiting)";
+            //     string loggingRegexFilter = ""; // Alles wird geloggt (ist der Default).
+            //     string loggingRegexFilter = @"(?:_NOPPES_)"; // Nichts wird geloggt, bzw. nur Zeilen, die "_NOPPES_" enthalten.
+            // analog: Statistics.RegexFilter.
+            if (App._appSettings == null)
+            {
+                throw new ApplicationException("Keine AppSettings vorhanden.");
+            }
+            App._appSettings.AppEnvAccessor.UnregisterKey("DebugFile");
+            string logFilePathName = App._appSettings.ReplaceWildcards(App._appSettings.DebugFile);
+            App._appSettings.AppEnvAccessor.RegisterKeyValue("DebugFile", logFilePathName);
+            App._logger = new Logger(logFilePathName, _appSettings.DebugFileRegexFilter, false);
+            App._logger.DebugArchivingInterval = App._appSettings.DebugArchivingInterval;
+            App._logger.DebugArchiveMaxCount = App._appSettings.DebugArchiveMaxCount;
+            App._logger.LoggingTriggerCounter = 15000; // Default ist 5000 Zählvorgänge oder Millisekunden.
+            InfoController.GetInfoSource().RegisterInfoReceiver(App._logger, InfoTypes.Collection2InfoTypeArray(InfoTypes.All));
+            Statistics.IsTimerTriggered = true; // LoggingTriggerCounter gibt die Anzahl Zählvorgänge vor, nach der die Ausgabe erfolgt.
+            Statistics.LoggingTriggerCounter = 10000; // Default ist 5000 Zählvorgänge oder Millisekunden.
+            string statisticsFilePathName = App._appSettings.ReplaceWildcards(App._appSettings.StatisticsFile ?? "");
+
+            Statistics.RegexFilter = App._appSettings.StatisticsFileRegexFilter;
+            App._statisticsLogger = new Logger(statisticsFilePathName);
+            InfoController.GetInfoSource().RegisterInfoReceiver(App._statisticsLogger, new InfoType[] { InfoType.Statistics });
+
+            if (App._appSettings.FatalInitializationException != null)
+            {
+                throw App._appSettings.FatalInitializationException;
             }
         }
 
@@ -91,309 +402,29 @@ namespace Vishnu
                 catch { }
             }
         }
-    }
 
-    /// <summary>
-    /// Erkennt eine eventuell schon laufende Instanz dieser Anwendung und
-    /// entscheidet abhängig vom Schalter WindowsFormsApplicationBase.IsSingleInstance:
-    ///   a) IsSingleInstance = true: informiert die schon laufende Instanz dieser
-    ///      Anwendung, dass diese sich in den Vordergrund bringen soll und
-    ///      beendet sich dann, um Mehrfach-Instanziierungen zu vermeiden;
-    ///   b) IsSingleInstance = false: diese Instanz startet normal.
-    /// Nutzt die Assembly Microsoft.VisualBasic.dll.
-    /// </summary>
-    public class SingleInstanceManager : WindowsFormsApplicationBase
-    {
-        private SingleInstanceApplication? _app;
-
-        /// <summary>
-        /// Konstruktor.
-        /// </summary>
-        public SingleInstanceManager()
-        {
-            try
-            {
-                this.IsSingleInstance = GenericSingletonProvider.GetInstance<AppSettings>().SingleInstance;
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show(String.Format($"Fehler bei der Initialisierung: {ex.Message}"), "Fehlermeldung");
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Wird beim Start der Anwendung durchlaufen - Teil der Start-Anwendung (nicht WPF).
-        /// </summary>
-        /// <param name="e">Enthält die Kommandozeilen-Argumente.</param>
-        /// <returns>Immer false.</returns>
-        protected override bool OnStartup(Microsoft.VisualBasic.ApplicationServices.StartupEventArgs e)
-        {
-            _app = new SingleInstanceApplication();
-            _app.Run();
-            return false;
-        }
-
-        /// <summary>
-        /// Wird bei weiteren Starts der Anwendung durchlaufen - Teil der Start-Anwendung (nicht WPF).
-        /// </summary>
-        /// <param name="eventArgs">Enthält die Kommandozeilen-Argumente.</param>
-        protected override void OnStartupNextInstance(StartupNextInstanceEventArgs eventArgs)
-        {
-            base.OnStartupNextInstance(eventArgs);
-            _app?.Activate();
-        }
-    }
-
-    /// <summary>
-    /// Hauptklasse für den Start der WPF-Anwendung.
-    /// App.cs entspricht App.xaml.cs einer klassischen WPF-Anwendung.
-    /// Hier startet als erstes der nicht-WPF Teil der Anwendung.
-    /// </summary>
-    /// <remarks>
-    /// File: App.cs
-    /// Autor: Erik Nagel
-    ///
-    /// 04.03.2013 Erik Nagel: erstellt
-    /// 14.12.2013 Erik Nagel: Erfolgreicher Memorycheck (memory.txt). 
-    /// 14.07.2016 Erik Nagel: Der Pfad "DebugFile" kann jetzt in Vishnu.exe.config.user überschrieben werden. 
-    /// 28.10.2017 Erik Nagel: Implementierung von IsSingleInstance, 
-    ///                        von App.xaml.cs in App.cs umbenannt und App.xaml rausgeschmissen.
-    /// 23.06.2019 Erik Nagel: Aufräumen aus OnProcessExit in mainWindow_Closed und
-    ///                        AppDomain.CurrentDomain.UnhandledException gezogen, da OnProcessExit
-    ///                        u.U. nicht mehr ganz durchlaufen wird, sondern z.B. bei Close des
-    ///                        MainWindows über "X" rechts oben abrupt abbricht.
-    /// </remarks>
-    public class SingleInstanceApplication : System.Windows.Application
-    {
-        // Das Main-Window
-        private WPF_UI.MainWindow? _mainWindow;
-
-        /// <summary>
-        /// Wird von einer anderen startenden Instanz angesprungen, bevor jene sich beendet,
-        /// wenn deren Schalter IsSingleInstance = true ist.
-        /// </summary>
-        public void Activate()
-        {
-            if (this._mainWindow == null)
-            {
-                return;
-            }
-            // DEBUG: MessageBox.Show("Ich wurde gerade aktiviert.");
-            // Reaktivieren des Hauptfensters dieser Instanz der Anwendung.
-            if (!this._mainWindow.IsVisible)
-            {
-                this._mainWindow.Show();
-            }
-
-            if (this._mainWindow.WindowState == WindowState.Minimized)
-            {
-                this._mainWindow.WindowState = WindowState.Normal;
-            }
-
-            this._mainWindow.Activate();
-            //this._mainWindow.Topmost = true;  // nicht erforderlich
-            //this._mainWindow.Topmost = false; // nicht erforderlich
-            this._mainWindow.Focus();           // wichtig!
-        }
-
-        /// <summary>
-        /// Wird beim Start der Anwendung durchlaufen.
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnStartup(System.Windows.StartupEventArgs e)
-        {
-            base.OnStartup(e);
-            SingleInstanceApplication._cleanupDone = false;
-            this._splashWindow = SplashWindow.StartSplashWindow();
-            this._splashScreenMessageReceiver = new ViewerAsWrapper(this.handleSplashScreenMessages);
-            InfoController.GetInfoSource().RegisterInfoReceiver(this._splashScreenMessageReceiver, typeof(SplashScreenMessage), new[] { InfoType.Info });
-            InfoController.GetInfoPublisher().Publish(new SplashScreenMessage("initializing system"));
-
-            AppDomain.CurrentDomain.UnhandledException += (object sender, System.UnhandledExceptionEventArgs args) =>
-            {
-                string exceptionString;
-#if DEBUG
-                exceptionString = ((Exception)args.ExceptionObject).ToString(); // Exception für später retten.
-#else
-                exceptionString = ((Exception)args.ExceptionObject).Message; // Exception für später retten.
-#endif
-                if (this._splashWindow != null)
-                {
-                    try
-                    {
-                        this._splashWindow.FinishAndClose();
-                    }
-                    catch { }
-                }
-                if (!SingleInstanceApplication._cleanupDone)
-                {
-                    SingleInstanceApplication.doVishnuCleanup();
-                }
-                System.Windows.MessageBox.Show(exceptionString, "Exception",
-                    MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK,
-                    System.Windows.MessageBoxOptions.DefaultDesktopOnly);
-                //Application.Current.Shutdown(-1);            // die auskommentierten
-                //Dispatcher.BeginInvoke((Action)delegate()    // Versuche
-                //{                                            // funktionieren
-                //  Application.Current.Shutdown();            // beide NICHT!
-                //});
-                Environment.Exit(-1);
-            };
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
-            SingleInstanceApplication._appSettings = GenericSingletonProvider.GetInstance<AppSettings>();
-            this._splashWindow.ShowVersion(SingleInstanceApplication._appSettings.ProgrammVersion);
-            if (SingleInstanceApplication._appSettings.FatalInitializationException == null)
-            {
-                SingleInstanceApplication._appSettings.UserParametersReloaded += ParameterReader_ParametersReloaded;
-                SingleInstanceApplication._appSettings.InitUserParameterReader();
-            }
-            this.PrepareStart();
-            if (SingleInstanceApplication._appSettings.DemoModus)
-            {
-                this._splashWindow.ShowVersion(SingleInstanceApplication._appSettings.ProgrammVersion + " DEMO");
-            }
-
-            // Die Business-Logic
-            // Demo: hart verdrahteter JobProvider:
-            // App._businessLogic = new LogicalTaskTree.LogicalTaskTree(new TreeParameters("Tree 1", null), new MixedTestJobProvider());
-
-            // Die für den gesamten Tree gültigen Parameter
-            TreeParameters treeParameters = new TreeParameters(String.Format($"Tree {++LogicalTaskTree.LogicalTaskTree.TreeId}"));
-
-            // Der Produktions-JobProvider mit extern über XML definierten Jobs:
-            SingleInstanceApplication._businessLogic = new LogicalTaskTree.LogicalTaskTree(treeParameters, new ProductionJobProvider());
-
-            // Das Main-Window
-            this._mainWindow = new WPF_UI.MainWindow(_appSettings.StartWithJobs, _appSettings.SizeOnVirtualScreen, _appSettings.VishnuWindowAspects);
-            this._mainWindow.Closed += mainWindow_Closed;
-            // Das LogicalTaskTree-ViewModel
-            LogicalTaskTreeViewModel logicalTaskTreeViewModel = new LogicalTaskTreeViewModel(
-                SingleInstanceApplication._businessLogic, this._mainWindow, SingleInstanceApplication._appSettings.StartTreeOrientation,
-                SingleInstanceApplication._appSettings.FlatNodeListFilter, treeParameters);
-
-            // Das Main-ViewModel
-            MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(logicalTaskTreeViewModel, this._mainWindow.ForceRecalculateWindowMeasures,
-                SingleInstanceApplication._appSettings.FlatNodeListFilter, SingleInstanceApplication._appSettings.DemoModus ? "-DEMO-" : "", treeParameters);
-
-            // Verbinden von Main-Window mit Main-ViewModel
-            this._mainWindow.DataContext = mainWindowViewModel; //mainViewModel;
-
-            // Start der UI
-            InfoController.GetInfoPublisher().Publish(new SplashScreenMessage("starting UI"));
-            this._splashWindow.FinishAndClose();
-            //this._mainWindow.Topmost = true; // nicht erforderlich
-            this.MainWindow.Name = "MainWindow"; // 05.11.2023 Nagel+- for debug purposes
-            this._mainWindow.Show();
-            //this._mainWindow.Topmost = false; // nicht erforderlich
-            //this._mainWindow.BringIntoView(); geht nicht
-            //this._mainWindow.Focus(); geht hier nicht, muss aber nach Activate() kommen!
-            this._mainWindow.Activate(); // geht!
-            this._mainWindow.Focus();    // wichtig!
-            if (SingleInstanceApplication._appSettings.Autostart)
-            {
-                Task task = Task.Factory.StartNew(() =>
-                {
-                    int sleepCounter = 0;
-                    while (this._mainWindow.IsRelocating && sleepCounter++ < 50)
-                    {
-                        Thread.Sleep(100);
-                    }
-                    Thread.Sleep(500); // Notwendig, das die Synchronisation selbst auch noch Zeit kostet.
-                    SingleInstanceApplication._businessLogic.Tree.UserRun();
-                });
-            }
-        }
-
-        private void PrepareStart()
-        {
-            this.SetupLogging();
-
-            // string executingAssemblyLocation = AppDomain.CurrentDomain.BaseDirectory;
-            if (!this.checkCanRun())
-            {
-                throw new ApplicationException("Vishnu ist vorübergehend gesperrt worden."
-                             + Environment.NewLine + " Bitte wenden Sie sich an die Administration.");
-            }
-            this.CopyJobsIfNecessary();
-            if (String.IsNullOrEmpty(SingleInstanceApplication._appSettings?.MainJobName))
-            {
-                if (!SingleInstanceApplication._appSettings?.AppConfigUserLoaded == true)
-                {
-                    string userCfgDir = Path.GetDirectoryName(SingleInstanceApplication._appSettings?.AppConfigUser) ?? "";
-                    if (!Directory.Exists(userCfgDir))
-                    {
-                        Directory.CreateDirectory(userCfgDir);
-                    }
-                    File.Copy(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "Vishnu.exe.config.user.default"),
-                              Path.Combine(userCfgDir, "Vishnu.exe.config.user"), true);
-                    SingleInstanceApplication._appSettings?.LoadSettings();
-                }
-                if (String.IsNullOrEmpty(SingleInstanceApplication._appSettings?.MainJobName))
-                {
-                    throw new ArgumentException("Es wurde keine Job-Definition angegeben.");
-                }
-            }
-            this.CopyClickOnceStarter();
-        }
-
-        private void SetupLogging()
-        {
-            // Globales Logging installieren:
-            // Beispiele - der Suchbegriff steht jeweils zwischen ":" und ")":
-            //     string loggingRegexFilter = @"(?:loadChildren)";
-            //     string loggingRegexFilter = @"(?:Waiting)";
-            //     string loggingRegexFilter = ""; // Alles wird geloggt (ist der Default).
-            //     string loggingRegexFilter = @"(?:_NOPPES_)"; // Nichts wird geloggt, bzw. nur Zeilen, die "_NOPPES_" enthalten.
-            // analog: Statistics.RegexFilter.
-            if (SingleInstanceApplication._appSettings == null)
-            {
-                throw new ApplicationException("Keine AppSettings vorhanden.");
-            }
-            SingleInstanceApplication._appSettings.AppEnvAccessor.UnregisterKey("DebugFile");
-            string logFilePathName = SingleInstanceApplication._appSettings.ReplaceWildcards(SingleInstanceApplication._appSettings.DebugFile);
-            SingleInstanceApplication._appSettings.AppEnvAccessor.RegisterKeyValue("DebugFile", logFilePathName);
-            SingleInstanceApplication._logger = new Logger(logFilePathName, _appSettings.DebugFileRegexFilter, false);
-            SingleInstanceApplication._logger.DebugArchivingInterval = SingleInstanceApplication._appSettings.DebugArchivingInterval;
-            SingleInstanceApplication._logger.DebugArchiveMaxCount = SingleInstanceApplication._appSettings.DebugArchiveMaxCount;
-            SingleInstanceApplication._logger.LoggingTriggerCounter = 15000; // Default ist 5000 Zählvorgänge oder Millisekunden.
-            InfoController.GetInfoSource().RegisterInfoReceiver(SingleInstanceApplication._logger, InfoTypes.Collection2InfoTypeArray(InfoTypes.All));
-            Statistics.IsTimerTriggered = true; // LoggingTriggerCounter gibt die Anzahl Zählvorgänge vor, nach der die Ausgabe erfolgt.
-            Statistics.LoggingTriggerCounter = 10000; // Default ist 5000 Zählvorgänge oder Millisekunden.
-            string statisticsFilePathName = SingleInstanceApplication._appSettings.ReplaceWildcards(SingleInstanceApplication._appSettings.StatisticsFile ?? "");
-
-            Statistics.RegexFilter = SingleInstanceApplication._appSettings.StatisticsFileRegexFilter;
-            SingleInstanceApplication._statisticsLogger = new Logger(statisticsFilePathName);
-            InfoController.GetInfoSource().RegisterInfoReceiver(SingleInstanceApplication._statisticsLogger, new InfoType[] { InfoType.Statistics });
-
-            if (SingleInstanceApplication._appSettings.FatalInitializationException != null)
-            {
-                throw SingleInstanceApplication._appSettings.FatalInitializationException;
-            }
-        }
-
-        private void CopyJobsIfNecessary()
+        private static void CopyJobsIfNecessary()
         {
             try
             {
                 //InfoController.GetInfoPublisher().Publish(this,
                 //    String.Format($"IsClickOnce: {SingleInstanceApplication._appSettings.IsClickOnce}"), InfoType.NoRegex);
-                string clickOnceDataDirectoryString = SingleInstanceApplication._appSettings?.ClickOnceDataDirectory == null ?
-                    "null" : SingleInstanceApplication._appSettings.ClickOnceDataDirectory;
+                string clickOnceDataDirectoryString = App._appSettings?.ClickOnceDataDirectory == null ?
+                    "null" : App._appSettings.ClickOnceDataDirectory;
                 //InfoController.GetInfoPublisher().Publish(this,
                 //    String.Format($"ClickOnceDataDirectory: {clickOnceDataDirectoryString}"), InfoType.NoRegex);
                 //InfoController.GetInfoPublisher().Publish(this,
                 //    String.Format($"NewDeployment.xml: {File.Exists(Path.Combine(SingleInstanceApplication._appSettings.ApplicationRootPath, "NewDeployment.xml"))}")
                 //    , InfoType.NoRegex);
                 // MessageBox.Show(String.Format($"Vor ClickOnceAktionen auf {clickOnceDataDirectoryString}"));
-                if (SingleInstanceApplication._appSettings?.IsClickOnce == true
+                if (App._appSettings?.IsClickOnce == true
                     && Directory.Exists(clickOnceDataDirectoryString)
-                    && File.Exists(Path.Combine(SingleInstanceApplication._appSettings.ApplicationRootPath, "NewDeployment.xml")))
+                    && File.Exists(Path.Combine(App._appSettings.ApplicationRootPath, "NewDeployment.xml")))
                 {
-                    this.DirectoryCopy(clickOnceDataDirectoryString,
-                        SingleInstanceApplication._appSettings.ApplicationRootPath, true);
-                    File.Delete(Path.Combine(SingleInstanceApplication._appSettings.ApplicationRootPath, "NewDeployment.xml"));
-                    InfoController.GetInfoPublisher().Publish(this,
+                    Global.DirectoryCopy(clickOnceDataDirectoryString,
+                        App._appSettings.ApplicationRootPath, true);
+                    File.Delete(Path.Combine(App._appSettings.ApplicationRootPath, "NewDeployment.xml"));
+                    InfoController.GetInfoPublisher().Publish(App._mainWindow,
                         String.Format($"Jobs Copied and {Path.Combine(clickOnceDataDirectoryString, "NewDeployment.xml")} deleted.")
                         , InfoType.NoRegex);
                 }
@@ -401,50 +432,12 @@ namespace Vishnu
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show("Fehler bei CopyJobsIfNecessary: " + ex.Message);
+                MessageBox.Show("Fehler bei CopyJobsIfNecessary: " + ex.Message);
                 // throw;
             }
         }
 
-        private void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
-        {
-            // Get the subdirectories for the specified directory.
-            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
-            DirectoryInfo[] dirs = dir.GetDirectories();
-
-            if (!dir.Exists)
-            {
-                throw new DirectoryNotFoundException(
-                    "Source directory does not exist or could not be found: "
-                    + sourceDirName);
-            }
-
-            // If the destination directory doesn't exist, create it.
-            if (!Directory.Exists(destDirName))
-            {
-                Directory.CreateDirectory(destDirName);
-            }
-
-            // Get the files in the directory and copy them to the new location.
-            FileInfo[] files = dir.GetFiles();
-            foreach (FileInfo file in files)
-            {
-                string temppath = Path.Combine(destDirName, file.Name);
-                file.CopyTo(temppath, true);
-            }
-
-            // If copying subdirectories, copy them and their contents to new location.
-            if (copySubDirs)
-            {
-                foreach (DirectoryInfo subdir in dirs)
-                {
-                    string temppath = Path.Combine(destDirName, subdir.Name);
-                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
-                }
-            }
-        }
-
-        private bool checkCanRun()
+        private static bool CheckCanRun()
         {
             return true; //17.01.2017 Prüfung deaktiviert.
             /*
@@ -465,14 +458,14 @@ namespace Vishnu
             */
         }
 
-        private void CopyClickOnceStarter()
+        private static void CopyClickOnceStarter()
         {
             try
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append(Environment.GetFolderPath(Environment.SpecialFolder.Programs));
                 sb.Append("\\");
-                sb.Append(SingleInstanceApplication._appSettings?.VishnuProvider);
+                sb.Append(App._appSettings?.VishnuProvider);
                 sb.Append("\\");
                 sb.Append("ClickOnceStarter.exe");
                 string targetPath = sb.ToString();
@@ -491,98 +484,84 @@ namespace Vishnu
             catch { }
         }
 
-        void mainWindow_Closed(object? sender, EventArgs e)
+        private void AutostartIfSet(AppSettings appSettings)
         {
-            if (!SingleInstanceApplication._cleanupDone)
+            if (appSettings.Autostart)
             {
-                SingleInstanceApplication.doVishnuCleanup();
+                Task task = Task.Factory.StartNew(() =>
+                {
+                    int sleepCounter = 0;
+                    while ((App._mainWindow?.IsRelocating == true) && sleepCounter++ < 50)
+                    {
+                        Thread.Sleep(100);
+                    }
+                    Thread.Sleep(500); // Notwendig, das die Synchronisation selbst auch noch Zeit kostet.
+                    App._businessLogic?.Tree.UserRun();
+                });
             }
-            //Application.Current.Shutdown(-1);            // die auskommentierten
-            //Dispatcher.BeginInvoke((Action)delegate()    // Versuche
-            //{                                            // funktionieren
-            //  Application.Current.Shutdown();            // beide NICHT!
-            //});
-            //doProcessExit();
-            Environment.Exit(-1); // TODO: erneut auf Notwendigkeit Testen
         }
 
-        private static AppSettings? _appSettings;
-        private static Logger? _logger;
-        private static Logger? _statisticsLogger;
-        private static LogicalTaskTree.LogicalTaskTree? _businessLogic;
-        private SplashWindow? _splashWindow;
-        private ViewerAsWrapper? _splashScreenMessageReceiver;
-        private static bool _cleanupDone;
-
-        private void ParameterReader_ParametersReloaded(object? sender, EventArgs e)
+        private static void ParameterReader_ParametersReloaded(object? sender, EventArgs e)
         {
-            SingleInstanceApplication._businessLogic?.Tree.GetTopRootJobList()
-                .ProcessTreeEvent("ParametersReloaded", SingleInstanceApplication._appSettings?.UserParameterReaderPath);
+            App._businessLogic?.Tree.GetTopRootJobList()
+                .ProcessTreeEvent("ParametersReloaded", App._appSettings?.UserParameterReaderPath);
         }
 
-        private void handleSplashScreenMessages(object? sender, InfoArgs msgArgs)
+        private static void handleSplashScreenMessages(object? sender, InfoArgs msgArgs)
         {
-            this._splashWindow?.ShowMessage(((SplashScreenMessage)msgArgs.MessageObject).Message);
-        }
-
-        // Wird in jedem Fall beim Beenden von Vishnu durchlaufen.
-        // Versucht noch, Aufräumarbeiten auszuführen, endet aber u.U. abrupt
-        // ohne fertig zu werden.
-        private static void OnProcessExit(object? sender, EventArgs e)
-        {
-            if (!SingleInstanceApplication._cleanupDone)
-            {
-                SingleInstanceApplication.doVishnuCleanup();
-            }
+            App._splashWindow?.ShowMessage(((SplashScreenMessage)msgArgs.MessageObject).Message);
         }
 
         // Soll in jedem Fall beim Beenden von Vishnu durchlaufen werden.
         // Gibt die BusinessLogic und die AppSettings frei und löscht ggf.
         // das beim Start angelegte WorkingDirectory.
-        private static void doVishnuCleanup()
+        private static void DoVishnuCleanup()
         {
+            App._cleanupStarted = true;
+            Statistics.Stop();
+            App._logger?.Stop();
             try
             {
-                try
+                LogicalTaskTree.LogicalNode.ResumeTree(); // frees all waiting nodes
+                LogicalTaskTree.LogicalNode.AllowSnapshots(); // to avoid deadlocks.
+                App._businessLogic?.Dispose();
+            }
+            catch { }
+            if (App._appSettings != null)
+            {
+                if (!String.IsNullOrEmpty(App._appSettings.ZipRelativeDummyDirectory)
+                    && Directory.Exists(App._appSettings.ZipRelativeDummyDirectory))
                 {
-                    LogicalTaskTree.LogicalNode.ResumeTree(); // frees all waiting nodes
-                    LogicalTaskTree.LogicalNode.AllowSnapshots(); // to avoid deadlocks.
-                    SingleInstanceApplication._businessLogic?.Dispose();
-                }
-                catch { }
-                if (SingleInstanceApplication._appSettings != null)
-                {
-                    if (!String.IsNullOrEmpty(SingleInstanceApplication._appSettings.ZipRelativeDummyDirectory)
-                        && Directory.Exists(SingleInstanceApplication._appSettings.ZipRelativeDummyDirectory))
-                    {
-                        try
-                        {
-                            Directory.Delete(SingleInstanceApplication._appSettings.ZipRelativeDummyDirectory, true);
-                        }
-                        catch { }
-                    }
                     try
                     {
-                        SingleInstanceApplication._appSettings?.Dispose();
+                        Directory.Delete(App._appSettings.ZipRelativeDummyDirectory, true);
                     }
                     catch { }
                 }
                 try
                 {
-                    SingleInstanceApplication._logger?.Dispose();
-                }
-                catch { }
-                Statistics.Stop();
-                try
-                {
-                    SingleInstanceApplication._statisticsLogger?.Dispose();
+                    App._appSettings?.Dispose();
                 }
                 catch { }
             }
-            finally
+            App._statisticsLogger = null;
+            try
             {
-                SingleInstanceApplication._cleanupDone = true;
+                App._logger?.Dispose();
             }
+            catch { }
         }
+
+        private static void AssistedSuicide()
+        {
+            Process externalProcess = new Process();
+            externalProcess.StartInfo.FileName = "ProcessTerminator.exe";
+            externalProcess.StartInfo.Arguments = Process.GetCurrentProcess().Id.ToString() + " 1000";
+            externalProcess.Start();
+            externalProcess.WaitForExit();
+        }
+
+        #endregion helpers
+
     }
 }

@@ -11,8 +11,8 @@
     <Company>NetEti</Company>
     <Description>$(AssemblyName) - Bibliothek mit gemeinsamen Klassen für Vishnu und Plugins</Description>
     <Copyright>Copyright © $(Authors) 2012-$([System.DateTime]::Now.Year)</Copyright>
-    <AssemblyVersion>8.1.6.2</AssemblyVersion>
-    <FileVersion>8.1.6.2</FileVersion>
+    <AssemblyVersion>8.2.0.0</AssemblyVersion>
+    <FileVersion>8.2.0.0</FileVersion>
     <PackageTags>NetEti Vishnu Basics</PackageTags>
   </PropertyGroup>
 
@@ -49,6 +49,9 @@
 		    <Reference Include="NetEti.MVVMini">
 		      <HintPath>$(AssemblyRoot)/NetEti.MVVMini.dll</HintPath>
 		    </Reference>
+		    <Reference Include="NetEti.NetworkMappingsRefresher">
+		      <HintPath>$(AssemblyRoot)/NetEti.NetworkMappingsRefresher.dll</HintPath>
+		    </Reference>
 		    <Reference Include="NetEti.ObjectSerializer">
 		      <HintPath>$(AssemblyRoot)/NetEti.ObjectSerializer.dll</HintPath>
 		    </Reference>
@@ -63,6 +66,7 @@
 		    <PackageReference Include="NetEti.Logging" Version="1.0.0" />
 		    <PackageReference Include="NetEti.MultiScreen" Version="1.0.0" />
 		    <PackageReference Include="NetEti.MVVMini" Version="1.0.0" />
+		    <PackageReference Include="NetEti.NetworkMappingsRefresher" Version="1.0.0" />
 		    <PackageReference Include="NetEti.ObjectSerializer" Version="1.0.0" />
 		  </ItemGroup>
     </Otherwise>

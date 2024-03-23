@@ -2,7 +2,7 @@
   "profiles": {
     "Vishnu": {
       "commandName": "Project",
-      "commandLineArgs": "-job=\"Jobs/CheckSpecials\" --DebugMode=true -Autostart=true -StartWithJobs=false --FlatNodeListFilter=\"JobConnector|NodeConnector|NodeList\" --NoWorkers=false --AbortingAllowed=false --HelpPreference=\"local\""
+      "commandLineArgs": "-job=%VishnuSourceRoot%/NetEti/Jobs/CheckSpecials --HelpPreference=local --KillChildProcessesOnApplicationExit=true"
     }
   }
 }

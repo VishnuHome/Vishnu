@@ -13,8 +13,8 @@
     <Company>NetEti</Company>
     <Description>Monitoring- und Prozesssteuerungssoftware mit integrierter Verarbeitung erweiterter logischer Ausdrücke.</Description>
     <Copyright>Copyright © $(Authors) 2012-$([System.DateTime]::Now.Year)</Copyright>
-    <AssemblyVersion>8.1.6.2</AssemblyVersion>
-    <FileVersion>8.1.6.2</FileVersion>
+    <AssemblyVersion>8.2.0.0</AssemblyVersion>
+    <FileVersion>8.2.0.0</FileVersion>
     <PackageTags>NetEti Vishnu Node Control View</PackageTags>
   </PropertyGroup>
 
@@ -43,6 +43,9 @@
 		    <Reference Include="NetEti.IniAccess">
 		      <HintPath>$(AssemblyRoot)/NetEti.IniAccess.dll</HintPath>
 		    </Reference>
+		    <Reference Include="NetEti.ProcessTools">
+		      <HintPath>$(AssemblyRoot)/NetEti.ProcessTools.dll</HintPath>
+		    </Reference>
 		    <Reference Include="NetEti.PropertyAccess">
 		      <HintPath>$(AssemblyRoot)/NetEti.PropertyAccess.dll</HintPath>
 		    </Reference>
@@ -70,6 +73,9 @@
 		    <Reference Include="NetEti.Logging">
 		      <HintPath>$(AssemblyRoot)/NetEti.Logging.dll</HintPath>
 		    </Reference>
+		    <Reference Include="NetEti.QuickEdit">
+		      <HintPath>$(AssemblyRoot)/NetEti.QuickEdit.dll</HintPath>
+		    </Reference>
 		  </ItemGroup>
   	</When>
     <Otherwise>
@@ -78,6 +84,7 @@
 		    <PackageReference Include="NetEti.CommandLineAccess" Version="1.0.0" />
 		    <PackageReference Include="NetEti.EnvAccess" Version="1.0.0" />
 		    <PackageReference Include="NetEti.IniAccess" Version="1.0.0" />
+		    <PackageReference Include="NetEti.ProcessTools" Version="1.0.0" />
 		    <PackageReference Include="NetEti.PropertyAccess" Version="1.0.0" />
 		    <PackageReference Include="NetEti.RegAccess" Version="1.0.0" />
 		    <PackageReference Include="NetEti.SettingsAccess" Version="1.0.0" />
@@ -98,6 +105,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -108,9 +116,6 @@
   </ItemGroup>
 
 	<ItemGroup>
-	  <Reference Include="NetEti.QuickEdit">
-	    <HintPath>..\..\..\ReadyBin\Assemblies\NetEti.QuickEdit.dll</HintPath>
-	  </Reference>
 	  <Reference Include="WpfAnimatedGif">
 	    <HintPath>$(AssemblyRoot)/WpfAnimatedGif.dll</HintPath>
 	  </Reference>
@@ -118,6 +123,9 @@
 
 	<ItemGroup>
 	  <None Update="Microsoft.Data.SqlClient.SNI.dll">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Vishnu.exe.config.user.default">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
@@ -138,6 +146,7 @@
     <Exec Command="copy /y &quot;$(ProjectDir)..\DefaultNodeControls\JobConnectorUserControl\JobConnectorUserControl\bin\$(ConfigurationName)\$(TargetFramework)\JobConnectorUserControl.*&quot; &quot;$(TargetDir)DefaultNodeControls\*.*&quot;" />
     <Exec Command="copy /y &quot;$(ProjectDir)..\DefaultNodeControls\SnapshotUserControl\SnapshotUserControl\bin\$(ConfigurationName)\$(TargetFramework)\SnapshotUserControl.*&quot; &quot;$(TargetDir)DefaultNodeControls\*.*&quot;" />
     <Exec Command="copy /y &quot;$(ProjectDir)..\DefaultNodeControls\ConstantNodeUserControl\ConstantNodeUserControl\bin\$(ConfigurationName)\$(TargetFramework)\ConstantNodeUserControl.*&quot; &quot;$(TargetDir)DefaultNodeControls\*.*&quot;" />
+    <Exec Command="copy /y &quot;$(ProjectDir)..\ProcessTerminator\bin\$(ConfigurationName)\$(TargetFramework)\ProcessTerminator.*&quot; &quot;$(TargetDir)*.*&quot;" />
   </Target>
 
 </Project>

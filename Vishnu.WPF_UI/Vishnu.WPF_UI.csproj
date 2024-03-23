@@ -11,8 +11,8 @@
     <Company>NetEti</Company>
     <Description>Assembly mit einem User-Interface für die MVVM-Anwendung Vishnu</Description>
     <Copyright>Copyright © $(Authors) 2012-$([System.DateTime]::Now.Year)</Copyright>
-    <AssemblyVersion>8.1.6.2</AssemblyVersion>
-    <FileVersion>8.1.6.2</FileVersion>
+    <AssemblyVersion>8.2.0.0</AssemblyVersion>
+    <FileVersion>8.2.0.0</FileVersion>
     <PackageTags>NetEti Vishnu Main View</PackageTags>
   </PropertyGroup>
 
@@ -43,6 +43,9 @@
 		    <Reference Include="NetEti.MVVMini">
 		      <HintPath>$(AssemblyRoot)/NetEti.MVVMini.dll</HintPath>
 		    </Reference>
+		    <Reference Include="NetEti.ProcessTools">
+		      <HintPath>$(AssemblyRoot)/NetEti.ProcessTools.dll</HintPath>
+		    </Reference>
 		    <Reference Include="NetEti.ZoomBox">
 		      <HintPath>$(AssemblyRoot)/NetEti.ZoomBox.dll</HintPath>
 		    </Reference>
@@ -55,6 +58,7 @@
 		    <PackageReference Include="NetEti.Logging" Version="1.0.0" />
 		    <PackageReference Include="NetEti.MultiScreen" Version="1.0.0" />
 		    <PackageReference Include="NetEti.MVVMini" Version="1.0.0" />
+		    <PackageReference Include="NetEti.ProcessTools" Version="1.0.0" />
 		    <PackageReference Include="NetEti.ZoomBox" Version="1.0.0" />
 		  </ItemGroup>
     </Otherwise>

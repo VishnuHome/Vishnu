@@ -134,7 +134,7 @@ namespace LogicalTaskTree
         private static void SaveSnapshot(LogicalNode tree)
         {
             AppSettings appSettings = GenericSingletonProvider.GetInstance<AppSettings>();
-            string snapshotDirectory = Path.Combine(appSettings.ResolvedSnapshotDirectory, appSettings.MainJobName);
+            string snapshotDirectory = Path.Combine(appSettings.SnapshotDirectory, appSettings.MainJobName);
             if (!Directory.Exists(snapshotDirectory))
             {
                 Directory.CreateDirectory(snapshotDirectory);
@@ -175,7 +175,7 @@ namespace LogicalTaskTree
         private static void CleanUpSnapshots(bool all = false)
         {
             AppSettings appSettings = GenericSingletonProvider.GetInstance<AppSettings>();
-            string snapshotDirectory = Path.Combine(appSettings.ResolvedSnapshotDirectory, appSettings.MainJobName);
+            string snapshotDirectory = Path.Combine(appSettings.SnapshotDirectory, appSettings.MainJobName);
             if (Directory.Exists(snapshotDirectory))
             {
                 string lastXmlFilePath = "";

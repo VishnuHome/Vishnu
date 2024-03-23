@@ -13,6 +13,7 @@ using System.Windows.Media.TextFormatting;
 using NetEti.ApplicationControl;
 using System.Security.Cryptography.Xml;
 using static System.Net.Mime.MediaTypeNames;
+using System.Windows.Interop;
 
 namespace Vishnu.WPF_UI
 {
@@ -163,6 +164,40 @@ namespace Vishnu.WPF_UI
                   this._forceScreenRefreshTimer.Interval = this._screenRefreshTimerInterval;
               }));
             this._forceScreenRefreshTimer.Enabled = true;
+        }
+
+        /// <summary>
+        /// Raises the System.Windows.Window.SourceInitialized event.
+        /// </summary>
+        /// <param name="e">Event args.</param>
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            this._hwndSource = (HwndSource)PresentationSource.FromVisual(this);
+            this._hwndSource.AddHook(WndProc);
+        }
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            // NativeMethods.WM_SHOWME wird von einer anderen startenden Instanz gesendet,
+            // wenn deren Schalter IsSingleInstance = true ist, bevor jene sich beendet.
+            if (msg == Messaging.WM_SHOWME)
+            {
+                ShowMe();
+            }
+            return IntPtr.Zero;
+        }
+
+        private void ShowMe()
+        {
+            if (WindowState == WindowState.Minimized)
+            {
+                WindowState = WindowState.Normal;
+            }
+            this.Activate();
+            //this._mainWindow.Topmost = true;  // nicht erforderlich
+            //this._mainWindow.Topmost = false; // nicht erforderlich
+            this.Focus();           // wichtig!
         }
 
         private void MainWindow_LocationChanged(object? sender, EventArgs e)
@@ -322,6 +357,7 @@ namespace Vishnu.WPF_UI
         private ZoomBox? _treeZoomBox;
         private ZoomBox? _jobGroupZoomBox;
         private WindowAspects? _mainWindowStartAspects;
+        private HwndSource? _hwndSource;
         private int _firstSelectedIndex;
 
         /// <summary>
@@ -380,7 +416,10 @@ namespace Vishnu.WPF_UI
         // Dies wird hier durch eine temporäre Änderung der Window.Width um ein Pixel korrigiert.
         private void refreshByTemporarilyChangingSize()
         {
-            // return;
+            if (this.ActualWidth < 2)
+            {
+                return;
+            }
             this.Dispatcher.BeginInvoke(new Action(()
               =>
             {
@@ -593,6 +632,11 @@ namespace Vishnu.WPF_UI
             this._forceScreenRefreshTimer.Interval = 500; // Kurz umschalten, damit schnell ein Refresh nachgeschoben wird.
         }
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            this._hwndSource?.RemoveHook(WndProc);
+        }
+
         private void Window_Closed(object sender, EventArgs e)
         {
             this._forceScreenRefreshTimer.Dispose();
@@ -601,7 +645,6 @@ namespace Vishnu.WPF_UI
                 this._sizeChangedTimer.Stop();
                 this._sizeChangedTimer = null;
             }
-            //Application.Current.Shutdown(); // funktioniert nicht
         }
 
         private void sizeHasChanged(object? sender, EventArgs e)

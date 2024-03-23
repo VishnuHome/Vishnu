@@ -12,8 +12,8 @@
     <Company>NetEti</Company>
     <Description>Haupt-Verarbeitungslogik von Vishnu</Description>
     <Copyright>Copyright © $(Authors) 2012-$([System.DateTime]::Now.Year)</Copyright>
-    <AssemblyVersion>8.1.6.2</AssemblyVersion>
-    <FileVersion>8.1.6.2</FileVersion>
+    <AssemblyVersion>8.2.0.0</AssemblyVersion>
+    <FileVersion>8.2.0.0</FileVersion>
     <PackageTags>NetEti Vishnu Businesslogic</PackageTags>
   </PropertyGroup>
 
@@ -50,6 +50,9 @@
 		    <Reference Include="NetEti.MVVMini">
 		      <HintPath>$(AssemblyRoot)/NetEti.MVVMini.dll</HintPath>
 		    </Reference>
+		    <Reference Include="NetEti.NetworkMappingsRefresher">
+		      <HintPath>$(AssemblyRoot)/NetEti.NetworkMappingsRefresher.dll</HintPath>
+		    </Reference>
 		    <Reference Include="NetEti.ObjectSerializer">
 		      <HintPath>$(AssemblyRoot)/NetEti.ObjectSerializer.dll</HintPath>
 		    </Reference>
@@ -73,6 +76,7 @@
 		    <PackageReference Include="NetEti.InfoController" Version="1.0.0" />
 		    <PackageReference Include="NetEti.Logging" Version="1.0.0" />
 		    <PackageReference Include="NetEti.MVVMini" Version="1.0.0" />
+		    <PackageReference Include="NetEti.NetworkMappingsRefresher" Version="1.0.0" />
 		    <PackageReference Include="NetEti.ObjectSerializer" Version="1.0.0" />
 		    <PackageReference Include="NetEti.ProcessTools" Version="1.0.0" />
 		    <PackageReference Include="NetEti.TaskWorker" Version="1.0.0" />

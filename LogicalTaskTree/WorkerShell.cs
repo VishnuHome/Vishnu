@@ -19,7 +19,7 @@ namespace LogicalTaskTree
     /// Kapselt den Aufruf einer externen Arbeitsroutine,
     /// die als Reaktion auf eine definierte Änderung des Tree-Zustands
     /// (TreeEvent) als externe Exe ausgeführt wird (fire and forget)
-    /// TODO: später evtl. auch als lightweight Dll-Plugin realisieren.
+    /// TODO: später eventuell auch als lightweight Dll-Plugin realisieren.
     /// </summary>
     /// <remarks>
     /// File: WorkerShell.cs

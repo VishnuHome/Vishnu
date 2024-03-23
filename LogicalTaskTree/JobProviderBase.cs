@@ -133,7 +133,6 @@ namespace LogicalTaskTree
         {
             this.LoadedJobPackages = new Dictionary<string, JobPackage>();
             this._appSettings = GenericSingletonProvider.GetInstance<AppSettings>();
-            this.ReachableServers = new Dictionary<string, bool>();
         }
 
         #endregion public members
@@ -153,13 +152,6 @@ namespace LogicalTaskTree
         /// Dictionary mit allen bisher geladenen JobPackages.
         /// </summary>
         protected Dictionary<string, JobPackage> LoadedJobPackages;
-
-        /// <summary>
-        /// Stringliste mit allen bisher erreichbaren oder unerreichbaren Servern (aus diversen Dateipfaden).
-        /// Dient zur Optimierung der Ladezeit von Vishnu; Wenn ein Pfad mit einem Server beginnt
-        /// (\\Servername), dann wird in diesem Dictionary vermerkt, ob der Server erreichbar ist, oder nicht.
-        /// </summary>
-        protected Dictionary<string, bool> ReachableServers;
 
         /// <summary>
         /// Diverse Anwendungseinstellungen als Properties.

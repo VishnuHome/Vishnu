@@ -4,6 +4,8 @@ using System.Windows.Media.Animation;
 using System.Threading;
 using System.Windows.Threading;
 using System.ComponentModel;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace NetEti.CustomControls
 {
@@ -28,6 +30,10 @@ namespace NetEti.CustomControls
         private showDelegate _showDelegate;
         private showDelegate _showVersionDelegate;
         private static ManualResetEvent? ResetSplashCreated;
+        private ConcurrentQueue<string> _linesToDisplay;
+        private Task? _messageLoop;
+        private CancellationTokenSource _cancellationTokenSource;
+        private CancellationToken _cancellationToken;
 
         /// <summary>
         /// Erzeugt das SplashWindow, startet es und gibt eine Referenz darauf zurück.
@@ -40,7 +46,7 @@ namespace NetEti.CustomControls
             SplashThread.SetApartmentState(ApartmentState.STA);
             SplashThread.IsBackground = true;
             SplashThread.Name = "Splash Screen";
-            SplashThread.Start();
+            SplashThread.Start(); // Instanziiert _splashWindow
             ResetSplashCreated.WaitOne();
             return _splashWindow ?? throw new NullReferenceException("_splashWindow konnte nicht instanziiert werden.");
         }
@@ -85,6 +91,9 @@ namespace NetEti.CustomControls
         private SplashWindow()
         {
             InitializeComponent();
+            this._cancellationTokenSource = new CancellationTokenSource();
+            this._cancellationToken = this._cancellationTokenSource.Token;
+            this._linesToDisplay = new();
             this._isClosingOrClosed = false;
             this._lastMessage = String.Empty;
             this._showDelegate = new showDelegate(this.showText);
@@ -104,6 +113,29 @@ namespace NetEti.CustomControls
         /// </summary>
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        private void MessageLoop(CancellationToken cancellationToken)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                while (_linesToDisplay.TryDequeue(out string? txt))
+                {
+                    if (!String.IsNullOrEmpty(txt))
+                    {
+                        if (!String.IsNullOrEmpty(this._lastMessage))
+                        {
+                            Thread.Sleep(1000);
+                            _splashWindow?.Dispatcher.Invoke(new Action(() => { BeginStoryboard(_hideboard); }));
+                        }
+                        this._lastMessage = txt;
+                        _splashWindow?.Dispatcher.Invoke(new Action(() => { txtLoading.Text = txt; }));
+                        _splashWindow?.Dispatcher.Invoke(new Action(() => { BeginStoryboard(_showboard); }));
+                    }
+                }
+            }
+            catch (OperationCanceledException) { }
+        }
+
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             if (!closeStoryBoardCompleted)
@@ -116,6 +148,10 @@ namespace NetEti.CustomControls
         private void closeStoryBoard_Completed(object sender, EventArgs e)
         {
             closeStoryBoardCompleted = true;
+            this._cancellationTokenSource.Cancel();
+            this._messageLoop?.Wait();
+            this._messageLoop?.Dispose();
+
             this.Close();
         }
 
@@ -128,13 +164,28 @@ namespace NetEti.CustomControls
 
         private void showText(string txt)
         {
-            if (!String.IsNullOrEmpty(this._lastMessage))
+            _linesToDisplay.Enqueue(txt);
+            if (!(this._messageLoop?.Status == TaskStatus.Running)) 
             {
-                BeginStoryboard(_hideboard);
+                if (this._messageLoop?.Status == TaskStatus.RanToCompletion
+                    || this._messageLoop?.Status == TaskStatus.Faulted
+                    || this._messageLoop?.Status == TaskStatus.Canceled)
+                {
+                    this._messageLoop?.Dispose();
+                }
+                this._cancellationTokenSource.TryReset();
+                this._messageLoop = Task.Run(() => this.MessageLoop(this._cancellationToken));
+                //this._messageLoop = new Task(this.MessageLoop, this._cancellationToken);
+                //this._messageLoop.Start();
             }
-            this._lastMessage = txt;
-            txtLoading.Text = txt;
-            BeginStoryboard(_showboard);
+            //if (!String.IsNullOrEmpty(this._lastMessage))
+            //{
+            //    BeginStoryboard(_hideboard);
+            //}
+            //this._lastMessage = txt;
+            //txtLoading.Text = txt;
+            //BeginStoryboard(_showboard);
+            
             //this.Topmost = false;
         }
 
@@ -144,6 +195,7 @@ namespace NetEti.CustomControls
             this.RaisePropertyChanged("Version");
             this.Topmost = false;
         }
+
         private void RaisePropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)

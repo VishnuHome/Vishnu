@@ -9,6 +9,7 @@ using System.Xml;
 using System.Xml.Linq;
 using NetEti.ApplicationControl;
 using NetEti.CustomControls;
+using NetEti.FileTools;
 using NetEti.FileTools.Zip;
 using Vishnu.Interchange;
 
@@ -23,6 +24,8 @@ namespace LogicalTaskTree.Provider
     ///   12.10.2013 Erik Nagel: erstellt
     ///   27.10.2017 Erik Nagel: Bessere Auflösung gezippter Jobs mit SubJobs.
     ///   01.02.2024 Erik Nagel: AppSettings.JobDirPathes um "Documentation" und "Tests" erweitert.
+    ///   22.02.2024 Erik Nagel: GetJobElementResolvedPath, isPathServerReachable und canPing
+    ///              hier rausgeschmissen und in überarbeiteter Form in NetworkMappingsRefresher realisiert.
     /// </remarks>
     public class ProductionJobProvider : JobProviderBase
     {
@@ -37,17 +40,17 @@ namespace LogicalTaskTree.Provider
         {
             if (String.IsNullOrEmpty(logicalJobName))
             {
-                this._appSettings.JobDirPathes = new Stack<string>();
-                this._appSettings.JobDirPathes.Push(Path.Combine(this._appSettings.VishnuSourceRoot, "VishnuHome/Tests"));
-                this._appSettings.JobDirPathes.Push(Path.Combine(this._appSettings.VishnuSourceRoot, "VishnuHome/Documentation"));
-                this._appSettings.JobDirPathes.Push(this._appSettings.ApplicationRootPath);
-                this._appSettings.JobDirPathes.Push("");
+                //this._appSettings.JobDirPathes = new Stack<string>();
+                //this._appSettings.JobDirPathes.Push(Path.Combine(this._appSettings.VishnuSourceRoot, "VishnuHome/Tests"));
+                //this._appSettings.JobDirPathes.Push(Path.Combine(this._appSettings.VishnuSourceRoot, "VishnuHome/Documentation"));
+                //this._appSettings.JobDirPathes.Push(this._appSettings.ApplicationRootPath);
+                //this._appSettings.JobDirPathes.Push("");
                 string rootJobPackageTmp = this._appSettings.RootJobPackagePath ?? this._appSettings.ApplicationRootPath;
                 if (this._appSettings.RootJobXmlName.ToLower() != "jobdescription.xml")
                 {
                     rootJobPackageTmp = Path.Combine(rootJobPackageTmp, Path.GetFileName(this._appSettings.RootJobXmlName));
                 }
-                string jobXml = replaceWildcardsNPathes(rootJobPackageTmp, this._appSettings.JobDirPathes.ToArray());
+                string jobXml = ReplaceWildcardsAndPathes(rootJobPackageTmp, this._appSettings.JobDirPathes.ToArray());
                 if (!jobXml.ToLower().EndsWith(".xml"))
                 {
                     jobXml = Path.Combine(jobXml, "JobDescription.xml");
@@ -183,18 +186,18 @@ namespace LogicalTaskTree.Provider
         {
             if (!isSnapshot)
             {
-                string tmpPath = Path.GetFullPath(replaceWildcardsNPathes(jobXML, _appSettings.JobDirPathes.ToArray()));
+                string tmpPath = Path.GetFullPath(ReplaceWildcardsAndPathes(jobXML, _appSettings.JobDirPathes.ToArray()));
                 if (!String.IsNullOrEmpty(this._appSettings.ZipRelativeDummyDirectory)
                   && !Directory.Exists(tmpPath) && !File.Exists(tmpPath))
                 {
-                    tmpPath = Path.GetFullPath(replaceWildcardsNPathes(jobXML + ".zip", _appSettings.JobDirPathes.ToArray()));
+                    tmpPath = Path.GetFullPath(ReplaceWildcardsAndPathes(jobXML + ".zip", _appSettings.JobDirPathes.ToArray()));
                 }
                 if (!Directory.Exists(tmpPath) && !File.Exists(tmpPath))
                 {
-                    tmpPath = Path.GetFullPath(replaceWildcardsNPathes(jobXML + ".xml", _appSettings.JobDirPathes.ToArray()));
+                    tmpPath = Path.GetFullPath(ReplaceWildcardsAndPathes(jobXML + ".xml", _appSettings.JobDirPathes.ToArray()));
                 }
                 jobXML = unpackIfPacked(tmpPath, isRootJob);
-                _resolvedJobDir = Path.GetDirectoryName(replaceWildcardsNPathes(jobXML, _appSettings.JobDirPathes.ToArray())) ?? "";
+                _resolvedJobDir = Path.GetDirectoryName(ReplaceWildcardsAndPathes(jobXML, _appSettings.JobDirPathes.ToArray())) ?? "";
                 if (isRootJob)
                 {
                     this._appSettings.AppEnvAccessor.RegisterKeyValue("JobDirectory", Path.GetFullPath(_resolvedJobDir));
@@ -211,7 +214,7 @@ namespace LogicalTaskTree.Provider
             }
             else
             {
-                string tmpPath = Path.GetFullPath(replaceWildcardsNPathes(jobXML, new string[] { }));
+                string tmpPath = Path.GetFullPath(ReplaceWildcardsAndPathes(jobXML, new string[] { }));
                 string tmpDir = Path.GetDirectoryName(tmpPath) ?? "";
                 if (!File.Exists(tmpPath) && !Directory.Exists(tmpDir))
                 {
@@ -459,10 +462,10 @@ namespace LogicalTaskTree.Provider
             // Trigger, der steuert, wann ein Snapshot des aktuellen Jobs erzeugt werden soll (geht nur bei isRootJob == true).
             if (isRootJob)
             {
-                string snapshotDirectory = _appSettings.ReplaceWildcards(_appSettings.ResolvedSnapshotDirectory);
-                if (!Directory.Exists(_appSettings.ResolvedSnapshotDirectory))
+                string snapshotDirectory = _appSettings.ReplaceWildcards(_appSettings.SnapshotDirectory);
+                if (!Directory.Exists(_appSettings.SnapshotDirectory))
                 {
-                    Directory.CreateDirectory(_appSettings.ResolvedSnapshotDirectory);
+                    Directory.CreateDirectory(_appSettings.SnapshotDirectory);
                 }
                 tmpXElement = (subJobRoot.Elements("JobSnapshotTrigger").FirstOrDefault());
                 if (tmpXElement != null)
@@ -476,7 +479,7 @@ namespace LogicalTaskTree.Provider
 
                     tmpString = tmpXElement.Element("Parameters")?.Value;
                     paraString = tmpString
-                        == null ? null : replaceWildcardsNPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
+                        == null ? null : ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
                     tmpString = tmpXElement.Element("Reference")?.Value;
                     if (tmpString != null)
                     {
@@ -501,7 +504,7 @@ namespace LogicalTaskTree.Provider
                         if (tmpString != null)
                         {
                             jobPackage.Job.JobSnapshotTrigger
-                                = new TriggerShell(replaceWildcardsNPathes(tmpString,
+                                = new TriggerShell(ReplaceWildcardsAndPathes(tmpString,
                               _appSettings.AssemblyDirectories.ToArray()), paraString);
                         }
                         else
@@ -554,7 +557,7 @@ namespace LogicalTaskTree.Provider
                 //}
                 tmpString = tmpXElement.Element("Parameters")?.Value;
                 paraString = tmpString
-                    == null ? null : replaceWildcardsNPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
+                    == null ? null : ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
                 tmpString = tmpXElement.Element("Reference")?.Value;
                 if (tmpString != null)
                 {
@@ -570,7 +573,7 @@ namespace LogicalTaskTree.Provider
                     if (tmpString != null)
                     {
                         jobPackage.Job.JobTrigger
-                            = new TriggerShell(replaceWildcardsNPathes(tmpString,
+                            = new TriggerShell(ReplaceWildcardsAndPathes(tmpString,
                           _appSettings.AssemblyDirectories.ToArray()), paraString);
                     }
                     else
@@ -586,7 +589,7 @@ namespace LogicalTaskTree.Provider
             {
                 tmpString = tmpXElement.Element("Parameters")?.Value;
                 paraString = tmpString
-                    == null ? null : replaceWildcardsNPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
+                    == null ? null : ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
                 if (paraString == xmlLogicalJobName)
                 {
                     paraString = logicalJobName; // Referenz ggf. umbiegen
@@ -602,7 +605,7 @@ namespace LogicalTaskTree.Provider
                     if (tmpString != null && paraString != null)
                     {
                         jobPackage.Job.JobLogger
-                            = new LoggerShell(replaceWildcardsNPathes(tmpString, _appSettings.AssemblyDirectories.ToArray()),
+                            = new LoggerShell(ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray()),
                                 paraString);
                     }
                     else
@@ -622,7 +625,7 @@ namespace LogicalTaskTree.Provider
                 {
                     tmpString = tmpXElement.Element("Parameters")?.Value;
                     paraString = tmpString
-                        == null ? null : replaceWildcardsNPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
+                        == null ? null : ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
                     tmpString = tmpXElement.Element("Reference")?.Value;
                     if (tmpString != null)
                     {
@@ -637,7 +640,7 @@ namespace LogicalTaskTree.Provider
                         tmpString = tmpXElement.Element("PhysicalPath")?.Value;
                         if (tmpString != null)
                         {
-                            trigger = new TriggerShell(replaceWildcardsNPathes(tmpString,
+                            trigger = new TriggerShell(ReplaceWildcardsAndPathes(tmpString,
                               _appSettings.AssemblyDirectories.ToArray()), paraString);
                         }
                         else
@@ -660,7 +663,7 @@ namespace LogicalTaskTree.Provider
                     {
                         tmpString = tmpXElement.Element("Parameters")?.Value;
                         paraString = tmpString
-                            == null ? null : replaceWildcardsNPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
+                            == null ? null : ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
                         if (paraString == xmlLogicalJobName)
                         {
                             paraString = logicalJobName; // Referenz ggf. umbiegen
@@ -669,7 +672,7 @@ namespace LogicalTaskTree.Provider
                         if (paraString != null && tmpString != null)
                         {
                             logger = new LoggerShell(
-                                replaceWildcardsNPathes(tmpString, _appSettings.AssemblyDirectories.ToArray()), paraString);
+                                ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray()), paraString);
                         }
                         else
                         {
@@ -681,7 +684,7 @@ namespace LogicalTaskTree.Provider
                 bool isMirror = false;
                 tmpString = jobChecker.Element("Parameters")?.Value;
                 paraString = tmpString
-                    == null ? null : replaceWildcardsNPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
+                    == null ? null : ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
                 isMirror = paraString != null && paraString.ToUpper().Equals("ISMIRROR");
                 tmpXElement = jobChecker.Elements("PhysicalPath").FirstOrDefault();
                 if (tmpXElement == null)
@@ -689,7 +692,7 @@ namespace LogicalTaskTree.Provider
                     throw new ArgumentException("Ein Checker muss einen PhysicalPath zugeordnet bekommen.");
                 }
                 string physicalDllPath
-                  = replaceWildcardsNPathes(tmpXElement.Value, _appSettings.AssemblyDirectories.ToArray());
+                  = ReplaceWildcardsAndPathes(tmpXElement.Value, _appSettings.AssemblyDirectories.ToArray());
                 isMirror |= Path.GetFileNameWithoutExtension(physicalDllPath).ToUpper().Equals("TRIGGEREVENTMIRRORCHECKER");
                 bool alwaysReloadChecker = _appSettings.UncachedCheckers.Contains(
                     Path.GetFileNameWithoutExtension(physicalDllPath));
@@ -737,7 +740,7 @@ namespace LogicalTaskTree.Provider
                     // string pluginDirectory = Path.Combine(this._resolvedJobDir, "Plugin");
                     if (checkerShell.CheckerParameters != null)
                     {
-                        checkerShell.CheckerParameters = replaceWildcardsNPathes(checkerShell.CheckerParameters, _appSettings.AssemblyDirectories.ToArray());
+                        checkerShell.CheckerParameters = ReplaceWildcardsAndPathes(checkerShell.CheckerParameters, _appSettings.AssemblyDirectories.ToArray());
                     }
                     tmpString = jobChecker.Element("LogicalName")?.Value;
                     if (String.IsNullOrEmpty(tmpString))
@@ -757,7 +760,7 @@ namespace LogicalTaskTree.Provider
             foreach (XElement jobValueModifier in jobValueModifiers)
             {
                 XElement? item = jobValueModifier.Element("PhysicalPath");
-                string? jobValueModifierSlave = item == null ? null : replaceWildcardsNPathes(item.Value, _appSettings.AssemblyDirectories.ToArray());
+                string? jobValueModifierSlave = item == null ? null : ReplaceWildcardsAndPathes(item.Value, _appSettings.AssemblyDirectories.ToArray());
                 item = jobValueModifier.Element("Format");
                 string? jobValueModifierFormat = item?.Value;
                 item = jobValueModifier.Elements("SingleNodeUserControlPath").FirstOrDefault();
@@ -839,7 +842,7 @@ namespace LogicalTaskTree.Provider
                 tmpXElement = singleJobTrigger.Element("Parameters");
                 if (tmpXElement != null)
                 {
-                    paraString = replaceWildcardsNPathes(tmpXElement.Value, _appSettings.AssemblyDirectories.ToArray());
+                    paraString = ReplaceWildcardsAndPathes(tmpXElement.Value, _appSettings.AssemblyDirectories.ToArray());
                 }
                 tmpString = singleJobTrigger.Element("Reference")?.Value;
                 if (tmpString != null)
@@ -864,7 +867,7 @@ namespace LogicalTaskTree.Provider
                         throw new ArgumentException(
                             "'Reference' und/oder 'PhysicalPath' nicht gefunden. Ein Trigger ohne 'Reference' muss einen 'PhysicalPath' und einen 'LogicalName' haben?");
                     }
-                    trigger = new TriggerShell(replaceWildcardsNPathes(tmpPhysicalPath,
+                    trigger = new TriggerShell(ReplaceWildcardsAndPathes(tmpPhysicalPath,
                       _appSettings.AssemblyDirectories.ToArray()), paraString);
                     jobPackage.Job.Triggers.Add(tmpLogicalName, trigger);
                 }
@@ -876,7 +879,7 @@ namespace LogicalTaskTree.Provider
             {
                 tmpString = singleJobLogger.Element("Parameters")?.Value;
                 paraString = tmpString
-                    == null ? null : replaceWildcardsNPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
+                    == null ? null : ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
                 if (paraString == xmlLogicalJobName)
                 {
                     paraString = logicalJobName; // Referenz ggf. umbiegen
@@ -884,7 +887,7 @@ namespace LogicalTaskTree.Provider
                 tmpString = singleJobLogger.Element("PhysicalPath")?.Value;
                 if (tmpString != null && paraString != null)
                 {
-                    LoggerShell logger = new LoggerShell(replaceWildcardsNPathes(tmpString,
+                    LoggerShell logger = new LoggerShell(ReplaceWildcardsAndPathes(tmpString,
                       _appSettings.AssemblyDirectories.ToArray()), paraString);
                     tmpString = singleJobLogger.Element("LogicalName")?.Value;
                     if (String.IsNullOrEmpty(tmpString))
@@ -949,7 +952,7 @@ namespace LogicalTaskTree.Provider
                                 tmpString = workerTrigger.Element("PhysicalPath")?.Value;
                                 if (tmpString != null)
                                 {
-                                    trigger = new TriggerShell(replaceWildcardsNPathes(tmpString,
+                                    trigger = new TriggerShell(ReplaceWildcardsAndPathes(tmpString,
                                       _appSettings.AssemblyDirectories.ToArray()), paraString);
                                 }
                                 else
@@ -970,7 +973,7 @@ namespace LogicalTaskTree.Provider
                                 tmpString = subSubWorker.Element("PhysicalPath")?.Value;
                                 if (tmpString != null)
                                 {
-                                    string newPhysicalPath = replaceWildcardsNPathes(tmpString,
+                                    string newPhysicalPath = ReplaceWildcardsAndPathes(tmpString,
                                       _appSettings.AssemblyDirectories.ToArray());
                                     subSubWorker.Element("PhysicalPath")?.ReplaceWith(new XElement("PhysicalPath", newPhysicalPath));
                                 }
@@ -978,7 +981,7 @@ namespace LogicalTaskTree.Provider
                             tmpString = subWorker.Element("PhysicalPath")?.Value;
                             if (tmpString != null)
                             {
-                                subWorkerList.Add(new WorkerShell(replaceWildcardsNPathes(tmpString,
+                                subWorkerList.Add(new WorkerShell(ReplaceWildcardsAndPathes(tmpString,
                                   _appSettings.AssemblyDirectories.ToArray()),
                                   subWorkerPara, transportByFile, trigger));
                             }
@@ -1015,7 +1018,7 @@ namespace LogicalTaskTree.Provider
                 tmpString = subJob.Element("LogicalName")?.Value;
                 if (xvar != null)
                 {
-                    physicalPath = replaceWildcardsNPathes(xvar.Value, _appSettings.JobDirPathes.ToArray());
+                    physicalPath = ReplaceWildcardsAndPathes(xvar.Value, _appSettings.JobDirPathes.ToArray());
                 }
                 else
                 {
@@ -1024,7 +1027,7 @@ namespace LogicalTaskTree.Provider
                     {
                         if (tmpString != null)
                         {
-                            physicalPath = replaceWildcardsNPathes(tmpString, _appSettings.JobDirPathes.ToArray());
+                            physicalPath = ReplaceWildcardsAndPathes(tmpString, _appSettings.JobDirPathes.ToArray());
                         }
                         else
                         {
@@ -1095,11 +1098,11 @@ namespace LogicalTaskTree.Provider
                     {
                         //if (!physicalSnapshotPath.ToLower().EndsWith(physicalSnapshotName.ToLower()))
                         //{
-                        //  physicalSnapshotPath = Path.Combine(_appSettings.ResolvedSnapshotDirectory, physicalSnapshotName, physicalSnapshotPath);
+                        //  physicalSnapshotPath = Path.Combine(_appSettings.SnapshotDirectory, physicalSnapshotName, physicalSnapshotPath);
                         //}
                         //else
                         //{
-                        physicalSnapshotPath = Path.Combine(_appSettings.ResolvedSnapshotDirectory, physicalSnapshotPath);
+                        physicalSnapshotPath = Path.Combine(_appSettings.SnapshotDirectory, physicalSnapshotPath);
                         //}
                     }
                     physicalSnapshotPath = Path.Combine(physicalSnapshotPath, "JobSnapshot.info");
@@ -1111,7 +1114,7 @@ namespace LogicalTaskTree.Provider
                         tmpString = tmpXElement.Element("Parameters")?.Value;
                         if (tmpString != null)
                         {
-                            paraString = replaceWildcardsNPathes(tmpString.Replace("JobSnapshot.xml", "JobSnapshot.info"), new string[] { });
+                            paraString = ReplaceWildcardsAndPathes(tmpString.Replace("JobSnapshot.xml", "JobSnapshot.info"), new string[] { });
                         }
                         else
                         {
@@ -1134,7 +1137,7 @@ namespace LogicalTaskTree.Provider
                         {
                             tmpString = tmpXElement.Element("PhysicalPath")?.Value
                                 ?? throw new ArgumentException("'Reference' und/oder 'PhysicalPath' nicht gefunden. Ein Trigger ohne 'Reference' muss einen 'PhysicalPath' haben?");
-                            trigger = new TriggerShell(replaceWildcardsNPathes(tmpString,
+                            trigger = new TriggerShell(ReplaceWildcardsAndPathes(tmpString,
                               _appSettings.AssemblyDirectories.ToArray()), paraString);
                         }
                         tmpString = tmpXElement.Element("LogicalName")?.Value;
@@ -1166,7 +1169,8 @@ namespace LogicalTaskTree.Provider
             }
             catch
             {
-                throw new ApplicationException(String.Format("Job {0}: Ein Job kann nur einmal hinzugefügt werden.\nHinweis: eine mehrfache Referenzierung in einem logischen Ausdruck ist jedoch möglich.", jobPackage.JobName));
+                throw new ApplicationException(String.Format("Job {0}: Ein Job kann nur einmal hinzugefügt werden."
+                    + "\nHinweis: eine mehrfache Referenzierung in einem logischen Ausdruck ist jedoch möglich.", jobPackage.JobName));
             }
             if (popDirs)
             {
@@ -1175,7 +1179,7 @@ namespace LogicalTaskTree.Provider
             return logicalJobName;
         }
 
-        private string replaceWildcardsNPathes(string para, string[] searchDirectories)
+        private string ReplaceWildcardsAndPathes(string para, string[] searchDirectories)
         {
             para = _appSettings.ReplaceWildcards(para);
             string paraString = "";
@@ -1185,8 +1189,9 @@ namespace LogicalTaskTree.Provider
                 string modifiedParaPart = paraPart;
                 if (modifiedParaPart.Trim() != String.Empty)
                 {
-                    // TODO: diese Ersetzung noch besser gegen versehentliches Einfügen von Pfaden schützen.
-                    modifiedParaPart = GetJobElementResolvedPath(modifiedParaPart, searchDirectories);
+                    string path = NetworkMappingsRefresher.GetNextReachablePath(
+                        modifiedParaPart, searchDirectories) ?? modifiedParaPart;
+                    modifiedParaPart = path.Replace(@"Plugin\Plugin", "Plugin");
                 }
                 paraString += delimiter + modifiedParaPart;
                 delimiter = "|";
@@ -1212,110 +1217,6 @@ namespace LogicalTaskTree.Provider
             }
         }
 
-        private string GetJobElementResolvedPath(string path, string[] searchDirectories)
-        {
-            if (path.StartsWith("\\\\") || path.StartsWith(@"//") || (path.Length > 1 && path[1] == ':') || Regex.IsMatch(path, @"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"))
-            {
-                // Path.IsPathRooted erkennt führende IPs nicht und liefert auch bei nur einem führenden '/' oder '\' true.
-                return path.Replace(@"Plugin\Plugin", "Plugin");
-            }
-            else
-            {
-                if (!(path.Contains(".") || path.Contains("\\") || path.Contains(@"/")))
-                {
-                    // wird nicht als Pfad betrachtet und direkt zurückgegeben
-                    return path;
-                }
-                string tmpPath = path.Replace(@"Plugin\Plugin", "Plugin");
-                try
-                {
-                    foreach (string tmpDirectory in searchDirectories)
-                    {
-                        // InfoController.GetInfoPublisher().Publish("#JobSearch# '" + tmpDirectory + "'");
-                        if (tmpDirectory != "")
-                        {
-                            if (isPathServerReachable(tmpDirectory) && Directory.Exists(tmpDirectory))
-                            {
-                                //string tmpPath2 = Path.Combine(tmpDirectory, tmpPath);
-                                string tmpPath2 = String.IsNullOrEmpty(tmpDirectory) ?
-                                    tmpPath : tmpDirectory.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar + tmpPath;
-                                // Anmerkung: Path.Combine schmeißt den ersten Pfad komplett weg,
-                                // wenn der zweite Pfad ein absoluter Pfad ist. Deswegen erfolgt weiter oben
-                                // die Abfrage auf absoluten Pfad am Anfang.
-                                if (File.Exists(tmpPath2) || Directory.Exists(tmpPath2))
-                                {
-                                    return tmpPath2;
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (ArgumentException)
-                {
-                }
-                return tmpPath;
-            }
-        }
-
-        private bool isPathServerReachable(string tmpPath)
-        {
-            string server = tmpPath;
-            bool serverIsIP = true;
-            if (server.StartsWith("\\\\") || server.StartsWith(@"//"))
-            {
-                serverIsIP = false;
-                server = server.Substring(2);
-            }
-            else
-            {
-                if (!Regex.IsMatch(server, @"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$"))
-                {
-                    return true;
-                }
-            }
-            server = Path.GetDirectoryName(server) ?? Directory.GetCurrentDirectory();
-            if (!serverIsIP)
-            {
-                server = "\\\\" + server;
-            }
-            if (ReachableServers.ContainsKey(server))
-            {
-                return ReachableServers[server];
-            }
-            int retries = 3;
-            int timeout = 2000;
-            int retry = 0;
-            while (retry++ < retries && !canPing(server, timeout)) { }
-            if (retry > retries)
-            {
-                ReachableServers.Add(server, false);
-            }
-            else
-            {
-                ReachableServers.Add(server, true);
-            }
-            return ReachableServers[server];
-        }
-
-        private bool canPing(string address, int timeout)
-        {
-            Ping ping = new Ping();
-            try
-            {
-                PingReply reply = ping.Send(address, timeout);
-                if (reply == null) { return false; }
-
-                return (reply.Status == IPStatus.Success);
-            }
-            catch (PingException)
-            {
-                return false;
-            }
-            catch (ArgumentNullException)
-            {
-                return false;
-            }
-        }
         #endregion private members
     }
 }

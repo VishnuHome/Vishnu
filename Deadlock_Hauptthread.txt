@@ -1,0 +1,19 @@
+1	Hauptthread
+
+ 	[Externer Code]	
+ 	NetEti.Logging.dll!NetEti.ApplicationControl.LoggerBase.flushBuffer(bool sync) Zeile 429	C#
+>	NetEti.Logging.dll!NetEti.ApplicationControl.LoggerBase.Dispose(bool disposing) Zeile 50	C#
+ 	NetEti.Logging.dll!NetEti.ApplicationControl.LoggerBase.Dispose() Zeile 34	C#
+ 	NetEti.InfoController.dll!NetEti.ApplicationControl.InfoController.DisposeAll() Zeile 240	C#
+ 	NetEti.InfoController.dll!NetEti.ApplicationControl.InfoController.Dispose(bool disposing) Zeile 52	C#
+ 	NetEti.InfoController.dll!NetEti.ApplicationControl.InfoController.Dispose() Zeile 36	C#
+ 	NetEti.BasicAppSettings.dll!NetEti.ApplicationEnvironment.BasicAppSettings.Dispose(bool disposing) Zeile 590	C#
+ 	NetEti.BasicAppSettings.dll!NetEti.ApplicationEnvironment.BasicAppSettings.Dispose() Zeile 531	C#
+ 	Vishnu.dll!Vishnu.SingleInstanceApplication.doVishnuCleanup() Zeile 566	C#
+ 	
+ 	
+ 	Vishnu.dll!Vishnu.SingleInstanceApplication.mainWindow_Closed(object sender, System.EventArgs e) Zeile 498	C#
+ 	[Externer Code]	
+ 	Vishnu.dll!Vishnu.SingleInstanceManager.OnStartup(Microsoft.VisualBasic.ApplicationServices.StartupEventArgs e) Zeile 133	C#
+ 	[Externer Code]	
+ 	Vishnu.dll!Vishnu.EntryPoint.Main(string[] args) Zeile 32	C#

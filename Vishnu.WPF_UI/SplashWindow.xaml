@@ -12,13 +12,13 @@
             <ThicknessAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)"
                                         Storyboard.TargetName="txtLoading">
                 <EasingThicknessKeyFrame KeyTime="0:0:0" Value="24,0,0,0"/>
-                <EasingThicknessKeyFrame KeyTime="0:0:1" Value="24,0,0,70"/>
+                <EasingThicknessKeyFrame KeyTime="0:0:1" Value="24,0,0,85"/>
             </ThicknessAnimationUsingKeyFrames>
         </Storyboard>
         <Storyboard x:Key="HideStoryBoard">
             <ThicknessAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)"
                                         Storyboard.TargetName="txtLoading">
-                <EasingThicknessKeyFrame KeyTime="0:0:0" Value="24,0,0,70"/>
+                <EasingThicknessKeyFrame KeyTime="0:0:0" Value="24,0,0,85"/>
                 <EasingThicknessKeyFrame KeyTime="0:0:1" Value="24,0,0,150"/>
             </ThicknessAnimationUsingKeyFrames>
         </Storyboard>

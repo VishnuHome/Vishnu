@@ -1,0 +1,41 @@
+7	Arbeitsthread
+
+ 	[Externer Code]	
+ 	NetEti.Logging.dll!NetEti.ApplicationControl.LoggerBase.flushBuffer(bool sync) Zeile 401	C#
+>	NetEti.Logging.dll!NetEti.ApplicationControl.LoggerBase.Dispose(bool disposing) Zeile 50	C#
+ 	NetEti.Logging.dll!NetEti.ApplicationControl.LoggerBase.Dispose() Zeile 34	C#
+ 	NetEti.InfoController.dll!NetEti.ApplicationControl.InfoController.DisposeAll() Zeile 240	C#
+ 	NetEti.InfoController.dll!NetEti.ApplicationControl.InfoController.Dispose(bool disposing) Zeile 52	C#
+ 	NetEti.InfoController.dll!NetEti.ApplicationControl.InfoController.Dispose() Zeile 36	C#
+ 	NetEti.BasicAppSettings.dll!NetEti.ApplicationEnvironment.BasicAppSettings.Dispose(bool disposing) Zeile 590	C#
+ 	NetEti.BasicAppSettings.dll!NetEti.ApplicationEnvironment.BasicAppSettings.Dispose() Zeile 531	C#
+ 	Vishnu.dll!Vishnu.SingleInstanceApplication.doVishnuCleanup() Zeile 566	C#
+ 	
+ 	
+ 	Vishnu.dll!Vishnu.SingleInstanceApplication.OnStartup.AnonymousMethod__2_0(object sender, System.UnhandledExceptionEventArgs args) Zeile 231	C#
+ 	[Externer Code]	
+
+
+System.IO.DirectoryNotFoundException: Could not find a part of the path 'C:\Users\micro\AppData\Local\Temp\Vishnu.CheckWeatherHistory'.
+   at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.FileInfos(String directory, String expression, EnumerationOptions options, Boolean isNormalized)
+   at System.IO.DirectoryInfo.InternalEnumerateInfos(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions options)
+   at System.IO.DirectoryInfo.GetFiles(String searchPattern, EnumerationOptions enumerationOptions)
+   at NetEti.ApplicationControl.Logger.OrganizeLoggings(TimeSpan debugArchivingInterval, Int32 debugArchiveMaxCount) in C:\Users\micro\Documents\private4\WPF\openVishnu8\WorkFrame\InfoController\Logging\Logger.cs:line 153
+   at NetEti.ApplicationControl.LoggerBase.flushBufferAsync() in C:\Users\micro\Documents\private4\WPF\openVishnu8\WorkFrame\InfoController\Logging\LoggerBase.cs:line 454
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   
+1. Die Abfrage auf SingleInstanceApplication.doVishnuCleanup() innerhalb von
+   AppDomain.CurrentDomain.UnhandledException ist unzureichend.
+   Wenn innerhalb von doVishnuCleanup() wiederum eine Exception auftritt ist
+   das Setzten von SingleInstanceApplication._cleanupDone=true am Ende der
+   Routine zu spät. Hierdurch tritt letztendlich der Deadlock auf.
+   Lösung: Es muss ganz am Anfang ein Flag "_cleanupStarted" gesetzt werden,
+   um einen doppelten Einstieg in doVishnuCleanup() zu verhindern.
+2. Die Ursache für die Exception innerhalb von doVishnuCleanup() muss
+   gefunden und behoben werden.
+   

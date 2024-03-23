@@ -10,7 +10,7 @@
         MinHeight="120" MinWidth="260"
         ContentRendered="window_ContentRendered" Closed="Window_Closed" SizeChanged="Window_SizeChanged"
         Activated="Window_Activated"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen" Closing="Window_Closing">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

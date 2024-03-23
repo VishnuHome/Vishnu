@@ -1,0 +1,10 @@
+Nicht markiert	>	22004	23	Arbeitsthread	<Kein Name>	System.Private.CoreLib.dll!System.Threading.Thread.Join
+Nicht markiert		42876	1	Hauptthread	Hauptthread	System.Private.CoreLib.dll!System.Threading.SynchronizationContext.WaitHelper
+Nicht markiert		29812	11	Arbeitsthread	.NET System Events	Microsoft.Win32.SystemEvents.dll!Interop.User32.GetMessageW.____PInvoke|212_0
+Nicht markiert		16060	7	Arbeitsthread	.NET TP Gate	System.Private.CoreLib.dll!System.Threading.WaitHandle.WaitOneNoCheck
+Nicht markiert		25232	4	Arbeitsthread	.NET ThreadPool IO	System.Private.CoreLib.dll!System.Threading.PortableThreadPool.IOCompletionPoller.Poll
+Nicht markiert		34688	25	Arbeitsthread	.NET TP Worker	System.Private.CoreLib.dll!System.Threading.LowLevelLifoSemaphore.WaitForSignal
+Nicht markiert		30008	9	Arbeitsthread	.NET Timer	System.Private.CoreLib.dll!System.Threading.WaitHandle.WaitOneNoCheck
+Nicht markiert		40704	2	Arbeitsthread	<Kein Name>	
+Nicht markiert		22644	45	Arbeitsthread	.NET Counter Poller	System.Private.CoreLib.dll!System.Threading.WaitHandle.WaitOneNoCheck
+Nicht markiert		37204	51	Arbeitsthread	.NET TP Worker	System.Private.CoreLib.dll!System.Threading.LowLevelLifoSemaphore.WaitForSignal

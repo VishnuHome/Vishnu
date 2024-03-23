@@ -171,11 +171,15 @@ namespace Vishnu.Interchange
         /// <returns>Bildschirminformationen zum MainWindow.</returns>
         private static Rect ThreadAccessMainWindowMeasuresOnGuiDispatcher()
         {
-            var rect = Application.Current.Dispatcher.Invoke(new Func<Rect>(() =>
+            Rect rect;
+            if (Application.Current != null)
             {
-                Window mainWindow = System.Windows.Application.Current.MainWindow;
-                return new Rect(mainWindow.Left, mainWindow.Top, mainWindow.Width, mainWindow.Height);
-            }));
+                rect = Application.Current.Dispatcher.Invoke(new Func<Rect>(() =>
+                {
+                    Window mainWindow = System.Windows.Application.Current.MainWindow;
+                    return new Rect(mainWindow.Left, mainWindow.Top, mainWindow.Width, mainWindow.Height);
+                }));
+            }
             return rect;
         }
     }

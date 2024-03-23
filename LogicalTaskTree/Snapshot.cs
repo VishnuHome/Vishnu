@@ -299,7 +299,7 @@ namespace LogicalTaskTree
                         String.Format($"LastRead_org_{guid}.xml")));
             }
             catch { }
-            string lastXmlDocPath = System.IO.Path.Combine(this.AppSettings.ResolvedSnapshotDirectory,
+            string lastXmlDocPath = System.IO.Path.Combine(this.AppSettings.SnapshotDirectory,
                 String.Format($"LastRead_{guid}.xml"));
             this._lastXmlDoc?.Save(lastXmlDocPath);
         }

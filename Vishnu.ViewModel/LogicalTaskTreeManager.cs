@@ -158,7 +158,31 @@ namespace Vishnu.ViewModel
         {
             string vishnuDocPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(
                 GenericSingletonProvider.GetInstance<AppSettings>().VishnuSourceRoot, @"Vishnu_doc.de.chm"));
-            System.Windows.Forms.Help.ShowHelp(null, vishnuDocPath);
+            if (!File.Exists(vishnuDocPath))
+            {
+                vishnuDocPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(
+                    GenericSingletonProvider.GetInstance<AppSettings>().VishnuRoot, @"Vishnu_doc.de.chm"));
+            }
+            if (File.Exists(vishnuDocPath))
+            {
+                System.Windows.Forms.Help.ShowHelp(null, vishnuDocPath);
+            }
+            else
+            {
+                if (!redirected)
+                {
+                    System.Windows.MessageBox.Show("Kann die lokale Vishnu Hilfe nicht aufrufen, versuche die Onlinehilfe ...",
+                        "Fehler",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    ShowVishnuOnlineHelp(redirected = true);
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("Kann die lokale Vishnu Hilfe nicht aufrufen, gebe auf.",
+                        "Fehler",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
 
             // Der Teil unten funktioniert nicht, sondern wirft folgende Exception:
             // An error occurred trying to start process

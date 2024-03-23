@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows7.0</TargetFramework>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<Title>$(AssemblyName) - killt einen Prozess mit einer gegebenen Id</Title>
+		<Description>$(AssemblyName) - killt einen Prozess mit einer gegebenen Id</Description>
+		<Copyright>Copyright © $(Authors) 2012-$([System.DateTime]::Now.Year)</Copyright>
+		<Authors>Erik Nagel</Authors>
+		<Company>NetEti</Company>
+	</PropertyGroup>
+
+</Project>

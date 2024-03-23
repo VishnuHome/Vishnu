@@ -179,9 +179,9 @@ namespace Vishnu.ViewModel
             {
                 ConfigurationManager.SaveLocalConfiguration(this.TreeVM, this.TreeOrientationState, windowAspects);
             });
+            Point? messagePosition = null;
             if (this._uIMain is Window)
             {
-
                 // Hier wird direkt vor dem Run TreeParams.LastParentViewAbsoluteScreenPosition neu gesetzt.
                 // Hintergrund: Der Benutzer kann in der Zwischenzeit das MainWindow verschoben haben.
                 // Achtung: eine direkte Zuweisung geht wegen Thread-übergreifendem Zugriff schief!
@@ -208,34 +208,43 @@ namespace Vishnu.ViewModel
                         }
                         this.TreeParams.LastParentViewAbsoluteScreenPosition =
                             lastParentViewAbsoluteScreenPosition;
+                        messagePosition = lastParentViewAbsoluteScreenPosition;
                     }
                 }));
-                new TimerMessageBox(this._uIMain as Window)
-                {
-                    Buttons = MessageBoxButtons.None,
-                    LifeTimeMilliSeconds = 2000,
-                    Icon = MessageBoxIcons.Working,
-                    Caption = "Verarbeitung läuft ...",
-                    Text = "Die aktuelle Bildschirmdarstellung wird gespeichert.",
-                    Position = this.TreeParams.LastParentViewAbsoluteScreenPosition
-                }.Show();
             }
-            else
-            {
-                new TimerMessageBox()
-                {
-                    Buttons = MessageBoxButtons.None,
-                    LifeTimeMilliSeconds = 2000,
-                    Icon = MessageBoxIcons.Working,
-                    Caption = "Verarbeitung läuft ...",
-                    Text = "Die aktuelle Bildschirmdarstellung wird gespeichert."
-                }.Show();
-            }
+            this.IssueTimerMessage(messagePosition);
+            this.MainWindowToTop();
         }
 
         #endregion public members
 
         #region private members
+
+        private void IssueTimerMessage(Point? position)
+        {
+            TimerMessageBox timerMessageBox = new((Window)this._uIMain)
+            {
+                Buttons = MessageBoxButtons.None,
+                LifeTimeMilliSeconds = 2000,
+                Icon = MessageBoxIcons.Working,
+                Caption = "Verarbeitung läuft ...",
+                Text = "Die aktuelle Bildschirmdarstellung wird gespeichert.",
+            };
+            if (position != null)
+            {
+                timerMessageBox.Position = (Point)position;
+            }
+            timerMessageBox.Show();
+        }
+
+        /// <summary>
+        /// Holt das Hauptfenster in den Vordergrund.
+        /// </summary>
+        private void MainWindowToTop()
+        {
+            Application.Current.MainWindow.Activate();
+            Application.Current.MainWindow.Focus(); // wichtig!
+        }
 
         private class ViewModelCompare : IEqualityComparer<LogicalNodeViewModel>
         {

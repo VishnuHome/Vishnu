@@ -6,17 +6,15 @@ Vishnu ist eine Monitoring- und Prozesssteuerungssoftware mit integrierter Verar
 
 ## Voraussetzungen
 
-  - Läuft auf Windows-Systemen ab Version 7.
-  - Entwicklung und Umwandlung mit Visual Studio 2019 oder höher.
+  - Läuft auf Systemen ab Windows 10.
+  - Entwicklung und Umwandlung mit Visual Studio 2022 Version 17.8 oder höher.
+  - .Net Runtime ab 8.0.2.
 
 ## Schnellstart
 
-Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
-  - ### Vorbereitung:
-	* Ein lokales Basisverzeichnis für alle weiteren Vishnu- und Hilfs-Verzeichnisse anlegen, zum Beispiel c:\Users\<user>\Documents\MyVishnu
-	* ### Wichtig: Eine Umgebungsvariable "Vishnu_Root" auf den Pfad zu diesem Verzeichnis setzen, z.B.: Vishnu_Root=c:\Users\<user>\Documents\MyVishnu.
-
+Für die erste Einrichtung führt bitte nachfolgende Schritte aus:
   - ### Installation:
+	* Ein lokales Basisverzeichnis für alle weiteren Vishnu- und Hilfs-Verzeichnisse anlegen, zum Beispiel c:\Users\<user>\Documents\MyVishnu
 	* [init.zip](https://github.com/VishnuHome/Setup/raw/master/Vishnu.bin/init.zip) herunterladen und in das Basisverzeichnis entpacken.
 
 	Es entsteht dann folgende Struktur:
@@ -25,15 +23,15 @@ Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
 
 	### Vishnu-Demo:
 
-	- Im Verzeichnis ReadyBin/Vishnu.bin das Script **_Vishnu_Demo.bat** starten.
+	- Im Verzeichnis ReadyBin/Vishnu.bin **Vishnu.exe** starten.
 
 ## Demos
-Im Unterverzeichnis **DemoJobs** findest du die Job-Definitionen einer Reihe von interessanten Demonstrations-Jobs.
+Im Unterverzeichnis **DemoJobs** findet ihr die Job-Definitionen einer Reihe von interessanten Demonstrations-Jobs.
 
 ## Dokumentation
-Die ausführliche Dokumentation findest du im mit entpackten **Vishnu_doc.de.chm** oder
+Die ausführliche Dokumentation findet ihr in **Vishnu** mit **F1**, im mit entpackten **Vishnu_doc.de.chm** oder
 online unter [Vishnu online Dokumentation](https://neteti.de/Vishnu.Doc/)
-<br/><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-size:14px;">(Hinweis: Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte, sieh bitte im [CHM-HowTo](CHM_HowTo.md) nach.)</span>
+<br/><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-size:14px;">(Hinweis: Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte, seht bitte im [CHM-HowTo](CHM_HowTo.md) nach.)</span>
 
 ## Quellcode und Entwicklung
 
@@ -46,15 +44,15 @@ online unter [Vishnu online Dokumentation](https://neteti.de/Vishnu.Doc/)
 	
 	-  in der git-bash über git clone:
 
-		  cd VishnuHome
-		  git clone git@github.com:VishnuHome/Vishnu.git
+		  cd VishnuHome<br />
+		  git clone git@github.com:&lt;meOnGitHub&gt;/Vishnu.git
 
-	-  oder über "Open with GitHub Desktop", wenn du die Desktop-Anwendung bevorzugst
+	-  oder über "Open with GitHub Desktop", wenn ihr die Desktop-Anwendung bevorzugt
 	
-	-  nicht empfohlen: über "Download ZIP" kommst du zwar auch an den Quellcode von Vishnu, 
-	   hast dann aber keine Anbindung an dein geforktes Repository auf github.
+	-  nicht empfohlen: über "Download ZIP" kommt ihr zwar auch an den Quellcode von Vishnu, 
+	   habt dann aber keine Anbindung an euer geforktes Repository auf github.
 	
-   ![clone](Git_Clone_small.png)
+   ![clone](Git_Clone.png)
 	
 
 ## Die Vishnu-Plugins
@@ -65,43 +63,60 @@ Zu den Vishnu-Plugins gehören neben anderen die Checker.
 Checker sind die wesentlichen Vishnu-Akteure. Sie machen die Prüf-Arbeit und liefern
 Prüfergebnisse zurück (siehe auch in der Hilfe [Vishnu Akteure](https://neteti.de/Vishnu.Doc/html/bc0ffa08-c936-4fad-8fdb-dbd2279fc360.htm)
 und [eigene Checker](https://neteti.de/Vishnu.Doc/html/a3f9771a-ac24-46c0-97df-d2bde6a990e8.htm)).
-Vishnu liefert schon eine Reihe von Checkern mit. Diese findest du unter [InPlug](https://github.com/InPlug).
+Vishnu liefert schon eine Reihe von Checkern mit. Diese findet ihr unter [InPlug](https://github.com/InPlug).
 
-Vishnu-Plugins kannst du genauso forken und clonen wie unter [Quellcode und Entwickung](#Quellcode-und-Entwicklung) schon beschrieben,
-nur dass dein lokales Unterverzeichnis das schon vorgesehene **InPlug** sein sollte.
+Vishnu-Plugins könnt ihr genauso forken und clonen wie unter [Quellcode und Entwickung](#Quellcode-und-Entwicklung) schon beschrieben,
+nur dass euer lokales Unterverzeichnis das schon vorgesehene **InPlug** sein sollte.
 <br/>(Quellen: https://github.com/InPlug)
 
 ## Das Basis-Framework
 Vishnu arbeitet mit einigen allgemeingültigen DLLs, dem Basis-Framework.
-Für den Fall, dass du dir die Quellen davon anschauen willst oder dorthinein debuggen musst,
-kannst du dir die zugehörigen Quellen in den dafür vorgesehenen Ordner **WorkFrame** clonen.
+Für den Fall, dass ihr euch die Quellen davon anschauen wollt oder dorthinein debuggen müsst,
+könnt ihr euch die zugehörigen Quellen in den dafür vorgesehenen Ordner **WorkFrame** clonen.
 <br/>(Quellen: https://github.com/WorkFrame)
 
 ---
 
-## Mitmachen (Contributing)
-Wenn du Fehler entdeckst oder Verbesserungsvorschläge einbringen willst, eröffne bitte zuerst ein neues Diskusionsthema ("New issue").<br/>
-Bitte prüfe aber vorher, ob ein passendes Thema nicht vielleicht schon existiert.
+## Gibt es Support?
+
+#### Kurze Antwort: *nein*.<br/>
+#### lange Antwort:
+Ich (Erik) entwickle Vishnu aktuell (März 2024) noch allein.
+Auch, wenn ich natürlich alle eure Erfahrungberichte, Anregungen, Verbesserungsvorschläge und Fehlermeldungen
+mit Interesse verfolge, kann ich im Moment einfach noch nicht absehen, wie sich die Dinge entwickeln werden.
+Wo ich kann, werde ich Fehler beheben und Anregungen in meiner persönlichen Priorisierung berücksichtigen.
+Aber an dieser Stelle sei noch mal gesagt: Vishnu ist open Source und free.
+**Also helft euch selbst und vor allem: gegenseitig.**
+
+## Kommunikation und Mitmachen
+
+**Bitte nutzt die Diskusionsthemen ("Issues").**
+<br />Wenn ihr Fehler entdeckt oder Verbesserungsvorschläge einbringen wollt, eröffnet bitte zuerst ein neues Diskusionsthema ("New issue").
+Bitte prüft aber vorher, ob ein passendes Thema nicht vielleicht schon existiert.<br />
+Es sind alle Arten von Verbesserungsvorschlägen, aber auch persönliche Erfahrungsberichte herzlich willkommen.
+Das müssen nicht unbedingt weltverbessernde Großtaten sein, auch Schreibfehler wollen korrigiert werden.
+Insbesondere fehlen mir noch gute Ideen und Lösungen für eine englische Präsenz.
+In der Vishnu-Hilfe findet ihr Anregungen auf den Seiten [Ideensammlung](https://neteti.de/Vishnu.Doc/html/2e84f44c-6249-45dc-bdc2-c656de87c907.htm)
+und [bekannte Fehler und Probleme](https://neteti.de/Vishnu.Doc/html/68cd3f39-4a2c-49f3-8a90-b2442b5880a9.htm).
 
 #### Änderungen und Debugging am Plugin- oder Vishnu-Quellcode
 
-**Wichtig:** Mach möglichst keine Änderungen, Korrekturen oder Erweiterungen
-am master-branch des Quellcodes, sondern lege zuerst einen eigenen **neuen branch** an. 
-Nur so kannst du später deine Verbesserungen auch zurückliefern (**pull-request**).
+**Wichtig:** Macht möglichst keine Änderungen, Korrekturen oder Erweiterungen
+am master-branch des Quellcodes, sondern legt zuerst einen eigenen **neuen branch** an. 
+Nur so könnt ihr später eure Verbesserungen eventuell auch zurückliefern (**pull-request**).
 
 Da der Vishnu-Kernel besonders hohen Anforderungen an Korrektheit, Stabilität und Performance unterliegt,
-solltest du vielleicht mit Korrekturen, Erweiterungen an - oder Neuerstellung von - Vishnu-Plugins beginnen.
+solltet ihr vielleicht mit Korrekturen, Erweiterungen an - oder Neuerstellung von - Vishnu-Plugins beginnen.
 Der Vishnu-Kernel ist darüber hinaus sehr testaufwendig, weshalb Reaktionen möglicherweise länger
 auf sich warten lassen können.
 
 #### Änderungen am Quellcode in das Original-Repository zurückspielen
 
-Wenn du Änderungen am Plugin- oder Vishnu-Quellcode vorgenommen und ausführlich getestet hast,
-kannst du deinen eigenen **branch** an Vishnu über einen **"pull request"** zurückliefern. 
-Dein Branch wird dann begutachtet und bei Erfolg in Vishnu-master übernommen.
-Bitte versuche nicht, einen direkt geänderten master-branch zurückzumelden - das würde nicht angenommen.
-
-**Ein Hinweis in eigener Sache: ich (Erik) entwickle Vishnu aktuell (Dezember 2022) noch allein, weshalb die Bearbeitung deiner Anfragen und Änderungen länger dauern kann!**
+Wenn ihr Änderungen am Plugin- Framework- oder Vishnu-Quellcode vorgenommen und ausführlich getestet habt,
+könnt ihr euren eigenen **branch** an Vishnu über einen **"pull request"** zurückliefern. 
+Der Branch wird dann begutachtet und bei Erfolg in Vishnu-master übernommen.
+Bitte versucht nicht, einen direkt geänderten master-branch zurückzumelden - das würde nicht angenommen.
+(siehe auch [Gibt es Support?](#Gibt-es-Support?))
 
 ---
 
@@ -111,43 +126,48 @@ Bitte versuche nicht, einen direkt geänderten master-branch zurückzumelden - d
 Vielen Dank an Eric Woodruff, EWSoftware.
 Ohne den Sandcastle Help File Builder wäre die Vishnu-Dokumentation nicht denkbar.
 
-[Visual Commander](https://marketplace.visualstudio.com/items?itemName=SergeyVlasov.VisualCommander)<br/>
-Danke auch an Sergey Vlasov für seine hilfreiche Visual Studio Automatisierung.
-
 [Newtonsoft.Json](https://www.newtonsoft.com/json)<br/>
-Dank auch an James Newton-King für seine unverzichtbare Software.
+Danke an James Newton-King für seine unverzichtbare Software.
 
-Demo-Logik für SplashWindow<br/>
-[Dank an Amr Azab](http://www.codeproject.com/Articles/116875/WPF-Loading-Splash-Screen)
-und [Nate Lowry](http://blog.dontpaniclabs.com/post/2013/11/14/Dynamic-Splash-Screens-in-WPF).
+[Demo-Logik für SplashWindow](https://www.codeproject.com/Articles/116875/WPF-Loading-Splash-Screen)<br />
+Dank an Amr Azab und Nate Lowry.
 
 [WPF-Tortendiagrammme](https://www.codeproject.com/Articles/442506/Simple-and-Easy-to-Use-Pie-Chart-Controls-in-WPF)</br>
 Vielen Dank an Kashif Imran auf Code Project.
 
 [Variable Grids](https://rachel53461.wordpress.com/2011/09/17/wpf-grids-rowcolumn-count-properties/)</br>
-Herzlichen Dank an Rachel Lim für ihren fantastischen Blog.
+Herzlichen Dank an Rachel Lim für ihren fantastischen Blog. Danke auch für ihren Hinweis zu ShutdownMode.OnMainWindowClose.
 
 [Monphasen Berechnung](https://www.codeproject.com/script/Membership/View.aspx?mid=1961229)<br/>
 Danke Mostafa Kaisoun für seine Berechnungslogik.
 
-[Wettervorhersagen und Wetter-Icons](http://www.7timer.info)<br/>
+[Geolocation](https://www.geojs.io)<br/>
+Vielen Dank an die Entwickler und Sponsoren dieser freien Seite für Geolocation.
+
+[Wettervorhersagen und Wetter-Icons](https://www.7timer.info)<br/>
 Vielen Dank an Chenzhou Cui und seine Freunde, die diese wunderbare, freie Seite für Wettervorhersagen betreiben.
 
-[Mindest-Informationen über einen Screen](http://stackoverflow.com/questions/1927540/how-to-get-the-size-of-the-current-screen-in-wpf)<br/>
+[Mindest-Informationen über einen Screen](https://stackoverflow.com/questions/1927540/how-to-get-the-size-of-the-current-screen-in-wpf)<br/>
 Danke an Nils Andresen auf StackOverflow
 
 [Basisklassen für ViewModels](https://github.com/poma/SshConnect/blob/master/SshConnect/MvvmFoundation/ObservableObject.cs)<br/>
 Vielen Dank an Roman Semenov (poma) für diese Starthilfe.
 
-[ZIP-Routinen für ZIPs > 4GB mit Passwörtern](http://www.eggheadcafe.com/tutorials/aspnet/9ce6c242-c14c-4969-9251-af95e4cf320f/zip--unzip-folders-and-f.aspx)<br/>
-Danke Peter Bromberg.
+[Visual Commander](https://marketplace.visualstudio.com/items?itemName=SergeyVlasov.VisualCommander)<br/>
+Danke auch an Sergey Vlasov für seine hilfreiche Visual Studio Automatisierung.
+
+[SingleInstance](https://stackoverflow.com/users/51170/matt-davis)
+Danke an Matt Davis für seine sehr gute Mutex-Lösung.
+
+[inzwischen nicht mehr online: ZIP-Routinen für ZIPs > 4GB mit Passwörtern]<br/>
+Danke auch Peter Bromberg für seine Unterstützung bei den Zip-Routinen.
 
 [Equality Converter](https://stackoverflow.com/questions/37302270/comparing-two-dynamic-values-in-datatrigger)</br>
 Dank an Jason Tyler auf stackoverflow.
 
-Dank auch an die vielen weiteren Software-Entwickler/innen, die ihr Wissen mit uns allen geteilt haben.<br/>
+Dank auch an die vielen weiteren Software-Entwickler/Entwicklerinnen, die ihr Wissen mit uns allen geteilt haben.<br/>
 
-Last but not least geht mein Dank an die Teams von Microsoft für ihre Express- und Community-Editions.
+Last but not least geht mein Dank an die Teams von Microsoft für ihre freien Express- und Community-Editions.
 
 ### Viel Spass mit Vishnu!
 Erik Nagel

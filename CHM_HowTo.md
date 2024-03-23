@@ -1,4 +1,4 @@
-#### Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte kann das zwei Ursachen haben:
+#### Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte, kann das zwei Ursachen haben:
 1. Die Hilfedatei ist auf einem Netzlaufwerk gespeichert.
 <br/>**Lösung:** kopiere die Datei auf ein lokales Laufwerk.
 

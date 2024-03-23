@@ -44,6 +44,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SingleNodeUserControlDemo",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapshotUserControl", "DefaultNodeControls\SnapshotUserControl\SnapshotUserControl\SnapshotUserControl.csproj", "{2B9501E8-513F-4288-8616-7A1E9C4BCF97}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessTerminator", "ProcessTerminator\ProcessTerminator.csproj", "{67C1B2B8-4482-41BA-9231-74E5768BD44C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -106,6 +108,10 @@ Global
 		{2B9501E8-513F-4288-8616-7A1E9C4BCF97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B9501E8-513F-4288-8616-7A1E9C4BCF97}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B9501E8-513F-4288-8616-7A1E9C4BCF97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67C1B2B8-4482-41BA-9231-74E5768BD44C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67C1B2B8-4482-41BA-9231-74E5768BD44C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67C1B2B8-4482-41BA-9231-74E5768BD44C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67C1B2B8-4482-41BA-9231-74E5768BD44C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

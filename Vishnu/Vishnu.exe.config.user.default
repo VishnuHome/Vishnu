@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<configuration>
+	<appSettings>
+		<!--   Benutzeranwendung und konfigurierte Eigenschafteneinstellungen hier einfuegen.-->
+		<!--   Beispiel: <add key="settingName" value="settingValue"/> -->
+		<add key="DemoModus" value="true"/>
+		<add key="UserParameterReaderPath" value="%UserAssemblyDirectory%\DemoParameterProvider.dll" />
+		<add key="DumpAppSettings" value="true"/>
+		<!-- add key="KillWorkingDirectoryAtShutdown" value="true"/ -->
+		<add key="Autostart" value="true"/>
+		<add key="Job" value="DemoJobs\Simple\CheckAll"/>
+	</appSettings>
+</configuration>

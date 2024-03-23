@@ -5,6 +5,7 @@ using System;
 using NetEti.Globals;
 using System.Security;
 using System.Windows;
+using NetEti.FileTools;
 
 namespace Vishnu.Interchange
 {
@@ -285,7 +286,7 @@ namespace Vishnu.Interchange
         /// SnapshotDirectory-Pfad immer relativ zum Verzeichnis, in dem die JobDescription.xml
         /// des MainJob liegt.
         /// </summary>
-        public string? SnapshotDirectory { get; set; }
+        public string SnapshotDirectory { get; set; }
 
         /// <summary>
         /// Ausrichtung des Trees beim Start der Anwendung.
@@ -418,106 +419,9 @@ namespace Vishnu.Interchange
             this.AppEnvAccessor.UnregisterKey("WorkingDirectory");
             this.AppEnvAccessor.UnregisterKey("DebugFile");
             this.AppEnvAccessor.UnregisterKey("SnapshotDirectory");
-            this.AppEnvAccessor.UnregisterKey("SearchDirectory");
             this.AppEnvAccessor.UnregisterKey("DebugFile");
             this.AppEnvAccessor.UnregisterKey("StatisticsFile");
-
-            this.RootJobPackagePath = this.ReplaceWildcards(this.GetStringValue("Job", this.GetStringValue("1", String.Empty)) ?? String.Empty);
-            this.RootJobXmlName = "jobdescription.xml";
-            if (!String.IsNullOrEmpty(this.RootJobPackagePath))
-            {
-                if (this.RootJobPackagePath.ToLower().EndsWith(".xml"))
-                {
-                    this.RootJobXmlName = Path.GetFileName(this.RootJobPackagePath);
-                    this.RootJobPackagePath = Path.GetDirectoryName(this.RootJobPackagePath);
-                }
-                string? tmpPath = this.RootJobPackagePath;
-                if (this.RootJobXmlName.ToLower() != "jobdescription.xml")
-                {
-                    tmpPath = Path.Combine(tmpPath ?? "", Path.GetFileNameWithoutExtension(this.RootJobXmlName));
-                }
-                this.MainJobName = Path.GetFileNameWithoutExtension(tmpPath) ?? String.Empty;
-            }
-            else
-            {
-                this.MainJobName = String.Empty;
-            }
-            this.DemoModus = this.GetValue<bool>("DemoModus", false);
-
-            this.SnapshotDirectory = this.GetStringValue("SnapshotDirectory", null);
-            this.AppEnvAccessor.RegisterKeyValue("SnapshotDirectory", this.SnapshotDirectory);
-            this.LocalConfigurationDirectory = this.GetStringValue("LocalConfigurationDirectory", Path.GetDirectoryName(this.AppConfigUser));
-            string rootJobPackageTmp = this.RootJobPackagePath ?? this.ApplicationRootPath;
-            this.AppEnvAccessor.RegisterKeyValue("JobDirectory", Path.GetFullPath(rootJobPackageTmp));
-            if (this.SnapshotDirectory != null)
-            {
-                if (!(this.SnapshotDirectory.Contains(":")
-                      || this.SnapshotDirectory.StartsWith(@"/")
-                      || this.SnapshotDirectory.StartsWith(@"\")))
-                {
-                    if (!(rootJobPackageTmp.Contains(":")
-                          || rootJobPackageTmp.StartsWith(@"/")
-                          || rootJobPackageTmp.StartsWith(@"\")))
-                    {
-                        this.ResolvedSnapshotDirectory = Path.Combine(this.ApplicationRootPath, rootJobPackageTmp, this.SnapshotDirectory);
-                    }
-                    else
-                    {
-                        this.ResolvedSnapshotDirectory = Path.Combine(rootJobPackageTmp, this.SnapshotDirectory);
-                    }
-                }
-                else
-                {
-                    this.ResolvedSnapshotDirectory = this.SnapshotDirectory;
-                }
-            }
-            else
-            {
-                if (!(rootJobPackageTmp.Contains(":")
-                      || rootJobPackageTmp.StartsWith(@"/")
-                      || rootJobPackageTmp.StartsWith(@"\")))
-                {
-                    this.ResolvedSnapshotDirectory = Path.Combine(this.ApplicationRootPath, rootJobPackageTmp, "..\\Snapshots");
-                }
-                else
-                {
-                    this.ResolvedSnapshotDirectory = Path.Combine(rootJobPackageTmp, "..\\Snapshots");
-                }
-            }
-            this.AppEnvAccessor.RegisterKeyValue("SnapshotDirectory(resolved)", this.ResolvedSnapshotDirectory);
-            string? tmpDirectory = null;
-            if (this.AppEnvAccessor.IsDefault("WorkingDirectory"))
-            {
-                string jobnameExtension = "";
-                if (!String.IsNullOrEmpty(this._mainJobName))
-                {
-                    jobnameExtension = "." + this.MainJobName;
-                }
-                tmpDirectory = this.GetStringValue("__REPLACE_WILDCARDS__", Path.Combine(Path.Combine(this.TempDirectory, this.ApplicationName + jobnameExtension),
-                  this.ProcessId.ToString()).TrimEnd(Path.DirectorySeparatorChar));
-            }
-            else
-            {
-                tmpDirectory = this.GetStringValue("__REPLACE_WILDCARDS__", this.WorkingDirectory);
-            }
-            if (tmpDirectory != null)
-            {
-                this.WorkingDirectory = tmpDirectory;
-            }
-            this.AppEnvAccessor.RegisterKeyValue("WorkingDirectory", this.WorkingDirectory);
-            this.SearchDirectory = this.GetStringValue("SearchDirectory", this.WorkingDirectory)?.TrimEnd(Path.DirectorySeparatorChar);
-            string defaultDebugFile = this.WorkingDirectory + Path.DirectorySeparatorChar + this.ApplicationName + @".log";
-            this.DebugFile = this.GetStringValue("DebugFile", defaultDebugFile) ?? defaultDebugFile;
-            this.AppEnvAccessor.RegisterKeyValue("DebugFile", this.DebugFile);
-            this.StatisticsFile = this.GetStringValue("StatisticsFile", this.WorkingDirectory + Path.DirectorySeparatorChar + this.ApplicationName + @".stat");
-
-            this.AssemblyDirectories = new List<string> {
-                "",
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugin"),
-                AppDomain.CurrentDomain.BaseDirectory
-            };
-            this.AbortingAllowed = this.GetValue<bool>("AbortingAllowed", true);
-            this.AcceptNullResults = this.GetValue<bool>("AcceptNullResults", false);
+            bool defaultDemo = false;
 
             // Ermittlung der Properties VishnuRoot und UserAssemblyDirectory zur Laufzeit.
             string userAssemblyDirectoryCandidate = Path.Combine(this.ApplicationRootPath, @"../UserAssemblies");
@@ -565,11 +469,94 @@ namespace Vishnu.Interchange
             AppSettingsRegistry.RememberParameterSource("VishnuSourceRoot", "Logic", Path.GetFullPath(this.VishnuSourceRoot));
             this.UserAssemblyDirectory = this.GetStringValue("UserAssemblyDirectory",
                 this.GetStringValue("Vishnu_UserAssemblies", userAssemblyDirectoryCandidate)) ?? userAssemblyDirectoryCandidate;
+            this.AssemblyDirectories = new List<string> {
+                "",
+                AppDomain.CurrentDomain.BaseDirectory
+            };
             if (!this.AssemblyDirectories.Contains(this.UserAssemblyDirectory))
             {
                 this.AssemblyDirectories.Insert(0, this.UserAssemblyDirectory);
                 this.AppEnvAccessor.RegisterKeyValue("UserAssemblyDirectory", this.UserAssemblyDirectory);
             }
+
+            string? tmpRootJobPackagePath = this.GetStringValue("Job", this.GetStringValue("1", null));
+            if (tmpRootJobPackagePath != null)
+            {
+                this.RootJobPackagePath = this.ReplaceWildcards(tmpRootJobPackagePath);
+            }
+            else
+            {
+                this.RootJobPackagePath = @"DemoJobs\Simple\CheckAll";
+                defaultDemo = true;
+            }
+            this.RootJobXmlName = "jobdescription.xml";
+            if (!String.IsNullOrEmpty(this.RootJobPackagePath))
+            {
+                if (this.RootJobPackagePath.ToLower().EndsWith(".xml"))
+                {
+                    this.RootJobXmlName = Path.GetFileName(this.RootJobPackagePath);
+                    this.RootJobPackagePath = Path.GetDirectoryName(this.RootJobPackagePath);
+                }
+                string? tmpPath = this.RootJobPackagePath;
+                if (this.RootJobXmlName.ToLower() != "jobdescription.xml")
+                {
+                    tmpPath = Path.Combine(tmpPath ?? "", Path.GetFileNameWithoutExtension(this.RootJobXmlName));
+                }
+                this.MainJobName = Path.GetFileNameWithoutExtension(tmpPath) ?? String.Empty;
+            }
+            else
+            {
+                this.MainJobName = String.Empty;
+            }
+
+            string? tmpDirectory = null;
+            if (this.AppEnvAccessor.IsDefault("WorkingDirectory"))
+            {
+                string jobnameExtension = "";
+                if (!String.IsNullOrEmpty(this._mainJobName))
+                {
+                    jobnameExtension = "." + this.MainJobName;
+                }
+                tmpDirectory = this.GetStringValue("__REPLACE_WILDCARDS__", Path.Combine(Path.Combine(this.TempDirectory, this.ApplicationName + jobnameExtension),
+                  this.ProcessId.ToString()).TrimEnd(Path.DirectorySeparatorChar));
+            }
+            else
+            {
+                tmpDirectory = this.GetStringValue("__REPLACE_WILDCARDS__", this.WorkingDirectory);
+            }
+            if (tmpDirectory != null)
+            {
+                this.WorkingDirectory = tmpDirectory;
+            }
+            this.AppEnvAccessor.RegisterKeyValue("WorkingDirectory", this.WorkingDirectory);
+            this.LocalConfigurationDirectory = this.GetStringValue("LocalConfigurationDirectory", Path.GetDirectoryName(this.AppConfigUser));
+
+            this.DemoModus = this.GetValue<bool>("DemoModus", defaultDemo);
+            this.JobDirPathes = new Stack<string>();
+            this.JobDirPathes.Push(Path.Combine(this.VishnuSourceRoot, "VishnuHome/Tests"));
+            this.JobDirPathes.Push(Path.Combine(this.VishnuSourceRoot, "VishnuHome/Documentation"));
+            this.JobDirPathes.Push(this.ApplicationRootPath);
+            this.JobDirPathes.Push("");
+            this.RootJobPackagePath = NetworkMappingsRefresher.GetNextReachablePath(this.RootJobPackagePath, this.JobDirPathes.ToArray())
+                ?? throw new ApplicationException("Es wurde kein gültiger Job-Pfad gefunden.");
+            this.AppEnvAccessor.RegisterKeyValue("JobDirectory", this.RootJobPackagePath);
+
+            this.SnapshotDirectory = this.GetStringValue("SnapshotDirectory", "..\\Snapshots") ?? String.Empty;
+            if (!(this.SnapshotDirectory.Contains(":")
+                  || this.SnapshotDirectory.StartsWith(@"/")
+                  || this.SnapshotDirectory.StartsWith(@"\")))
+            {
+                this.SnapshotDirectory = Path.Combine(this.RootJobPackagePath, this.SnapshotDirectory);
+            }
+            this.AppEnvAccessor.RegisterKeyValue("SnapshotDirectory", this.SnapshotDirectory);
+
+            string defaultDebugFile = this.WorkingDirectory + Path.DirectorySeparatorChar + this.ApplicationName + @".log";
+            this.DebugFile = this.GetStringValue("DebugFile", defaultDebugFile) ?? defaultDebugFile;
+            this.AppEnvAccessor.RegisterKeyValue("DebugFile", this.DebugFile);
+            this.StatisticsFile = this.GetStringValue("StatisticsFile", this.WorkingDirectory + Path.DirectorySeparatorChar + this.ApplicationName + @".stat");
+
+            this.AbortingAllowed = this.GetValue<bool>("AbortingAllowed", true);
+            this.AcceptNullResults = this.GetValue<bool>("AcceptNullResults", false);
 
             this.UserParameterReaderPath = this.GetStringValue("UserParameterReaderPath", null);
             this.StartTreeOrientation = (TreeOrientation)Enum.Parse(typeof(TreeOrientation), 
@@ -645,7 +632,7 @@ namespace Vishnu.Interchange
             }
             else
             {
-                this.Autostart = this.GetValue<bool>("Autostart", false);
+                this.Autostart = this.GetValue<bool>("Autostart", defaultDemo);
             }
             this.SizeOnVirtualScreen = this.GetValue<bool>("SizeOnVirtualScreen", false);
             this.LoadJobDialog = this.GetValue<bool>("LoadJobDialog", false);
@@ -779,7 +766,6 @@ namespace Vishnu.Interchange
             //this.FatalInitializationException = null;
             //this.AssemblyDirectories = new List<string>();
             //this.JobDirPathes = new Stack<string>();
-            //this.ResolvedSnapshotDirectory = ".";
             //this.UserAssemblyDirectory = ".";
             //this.RootJobXmlName = "jobdescription.xml";
             //this.UncachedCheckers = new List<string>();

@@ -2519,9 +2519,8 @@ namespace LogicalTaskTree
         // 02.12.2023 Nagel+
         private void LogThis(string signature, bool statistics = true)
         {
-            // 04.12.2023 Nagel+
-            // return;
-            // 04.12.2023 Nagel-
+            // 23.02.2024 Nagel+ auskommentiert.
+            /*
             if (!statistics)
             {
                 InfoController.GetInfoPublisher().Publish(this,
@@ -2533,8 +2532,9 @@ namespace LogicalTaskTree
             {
                 Statistics.Inc(String.Format($"Id/Name: {this.IdInfo,-30}, State: {this.State.ToString(),-15}," + $" LogicalState: {this.LogicalState.ToString(),-10} {signature}"));
             }
+            */
+            // 23.02.2024 Nagel- auskommentiert.
         }
-        // 02.12.2023 Nagel-
 
         /// <summary>
         /// Action für den Run eines (Teil-)Baums.

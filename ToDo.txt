@@ -968,7 +968,7 @@ ERLEDIGT: Positionierung bei mehreren Bildschirmen für Hauptfenster und Meldunge
 ERLEDIGT: Funktion "LogMemory" beim Aufruf von "Pause Tree" hinzugefügt.
 ERLEDIGT: Parameter "AbortingAllowed" hinzugefügt.
 
-Stand: 15.01.2024 Version 8.0.4.0 (Discovery)
+Stand: 15.01.2024 Version 8.0.2 (Discovery)
 
 ERLEDIGT: Komplettüberarbeitung der Positionierung von Fenstern, WPF-Dialog-Checkern und Meldungen
           auf einem und mehreren Bildschirmen.
@@ -991,12 +991,18 @@ ERLEDIGT: Bugfix: Worker wurden bei existierenden NodeConnectoren auf SingleNode
 ERLEDIGT: Bugfix: UserRun oder UserBreak auf einen Knoten bei pausiertem Tree führte zum Deadlock.
 ERLEDIGT: Tests ohne AddOn, alles leermachen (delete_binaries), ReadyBin löschen
 
-Stand: 21.01.2024 Version 8.1.6.0 (Progress)
+ERLEDIGT: SizeOnVirtualScreen wieder einführen: bei false Größe und Position bei mehreren Bildschirmen
+	        trotzdem auf einen beschränken (Umschalten in die Jobs-Ansicht und zurück).
+ERLEDIGT: Icon für die Vishnu-Hilfe.
+ERLEDIGT: Icon für Vishnu-Meldungen verbessern.
 
-SizeOnVirtualScreen wieder einführen: bei false Größe und Position bei mehreren Bildschirmen
-	trotzdem auf einen beschränken (Umschalten in die Jobs-Ansicht und zurück).
+ERLEDIGT: NetworkMappingsRefresher überarbeitet und erweitert.
+ERLEDIGT: Die Ausgaben im SplashScreen beim Vishnu Start werden jetzt asynchron und verzögert verarbeitet.
+ERLEDIGT: Der Vishnu-Start in App.cs wurde komplett überarbeitet und auf Mutex umgestellt
+ERLEDIGT: Die Geolocation-Api im WeatherChecker wurde von http://ip-api.com/json auf
+          https://get.geojs.io/v1/ip/geo.json umgestellt.
 
-Stand: 13.02.2024 Version 8.2.0.0 (Arrival)
+Stand: 26.02.2024 Version 8.2.0 (Arrival)
 
 -------------------------------------------------------------------------------------------------------------
 
@@ -1030,14 +1036,11 @@ Hinweise:
 Cooperatives Cancelling komplett implementieren (auch Checker).
 Speichern der Bildschirmdarstellung (Strg-s) mit in das Kontextmenü aufnehmen.
 Aktuelle Size wird noch nicht in Messages und UserControls übernommen.
-Icon für die Vishnu-Hilfe.
-Icon für Vishnu-Meldungen verbessern.
 CheckWeatherHistory zeigt am 21.01.2024 (und auch vorerst an den Folgetagen)
 	in SaasFee bis inklusive 12:00 Uhr Mittags noch Nachtsymbole an.
 	Ist das ein Fehler oder ein Feature (Sonnenstunden/Bergabdeckung)?
 openVishnu7 mit VS2022 pre, Vishnu5 mit VS2022 pre
 free mini tetris
-NetWorkMappingsRefresher debuggen
 Demodaten für alle Xaml
 nächster Lauf nach Datumswechsel checken
 Rootverzeichnisse bereinigen
@@ -1216,16 +1219,32 @@ Fehler: übergeordneter Knoten bleibt manchmal auf Gelb (CheckTreeEventTriggerMin
 Fehler: CheckTreeEventTriggerMinimal, FalseTrueNodeListError: True, Exception, True => Balken oben gelb statt grün
 Fehler: CheckTreeEventTwoJobConnectors: True, Exception, 
 				True => direkte JobReferenz ok, TriggerEventMirrorChecker: Exception bleibt
+---------------------------
+Exception beim Beenden von Vishnu.CheckSpecials (nach Lauf über zwei Tage mit Abschalten über Energiesparmodus:
+	System.ComponentModel.Win32Exception (1816): Nicht genügend Quoten verfügbar, um diesen Befehl zu verarbeiten.
+   at MS.Win32.ManagedWndProcTracker.HookUpDefWindowProc(IntPtr hwnd)
+   at MS.Win32.ManagedWndProcTracker.OnAppDomainProcessExit()
 
+---------------------------
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at Vishnu.WPF_UI.MainWindow..ctor(Boolean startWithJobs, Boolean sizeOnVirtualScreen, WindowAspects mainWindowStartAspects)
+    in C:\Users\micro\Documents\private4\WPF\openVishnu8\VishnuHome\Vishnu\Vishnu.WPF_UI\MainWindow.xaml.cs:line 109
+   at Vishnu.App.VishnuRun(AppSettings appSettings) in C:\Users\micro\Documents\private4\WPF\openVishnu8\VishnuHome\Vishnu\Vishnu\App.cs:line 183
+   at Vishnu.App.RunApplication(AppSettings appSettings) in C:\Users\micro\Documents\private4\WPF\openVishnu8\VishnuHome\Vishnu\Vishnu\App.cs:line 169
+   at Vishnu.App.Main(String[] args) in C:\Users\micro\Documents\private4\WPF\openVishnu8\VishnuHome\Vishnu\Vishnu\App.cs:line 88
+---------------------------
 
 -------------------------------------------------------------------------------------------------------------
 Allgemeinere Ideen, etc.
 -------------------------------------------------------------------------------------------------------------
 MultiScreen Überabeitung
-1. Es wird nur moch mit SizeOnVirtualScreen = true gearbeitet; der Parameter wird stillgelegt.
-2. Der Rest sollte eigentlich schon egal sein.
-3. Ob die einzelnen Bildschirme unterschiedliche Maße und Auflösungen haben, liegt in der Verantwortung des Anwenders.
-   Ebenso, ob sie über Windows-Systemeinstellung logisch richtig angeordnet wurden (links=links, oben=onben, ...).
+1. SizeOnVirtualScreen ist erforderlich, da sonst Vishnu beim Umschalten zur Jobs-Ansicht und zurück
+   teilweise auf dem anderen Bildschirm dargestellt wird, obwohl das nicht gewollt ist.
+[falsch: 1. Es wird nur moch mit SizeOnVirtualScreen = true gearbeitet; der Parameter wird stillgelegt.]
+[falsch: 2. Der Rest sollte eigentlich schon egal sein.]
+2. Ob die einzelnen Bildschirme unterschiedliche Maße und Auflösungen haben, liegt in der Verantwortung des
+   Anwenders. Ebenso, ob sie über Windows-Systemeinstellung logisch richtig angeordnet wurden
+   (links=links, oben=onben, ...).
 -------------------------------------------------------------------------------------------------------------
 Vishnu als Signal/Interrupt-gesteuertes System
 	Motivation: die klassische Checker-Ansteuerung erfolgt über Polling durch TimerTrigger.
@@ -1971,6 +1990,15 @@ PS > (gci -include *.cs,*.cpp,*.xaml -recurse | select-string .).Count
             //    Priorität haben.
             //    
 
+C:\Users\micro\Documents\Tools\openVishnu8\Vishnu.bin
+C:\Users\micro\Documents\Tools\openVishnu8\Vishnu.bin\Vishnu.exe -job=.\Jobs\CheckSpecials
+ -UserAssemblyDirectory="../UserAssemblies"
+
+C:\Users\micro\Documents\Tools\openVishnu8\Vishnu.bin
+C:\Users\micro\Documents\Tools\openVishnu8\Vishnu.bin\Vishnu.exe -job=.\Jobs\CheckWeatherHistory
+ -UserAssemblyDirectory="../UserAssemblies"
+ Vishnu.%MainJobName%
+ 
 
 Vishnu.exe --FlatNodeListFilter="JobConnector|NodeConnector|NodeList" -job="TestJobs\Tests\TwoDialogNodes" --NoWorkers=true --DebugMode=true --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --NoWorkers=false --AbortingAllowed=false
 2024.02.01 13:40:17 System  Job: Wert: TestJobs\Tests\TwoDialogNodes, Quelle: CommandLine
