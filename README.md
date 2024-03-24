@@ -116,7 +116,7 @@ Wenn ihr Änderungen am Plugin- Framework- oder Vishnu-Quellcode vorgenommen und
 könnt ihr euren eigenen **branch** an Vishnu über einen **"pull request"** zurückliefern. 
 Der Branch wird dann begutachtet und bei Erfolg in Vishnu-master übernommen.
 Bitte versucht nicht, einen direkt geänderten master-branch zurückzumelden - das würde nicht angenommen.
-(siehe auch [Gibt es Support?](#Gibt-es-Support?))
+(siehe auch [Gibt es Support?](#Gibt-es-Support))
 
 ---
 
