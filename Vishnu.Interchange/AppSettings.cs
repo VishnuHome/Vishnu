@@ -533,6 +533,7 @@ namespace Vishnu.Interchange
 
             this.DemoModus = this.GetValue<bool>("DemoModus", defaultDemo);
             this.JobDirPathes = new Stack<string>();
+            this.JobDirPathes.Push(Path.Combine(Path.GetDirectoryName(this.UserAssemblyDirectory) ?? "", "Vishnu.bin"));
             this.JobDirPathes.Push(Path.Combine(this.VishnuSourceRoot, "VishnuHome/Tests"));
             this.JobDirPathes.Push(Path.Combine(this.VishnuSourceRoot, "VishnuHome/Documentation"));
             this.JobDirPathes.Push(this.ApplicationRootPath);

@@ -1001,6 +1001,9 @@ ERLEDIGT: Die Ausgaben im SplashScreen beim Vishnu Start werden jetzt asynchron 
 ERLEDIGT: Der Vishnu-Start in App.cs wurde komplett überarbeitet und auf Mutex umgestellt
 ERLEDIGT: Die Geolocation-Api im WeatherChecker wurde von http://ip-api.com/json auf
           https://get.geojs.io/v1/ip/geo.json umgestellt.
+ERLEDIGT: Das Vishnu-Ende in App.cs wird jetzt nicht mehr normal durchlaufen, sondern Vishnu wird jetzt
+          durch einen externen ProcessTerminator gekillt. Das verhindert sporadisch auftretende
+          Exceptions im .Net Finalizer: System.ComponentModel.Win32Exception (1816): Not enough quota available, to process this command.
 
 Stand: 26.02.2024 Version 8.2.0 (Arrival)
 
