@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Vishnu": {
-      "commandName": "Project",
-      "commandLineArgs": "-job=%VishnuSourceRoot%/NetEti/Jobs/CheckSpecials --HelpPreference=local --KillChildProcessesOnApplicationExit=true"
-    }
-  }
-}

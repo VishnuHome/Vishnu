@@ -1,5 +1,5 @@
 # Vishnu
-Vishnu ist eine Monitoring- und Prozesssteuerungssoftware mit integrierter Verarbeitung erweiterter logischer Ausdrücke.
+Vishnu ist ein Monitoring- und Prozesssteuerungs-Baukasten mit integrierter Verarbeitung erweiterter logischer Ausdrücke.
 
 ![Vishnu-Hilfe Startseite](./FirstView.png?raw=true "Vishnu-Hilfe")
 *So sieht Vishnu nach dem Start mit dem ersten Demo-Job ungefähr aus*.
@@ -12,7 +12,7 @@ Vishnu ist eine Monitoring- und Prozesssteuerungssoftware mit integrierter Verar
 
 ## Schnellstart
 
-Für die erste Einrichtung führt bitte nachfolgende Schritte aus:
+Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
   - ### Installation:
 	* Ein lokales Basisverzeichnis für alle weiteren Vishnu- und Hilfs-Verzeichnisse anlegen, zum Beispiel c:\Users\<user>\Documents\MyVishnu
 	* [init.zip](https://github.com/VishnuHome/Setup/raw/master/Vishnu.bin/init.zip) herunterladen und in das Basisverzeichnis entpacken.
@@ -26,12 +26,12 @@ Für die erste Einrichtung führt bitte nachfolgende Schritte aus:
 	- Im Verzeichnis ReadyBin/Vishnu.bin **Vishnu.exe** starten.
 
 ## Demos
-Im Unterverzeichnis **DemoJobs** findet ihr die Job-Definitionen einer Reihe von interessanten Demonstrations-Jobs.
+Im Unterverzeichnis **DemoJobs** stehen die Job-Definitionen einer Reihe von interessanten Demonstrations-Jobs.
 
 ## Dokumentation
-Die ausführliche Dokumentation findet ihr in **Vishnu** mit **F1**, im mit entpackten **Vishnu_doc.de.chm** oder
+Die ausführliche Dokumentation findest du in **Vishnu** mit **F1**, im mit gelieferten **Vishnu_doc.de.chm** oder
 online unter [Vishnu online Dokumentation](https://neteti.de/Vishnu.Doc/)
-<br/><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-size:14px;">(Hinweis: Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte, seht bitte im [CHM-HowTo](CHM_HowTo.md) nach.)</span>
+<br/><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-size:14px;">(Hinweis: Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte, sieh bitte im [CHM-HowTo](CHM_HowTo.md) nach.)</span>
 
 ## Quellcode und Entwicklung
 
@@ -47,10 +47,10 @@ online unter [Vishnu online Dokumentation](https://neteti.de/Vishnu.Doc/)
 		  cd VishnuHome<br />
 		  git clone git@github.com:&lt;meOnGitHub&gt;/Vishnu.git
 
-	-  oder über "Open with GitHub Desktop", wenn ihr die Desktop-Anwendung bevorzugt
+	-  oder über "Open with GitHub Desktop", wenn du die Desktop-Anwendung bevorzugst
 	
-	-  nicht empfohlen: über "Download ZIP" kommt ihr zwar auch an den Quellcode von Vishnu, 
-	   habt dann aber keine Anbindung an euer geforktes Repository auf github.
+	-  nicht empfohlen: über "Download ZIP" kommst du zwar auch an den Quellcode von Vishnu, 
+	   hast dann aber keine Anbindung an dein geforktes Repository auf github.
 	
    ![clone](Git_Clone.png)
 	
@@ -63,16 +63,16 @@ Zu den Vishnu-Plugins gehören neben anderen die Checker.
 Checker sind die wesentlichen Vishnu-Akteure. Sie machen die Prüf-Arbeit und liefern
 Prüfergebnisse zurück (siehe auch in der Hilfe [Vishnu Akteure](https://neteti.de/Vishnu.Doc/html/bc0ffa08-c936-4fad-8fdb-dbd2279fc360.htm)
 und [eigene Checker](https://neteti.de/Vishnu.Doc/html/a3f9771a-ac24-46c0-97df-d2bde6a990e8.htm)).
-Vishnu liefert schon eine Reihe von Checkern mit. Diese findet ihr unter [InPlug](https://github.com/InPlug).
+Vishnu liefert schon eine Reihe von Checkern mit. Diese findest du unter [InPlug](https://github.com/InPlug).
 
-Vishnu-Plugins könnt ihr genauso forken und clonen wie unter [Quellcode und Entwickung](#Quellcode-und-Entwicklung) schon beschrieben,
-nur dass euer lokales Unterverzeichnis das schon vorgesehene **InPlug** sein sollte.
+Vishnu-Plugins kannst du genauso forken und clonen wie unter [Quellcode und Entwickung](#Quellcode-und-Entwicklung) schon beschrieben,
+nur dass dein lokales Unterverzeichnis das schon vorgesehene **InPlug** sein sollte.
 <br/>(Quellen: https://github.com/InPlug)
 
 ## Das Basis-Framework
 Vishnu arbeitet mit einigen allgemeingültigen DLLs, dem Basis-Framework.
-Für den Fall, dass ihr euch die Quellen davon anschauen wollt oder dorthinein debuggen müsst,
-könnt ihr euch die zugehörigen Quellen in den dafür vorgesehenen Ordner **WorkFrame** clonen.
+Für den Fall, dass du dir die Quellen davon anschauen willst oder dorthinein debuggen musst,
+kannst du dir die zugehörigen Quellen in den dafür vorgesehenen Ordner **WorkFrame** clonen.
 <br/>(Quellen: https://github.com/WorkFrame)
 
 ---
@@ -81,8 +81,8 @@ könnt ihr euch die zugehörigen Quellen in den dafür vorgesehenen Ordner **Wor
 
 #### Kurze Antwort: *nein*.<br/>
 #### lange Antwort:
-Ich (Erik) entwickle Vishnu aktuell (März 2024) noch allein.
-Auch, wenn ich natürlich alle eure Erfahrungberichte, Anregungen, Verbesserungsvorschläge und Fehlermeldungen
+Ich (Erik) programmiere Vishnu aktuell (April 2024) noch allein.
+Auch, wenn ich natürlich alle deine/eure Erfahrungberichte, Anregungen, Verbesserungsvorschläge und Fehlermeldungen
 mit Interesse verfolge, kann ich im Moment einfach noch nicht absehen, wie sich die Dinge entwickeln werden.
 Wo ich kann, werde ich Fehler beheben und Anregungen in meiner persönlichen Priorisierung berücksichtigen.
 Aber an dieser Stelle sei noch mal gesagt: Vishnu ist open Source und free.
@@ -91,31 +91,31 @@ Aber an dieser Stelle sei noch mal gesagt: Vishnu ist open Source und free.
 ## Kommunikation und Mitmachen
 
 **Bitte nutzt die Diskusionsthemen ("Issues").**
-<br />Wenn ihr Fehler entdeckt oder Verbesserungsvorschläge einbringen wollt, eröffnet bitte zuerst ein neues Diskusionsthema ("New issue").
-Bitte prüft aber vorher, ob ein passendes Thema nicht vielleicht schon existiert.<br />
+<br />Wenn du Fehler entdeckst oder Verbesserungsvorschläge einbringen willst, eröffne bitte zuerst ein neues Diskusionsthema ("New issue").
+Bitte prüfe aber vorher, ob ein passendes Thema nicht vielleicht schon existiert.<br />
 Es sind alle Arten von Verbesserungsvorschlägen, aber auch persönliche Erfahrungsberichte herzlich willkommen.
 Das müssen nicht unbedingt weltverbessernde Großtaten sein, auch Schreibfehler wollen korrigiert werden.
 Insbesondere fehlen mir noch gute Ideen und Lösungen für eine englische Präsenz.
-In der Vishnu-Hilfe findet ihr Anregungen auf den Seiten [Ideensammlung](https://neteti.de/Vishnu.Doc/html/2e84f44c-6249-45dc-bdc2-c656de87c907.htm)
+In der Vishnu-Hilfe stehen dazu Anregungen auf den Seiten [Ideensammlung](https://neteti.de/Vishnu.Doc/html/2e84f44c-6249-45dc-bdc2-c656de87c907.htm)
 und [bekannte Fehler und Probleme](https://neteti.de/Vishnu.Doc/html/68cd3f39-4a2c-49f3-8a90-b2442b5880a9.htm).
 
 #### Änderungen und Debugging am Plugin- oder Vishnu-Quellcode
 
-**Wichtig:** Macht möglichst keine Änderungen, Korrekturen oder Erweiterungen
-am master-branch des Quellcodes, sondern legt zuerst einen eigenen **neuen branch** an. 
-Nur so könnt ihr später eure Verbesserungen eventuell auch zurückliefern (**pull-request**).
+**Wichtig:** Mache möglichst keine Änderungen, Korrekturen oder Erweiterungen
+am master-branch des Quellcodes, sondern lege zuerst einen eigenen **neuen branch** an. 
+Nur so kannst du später deine Verbesserungen eventuell auch zurückliefern (**pull-request**).
 
 Da der Vishnu-Kernel besonders hohen Anforderungen an Korrektheit, Stabilität und Performance unterliegt,
-solltet ihr vielleicht mit Korrekturen, Erweiterungen an - oder Neuerstellung von - Vishnu-Plugins beginnen.
+solltest du vielleicht mit Korrekturen, Erweiterungen an - oder Neuerstellung von - Vishnu-Plugins beginnen.
 Der Vishnu-Kernel ist darüber hinaus sehr testaufwendig, weshalb Reaktionen möglicherweise länger
 auf sich warten lassen können.
 
 #### Änderungen am Quellcode in das Original-Repository zurückspielen
 
-Wenn ihr Änderungen am Plugin- Framework- oder Vishnu-Quellcode vorgenommen und ausführlich getestet habt,
-könnt ihr euren eigenen **branch** an Vishnu über einen **"pull request"** zurückliefern. 
+Wenn du Änderungen am Plugin- Framework- oder Vishnu-Quellcode vorgenommen und ausführlich getestet hast,
+kannst du deinen eigenen **branch** über einen **"pull request"** zurückliefern. 
 Der Branch wird dann begutachtet und bei Erfolg in Vishnu-master übernommen.
-Bitte versucht nicht, einen direkt geänderten master-branch zurückzumelden - das würde nicht angenommen.
+Bitte versuche nicht, einen direkt geänderten master-branch zurückzumelden - das würde nicht angenommen.
 (siehe auch [Gibt es Support?](#Gibt-es-Support))
 
 ---

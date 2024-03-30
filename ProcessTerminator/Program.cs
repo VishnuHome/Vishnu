@@ -22,9 +22,9 @@ namespace ProcessTerminator
             {
                 process = Process.GetProcessById((int)pid);
             }
-            catch (Exception ex)
+            catch // (Exception ex)
             {
-                MessageBox.Show("ProcessTerminator Process.Id [Delay]: " + ex.Message);
+                // MessageBox.Show("ProcessTerminator Process.Id [Delay]: " + ex.Message);
                 return 4;
             }
             if (args.Length > 1 && int.TryParse(args[1], out delay))
@@ -35,9 +35,9 @@ namespace ProcessTerminator
             {
                 process.Kill();
             }
-            catch (Exception ex)
+            catch // (Exception ex)
             {
-                MessageBox.Show($"ProcessTerminator Process.Id {pid} [Delay]: " + ex.Message);
+                // MessageBox.Show($"ProcessTerminator Process.Id {pid} [Delay]: " + ex.Message);
                 return 5;
             }
             // MessageBox.Show($"ProcessTerminator Process.Id {pid} [Delay]: {delay}");

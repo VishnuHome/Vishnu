@@ -324,7 +324,7 @@ namespace Vishnu
             {
                 throw new ArgumentException("Es wurde keine Job-Definition angegeben.");
             }
-            App.CopyClickOnceStarter();
+            // 30.03.2024 Erik Nagel deaktiviert: App.CopyClickOnceStarter();
         }
 
         private static void SetupLogging()
@@ -476,7 +476,7 @@ namespace Vishnu
                     {
                         Directory.CreateDirectory(targetDir);
                     }
-                    File.Copy(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "",
+                    File.Copy(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? "",
                         Path.GetFileName(targetPath)),
                         targetPath, true);
                 }
