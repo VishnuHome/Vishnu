@@ -82,6 +82,8 @@ namespace Vishnu
         [STAThread]
         public static void Main(string[] args)
         {
+            App._splashWindow = SplashWindow.StartSplashWindow();
+
             InstallAppDomainExceptionHandling();
             App._appSettings = GenericSingletonProvider.GetInstance<AppSettings>()
                 ?? throw new ApplicationException("AppSettings konnten nicht instanziiert werden.");
@@ -95,6 +97,7 @@ namespace Vishnu
                 _mutex = new Mutex(true, "Vishnu {DC42D2AB-59ED-4098-B159-730FFC63E88C}");
                 if (!_mutex.WaitOne(0, false))
                 {
+                    App._splashWindow?.FinishAndClose();
                     // MessageBox.Show("Die Anwendung läuft schon, sende Nachricht.");
                     // Special thanks to Matt Davis, https://stackoverflow.com/users/51170/matt-davis
                     // send our Win32 message to make the currently running instance
@@ -167,13 +170,12 @@ namespace Vishnu
         {
             SetAddRemoveProgramsIcon();
             App._cleanupStarted = false;
-            App._splashWindow = SplashWindow.StartSplashWindow();
             App._splashScreenMessageReceiver = new ViewerAsWrapper(App.handleSplashScreenMessages);
             InfoController.GetInfoSource().RegisterInfoReceiver(App._splashScreenMessageReceiver,
                 typeof(SplashScreenMessage), new[] { InfoType.Info });
             InfoController.GetInfoPublisher().Publish(new SplashScreenMessage("initialisiere das System"));
 
-            App._splashWindow.ShowVersion(appSettings.ProgrammVersion);
+            App._splashWindow?.ShowVersion(appSettings.ProgrammVersion);
             if (appSettings.FatalInitializationException == null)
             {
                 appSettings.UserParametersReloaded += ParameterReader_ParametersReloaded;
@@ -182,7 +184,7 @@ namespace Vishnu
             App.PrepareStart(appSettings);
             if (appSettings.DemoModus)
             {
-                App._splashWindow.ShowVersion(appSettings.ProgrammVersion + " DEMO");
+                App._splashWindow?.ShowVersion(appSettings.ProgrammVersion + " DEMO");
             }
             App.VishnuRun(appSettings);
         }
@@ -223,6 +225,8 @@ namespace Vishnu
             App._mainWpfApp.InitializeComponent(); // Übernimmt das MainWindow.
             App._mainWpfApp.MainWindow.Show();
             App._splashWindow?.FinishAndClose();
+            App._mainWpfApp.MainWindow.Activate(); // Beide erforderlich, da sonst das MainWindow nach dem
+            App._mainWpfApp.MainWindow.Focus(); // Schließen des Splash-Screens im Hintergrund verschwindet.
             App._mainWpfApp.AutostartIfSet(appSettings);
             App._mainWpfApp.Run();
             // Kurze Info: Hinter app.Run() wartet dieser Teil der Anwendung. Das funktioniert

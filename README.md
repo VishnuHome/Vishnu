@@ -90,7 +90,7 @@ Aber an dieser Stelle sei noch mal gesagt: Vishnu ist open Source und free.
 
 ## Kommunikation und Mitmachen
 
-**Bitte nutzt die Diskusionsthemen ("Issues").**
+**Bitte nutze die Diskusionsthemen ("Issues").**
 <br />Wenn du Fehler entdeckst oder Verbesserungsvorschläge einbringen willst, eröffne bitte zuerst ein neues Diskusionsthema ("New issue").
 Bitte prüfe aber vorher, ob ein passendes Thema nicht vielleicht schon existiert.<br />
 Es sind alle Arten von Verbesserungsvorschlägen, aber auch persönliche Erfahrungsberichte herzlich willkommen.
