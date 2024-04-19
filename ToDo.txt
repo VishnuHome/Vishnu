@@ -1036,8 +1036,12 @@ Hinweise:
 ###################
 
 --- TODO ----------------------------------------------------------------------------------------------------
+Fehler nach mehrmaligem, schnell hintereinander gestarteten Run auf WPFDialogChecker im Job CheckAnyTreeEvent:
+System.Threading.ThreadAbortException: System error.
 Cooperatives Cancelling komplett implementieren (auch Checker).
 Speichern der Bildschirmdarstellung (Strg-s) mit in das Kontextmenü aufnehmen.
+Uptime mit im Window-Header anzeigen.
+Aktuelle Vishnu-Version und Uptime zusätzlich in Tooltip auf Window-Header anzeigen (auch bei Dialog-Checkern).
 Aktuelle Size wird noch nicht in Messages und UserControls übernommen.
 CheckWeatherHistory zeigt am 21.01.2024 (und auch vorerst an den Folgetagen)
 	in SaasFee bis inklusive 12:00 Uhr Mittags noch Nachtsymbole an.
