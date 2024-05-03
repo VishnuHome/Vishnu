@@ -23,15 +23,18 @@ Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
 
 	### Vishnu-Demo:
 
-	- Im Verzeichnis ReadyBin/Vishnu.bin **Vishnu.exe** starten.
+	- Im Verzeichnis ReadyBin/Vishnu.bin **Vishnu.exe** starten.<br/>
+	<span style="font-size:14px;">Hinweis 1: Wenn Windows die passende DotNet-Runtime nachinstallieren möchte, folge bitte den Anweisungen und starte danach Vishnu erneut.<br />
+	<span style="font-size:14px;">Hinweis 2: Wenn die Meldung kommt
+	 "Der Computer wurde durch Windows geschützt", bitte einmalig über<br />"Weitere Informationen" gehen und den Start von Vishnu erlauben.</span>
 
 ## Demos
 Im Unterverzeichnis **DemoJobs** stehen die Job-Definitionen einer Reihe von interessanten Demonstrations-Jobs.
 
 ## Dokumentation
 Die ausführliche Dokumentation findest du in **Vishnu** mit **F1**, im mit gelieferten **Vishnu_doc.de.chm** oder
-online unter [Vishnu online Dokumentation](https://neteti.de/Vishnu.Doc/)
-<br/><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-size:14px;">(Hinweis: Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte, sieh bitte im [CHM-HowTo](CHM_HowTo.md) nach.)</span>
+online unter [Vishnu online Dokumentation](https://neteti.de/Vishnu.Doc/)<br/>
+<span style="font-size:14px;">(Hinweis: Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte, sieh bitte im [CHM-HowTo](CHM_HowTo.md) nach.)</span>
 
 ## Quellcode und Entwicklung
 
