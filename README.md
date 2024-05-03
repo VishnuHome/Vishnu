@@ -147,8 +147,9 @@ Danke Mostafa Kaisoun für seine Berechnungslogik.
 [Geolocation](https://www.geojs.io)<br/>
 Vielen Dank an die Entwickler und Sponsoren dieser freien Seite für Geolocation.
 
-[Wettervorhersagen und Wetter-Icons](https://www.7timer.info)<br/>
-Vielen Dank an Chenzhou Cui und seine Freunde, die diese wunderbare, freie Seite für Wettervorhersagen betreiben.
+[Wettervorhersagen](https://open-meteo.com) und<br/>
+[Wetter-Icons](https://www.7timer.info)<br/>
+Vielen Dank an das Team von open-meteo.com und auch an Chenzhou Cui und seine Freunde, die die Seite 7timer.info für Wettervorhersagen betreiben.
 
 [Mindest-Informationen über einen Screen](https://stackoverflow.com/questions/1927540/how-to-get-the-size-of-the-current-screen-in-wpf)<br/>
 Danke an Nils Andresen auf StackOverflow
