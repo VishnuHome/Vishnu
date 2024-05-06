@@ -553,7 +553,7 @@ namespace LogicalTaskTree
                     // 14.07.2022 Nagel-
 
                     logical = this.Checker.Run(null, this.TreeParams, source);
-                    if (!this.IsThreadValid(Thread.CurrentThread) || (this.CancellationToken.IsCancellationRequested)
+                    if (!LogicalNode.IsThreadValid(Thread.CurrentThread) || (this.CancellationToken.IsCancellationRequested)
                       || (this.LastLogicalState == NodeLogicalState.UserAbort))
                     {
                         if (this.Trigger != null)
@@ -643,6 +643,12 @@ namespace LogicalTaskTree
                 this.LogicalState = NodeLogicalState.Fault;
                 this.State = NodeState.Finished;
             }
+            //catch (System.Threading.ThreadAbortException ex)
+            //{
+            //    Thread.ResetAbort(); // Tritt bei offenen Dialog-Checkern und gleichzeitigem Run auf übergeordnete Knoten auf.
+            //                         // Hängt direkt mit der Nutzung der Klasse ProcessTools.Abortable bei AbortingAllowed=true zusammen.
+            //                         // TODO: bessere Lösung finden. 
+            //}
             catch (Exception ex)
             {
                 runException = ex; // Achtung, keine direkte Referenz, sondern über new Exception entkoppeln.
@@ -657,7 +663,7 @@ namespace LogicalTaskTree
             }
             finally
             {
-                if (!this.IsThreadValid(Thread.CurrentThread))
+                if (!LogicalNode.IsThreadValid(Thread.CurrentThread))
                 {
                     if (this.Trigger != null)
                     {

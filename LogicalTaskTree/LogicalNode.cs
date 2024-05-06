@@ -991,7 +991,7 @@ namespace LogicalTaskTree
         protected virtual void OnNodeProgressChanged(string itemsName, long countAll, long countSucceeded)
         {
             LogicalNode.WaitWhileTreePaused();
-            if (this.IsThreadValid(Thread.CurrentThread))
+            if (LogicalNode.IsThreadValid(Thread.CurrentThread))
             {
                 ProgressChangedEventArgs args = new ProgressChangedEventArgs((int)(((100.0 * countSucceeded) / countAll) + .5), null);
                 this.ProcessTreeEvent("ProgressChanged", args.ProgressPercentage);
@@ -1008,7 +1008,7 @@ namespace LogicalTaskTree
         public virtual void OnNodeProgressFinished(string itemsName, long countAll, long countSucceeded)
         {
             LogicalNode.WaitWhileTreePaused();
-            if (this.IsThreadValid(Thread.CurrentThread))
+            if (LogicalNode.IsThreadValid(Thread.CurrentThread))
             {
                 this.ProcessTreeEvent("Finished", null);
                 if (NodeProgressFinished != null)
@@ -1328,7 +1328,7 @@ namespace LogicalTaskTree
         /// </summary>
         static LogicalNode()
         {
-            LogicalNode._invalidThreads = new ConcurrentDictionary<Thread, bool>();
+            LogicalNode._invalidThreads = new ConcurrentDictionary<int, bool>();
             LogicalNode.IsSnapshotProhibited = false;
             LogicalNode.IsTreeFlushing = false;
             LogicalNode.IsTreePaused = false;
@@ -2059,29 +2059,38 @@ namespace LogicalTaskTree
             // Achtung: eine direkte Zuweisung geht wegen Thread-übergreifendem Zugriff schief!
             // Hinweis: ParentView ist bei Knoten, die aktuell auf dem Bildschirm nicht dargestellt
             // werden, nicht gefüllt (null).
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                if (this.ParentView != null)
+            //try
+            //{
+                Application.Current.Dispatcher.Invoke(new Action(() =>
                 {
-                    // 10.02.2024 Erik Nagel auskommentiert+ ScreenInfo actScreenInfo = ScreenInfo.GetMainWindowScreenInfo();
-                    // 10.02.2024 Erik Nagel auskommentiert- AppSettings.ActScreenBounds = actScreenInfo.Bounds;
+                    if (this.ParentView != null)
+                    {
+                        // 10.02.2024 Erik Nagel auskommentiert+ ScreenInfo actScreenInfo = ScreenInfo.GetMainWindowScreenInfo();
+                        // 10.02.2024 Erik Nagel auskommentiert- AppSettings.ActScreenBounds = actScreenInfo.Bounds;
 
-                    // TODO: Beim Hin- Und Herschalten zwischen Tree-und Jobs-Ansicht
-                    // wird die korrekte Anfangsposition nicht gehalten (Stand 22.01.2024 Nagel).
-                    Point lastParentViewAbsoluteScreenPosition =
-                        WindowAspects.GetFrameworkElementAbsoluteScreenPosition(this.ParentView, false);
-                    if (lastParentViewAbsoluteScreenPosition.X > AppSettings.ActScreenBounds.Right - 50)
-                    {
-                        lastParentViewAbsoluteScreenPosition.X = AppSettings.ActScreenBounds.Right - 50;
+                        // TODO: Beim Hin- Und Herschalten zwischen Tree-und Jobs-Ansicht
+                        // wird die korrekte Anfangsposition nicht gehalten (Stand 22.01.2024 Nagel).
+                        Point lastParentViewAbsoluteScreenPosition =
+                            WindowAspects.GetFrameworkElementAbsoluteScreenPosition(this.ParentView, false);
+                        if (lastParentViewAbsoluteScreenPosition.X > AppSettings.ActScreenBounds.Right - 50)
+                        {
+                            lastParentViewAbsoluteScreenPosition.X = AppSettings.ActScreenBounds.Right - 50;
+                        }
+                        if (lastParentViewAbsoluteScreenPosition.Y > AppSettings.ActScreenBounds.Bottom - 35)
+                        {
+                            lastParentViewAbsoluteScreenPosition.Y = AppSettings.ActScreenBounds.Bottom - 35;
+                        }
+                        this.TreeParams.LastParentViewAbsoluteScreenPosition =
+                            lastParentViewAbsoluteScreenPosition;
                     }
-                    if (lastParentViewAbsoluteScreenPosition.Y > AppSettings.ActScreenBounds.Bottom - 35)
-                    {
-                        lastParentViewAbsoluteScreenPosition.Y = AppSettings.ActScreenBounds.Bottom - 35;
-                    }
-                    this.TreeParams.LastParentViewAbsoluteScreenPosition =
-                        lastParentViewAbsoluteScreenPosition;
-                }
-            }));
+                }));
+            //}
+            //catch (System.Threading.ThreadAbortException ex)
+            //{
+            //    Thread.ResetAbort(); // Hier ist es ausnahmsweise zulässig, da die "korrekte" Bildschirmpositionierung
+            //                         // eines untergeordneten Controls nachrangig gegenüber der Ablaufsteuerung ist.
+            //                         // Hängt direkt mit der Nutzung der Klasse ProcessTools.Abortable bei AbortingAllowed=true zusammen.
+            //}
         }
 
         private void SetTreeParamsParentView()
@@ -2231,12 +2240,12 @@ namespace LogicalTaskTree
             {
                 if (thread.IsAlive)
                 {
-                    LogicalNode._invalidThreads.TryAdd(thread, true);
+                    LogicalNode._invalidThreads.TryAdd(thread.ManagedThreadId, true);
                 }
                 else
                 {
                     bool dummy;
-                    LogicalNode._invalidThreads.TryRemove(thread, out dummy);
+                    LogicalNode._invalidThreads.TryRemove(thread.ManagedThreadId, out dummy);
                 }
             }
         }
@@ -2246,9 +2255,9 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="thread">Der zu prüfende Thread.</param>
         /// <returns>True, wenn der Thread gültig ist.</returns>
-        protected bool IsThreadValid(Thread? thread)
+        internal static bool IsThreadValid(Thread? thread)
         {
-            return thread != null && !LogicalNode._invalidThreads.ContainsKey(thread);
+            return thread != null && !LogicalNode._invalidThreads.ContainsKey(thread.ManagedThreadId);
         }
 
         /// <summary>
@@ -2260,7 +2269,7 @@ namespace LogicalTaskTree
             if (thread != null)
             {
                 bool dummy;
-                LogicalNode._invalidThreads.TryRemove(thread, out dummy);
+                LogicalNode._invalidThreads.TryRemove(thread.ManagedThreadId, out dummy);
             }
         }
 
@@ -2306,7 +2315,7 @@ namespace LogicalTaskTree
 
 
         private static long _countdownToSleep = COUNTSUNTILSLEEP;
-        private static ConcurrentDictionary<Thread, bool> _invalidThreads;
+        private static ConcurrentDictionary<int, bool> _invalidThreads;
 
         // Die Verarbeitung eines Knotens läuft immer asynchron.
         // private Task asyncCheckerTask; Task geht nicht, wegen fehlendem ApartmentState.STA und WPF-Checkern.
@@ -2370,13 +2379,13 @@ namespace LogicalTaskTree
                 // InfoController.GetInfoPublisher().Publish(this, String.Format($"3. {this.NameId}.RunAsyncAsync {source.SourceId}/{source.SenderId} ({source.Name})"), InfoType.NoRegex);
                 if (this._starterThread != null)
                 {
-                    LogThis(String.Format($"#Multithreading# IsAlive: {this._starterThread.IsAlive}, IsThreadValid: {this.IsThreadValid(this._starterThread.GetThread())}")); // 02.01.2024 Nagel+- TEST
+                    LogThis(String.Format($"#Multithreading# IsAlive: {this._starterThread.IsAlive}, IsThreadValid: {LogicalNode.IsThreadValid(this._starterThread.GetThread())}")); // 02.01.2024 Nagel+- TEST
                 }
                 else
                 {
                     LogThis(String.Format($"#Multithreading# _starterThread is null")); // 02.01.2024 Nagel+- TEST
                 }
-                if (this._starterThread == null || !(this._starterThread.IsAlive && this.IsThreadValid(this._starterThread.GetThread())))
+                if (this._starterThread == null || !(this._starterThread.IsAlive && LogicalNode.IsThreadValid(this._starterThread.GetThread())))
                 {
                     // this.asyncCheckerTask = new Task(() => this.runAsync(source));
                     // Läuft über Thread um ApartmentState.STA setzen zu können. Ansonsten könnten

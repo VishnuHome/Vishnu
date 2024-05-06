@@ -59,7 +59,7 @@ namespace Vishnu.Interchange
         /// <summary>
         /// Bei True werden Knoten, die nicht auf kooperativen Cancel reagieren (können)
         /// durch "Abort()" hart abgebrochen.
-        /// Default: true.
+        /// Immer: false; künftig wegfallend.
         /// </summary>
         public bool AbortingAllowed { get; set; }
 
@@ -239,11 +239,6 @@ namespace Vishnu.Interchange
         /// Default: false.
         /// </summary>
         public bool NoWorkers { get; set; }
-
-        /// <summary>
-        /// Verzeichnis, in dem Snapshots von Knoten abgespeichert werden.
-        /// </summary>
-        public string ResolvedSnapshotDirectory { get; set; }
 
         /// <summary>
         /// Dateipfad zum obersten Job.
@@ -556,7 +551,7 @@ namespace Vishnu.Interchange
             this.AppEnvAccessor.RegisterKeyValue("DebugFile", this.DebugFile);
             this.StatisticsFile = this.GetStringValue("StatisticsFile", this.WorkingDirectory + Path.DirectorySeparatorChar + this.ApplicationName + @".stat");
 
-            this.AbortingAllowed = this.GetValue<bool>("AbortingAllowed", true);
+            this.AbortingAllowed = false; // Immer: false; künftig wegfallend. // this.GetValue<bool>("AbortingAllowed", true);
             this.AcceptNullResults = this.GetValue<bool>("AcceptNullResults", false);
 
             this.UserParameterReaderPath = this.GetStringValue("UserParameterReaderPath", null);

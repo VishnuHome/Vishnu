@@ -459,8 +459,11 @@ namespace LogicalTaskTree
                         // 28.01.2024 Nagel: Test-
                         */
                         string cp = this._checkerParameters?.ToString() ?? "";
-                        rtn = this._slave.Run(GenericSingletonProvider.GetInstance<AppSettings>()
-                            .ReplaceWildcards(cp), treeParameters, source);
+                        if (LogicalNode.IsThreadValid(Thread.CurrentThread))
+                        {
+                            rtn = this._slave.Run(GenericSingletonProvider.GetInstance<AppSettings>()
+                                .ReplaceWildcards(cp), treeParameters, source);
+                        }
                     }
                     finally
                     {

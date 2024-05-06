@@ -2006,6 +2006,8 @@ C:\Users\micro\Documents\Tools\openVishnu8\Vishnu.bin\Vishnu.exe -job=.\Jobs\Che
  -UserAssemblyDirectory="../UserAssemblies"
  Vishnu.%MainJobName%
  
+Vishnu.exe --job=TestJobs/CheckAnyTreeEvent --NoWorkers=true --AbortingAllowed=false
+Vishnu.exe --job=TestJobs/LongRunningNode --NoWorkers=true --AbortingAllowed=false
 
 Vishnu.exe --FlatNodeListFilter="JobConnector|NodeConnector|NodeList" -job="TestJobs\Tests\TwoDialogNodes" --NoWorkers=true --DebugMode=true --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --NoWorkers=false --AbortingAllowed=false
 2024.02.01 13:40:17 System  Job: Wert: TestJobs\Tests\TwoDialogNodes, Quelle: CommandLine
