@@ -14,7 +14,7 @@ Vishnu ist ein Monitoring- und Prozesssteuerungs-Baukasten mit integrierter Vera
 
 Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
   - ### Installation:
-	* Ein lokales Basisverzeichnis für alle weiteren Vishnu- und Hilfs-Verzeichnisse anlegen, zum Beispiel c:\Users\<user>\Documents\MyVishnu
+	* Ein lokales Basisverzeichnis für alle weiteren Vishnu- und Hilfs-Verzeichnisse anlegen, zum Beispiel c:\Users\<user>\Documents\MyVishnu.
 	* [init.zip](https://github.com/VishnuHome/Setup/raw/master/Vishnu.bin/init.zip) herunterladen und in das Basisverzeichnis entpacken.
 
 	Es entsteht dann folgende Struktur:
