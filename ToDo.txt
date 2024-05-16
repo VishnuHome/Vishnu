@@ -1036,8 +1036,16 @@ Hinweise:
 ###################
 
 --- TODO ----------------------------------------------------------------------------------------------------
+Escalator: Text bei weggefallener Ursache nochmal checken
+SQL-Parallelisierung noch mal neu angehen
+CheckAll Break+Run: "Die DB local ist nicht aktuell"; CheckSQL:D ist grau
+Vishnu Hilfe: andere Formate checken
+Docker für Vishnu evaluieren
+WIX evaluieren (Beispiel: iSpy Projekt)
 Fehler nach mehrmaligem, schnell hintereinander gestarteten Run auf WPFDialogChecker im Job CheckAnyTreeEvent:
 System.Threading.ThreadAbortException: System error.
+Manchmal erscheint (im Hintergrund bei alt-Tab) ein zusätzliches leeres Start Fenster
+JobLogger in Logger umbenennen?
 Cooperatives Cancelling komplett implementieren (auch Checker).
 Speichern der Bildschirmdarstellung (Strg-s) mit in das Kontextmenü aufnehmen.
 Uptime mit im Window-Header anzeigen.
@@ -1251,7 +1259,7 @@ MultiScreen Überabeitung
 [falsch: 2. Der Rest sollte eigentlich schon egal sein.]
 2. Ob die einzelnen Bildschirme unterschiedliche Maße und Auflösungen haben, liegt in der Verantwortung des
    Anwenders. Ebenso, ob sie über Windows-Systemeinstellung logisch richtig angeordnet wurden
-   (links=links, oben=onben, ...).
+   (links=links, oben=oben, ...).
 -------------------------------------------------------------------------------------------------------------
 Vishnu als Signal/Interrupt-gesteuertes System
 	Motivation: die klassische Checker-Ansteuerung erfolgt über Polling durch TimerTrigger.
