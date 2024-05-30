@@ -24,7 +24,7 @@ Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
 	### Vishnu-Demo:
 
 	- Im Verzeichnis ReadyBin/Vishnu.bin **Vishnu.exe** starten.<br/>
-	<span style="font-size:14px;">Hinweis 1: Wenn Windows die passende DotNet-Runtime nachinstallieren möchte, folge bitte den Anweisungen und starte danach Vishnu erneut.<br />
+	<span  style="font-size:14px;">Hinweis 1: Wenn Windows die passende DotNet-Runtime nachinstallieren möchte, folge bitte den Anweisungen und starte danach Vishnu erneut.<br />
 	<span style="font-size:14px;">Hinweis 2: Wenn die Meldung kommt
 	 "Der Computer wurde durch Windows geschützt", bitte einmalig über<br />"Weitere Informationen" gehen und den Start von Vishnu erlauben.</span>
 
