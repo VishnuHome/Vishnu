@@ -2,7 +2,6 @@
 Vishnu ist ein Monitoring- und Prozesssteuerungs-Baukasten mit integrierter Verarbeitung erweiterter logischer Ausdrücke.
 ![Vishnu-Hilfe Startseite](./FirstView.png?raw=true "Vishnu-Hilfe")
 *So sieht Vishnu nach dem Start mit dem ersten Demo-Job ungefähr aus*.
-### [ logical monitoring parallel process controller ]
 
 ## Voraussetzungen
 
@@ -11,9 +10,12 @@ Vishnu ist ein Monitoring- und Prozesssteuerungs-Baukasten mit integrierter Vera
   - .Net Runtime ab 8.0.2.
 
 ## Schnellstart
+  - ### Vishnu Quellen
+	* Die Quellen findest du hier: [Vishnu auf GitHub](https://github.com/VishnuHome/Vishnu)
 
-Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
   - ### Installation:
+
+	Für die erste Einrichtung führe bitte nachfolgende Schritte aus:
 	* Ein lokales Basisverzeichnis für alle weiteren Vishnu- und Hilfs-Verzeichnisse anlegen, zum Beispiel c:\Users\<user>\Documents\MyVishnu.
 	* [init.zip](https://github.com/VishnuHome/Setup/raw/master/Vishnu.bin/init.zip) herunterladen und in das Basisverzeichnis entpacken.
 
@@ -35,6 +37,7 @@ Im Unterverzeichnis **DemoJobs** stehen die Job-Definitionen einer Reihe von int
 Die ausführliche Dokumentation findest du in **Vishnu** mit **F1**, im mit gelieferten **Vishnu_doc.de.chm** oder
 online unter [Vishnu online Dokumentation](https://neteti.de/Vishnu.Doc/)<br/>
 <span style="font-size:14px;">(Hinweis: Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte, sieh bitte im [CHM-HowTo](CHM_HowTo.md) nach.)</span>
+#### Stichworte: Windows, wpf, c#, monitoring, job-controlling, logical tree, parallel, desktop, distributed
 
 ## Quellcode und Entwicklung
 
@@ -70,7 +73,7 @@ Vishnu liefert schon eine Reihe von Checkern mit. Diese findest du unter [InPlug
 
 Vishnu-Plugins kannst du genauso forken und clonen wie unter [Quellcode und Entwickung](#Quellcode-und-Entwicklung) schon beschrieben,
 nur dass dein lokales Unterverzeichnis das schon vorgesehene **InPlug** sein sollte.
-<br/>(Quellen: https://github.com/InPlug)
+<br/>(Quellen: [InPlug](https://github.com/InPlug))
 
 ## Das Basis-Framework
 Vishnu arbeitet mit einigen allgemeingültigen DLLs, dem Basis-Framework.
