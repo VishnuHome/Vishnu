@@ -27,11 +27,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-	working-directory: VishnuPages
   # Build job
   build:
     runs-on: ubuntu-latest
     steps:
+      - working-directory: VishnuPages
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Ruby
