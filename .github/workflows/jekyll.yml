@@ -30,8 +30,8 @@ jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
+    working-directory: VishnuPages
     steps:
-      - working-directory: VishnuPages
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Ruby
