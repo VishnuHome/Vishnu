@@ -1,3 +1,9 @@
+---
+title: Vishnu Monitoring und Steuerung
+layout: default  # Or your layout file name
+favicon: favicon.ico  # Replace with your favicon filename
+---
+
 # Vishnu
 ### Vishnu ist ein Monitoring- und Prozesssteuerungs-Baukasten mit integrierter Verarbeitung erweiterter logischer Ausdrücke.
 
