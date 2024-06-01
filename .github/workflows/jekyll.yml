@@ -27,6 +27,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+	working-directory: VishnuPages
   # Build job
   build:
     runs-on: ubuntu-latest

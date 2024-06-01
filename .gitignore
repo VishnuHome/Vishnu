@@ -23,6 +23,15 @@ copyErrorLog.txt
 launchSettings.json
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
+Gemfile.lock
+/.bundle/
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
 
 # Build results
 [Dd]ebug/
