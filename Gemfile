@@ -1,9 +1,10 @@
-# Define gem source (usually points to RubyGems repository)
 source "https://rubygems.org"
 
-# List gem dependencies with optional version constraints
-gem "jekyll", "~> 4.2.0"  # Installs Jekyll version around 4.2.0
-gem "kramdown", ">= 2.3.0"   # Installs Kramdown version 2.3.0 or higher
+gem "github-pages", group: :jekyll_plugins
+
+# Optionale Plugins, falls benötigt:
+gem "jekyll-feed", "~> 0.12"
+gem "jekyll-seo-tag", "~> 2.6"
 
 gem "minima", "~> 2.0"
 
