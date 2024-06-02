@@ -35,10 +35,10 @@ jobs:
       with:
         ruby-version: '3.2' # Passe dies an deine Ruby-Version an
 
-    - name: Install dependencies
-      run: |
-        gem install bundler
-        bundle install
+    #- name: Install dependencies
+    #  run: |
+    #    gem install bundler
+    #    bundle install
       
     - name: Setup Pages
       uses: actions/configure-pages@v5
