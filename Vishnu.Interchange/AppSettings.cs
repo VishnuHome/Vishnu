@@ -838,14 +838,9 @@ namespace Vishnu.Interchange
         // so dass er (nach der Kommandozeile) höchste Priorität bekommt.
         private void LoadUserParameterReader(string userParameterReaderPathAndParameters)
         {
-            string[] pathPara = (userParameterReaderPathAndParameters + " ").Split(' ');
+            string[] pathPara = (userParameterReaderPathAndParameters + "|").Split('|', 2);
             string userParameterReaderPath = pathPara[0];
-            string userParameterReaderParameters = pathPara[1];
-            if (userParameterReaderPath.Contains("|"))
-            {
-                userParameterReaderParameters = ((userParameterReaderPath + "|").Split(new char[] { '|' }, 2)[1]).TrimEnd('|');
-                userParameterReaderPath = (userParameterReaderPath + "|").Split(new char[] { '|' }, 2)[0];
-            }
+            string userParameterReaderParameters = pathPara[1].TrimEnd('|');
             IParameterReader? parameterReader = null;
             try
             {
