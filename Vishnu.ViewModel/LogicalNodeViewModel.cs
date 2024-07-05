@@ -14,6 +14,7 @@ using System.Text;
 using NetEti.ApplicationControl;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Vishnu.ViewModel
 {
@@ -923,10 +924,10 @@ namespace Vishnu.ViewModel
         }
         */
 
-                    /// <summary>
-                    /// Liefert true, wenn die Funktion ausführbar ist.
-                    /// </summary>
-                    /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
         public override bool CanReloadTaskTreeExecute()
         {
             return true; // !(this._myLogicalNode is NodeConnector); // && this._myLogicalNode.CanTreeStart;
@@ -982,6 +983,66 @@ namespace Vishnu.ViewModel
             await Task.Run(() => LogicalTaskTreeManager.LogTaskTree(this, false));
             this.JobInProgress = "";
             // 06.11.2023 Nagel+- _ = this.ResetContextMenu();
+        }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        public override bool CanShowInfosExecute()
+        {
+            bool canShowInfos = true;
+            return canShowInfos;
+        }
+
+        /// <summary>
+        /// Holt eventuell vorhandene Vishnu-Infos (Messages und Logs) in den Vordergrund.
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
+        public override void ShowInfosExecute(object? parameter)
+        {
+            _ = this.DoShowInfos();
+        }
+
+        /// <summary>
+        /// Holt eventuell vorhandene Vishnu-Infos (Messages und Logs) in den Vordergrund.
+        /// </summary>
+        /// <returns>Task.</returns>
+        public async Task DoShowInfos()
+        {
+            this.JobInProgress = "ShowInfos";
+            await Task.Run(() => ProcessWorker.ShowChildProcesses(Process.GetCurrentProcess()));
+            this.JobInProgress = "";
+        }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        public override bool CanClearInfosExecute()
+        {
+            bool canClearInfos = true;
+            return canClearInfos;
+        }
+
+        /// <summary>
+        /// Löscht eventuell vorhandene Vishnu-Infos (Messages und Logs).
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
+        public override void ClearInfosExecute(object? parameter)
+        {
+            _ = this.DoClearInfos();
+        }
+
+        /// <summary>
+        /// Löscht eventuell vorhandene Vishnu-Infos (Messages und Logs).
+        /// </summary>
+        /// <returns>Task.</returns>
+        public async Task DoClearInfos()
+        {
+            this.JobInProgress = "ClearInfos";
+            await Task.Run(() => ProcessWorker.FinishChildProcesses(Process.GetCurrentProcess()));
+            this.JobInProgress = "";
         }
 
         /// <summary>

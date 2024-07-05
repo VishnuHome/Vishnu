@@ -75,6 +75,29 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <Style x:Key="SubMenuContainerTemplate" TargetType="MenuItem">
+        <Setter Property="HeaderTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <Border BorderBrush="{StaticResource MenuItemBorder.Brush}"
+                            BorderThickness="1" CornerRadius="6" Margin="-32,0,-139,0">
+                        <Border.Style>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="Background" Value="WhiteSmoke" />
+                            </Style>
+                        </Border.Style>
+                        <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release" Margin="0,0,4,0">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal" Margin="22,0,0,0">
+                                    <TextBlock Text="Infos" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                    </Border>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     <ContextMenu Name="cmContextMenu" x:Key="cmContextMenu">
         <Separator />
         <MenuItem Name="ShowVishnuHelp" Style="{StaticResource MenuItemTemplate}">
@@ -90,31 +113,68 @@
                 </Button>
             </MenuItem.Header>
         </MenuItem>
-        <MenuItem Name="ShowSettingsTaskTree" Style="{StaticResource MenuItemTemplate}">
+        <MenuItem Name="Infos" Style="{StaticResource SubMenuContainerTemplate}">
             <MenuItem.Header>
-                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
+                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                            <TextBlock Text="Infos" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </MenuItem.Header>
+            <MenuItem Name="ShowSettingsTaskTree" Style="{StaticResource MenuItemTemplate}">
+                <MenuItem.Header>
+                    <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
                         Command="{Binding ShowSettingsLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="../Media/dna.png" Width="15" Height="15" Margin="0,0,5,0"/>
-                            <TextBlock Text="Einstellungen" />
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-            </MenuItem.Header>
-        </MenuItem>
-        <MenuItem Name="ShowLogTaskTree" Style="{StaticResource MenuItemTemplate}">
-            <MenuItem.Header>
-                <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../Media/dna.png" Width="15" Height="15" Margin="0,0,5,0"/>
+                                <TextBlock Text="Einstellungen" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem Name="ShowLogTaskTree" Style="{StaticResource MenuItemTemplate}">
+                <MenuItem.Header>
+                    <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
                         Command="{Binding ShowLogLogicalTaskTree, diag:PresentationTraceSources.TraceLevel=High}">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="../Media/research.png" Width="15" Height="15" Margin="0,0,5,0"/>
-                            <TextBlock Text="Vishnu Logdatei" />
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-            </MenuItem.Header>
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../Media/research.png" Width="15" Height="15" Margin="0,0,5,0"/>
+                                <TextBlock Text="Vishnu Logdatei" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem Name="ShowInfos" Style="{StaticResource MenuItemTemplate}">
+                <MenuItem.Header>
+                    <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
+                        Command="{Binding ShowInfos, diag:PresentationTraceSources.TraceLevel=High}">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../Media/resize-26.png" Width="15" Height="15" Margin="0,0,5,0"/>
+                                <TextBlock Text="Zeige Infos" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem Name="ClearInfos" Style="{StaticResource MenuItemTemplate}">
+                <MenuItem.Header>
+                    <Button Style="{StaticResource MenuButtonTemplate}" ClickMode="Release"
+                        Command="{Binding ClearInfos, diag:PresentationTraceSources.TraceLevel=High}">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../Media/remove_image-26.png" Width="15" Height="15" Margin="0,0,5,0"/>
+                                <TextBlock Text="Lösche Infos" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                </MenuItem.Header>
+            </MenuItem>
         </MenuItem>
         <MenuItem Name="SwitchTaskTreeView" Style="{StaticResource MenuItemTemplate}">
             <MenuItem.Header>

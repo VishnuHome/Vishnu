@@ -4,6 +4,7 @@ using NetEti.Globals;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -388,6 +389,66 @@ namespace Vishnu.ViewModel
         {
             bool canLog = true;
             return canLog;
+        }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        public override bool CanShowInfosExecute()
+        {
+            bool canShowInfos = true;
+            return canShowInfos;
+        }
+
+        /// <summary>
+        /// Holt eventuell vorhandene Vishnu-Infos (Messages und Logs) in den Vordergrund.
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
+        public override void ShowInfosExecute(object? parameter)
+        {
+            _ = this.DoShowInfos();
+        }
+
+        /// <summary>
+        /// Holt eventuell vorhandene Vishnu-Infos (Messages und Logs) in den Vordergrund.
+        /// </summary>
+        /// <returns>Task.</returns>
+        public async Task DoShowInfos()
+        {
+            this.JobInProgress = "ShowInfos";
+            await Task.Run(() => ProcessWorker.ShowChildProcesses(Process.GetCurrentProcess()));
+            this.JobInProgress = "";
+        }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        public override bool CanClearInfosExecute()
+        {
+            bool canClearInfos = true;
+            return canClearInfos;
+        }
+
+        /// <summary>
+        /// Löscht eventuell vorhandene Vishnu-Infos (Messages und Logs).
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
+        public override void ClearInfosExecute(object? parameter)
+        {
+            _ = this.DoClearInfos();
+        }
+
+        /// <summary>
+        /// Löscht eventuell vorhandene Vishnu-Infos (Messages und Logs).
+        /// </summary>
+        /// <returns>Task.</returns>
+        public async Task DoClearInfos()
+        {
+            this.JobInProgress = "ClearInfos";
+            await Task.Run(() => ProcessWorker.FinishChildProcesses(Process.GetCurrentProcess()));
+            this.JobInProgress = "";
         }
 
         /// <summary>

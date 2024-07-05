@@ -12,8 +12,8 @@
     <Company>NetEti</Company>
     <Description>Assembly mit dem VievModel für die MVVM-Anwendung Vishnu</Description>
     <Copyright>Copyright © $(Authors) 2012-$([System.DateTime]::Now.Year)</Copyright>
-    <AssemblyVersion>8.2.0.3</AssemblyVersion>
-    <FileVersion>8.2.0.3</FileVersion>
+    <AssemblyVersion>8.2.1.0</AssemblyVersion>
+    <FileVersion>8.2.1.0</FileVersion>
     <PackageTags>NetEti Vishnu Main View Model</PackageTags>
   </PropertyGroup>
 
@@ -50,6 +50,9 @@
 		    <Reference Include="NetEti.MVVMini">
 		      <HintPath>$(AssemblyRoot)/NetEti.MVVMini.dll</HintPath>
 		    </Reference>
+		    <Reference Include="NetEti.ProcessTools">
+		      <HintPath>$(AssemblyRoot)/NetEti.ProcessTools.dll</HintPath>
+		    </Reference>
 		    <Reference Include="NetEti.TimerMessageBox">
 		      <HintPath>$(AssemblyRoot)/NetEti.TimerMessageBox.dll</HintPath>
 		    </Reference>
@@ -64,6 +67,7 @@
 		    <PackageReference Include="NetEti.QuickEdit" Version="1.0.0" />
 		    <PackageReference Include="NetEti.MultiScreen" Version="1.0.0" />
 		    <PackageReference Include="NetEti.MVVMini" Version="1.0.0" />
+		    <PackageReference Include="NetEti.ProcessTools" Version="1.0.0" />
 		    <PackageReference Include="NetEti.TimerMessageBox" Version="1.0.0" />
 		  </ItemGroup>
     </Otherwise>
