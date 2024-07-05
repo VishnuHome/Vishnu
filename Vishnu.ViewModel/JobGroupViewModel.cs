@@ -4,6 +4,7 @@ using NetEti.Globals;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -416,7 +417,7 @@ namespace Vishnu.ViewModel
         public async Task DoShowInfos()
         {
             this.JobInProgress = "ShowInfos";
-            await Task.Run(() => LogicalTaskTreeManager.ShowLogTaskTree());
+            await Task.Run(() => ProcessWorker.ShowChildProcesses(Process.GetCurrentProcess()));
             this.JobInProgress = "";
         }
 
@@ -440,15 +441,14 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
-        /// Öffnet die Logdatei im Standardeditor.
+        /// Löscht eventuell vorhandene Vishnu-Infos (Messages und Logs).
         /// </summary>
         /// <returns>Task.</returns>
         public async Task DoClearInfos()
         {
             this.JobInProgress = "ClearInfos";
-            await Task.Run(() => LogicalTaskTreeManager.ShowLogTaskTree());
+            await Task.Run(() => ProcessWorker.FinishChildProcesses(Process.GetCurrentProcess()));
             this.JobInProgress = "";
-            // 06.11.2023 Nagel+- _ = this.ResetContextMenu();
         }
 
         /// <summary>

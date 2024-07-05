@@ -474,7 +474,7 @@ namespace Vishnu.WPF_UI
 
         /// <summary>
         /// Speichert die aktuellen Window-Darstellungsparameter in einer Instanz von "WindowAspects"
-        /// und gibt "WindowAspects" dan als Aufrufparameter an die ViewModel-Routine "SaveTreeState" weiter,
+        /// und gibt "WindowAspects" dann als Aufrufparameter an die ViewModel-Routine "SaveTreeState" weiter,
         /// welche ihrerseits die WindowAspects ergänzt und zusammen mit Tree-relevanten Parametern abspeichert.
         /// </summary>
         /// <param name="target">Auslöser (Besitzer) des Commands.</param>
