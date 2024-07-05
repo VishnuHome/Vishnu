@@ -11,8 +11,8 @@
     <Company>NetEti</Company>
     <Description>Assembly mit einem User-Interface für die MVVM-Anwendung Vishnu</Description>
     <Copyright>Copyright © $(Authors) 2012-$([System.DateTime]::Now.Year)</Copyright>
-    <AssemblyVersion>8.2.0.4</AssemblyVersion>
-    <FileVersion>8.2.0.4</FileVersion>
+    <AssemblyVersion>8.2.1.0</AssemblyVersion>
+    <FileVersion>8.2.1.0</FileVersion>
     <PackageTags>NetEti Vishnu Main View</PackageTags>
   </PropertyGroup>
 
@@ -85,7 +85,9 @@
     <None Remove="Media\pauseTree.png" />
     <None Remove="Media\play.png" />
     <None Remove="Media\reloadTree.png" />
+    <None Remove="Media\remove_image-26.png" />
     <None Remove="Media\research.png" />
+    <None Remove="Media\resize-26.png" />
     <None Remove="Media\running_man.png" />
     <None Remove="Media\self_distract.png" />
     <None Remove="Media\stopwatch.png" />
@@ -130,7 +132,9 @@
     <Resource Include="Media\pauseTree.png" />
     <Resource Include="Media\play.png" />
     <Resource Include="Media\reloadTree.png" />
+    <Resource Include="Media\remove_image-26.png" />
     <Resource Include="Media\research.png" />
+    <Resource Include="Media\resize-26.png" />
     <Resource Include="Media\running_man.png" />
     <Resource Include="Media\self_distract.png" />
     <Resource Include="Media\stopwatch.png" />

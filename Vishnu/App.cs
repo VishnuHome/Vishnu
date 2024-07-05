@@ -141,7 +141,7 @@ namespace Vishnu
         protected override void OnStartup(System.Windows.StartupEventArgs e)
         {
             base.OnStartup(e);
-            // Das nachfolgende Setzen von OnExplicitShutdown oderOnMainWindowClose ist essenziell:
+            // Das nachfolgende Setzen von OnExplicitShutdown oder OnMainWindowClose ist essenziell:
             // Wenn die aktuelle Bildschirmeinstellung über Strg-s gespeichert wird,
             // erscheint für kurze Zeit eine TimerMessageBox. Wenn sich diese schließt
             // und OnMainWindowClose nicht gesetzt wurde, haut es die ganze app runter.

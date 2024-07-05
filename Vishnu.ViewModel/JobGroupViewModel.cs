@@ -394,6 +394,67 @@ namespace Vishnu.ViewModel
         /// Liefert true, wenn die Funktion ausführbar ist.
         /// </summary>
         /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        public override bool CanShowInfosExecute()
+        {
+            bool canShowInfos = true;
+            return canShowInfos;
+        }
+
+        /// <summary>
+        /// Holt eventuell vorhandene Vishnu-Infos (Messages und Logs) in den Vordergrund.
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
+        public override void ShowInfosExecute(object? parameter)
+        {
+            _ = this.DoShowInfos();
+        }
+
+        /// <summary>
+        /// Holt eventuell vorhandene Vishnu-Infos (Messages und Logs) in den Vordergrund.
+        /// </summary>
+        /// <returns>Task.</returns>
+        public async Task DoShowInfos()
+        {
+            this.JobInProgress = "ShowInfos";
+            await Task.Run(() => LogicalTaskTreeManager.ShowLogTaskTree());
+            this.JobInProgress = "";
+        }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        public override bool CanClearInfosExecute()
+        {
+            bool canClearInfos = true;
+            return canClearInfos;
+        }
+
+        /// <summary>
+        /// Löscht eventuell vorhandene Vishnu-Infos (Messages und Logs).
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter, wird hier nicht genutzt.</param>
+        public override void ClearInfosExecute(object? parameter)
+        {
+            _ = this.DoClearInfos();
+        }
+
+        /// <summary>
+        /// Öffnet die Logdatei im Standardeditor.
+        /// </summary>
+        /// <returns>Task.</returns>
+        public async Task DoClearInfos()
+        {
+            this.JobInProgress = "ClearInfos";
+            await Task.Run(() => LogicalTaskTreeManager.ShowLogTaskTree());
+            this.JobInProgress = "";
+            // 06.11.2023 Nagel+- _ = this.ResetContextMenu();
+        }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
         public override bool CanShowLogExecute()
         {
             bool canShowLog = true;

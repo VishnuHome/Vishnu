@@ -38,6 +38,16 @@ namespace Vishnu.ViewModel
         public ICommand ShowLogLogicalTaskTree { get { return this._btnShowLogTaskTreeRelayCommand; } }
 
         /// <summary>
+        /// Command für das ContextMenuItem "Zeige Infos" im ContextMenu für das "MainGrid" des Controls.
+        /// </summary>
+        public ICommand ShowInfos { get { return this._btnShowInfosRelayCommand; } }
+
+        /// <summary>
+        /// Command für das ContextMenuItem "Lösche Infos" im ContextMenu für das "MainGrid" des Controls.
+        /// </summary>
+        public ICommand ClearInfos { get { return this._btnClearInfosRelayCommand; } }
+
+        /// <summary>
         /// Command für das ContextMenuItem "Show Settings" im ContextMenu für das "MainGrid" des Controls.
         /// </summary>
         public ICommand ShowSettingsLogicalTaskTree { get { return this._btnShowSettingsTaskTreeRelayCommand; } }
@@ -348,6 +358,41 @@ namespace Vishnu.ViewModel
         }
 
         /// <summary>
+        /// Ist zum Anzeigen eventuell vorhandener Vishnu-Infos (Messages und Logs)
+        /// im Vordergrund vorgesehen.
+        /// Kann dafür an geeigneter Stelle überschrieben werden.
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter oder null.</param>
+        public virtual void ShowInfosExecute(object? parameter) { }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist, hier immer false.
+        /// Kann an geeigneter Stelle überschrieben werden.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        public virtual bool CanShowInfosExecute()
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Ist zum Löschen eventuell vorhandener Vishnu-Infos (Messages und Logs) vorgesehen.
+        /// Kann dafür an geeigneter Stelle überschrieben werden.
+        /// </summary>
+        /// <param name="parameter">Optionaler Parameter oder null.</param>
+        public virtual void ClearInfosExecute(object? parameter) { }
+
+        /// <summary>
+        /// Liefert true, wenn die Funktion ausführbar ist, hier immer false.
+        /// Kann an geeigneter Stelle überschrieben werden.
+        /// </summary>
+        /// <returns>True, wenn die Funktion ausführbar ist.</returns>
+        public virtual bool CanClearInfosExecute()
+        {
+            return false;
+        }
+
+        /// <summary>
         /// Ist zum Anzeigen der Vishnu-Parameter vorgesehen.
         /// Kann dafür an geeigneter Stelle überschrieben werden.
         /// </summary>
@@ -486,6 +531,8 @@ namespace Vishnu.ViewModel
             this._btnReloadTaskTreeRelayCommand = new RelayCommand(ReloadTaskTreeExecute, CanReloadTaskTreeExecute);
             this._btnLogTaskTreeRelayCommand = new RelayCommand(LogTaskTreeExecute, CanLogTaskTreeExecute);
             this._btnShowLogTaskTreeRelayCommand = new RelayCommand(ShowLogExecute, CanShowLogExecute);
+            this._btnShowInfosRelayCommand = new RelayCommand(ShowInfosExecute, CanShowInfosExecute);
+            this._btnClearInfosRelayCommand = new RelayCommand(ClearInfosExecute, CanClearInfosExecute);
             this._btnShowSettingsTaskTreeRelayCommand = new RelayCommand(ShowSettingsExecute, CanShowSettingsExecute);
             this._btnShowVishnuHelpRelayCommand = new RelayCommand(ShowVishnuHelpExecute, CanShowVishnuHelpExecute);
             this._btnPauseResumeTaskTreeRelayCommand = new RelayCommand(PauseResumeTaskTreeExecute, CanPauseResumeTaskTreeExecute);
@@ -540,6 +587,8 @@ namespace Vishnu.ViewModel
         private RelayCommand _btnReloadTaskTreeRelayCommand;
         private RelayCommand _btnLogTaskTreeRelayCommand;
         private RelayCommand _btnShowLogTaskTreeRelayCommand;
+        private RelayCommand _btnShowInfosRelayCommand;
+        private RelayCommand _btnClearInfosRelayCommand;
         private RelayCommand _btnShowSettingsTaskTreeRelayCommand;
         private RelayCommand _btnShowVishnuHelpRelayCommand;
         private RelayCommand _btnPauseResumeTaskTreeRelayCommand;
