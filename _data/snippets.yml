@@ -1,0 +1,19 @@
+title:
+  en: Multilingual Experiment
+  it: Esperimento Multilingue
+
+languages:
+  en:
+    value: English
+    slug: en
+  it:
+    value: Italian
+    slug: it
+
+back:
+  en: Back to the Top
+  it: Torna in Cima
+
+top:
+  en: Top
+  it: Cima

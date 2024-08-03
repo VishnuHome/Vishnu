@@ -1,0 +1,19 @@
+title: Vishnu - logical monitoring job-controller
+
+description: > # this means to ignore newlines until "baseurl:"
+  Vishnu ist ein Baukastensystem für Monitoring und Prozesssteuerung mit integrierter Verarbeitung erweiterter logischer Ausdrücke. Vishnu ist eine c# Desktopanwendung für Windows und open source.
+
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://vishnuhome.github.io/Vishnu" # the base hostname & protocol for your site
+
+keywords: ["Vishnu", "monitoring", "monitor", "Überwachung", "überwachen", "plugin", "parallel", "Prozesssteuerung", "Steuerung", "process", "job-controller", "controlling", "windows", "desktop", "c#", "github", "open source", "kostenlos", "free", "vishnu@reallyhuman.net"]
+
+include:
+  - _includes/head-custom.html
+  - head-custom.html
+
+# theme: minima
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag

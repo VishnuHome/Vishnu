@@ -16,6 +16,7 @@ _Mock/
 _private/
 _layouts/
 ..bfg-report/
+_site/
 
 Job_und_Snapshot_Pfade.txt
 devenvErrorLog.txt
