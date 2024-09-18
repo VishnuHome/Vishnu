@@ -1039,6 +1039,9 @@ Hinweise:
 Escalator: Text bei weggefallener Ursache nochmal checken
 SQL-Parallelisierung noch mal neu angehen
 CheckAll Break+Run: "Die DB local ist nicht aktuell"; CheckSQL:D ist grau
+Vishnu-Meldungen mit Vishnu minimieren und maximieren (evtl. auf Parameter oder Abfrage)
+Im Task Manager: komische leere Fenster "NvContainerWindowClass..." untersuchen
+Nullsoft Install System v2.46-4 Unicode mal checken, ob brauchbar und wie teuer
 Vishnu Hilfe: andere Formate checken
 Docker für Vishnu evaluieren
 WIX evaluieren (Beispiel: iSpy Projekt)

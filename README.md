@@ -13,6 +13,7 @@
 ## Schnellstart
   - ### Vishnu Quellen
 	* Die Quellen findest du hier: [Vishnu auf GitHub](https://github.com/VishnuHome/Vishnu)
+	* Die Übersichtsseite (github page) findest du hier: [Vishnu auf GitHub.io](https://vishnuhome.github.io/Vishnu)
 
   - ### Installation:
 
@@ -148,8 +149,9 @@ Herzlichen Dank an Rachel Lim für ihren fantastischen Blog. Danke auch für ihr
 [Monphasen Berechnung](https://www.codeproject.com/script/Membership/View.aspx?mid=1961229)<br/>
 Danke Mostafa Kaisoun für seine Berechnungslogik.
 
-[Geolocation](https://www.geojs.io)<br/>
-Vielen Dank an die Entwickler und Sponsoren dieser freien Seite für Geolocation.
+[Geolocation](https://www.geojs.io) und<br/>
+[Geolocation](https://get.geojs.io/v1/ip/geo.json)<br/>
+Vielen Dank an die Entwickler und Sponsoren dieser freien Seiten für Geolocation.
 
 [Wettervorhersagen](https://open-meteo.com) und<br/>
 [Wetter-Icons](https://www.7timer.info)<br/>
