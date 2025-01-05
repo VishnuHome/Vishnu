@@ -44,7 +44,7 @@ Die ausführliche Dokumentation findest du in **Vishnu** mit **F1**; Damit gelan
 per Voreinstellung zur [Vishnu online Dokumentation](https://neteti.de/Vishnu.doc.de/)<br />
 Es steht aber auch eine Vishnu-Hilfedatei zum Download bereit
 unter [Vishnu_doc.de.chm](https://neteti.de/Vishnu.doc.de/Vishnu_doc.de.chm)
-<span style="font-size:14px;">(Hinweis: Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte, sieh bitte im [CHM-HowTo](z_Chm_HowTo.md) nach.)</span>
+<span style="font-size:14px;">(Hinweis: Wenn die Hilfedatei (*.chm) nicht korrekt angezeigt werden sollte, sieh bitte im [CHM-HowTo](z_CHM_HowTo.md) nach.)</span>
 #### Stichworte: Windows, wpf, c#, monitoring, job-controlling, logical tree, parallel, desktop, distributed
 
 ## Quellcode und Entwicklung
