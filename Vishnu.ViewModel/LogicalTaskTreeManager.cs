@@ -133,7 +133,7 @@ namespace Vishnu.ViewModel
         {
             string vishnuHelpBrowserPath = System.IO.Path.Combine(
                 GenericSingletonProvider.GetInstance<AppSettings>().UserAssemblyDirectory, "VishnuHelpBrowser.exe");
-            try { Process.Start(vishnuHelpBrowserPath); }
+            try { Process.Start(vishnuHelpBrowserPath, GenericSingletonProvider.GetInstance<AppSettings>().Language); }
             catch (Exception ex)
             {
                 if (!redirected)

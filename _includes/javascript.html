@@ -1,0 +1,25 @@
+<script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function() {
+      var userLang = navigator.language || navigator.userLanguage;
+      var langPrefix = userLang.split('-')[0];
+      var supportedLangs = ['en', 'de'];
+
+      console.log("Erkannte Sprache: " + userLang);
+      console.log("Sprachpräfix: " + langPrefix);
+
+      if (supportedLangs.includes(langPrefix)) {
+          if (!window.location.pathname.startsWith('{{ site.baseurl }}/' + langPrefix + '/')) {
+              var targetUrl = '{{ site.baseurl }}/' + langPrefix + '/';
+              console.log("Umleitungspfad: " + targetUrl);
+              window.location.href = targetUrl;
+          } else {
+              console.log("Bereits auf der richtigen Sprachseite.");
+          }
+      } else {
+          var defaultUrl = '{{ site.baseurl }}/de/';
+          // console.log("Nicht unterstützte Sprache, Umleitung zur Standardseite: " + defaultUrl);
+          console.log("Nicht unterstützte Sprache, Verbleibe auf der Startseite.");
+          // window.location.href = defaultUrl;
+      }
+  });
+</script>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "de" }}">
+
+  {%- include head.html -%}
+
+  <body>
+
+    <div class="container-lg px-3 my-5 markdown-body">
+        {{ content }}
+    </div>
+
+    <footer>
+      <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }}&nbsp;&nbsp; Generated on: {{ site.time | date: "%B %d, %Y at %I:%M %p" }}</p>
+    </footer>
+
+  </body>
+
+</html>

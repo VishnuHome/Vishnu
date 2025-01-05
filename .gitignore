@@ -14,8 +14,9 @@ _Archiv/
 _Develop/
 _Mock/
 _private/
-_layouts/
+## _layouts/
 ..bfg-report/
+_site/
 
 Job_und_Snapshot_Pfade.txt
 devenvErrorLog.txt
