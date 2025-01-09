@@ -177,6 +177,7 @@ Danke an Matt Davis für seine sehr gute Mutex-Lösung.
 
 [inzwischen nicht mehr online: ZIP-Routinen für ZIPs > 4GB mit Passwörtern]<br />
 Danke auch Peter Bromberg für seine Unterstützung bei den Zip-Routinen.
+[notepad.zip](https://github.com/VishnuHome/Setup/raw/master/Vishnu.bin/notepad.zip)
 
 [Equality Converter](https://stackoverflow.com/questions/37302270/comparing-two-dynamic-values-in-datatrigger)<br />
 Dank an Jason Tyler auf stackoverflow.
