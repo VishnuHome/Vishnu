@@ -483,7 +483,14 @@ namespace Vishnu.Interchange
             else
             {
                 this.RootJobPackagePath = @"DemoJobs\Simple\CheckAll";
-                defaultDemo = true;
+                if (Directory.Exists(this.RootJobPackagePath))
+                {
+                    defaultDemo = true;
+                }
+                else
+                {
+                    this.RootJobPackagePath = "";
+                }
             }
             this.RootJobXmlName = "jobdescription.xml";
             if (!String.IsNullOrEmpty(this.RootJobPackagePath))
