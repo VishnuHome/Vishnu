@@ -425,6 +425,7 @@ namespace Vishnu.Interchange
             if (vr != null)
             {
                 this.VishnuRoot = vr;
+                this.VishnuSourceRoot = this.VishnuRoot;
             }
             else
             {
