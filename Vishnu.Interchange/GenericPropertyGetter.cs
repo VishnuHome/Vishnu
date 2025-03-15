@@ -62,7 +62,8 @@ namespace Vishnu.Interchange
                 }
                 catch (Exception ex)
                 {
-                    throw new TypeLoadException(String.Format("Die Property {0} ist nicht vom erwarteten Typ.", name), ex);
+                    throw new TypeLoadException(
+                        String.Format("Die Property {0} ist nicht vom erwarteten Typ.", name), ex);
                 }
             }
             return (T?)obj;
