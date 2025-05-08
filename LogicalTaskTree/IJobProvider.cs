@@ -1,8 +1,10 @@
-﻿namespace LogicalTaskTree
+﻿using NetEti.FileTools;
+using Vishnu.Interchange;
+
+namespace LogicalTaskTree
 {
     /// <summary>
-    /// Interface für Lieferanten von Jobs für JobList-Knoten
-    ///           im LogicalTaskTree.
+    /// Interface für Lieferanten von Jobs für JobList-Knoten im LogicalTaskTree.
     /// </summary>
     /// <remarks>
     /// File: IJobProvider.cs
@@ -17,8 +19,9 @@
         /// in einem LogicalTaskTree.
         /// </summary>
         /// <param name="name">Der Name des Jobs</param>
+        /// <param name="physicalJobPath">Der physikalische Pfad zur JobDescription oder zum Job-Verzeichnis oder null.</param>
         /// <returns>Instanz des Jobs, der zu dem Namen gehört.</returns>
-        Job GetJob(ref string name);
+        Job GetJob(ref string name, string? physicalJobPath = null);
 
         /// <summary>
         /// Retourniert den logischen Namen des Jobs mit dem
@@ -35,6 +38,5 @@
         /// <param name="name">Logischer oder physischer Name des Jobs oder JobPackages.</param>
         /// <returns>Physischer Name des JobPackages oder null.</returns>
         string? GetPhysicalJobPath(string name);
-
     }
 }

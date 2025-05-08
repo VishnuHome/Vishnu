@@ -45,8 +45,8 @@ namespace Vishnu
         private static App? _mainWpfApp;
         private static Mutex? _mutex;
         private static AppSettings? _appSettings;
-        private static Logger? _logger;
-        private static Logger? _statisticsLogger;
+        private static NetEti.ApplicationControl.Logger? _logger;
+        private static NetEti.ApplicationControl.Logger? _statisticsLogger;
         private static LogicalTaskTree.LogicalTaskTree? _businessLogic;
         private static SplashWindow? _splashWindow;
         private static bool _cleanupStarted;
@@ -347,7 +347,7 @@ namespace Vishnu
             App._appSettings.AppEnvAccessor.UnregisterKey("DebugFile");
             string logFilePathName = App._appSettings.ReplaceWildcards(App._appSettings.DebugFile);
             App._appSettings.AppEnvAccessor.RegisterKeyValue("DebugFile", logFilePathName);
-            App._logger = new Logger(logFilePathName, _appSettings.DebugFileRegexFilter, false);
+            App._logger = new NetEti.ApplicationControl.Logger(logFilePathName, _appSettings.DebugFileRegexFilter, false);
             App._logger.DebugArchivingInterval = App._appSettings.DebugArchivingInterval;
             App._logger.DebugArchiveMaxCount = App._appSettings.DebugArchiveMaxCount;
             App._logger.LoggingTriggerCounter = 15000; // Default ist 5000 Zählvorgänge oder Millisekunden.
@@ -357,7 +357,7 @@ namespace Vishnu
             string statisticsFilePathName = App._appSettings.ReplaceWildcards(App._appSettings.StatisticsFile ?? "");
 
             Statistics.RegexFilter = App._appSettings.StatisticsFileRegexFilter;
-            App._statisticsLogger = new Logger(statisticsFilePathName);
+            App._statisticsLogger = new NetEti.ApplicationControl.Logger(statisticsFilePathName);
             InfoController.GetInfoSource().RegisterInfoReceiver(App._statisticsLogger, new InfoType[] { InfoType.Statistics });
 
             if (App._appSettings.FatalInitializationException != null)

@@ -3,6 +3,7 @@ using System;
 using Vishnu.Interchange;
 using LogicalTaskTree.Provider;
 using NetEti.Globals;
+using System.Xml.Serialization;
 
 namespace LogicalTaskTree
 {
@@ -39,6 +40,11 @@ namespace LogicalTaskTree
         const string DEFAULTSINGLENODEUSERCONTROLPATH = @"DefaultNodeControls\SingleNodeUserControl.dll";
         const string DEFAULTCONSTANTNODEUSERCONTROLPATH = @"DefaultNodeControls\ConstantNodeUserControl.dll";
         const string DEFAULTSNAPSHOTUSERCONTROLPATH = @"DefaultNodeControls\SnapshotUserControl.dll";
+
+        /// <summary>
+        /// Das Format, in dem dieser Job gespeichert wurde (Json oder Xml).
+        /// </summary>
+        public JobDescriptionFormat Format { get; set; }
 
         /// <summary>
         /// Der logische Ausdruck, der durch eine JobList im LogicalTaskTree
@@ -176,7 +182,7 @@ namespace LogicalTaskTree
         }
 
         /// <summary>
-        /// Pfad zum dynamisch zu ladenden UserControl für eine JobList.
+        /// Pfad zum dynamisch zu ladenden UserControl für einen Snapshot.
         /// </summary>
         public string SnapshotUserControlPath
         {
@@ -322,7 +328,7 @@ namespace LogicalTaskTree
 
         // Hilfsproperty für das Hinzufügen von Workern zum
         // privaten Dictionary _workers.
-        // Wird von auße wie ein Dictionary wahrgenommen.
+        // Wird von außen wie ein Dictionary wahrgenommen.
         /// <summary>
         /// Liste von externen Arbeitsroutinen für einen jobPackage.Job.
         /// Ist ein Dictionary mit WorkerShell-Arrays zu aus

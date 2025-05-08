@@ -212,7 +212,8 @@ namespace LogicalTaskTree
         /// <param name="mother">Der Eltern-Knoten.</param>
         /// <param name="rootJobList">Die Root-JobList</param>
         /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
-        public Snapshot(LogicalNode mother, JobList rootJobList, TreeParameters treeParams)
+        /// <param name="physicalJobPath">Der physikalische Pfad zur JobDescription oder zum Job-Verzeichnis oder null.</param>
+        public Snapshot(LogicalNode mother, JobList rootJobList, TreeParameters treeParams, string? physicalJobPath = null)
           : base(mother, rootJobList, treeParams)
         {
             this._isDefaultSnapshot = false;
@@ -317,9 +318,10 @@ namespace LogicalTaskTree
         /// <param name="rootJoblist">Die zuständige JobList.</param>
         /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
         /// <param name="jobProvider">Die Datenquelle für den Job</param>
+        /// <param name="physicalJobPath">Der physikalische Pfad zur JobDescription oder zum Job-Verzeichnis.</param>
         /// <param name="parsedJobs">Liste von Namen aller bisher geparsten Jobs.</param>
         internal Snapshot(string logicalName, LogicalNode mother, JobList rootJoblist,
-            TreeParameters treeParams, IJobProvider jobProvider, List<string> parsedJobs)
+            TreeParameters treeParams, IJobProvider jobProvider, string physicalJobPath, List<string> parsedJobs)
           : base(logicalName, mother, rootJoblist, treeParams)
         {
             this._userControlPath = rootJoblist.SnapshotUserControlPath;
@@ -333,7 +335,7 @@ namespace LogicalTaskTree
             }
             this._jobProvider = jobProvider;
             string tmpJobName = logicalName;
-            this._job = this._jobProvider.GetJob(ref tmpJobName);
+            this._job = this._jobProvider.GetJob(ref tmpJobName, physicalJobPath);
             if (!String.IsNullOrEmpty(tmpJobName) && tmpJobName != logicalName)
             {
                 logicalName = tmpJobName;

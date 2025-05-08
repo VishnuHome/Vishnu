@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using LogicalTaskTree.Provider;
 using NetEti.Globals;
+using System.Windows;
 
 namespace LogicalTaskTree
 {
@@ -37,7 +38,7 @@ namespace LogicalTaskTree
         /// Standard-Konstruktor.
         /// </summary>
         public UndefinedJobListClass() : base(new TreeParameters("UNDEFINED"),
-            new JobProviderBase.UndefinedJobProvider()) { }
+            new JobProviderBase.UndefinedJobProvider(), "UNDEFINED") { }
     }
 
     /// <summary>
@@ -56,6 +57,17 @@ namespace LogicalTaskTree
     public class JobList : NodeList
     {
         #region public members
+
+        /// <summary>
+        /// Das Format, in dem dieser Job gespeichert wurde (Json oder Xml).
+        /// </summary>
+        public JobDescriptionFormat? Format
+        {
+            get
+            {
+                return this.Job?.Format;
+            }
+        }
 
         /// <summary>
         /// Der logische Ausdruck, der durch diese JobList abgearbeitet wird.
@@ -283,7 +295,8 @@ namespace LogicalTaskTree
         /// <param name="mother">Der Eltern-Knoten.</param>
         /// <param name="rootJobList">Die Root-JobList</param>
         /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
-        public JobList(LogicalNode mother, JobList rootJobList, TreeParameters treeParams)
+        /// <param name="physicalJobPath">Der physikalische Pfad zur JobDescription oder zum Job-Verzeichnis oder null.</param>
+        public JobList(LogicalNode mother, JobList rootJobList, TreeParameters treeParams, string? physicalJobPath = null)
           : base(mother, rootJobList, treeParams)
         {
             if (this.RootJobList == null)
@@ -322,9 +335,10 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="treeParams">Für den gesamten Tree gültige Parameter oder null.</param>
         /// <param name="jobProvider">Die Datenquelle für den Job</param>
-        public JobList(TreeParameters treeParams, IJobProvider jobProvider)
+        /// <param name="physicalJobPath">Der physikalische Pfad zur JobDescription oder zum Job-Verzeichnis oder null.</param>
+        public JobList(TreeParameters treeParams, IJobProvider jobProvider, string? physicalJobPath = null)
           : this(String.Empty, null, null, treeParams, jobProvider, new List<string>(),
-                new Dictionary<string, JobList?>())
+                new Dictionary<string, JobList?>(), physicalJobPath)
         { }
 
         /// <summary>
@@ -1069,9 +1083,10 @@ namespace LogicalTaskTree
         /// <param name="jobProvider">Die Datenquelle für den Job</param>
         /// <param name="parsedJobs">Liste von Namen aller bisher geparsten Jobs.</param>
         /// <param name="subJobs">Liste von Namen aller bisher verarbeiteten JobLists.</param>
+        /// <param name="physicalJobPath">Der physikalische Pfad zur JobDescription oder zum Job-Verzeichnis oder null beim Root-Job.</param>
         private JobList(string logicalName, LogicalNode? mother, JobList? rootJoblist,
             TreeParameters treeParams, IJobProvider jobProvider,
-          List<string> parsedJobs, Dictionary<string, JobList?> subJobs)
+          List<string> parsedJobs, Dictionary<string, JobList?> subJobs, string? physicalJobPath = null)
           : base(logicalName, mother, rootJoblist, treeParams)
         {
             this._parsedJobs = parsedJobs;
@@ -1085,7 +1100,10 @@ namespace LogicalTaskTree
                 throw new ApplicationException(String.Format("Rekursion bei ID: {0}.", logicalName));
             }
             this._jobProvider = jobProvider;
-            this.Job = this._jobProvider.GetJob(ref logicalName);
+            //***************************************************************************************
+            this.Job = this._jobProvider.GetJob(ref logicalName, physicalJobPath);
+            //***************************************************************************************
+            //***************************************************************************************
             this._userControlPath = this.Job.JobListUserControlPath;
             this._snapshotUserControlPath = this.Job.SnapshotUserControlPath;
             this._jobConnectorUserControlPath = this.Job.JobConnectorUserControlPath;
@@ -1214,7 +1232,7 @@ namespace LogicalTaskTree
         {
             // this.syntaxTree = new LogicalParser().Parse(this.LogicalExpression);
             this._syntaxTree = new TresholdParser().Parse(this.LogicalExpression);
-            this.buildParallelTree(this, this._syntaxTree);
+            this.BuildParallelTree(this, this._syntaxTree);
             foreach (string nodeName in this.TreeExternalCheckers.Keys)
             {
                 NodeCheckerBase checker = this.TreeExternalCheckers[nodeName];
@@ -1479,7 +1497,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="mother">Der übergeordnete Knoten des Teil-Baums</param>
         /// <param name="template">Der boolesche (Teil-)Baum (Bauplan)</param>
-        private void buildParallelTree(NodeList mother, SyntaxTree template)
+        private void BuildParallelTree(NodeList mother, SyntaxTree template)
         {
             if (template.Children != null)
             {
@@ -1626,7 +1644,7 @@ namespace LogicalTaskTree
                                 {
                                     // Es handelt sich um einen Snapshot eines externen LogicalTree.
                                     newChild = new Snapshot(child.NodeName, this, this, this.TreeParams,
-                                        this._jobProvider, this._parsedJobs);
+                                        this._jobProvider, "TODO-physicalJobPath", this._parsedJobs);
                                     newChild.NodeType = NodeTypes.Snapshot;
                                     mother.AddChild(newChild);
                                 }
@@ -1704,7 +1722,7 @@ namespace LogicalTaskTree
                             newListChild.BreakWithResult = this.BreakWithResult;
                             newListChild.IsVolatile = this.IsVolatile;
                             mother.AddChild(newListChild);
-                            this.buildParallelTree(newListChild, child); // Rekursion
+                            this.BuildParallelTree(newListChild, child); // Rekursion
                             break;
                         default:
                             break;

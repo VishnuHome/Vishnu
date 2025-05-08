@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
@@ -11,6 +12,7 @@ using NetEti.ApplicationControl;
 using NetEti.CustomControls;
 using NetEti.FileTools;
 using NetEti.FileTools.Zip;
+using NetEti.ObjectSerializer;
 using Vishnu.Interchange;
 
 namespace LogicalTaskTree.Provider
@@ -26,504 +28,487 @@ namespace LogicalTaskTree.Provider
     ///   01.02.2024 Erik Nagel: AppSettings.JobDirPathes um "Documentation" und "Tests" erweitert.
     ///   22.02.2024 Erik Nagel: GetJobElementResolvedPath, isPathServerReachable und canPing
     ///              hier rausgeschmissen und in überarbeiteter Form in NetworkMappingsRefresher realisiert.
+    ///   20.04.2025 Erik Nagel: Komplett überarbeitet; Verarbeitung von Json-JobDescriptions hinzugefügt.
     /// </remarks>
     public class ProductionJobProvider : JobProviderBase
     {
         #region protected members
+
         /// <summary>
         ///   Fügt dem Dictionary LoadedJobPackages das JobPackage
         ///   mit dem logischen Pfad logicalJobName hinzu.
         ///   Im Fehlerfall wird einfach nichts hinzugefügt.
         /// </summary>
+        /// <param name="physicalJobPath">Der physikalische Pfad zur JobDescription oder zum Job-Verzeichnis.</param>
         /// <param name="logicalJobName">Der logische Name des Jobs oder null beim Root-Job.</param>
-        protected override void TryLoadJobPackage(ref string logicalJobName)
+        /// <returns>Neu gesetzter, angepasster oder übergebener logicalJobName.</returns>
+        protected override string TryLoadJobPackage(string physicalJobPath, string? logicalJobName = null)
         {
-            if (String.IsNullOrEmpty(logicalJobName))
-            {
-                //this._appSettings.JobDirPathes = new Stack<string>();
-                //this._appSettings.JobDirPathes.Push(Path.Combine(this._appSettings.VishnuSourceRoot, "VishnuHome/Tests"));
-                //this._appSettings.JobDirPathes.Push(Path.Combine(this._appSettings.VishnuSourceRoot, "VishnuHome/Documentation"));
-                //this._appSettings.JobDirPathes.Push(this._appSettings.ApplicationRootPath);
-                //this._appSettings.JobDirPathes.Push("");
-                string rootJobPackageTmp = this._appSettings.RootJobPackagePath ?? this._appSettings.ApplicationRootPath;
-                if (this._appSettings.RootJobXmlName.ToLower() != "jobdescription.xml")
-                {
-                    rootJobPackageTmp = Path.Combine(rootJobPackageTmp, Path.GetFileName(this._appSettings.RootJobXmlName));
-                }
-                string jobXml = ReplaceWildcardsAndPathes(rootJobPackageTmp, this._appSettings.JobDirPathes.ToArray());
-                if (!jobXml.ToLower().EndsWith(".xml"))
-                {
-                    jobXml = Path.Combine(jobXml, "JobDescription.xml");
-                }
+                //string rootJobPath = this._appSettings.LocateAndPrepareJob();
+
                 try
                 {
                     int depth = 0;
-                    logicalJobName = loadJob(null, jobXml, logicalJobName,
+                    logicalJobName = LoadJob(null, physicalJobPath, logicalJobName,
                       null, false, null, null, true, false, out depth);
                 }
                 catch (Exception ex)
                 {
-                    throw new ApplicationException(String.Format($"Ladefehler auf {jobXml} ({Directory.GetCurrentDirectory()}" +
+                    throw new ApplicationException(String.Format($"Ladefehler auf {physicalJobPath} ({Directory.GetCurrentDirectory()}" +
                     $" {(System.Reflection.Assembly.GetExecutingAssembly().Location)})\r\n{ex.Message}"));
                 }
-            }
+            return logicalJobName;
         }
 
         #endregion protected members
 
         #region private members
 
-        private string? _resolvedJobDir;
+        #region Job
 
-        private void createAndRememberZipRelativeDummyDirectory(string zipPath)
+        //===================================================================================================
+        // Lädt einen Job oder SubJob; SubJobs können intern oder extern (eigenes JobDescription-File)
+        // angelegt sein. SubJobs werdenrekursiv wie Jobs geladen. Unterstützte Formate sind XML und JSON.
+        //===================================================================================================
+        private string LoadJob(Job? mother, string physicalJobPath, string? logicalJobName,
+            JobContainer? subJobContainer, bool startCollapsed, TriggerShell? snapshotTrigger,
+            string? snapshotTriggerName, bool isRootJob, bool isSnapshot, out int subJobDepth)
         {
-            string fallbackDirectory = Directory.GetCurrentDirectory();
-            string randomDirectoryName = Path.Combine(Path.GetDirectoryName(zipPath) ?? fallbackDirectory,
-                Path.GetRandomFileName() + ".v");
-            Directory.CreateDirectory(randomDirectoryName);
-            this._appSettings.ZipRelativeDummyDirectory = randomDirectoryName;
-            if (!_appSettings.JobDirPathes.Contains(randomDirectoryName))
-            {
-                _appSettings.JobDirPathes.Push(randomDirectoryName);
-            }
-        }
+            //===============================================================================================
+            ShowJobLoadingInfo(physicalJobPath, logicalJobName);
+            //===============================================================================================
 
-        // Wenn der Job ein ZIP-Archiv ist, wird der Job ins WorkingDirectory
-        // entpackt und ein angepasster Pfad zum Job zurückgeliefert.
-        private string unpackIfPacked(string jobPath, bool isRootJob)
-        {
-            Stack<string> searchedPathes = new Stack<string>();
-            string jobDir = Path.GetDirectoryName(jobPath) ?? "";
-            string jobFile = Path.GetFileName(jobPath);
-            searchedPathes.Push(jobPath);
-            ZipAccess zipAccess = new ZipAccess();
-            try
-            {
-                if (File.Exists(jobPath))
+            bool isDefaultSnapshot = false;
+            string? loadedLogicalJobName = logicalJobName; // Vorbelegung
+            bool popDirs = false;
+            JobContainer? jobContainer = null;
+            if (!String.IsNullOrEmpty(physicalJobPath)) // Bei MainJob oder extern definiertem
+            {                                           // SubJob XML oder JSON laden.
+                //===========================================================================================
+                loadedLogicalJobName = FindAndLoadJobDescription(physicalJobPath, isRootJob,
+                    isSnapshot, ref jobContainer, ref isDefaultSnapshot);
+                //===========================================================================================
+                if (string.IsNullOrEmpty(logicalJobName))
                 {
-                    if (zipAccess.IsZip(jobPath))
-                    {
-                        if (isRootJob) this.createAndRememberZipRelativeDummyDirectory(jobPath);
-                        jobDir = unpack(jobPath, zipAccess);
-                        jobFile = "JobDescription.xml";
-                    }
+                    logicalJobName = loadedLogicalJobName;
+                    ConfigurationManager.LoadLocalConfiguration(logicalJobName);
                 }
-                else
+                if (!isSnapshot)
                 {
-                    if (zipAccess.IsZip(jobDir))
-                    {
-                        if (isRootJob) this.createAndRememberZipRelativeDummyDirectory(jobDir);
-                        jobDir = unpack(jobDir, zipAccess);
-                    }
-                    else
-                    {
-                        if (Directory.Exists(jobDir))
-                        {
-                            if (Directory.Exists(jobPath))
-                            {
-                                jobDir = jobPath;
-                                jobFile = "JobDescription.xml";
-                            }
-                        }
-                        else
-                        {
-                            searchedPathes.Push(jobPath + ".zip");
-                            if (zipAccess.IsZip(jobPath + ".zip"))
-                            {
-                                if (isRootJob) this.createAndRememberZipRelativeDummyDirectory(jobPath);
-                                jobDir = unpack(jobPath + ".zip", zipAccess);
-                            }
-                            else
-                            {
-                                searchedPathes.Push(jobDir + ".zip");
-                                if (zipAccess.IsZip(jobDir + ".zip"))
-                                {
-                                    if (isRootJob) this.createAndRememberZipRelativeDummyDirectory(jobDir);
-                                    jobDir = unpack(jobDir + ".zip", zipAccess);
-                                }
-                                else
-                                {
-                                    string searchedPathesString = "";
-                                    while (searchedPathes.Count > 0)
-                                    {
-                                        searchedPathesString += Environment.NewLine + searchedPathes.Pop();
-                                    }
-                                    throw new FileNotFoundException(String.Format("Der Job wurde nicht gefunden:{0}.", searchedPathesString));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                zipAccess.Dispose();
-            }
-            return Path.Combine(jobDir, jobFile);
-        }
-
-        // Entpackt einen Job aus einem ZIP-Archiv.
-        private string unpack(string archive, ZipAccess zipAccess)
-        {
-            string rtn = Directory.GetCurrentDirectory();
-            zipAccess.UnZipArchive(archive, _appSettings.WorkingDirectory, null, false);
-            string archivePath = Path.Combine(Path.GetDirectoryName(archive) ?? "", Path.GetFileNameWithoutExtension(archive));
-            if (!_appSettings.AssemblyDirectories.Contains(archivePath))
-            {
-                _appSettings.AssemblyDirectories.Add(archivePath);
-            }
-            if (!_appSettings.JobDirPathes.Contains(archivePath))
-            {
-                _appSettings.JobDirPathes.Push(archivePath);
-            }
-            rtn = Path.Combine(_appSettings.WorkingDirectory, Path.GetFileNameWithoutExtension(archive));
-            return rtn;
-        }
-
-        // Lädt einen externen Job/SubJob aus einem XML oder einem gepackten XML (ZIP).
-        private string loadJobXMLFile(string jobXML, bool isRootJob, bool isSnapshot,
-                                      ref XDocument? xmlDoc, ref bool isDefaultSnapshot)
-        {
-            if (!isSnapshot)
-            {
-                string tmpPath = Path.GetFullPath(ReplaceWildcardsAndPathes(jobXML, _appSettings.JobDirPathes.ToArray()));
-                if (!String.IsNullOrEmpty(this._appSettings.ZipRelativeDummyDirectory)
-                  && !Directory.Exists(tmpPath) && !File.Exists(tmpPath))
-                {
-                    tmpPath = Path.GetFullPath(ReplaceWildcardsAndPathes(jobXML + ".zip", _appSettings.JobDirPathes.ToArray()));
-                }
-                if (!Directory.Exists(tmpPath) && !File.Exists(tmpPath))
-                {
-                    tmpPath = Path.GetFullPath(ReplaceWildcardsAndPathes(jobXML + ".xml", _appSettings.JobDirPathes.ToArray()));
-                }
-                jobXML = unpackIfPacked(tmpPath, isRootJob);
-                _resolvedJobDir = Path.GetDirectoryName(ReplaceWildcardsAndPathes(jobXML, _appSettings.JobDirPathes.ToArray())) ?? "";
-                if (isRootJob)
-                {
-                    this._appSettings.AppEnvAccessor.RegisterKeyValue("JobDirectory", Path.GetFullPath(_resolvedJobDir));
-                }
-                _appSettings.JobDirPathes.Push(_resolvedJobDir);
-                if (!_appSettings.AssemblyDirectories.Contains(Path.Combine(_resolvedJobDir, "Plugin")))
-                {
-                    _appSettings.AssemblyDirectories.Insert(0, Path.Combine(_resolvedJobDir, "Plugin"));
-                }
-                if (!_appSettings.AssemblyDirectories.Contains(_resolvedJobDir))
-                {
-                    _appSettings.AssemblyDirectories.Insert(1, _resolvedJobDir);
+                    popDirs = true;
                 }
             }
             else
             {
-                string tmpPath = Path.GetFullPath(ReplaceWildcardsAndPathes(jobXML, new string[] { }));
+                // inline definierter SubJob
+                jobContainer = subJobContainer;
+            }
+            if (String.IsNullOrEmpty(logicalJobName))
+            {
+                throw new ArgumentException("'LogicalJobName' ist nicht gesetzt(Job).");
+            }
+            if (jobContainer == null)
+            {
+                throw new ApplicationException("jobContainer is null.");
+            }
+
+            JobPackage jobPackage = new JobPackage(physicalJobPath, logicalJobName);
+            jobPackage.Job.IsDefaultSnapshot = isDefaultSnapshot;
+            string logicalExpression = jobContainer.LogicalExpression ?? "";
+            jobPackage.Job.LogicalExpression = logicalExpression;
+
+            //===============================================================================================
+            LoadUserControlPathes(mother, jobContainer, jobPackage);
+            //===============================================================================================
+            LoadJobProperties(physicalJobPath, logicalJobName, jobContainer, jobPackage);
+            //===============================================================================================
+            LoadJobJriggers(logicalJobName, snapshotTrigger, isRootJob, loadedLogicalJobName,
+                jobContainer, jobPackage);
+            //===============================================================================================
+            LoadJobLogger(logicalJobName, loadedLogicalJobName, jobContainer, jobPackage);
+            //===============================================================================================
+            LoadCheckers(physicalJobPath, logicalJobName, loadedLogicalJobName, jobContainer,
+                jobPackage);
+            //===============================================================================================
+            LoadValueModifiers(physicalJobPath, logicalJobName, jobContainer, jobPackage);
+            //===============================================================================================
+            LoadTriggers(logicalJobName, loadedLogicalJobName, jobContainer, jobPackage);
+            //===============================================================================================
+            LoadLoggers(logicalJobName, loadedLogicalJobName, jobContainer, jobPackage);
+            //===============================================================================================
+            LoadWorkers(logicalJobName, loadedLogicalJobName, jobContainer, jobPackage);
+            //===============================================================================================
+            subJobDepth = LoadSubJobs(jobContainer, jobPackage);
+            //===============================================================================================
+            LoadSnapshots(physicalJobPath, logicalJobName, loadedLogicalJobName,
+                jobContainer, jobPackage);
+            //===============================================================================================
+
+            try
+            {
+                LoadedJobPackages.Add(jobPackage.JobName, jobPackage);
+            }
+            catch
+            {
+                throw new ApplicationException(
+                    String.Format("Job {0}: Ein Job kann nur einmal hinzugefügt werden."
+                    + "\nHinweis: eine mehrfache Referenzierung in einem logischen Ausdruck ist jedoch möglich.",
+                    jobPackage.JobName));
+            }
+            if (popDirs)
+            {
+                _appSettings.JobDirPathes.Pop();
+            }
+            return logicalJobName;
+        }
+
+        #region ShowJobLoadingInfo
+
+        //===================================================================================================
+        // published den greade zu ladenden Job für den SplashScreen.
+        //===================================================================================================
+        private static void ShowJobLoadingInfo(string physicalJobPath, string? logicalJobName)
+        {
+            string? splashMessageJobName = logicalJobName;
+            if (String.IsNullOrEmpty(splashMessageJobName))
+            {
+                if (Directory.Exists(physicalJobPath))
+                {
+                    splashMessageJobName = Path.GetFileNameWithoutExtension(physicalJobPath);
+                }
+                else
+                {
+                    if (Path.GetExtension(physicalJobPath).ToLower() == ".zip")
+                    {
+                        splashMessageJobName = Path.GetFileNameWithoutExtension(physicalJobPath);
+                    }
+                    else
+                    {
+                        splashMessageJobName = Path.GetFileNameWithoutExtension(Path.GetDirectoryName(physicalJobPath));
+                    }
+                }
+            }
+            InfoController.GetInfoPublisher().Publish(new SplashScreenMessage("lade " + splashMessageJobName ?? "---"));
+        }
+
+        #endregion ShowJobLoadingInfo
+
+        #region FindAndLoadJobDescription
+
+        //===================================================================================================
+        // Sucht und lädt einen externen Job/SubJob aus einem XML oder Json oder einem gepackten
+        // XML oder Json (ZIP) und vermerkt dabei die relevanten Pfadinformationen in globalen Properties.
+        //===================================================================================================
+        private string FindAndLoadJobDescription(string physicalJobPath, bool isRootJob, bool isSnapshot,
+                                      ref JobContainer? jobContainer, ref bool isDefaultSnapshot)
+        {
+            // string resolvedJobDir;
+            if (!isSnapshot)
+            {
+                string resolvedJobDir;
+                physicalJobPath = this._appSettings.PrepareAndLocatePath(physicalJobPath);
+                resolvedJobDir = Path.GetDirectoryName(physicalJobPath) ?? "";
+                if (isRootJob)
+                {
+                    this._appSettings.AppEnvAccessor.RegisterKeyValue(
+                        "JobDirectory", Path.GetFullPath(resolvedJobDir));
+                }
+                _appSettings.JobDirPathes.Push(resolvedJobDir);
+                if (!_appSettings.AssemblyDirectories.Contains(Path.Combine(resolvedJobDir, "Plugin")))
+                {
+                    _appSettings.AssemblyDirectories.Insert(0, Path.Combine(resolvedJobDir, "Plugin"));
+                }
+                if (!_appSettings.AssemblyDirectories.Contains(resolvedJobDir))
+                {
+                    _appSettings.AssemblyDirectories.Insert(1, resolvedJobDir);
+                }
+            }
+            else
+            {
+                string tmpPath = this._appSettings.PrepareAndLocatePath(
+                    physicalJobPath, new string[] { }, false);
                 string tmpDir = Path.GetDirectoryName(tmpPath) ?? "";
                 if (!File.Exists(tmpPath) && !Directory.Exists(tmpDir))
                 {
                     if (Directory.Exists(Path.GetDirectoryName(tmpDir)))
                     {
                         Directory.CreateDirectory(tmpDir);
+                        // resolvedJobDir = tmpDir;
                     }
                     else
                     {
-                        throw new FileNotFoundException(String.Format("Weder der SnapShot, noch sein Verzeichnis wurden gefunden: {0}.", jobXML));
+                        throw new FileNotFoundException(String.Format(
+                            "Weder der SnapShot, noch sein Verzeichnis wurden gefunden: {0}.",
+                            physicalJobPath));
                     }
                 }
                 else
                 {
                     if (File.Exists(tmpPath))
                     {
-                        jobXML = File.ReadAllText(tmpPath);
+                        // Im .info File steht der Pfad zum Job
+                        physicalJobPath = File.ReadAllText(tmpPath);
                     }
-                    else
-                    {
-                        jobXML = Path.Combine(tmpDir, Path.GetFileName(tmpPath));
-                    }
-                    _resolvedJobDir = Path.GetDirectoryName(jobXML) ?? "";
+                    // resolvedJobDir = tmpDir;
                 }
             }
-            xmlDoc = getVishnuJobXML(jobXML);
-            if (xmlDoc == null)
+            this._appSettings.SaveJobPathes();
+            //===================================================================================================
+            jobContainer = this.LoadJobDescriptionFile(physicalJobPath, isSnapshot);
+            //===================================================================================================
+            if (jobContainer == null)
             {
                 if (!isSnapshot)
                 {
-                    throw new FileLoadException(jobXML);
+                    throw new FileLoadException(physicalJobPath);
                 }
                 else
                 {
                     isDefaultSnapshot = true;
-                    xmlDoc = XDocument.Load(@"LoadExceptionJob.xml");
+                    jobContainer =
+                        this.LoadJobDescriptionFile(this._appSettings.PrepareAndLocatePath(
+                            @"LoadExceptionJob.xml"), isSnapshot);
                 }
             }
-            string logicalName = (xmlDoc.Descendants("JobDescription").Elements("LogicalName").First().Value).ToString();
+            string logicalName = jobContainer?.LogicalName ?? "_unknown_";
             return logicalName;
         }
 
-        private XDocument? getVishnuJobXML(string jobXmlPath)
+        //===================================================================================================
+        // Lädt einen externen Job/SubJob aus einem XML oder Json und vermerkt dabei die
+        // relevanten Pfadinformationen in globalen Properties.
+        //===================================================================================================
+        private JobContainer? LoadJobDescriptionFile(
+            string physicalJobPath, bool isSnapshot = false)
         {
-            XDocument? xmlDoc = null;
-            if (File.Exists(jobXmlPath))
+            JobContainer? jobContainer = null;
+            string? jobDirectory = null;
+            if (File.Exists(physicalJobPath))
             {
-                xmlDoc = XDocument.Load(jobXmlPath);
+                jobDirectory = Path.GetDirectoryName(physicalJobPath) ?? "";
             }
             else
             {
-                string jobDir = Path.GetDirectoryName(jobXmlPath) ?? "";
-                if (Directory.Exists(jobDir))
+                if (Directory.Exists(physicalJobPath))
                 {
-                    foreach (string dll in Directory.GetFiles(jobDir, "*.dll"))
+                    jobDirectory = physicalJobPath;
+                }
+            }
+            if (Directory.Exists(jobDirectory))
+            {
+                IVishnuJobProvider? userJobProvider = null;
+                // Suche nach einem User-JobProvider, bekannte dlls ausschließen.
+                foreach (string dll in Directory.GetFiles(jobDirectory, "*.dll"))
+                {
+                    if (!(new List<string>() { "7z64.dll", "7z32.dll" }).Contains(Path.GetFileName(dll)))
                     {
-                        if (!(new List<string>() { "7z64.dll", "7z32.dll" }).Contains(Path.GetFileName(dll)))
+                        userJobProvider = (IVishnuJobProvider?)
+                            VishnuAssemblyLoader.GetAssemblyLoader().DynamicLoadObjectOfTypeFromAssembly(
+                                dll, typeof(IVishnuJobProvider));
+                        if (userJobProvider != null)
                         {
-                            IVishnuJobProvider? provider
-                                = (IVishnuJobProvider?)VishnuAssemblyLoader.GetAssemblyLoader().DynamicLoadObjectOfTypeFromAssembly(
-                                    dll, typeof(IVishnuJobProvider));
-                            if (provider != null)
-                            {
-                                xmlDoc = provider.GetVishnuJobXml(jobDir);
-                                break;
-                            }
+                            return userJobProvider.GetVishnuJobDescription(physicalJobPath);
                         }
                     }
                 }
             }
-            return xmlDoc;
-        }
-
-        // Lädt einen Job oder SubJob; SubJobs können intern oder extern (eigenes XML-File) angelegt sein.
-        private string loadJob(Job? mother, string jobXML, string? logicalJobName, XElement? xSubJob, bool startCollapsed,
-                               TriggerShell? snapshotTrigger, string? snapshotTriggerName, bool isRootJob, bool isSnapshot, out int subJobDepth)
-        {
-            string? splashMessageJobName = logicalJobName;
-            if (String.IsNullOrEmpty(splashMessageJobName))
+            if (File.Exists(physicalJobPath))
             {
-                if (Path.GetFileName(jobXML).ToLower() == "jobdescription.xml"
-                    || Path.GetFileName(jobXML).ToLower() == "jobsnapshot.xml")
+                if (physicalJobPath.ToLower().EndsWith(".xml"))
                 {
-                    splashMessageJobName = Path.GetFileNameWithoutExtension(Path.GetDirectoryName(jobXML));
+                    if (!isSnapshot)
+                    {
+                        jobContainer =
+                            SerializationUtility.LoadFromXmlFile<JobContainer>(physicalJobPath);
+                    }
+                    else
+                    {
+                        SnapshotJobContainer? snapshotJobContainer
+                            = SerializationUtility.LoadFromXmlFile<SnapshotJobContainer>(physicalJobPath);
+                        jobContainer = snapshotJobContainer?.JobDescription;
+                        if (jobContainer != null)
+                        {
+                            jobContainer.Path = snapshotJobContainer?.Path;
+                            jobContainer.TimeStamp = snapshotJobContainer?.TimeStamp;
+                        }
+                    }
+                    if (jobContainer != null)
+                    {
+                        jobContainer.Format = JobDescriptionFormat.Xml;
+                    }
                 }
                 else
                 {
-                    splashMessageJobName = Path.GetFileNameWithoutExtension(jobXML); // bei gezippten Jobs
-                }
-            }
-            InfoController.GetInfoPublisher().Publish(new SplashScreenMessage("lade " + splashMessageJobName ?? "---"));
-            //====================== Job =============================================================================================
-            bool isDefaultSnapshot = false;
-            string? xmlLogicalJobName = logicalJobName; // Vorbelegung
-            XElement? tmpSubJobRoot = null;
-            if (xSubJob != null)
-            {
-                tmpSubJobRoot = xSubJob;
-            }
-            bool popDirs = false;
-            if (!String.IsNullOrEmpty(jobXML)) // bei MainJob oder extern definiertem SubJob XML laden
-            {
-                XDocument? xmlDoc = new XDocument();
-                xmlLogicalJobName = loadJobXMLFile(jobXML, isRootJob, isSnapshot, ref xmlDoc, ref isDefaultSnapshot);
-                if (string.IsNullOrEmpty(logicalJobName))
-                {
-                    logicalJobName = xmlLogicalJobName;
-                    ConfigurationManager.LoadLocalConfiguration(logicalJobName); // 14.02.2019 Nagel+-
-                }
-                tmpSubJobRoot = xmlDoc?.Descendants("JobDescription").First();
-                if (!isSnapshot)
-                {
-                    popDirs = true;
-                }
-            }
-            XElement subJobRoot = tmpSubJobRoot ?? throw new XmlException("Es konnte kein Job/Subjob gelesen werden.");
-            if (String.IsNullOrEmpty(logicalJobName))
-            {
-                throw new ArgumentException("'LogicalJobName' ist nicht gesetzt(Job).");
-            }
-
-            JobPackage jobPackage = new JobPackage(jobXML, logicalJobName);
-            jobPackage.Job.IsDefaultSnapshot = isDefaultSnapshot;
-            string logicalExpression = subJobRoot.Elements("LogicalExpression").First().Value;
-            jobPackage.Job.LogicalExpression = logicalExpression;
-
-            string? tmpString;
-            string? paraString;
-            XElement? tmpXElement;
-
-            //Die UserControl-Pfade sind alle mit Default ungleich null vor-initialisiert (JobPackage.Job-Konstruktor),
-            //deshalb kann hier keine verinfachende null-propagation kodiert werden,
-            //da sonst die Vorbelegungen ggf. mit null überschrieben würden.
-            //Die Variante: "jobPackage.Job.JobListUserControlPath = tmpVar ??= jobPackage.Job.JobListUserControlPath;"
-            //würde zwar funktionieren, hätte aber im Fall "tmpVar == null" eine unnötige Zuweisung
-            //"jobPackage.Job.JobListUserControlPath = jobPackage.Job.JobListUserControlPath;" zur Folge.
-
-            //XElement tmpVar = (subJobRoot.Elements("JobListUserControlPath").FirstOrDefault());
-            //jobPackage.Job.JobListUserControlPath = tmpVar == null ? mother?.JobListUserControlPath : Convert.ToString(tmpVar.Value);
-            //jobPackage.Job.JobListUserControlPath = tmpVar ??= jobPackage.Job.JobListUserControlPath;
-            tmpString = subJobRoot.Elements("JobListUserControlPath").FirstOrDefault()?.Value ?? mother?.JobListUserControlPath;
-            if (tmpString != null)
-            {
-                jobPackage.Job.JobListUserControlPath = tmpString;
-            }
-            //tmpVar = (subJobRoot.Elements("UserControlPath").FirstOrDefault());
-            //jobPackage.Job.JobListUserControlPath = tmpVar == null ? null : Convert.ToString(tmpVar.Value);
-            //jobPackage.Job.JobListUserControlPath = tmpVar ??= jobPackage.Job.JobListUserControlPath;
-            tmpString = subJobRoot.Elements("UserControlPath").FirstOrDefault()?.Value;
-            if (tmpString != null)
-            {
-                jobPackage.Job.JobListUserControlPath = tmpString;
-            }
-            //tmpVar = (subJobRoot.Elements("JobConnectorUserControlPath").FirstOrDefault());
-            //jobPackage.Job.JobConnectorUserControlPath = tmpVar == null ? mother?.JobConnectorUserControlPath : Convert.ToString(tmpVar.Value);
-            tmpString = subJobRoot.Elements("JobConnectorUserControlPath").FirstOrDefault()?.Value ?? mother?.JobConnectorUserControlPath;
-            if (tmpString != null)
-            {
-                jobPackage.Job.JobConnectorUserControlPath = tmpString;
-            }
-            //tmpVar = (subJobRoot.Elements("NodeListUserControlPath").FirstOrDefault());
-            //jobPackage.Job.NodeListUserControlPath = tmpVar == null ? mother?.NodeListUserControlPath : Convert.ToString(tmpVar.Value);
-            tmpString = subJobRoot.Elements("NodeListUserControlPath").FirstOrDefault()?.Value ?? mother?.NodeListUserControlPath;
-            if (tmpString != null)
-            {
-                jobPackage.Job.NodeListUserControlPath = tmpString;
-            }
-            //tmpVar = (subJobRoot.Elements("SingleNodeUserControlPath").FirstOrDefault());
-            //jobPackage.Job.SingleNodeUserControlPath = tmpVar == null ? mother?.SingleNodeUserControlPath : Convert.ToString(tmpVar.Value);
-            tmpString = subJobRoot.Elements("SingleNodeUserControlPath").FirstOrDefault()?.Value ?? mother?.SingleNodeUserControlPath;
-            if (tmpString != null)
-            {
-                jobPackage.Job.SingleNodeUserControlPath = tmpString;
-            }
-            //tmpVar = (subJobRoot.Elements("ConstantNodeUserControlPath").FirstOrDefault());
-            //jobPackage.Job.ConstantNodeUserControlPath = tmpVar == null ? mother?.ConstantNodeUserControlPath : Convert.ToString(tmpVar.Value);
-            tmpString = subJobRoot.Elements("ConstantNodeUserControlPath").FirstOrDefault()?.Value ?? mother?.ConstantNodeUserControlPath;
-            if (tmpString != null)
-            {
-                jobPackage.Job.ConstantNodeUserControlPath = tmpString;
-            }
-            //tmpVar = (subJobRoot.Elements("SnapshotUserControlPath").FirstOrDefault());
-            //jobPackage.Job.SnapshotUserControlPath = tmpVar == null ? mother?.SnapshotUserControlPath : Convert.ToString(tmpVar.Value);
-            tmpString = subJobRoot.Elements("SnapshotUserControlPath").FirstOrDefault()?.Value ?? mother?.SnapshotUserControlPath;
-            if (tmpString != null)
-            {
-                jobPackage.Job.SnapshotUserControlPath = tmpString;
-            }
-            try
-            {
-                //tmpVar = (subJobRoot.Elements("BreakWithResult").FirstOrDefault());
-                //jobPackage.Job.BreakWithResult = tmpVar == null ? false : Convert.ToBoolean(tmpVar.Value);
-                //
-                //jobPackage.Job.BreakWithResult = false;
-                //tmpString = subJobRoot.Elements("BreakWithResult").FirstOrDefault()?.Value;
-                //if (tmpString != null)
-                //{
-                //    jobPackage.Job.BreakWithResult = Convert.ToBoolean(tmpString);
-                //}
-                jobPackage.Job.BreakWithResult
-                    = (subJobRoot.Elements("BreakWithResult").FirstOrDefault()?.Value) != null
-                        && Convert.ToBoolean(subJobRoot.Elements("BreakWithResult").FirstOrDefault()?.Value);
-
-                jobPackage.Job.ThreadLocked = false;
-                tmpXElement = subJobRoot.Elements("ThreadLocked").FirstOrDefault();
-                if (tmpXElement != null)
-                {
-                    jobPackage.Job.ThreadLocked = Convert.ToBoolean(tmpXElement.Value);
-                    XAttribute? tmpXAttribute = tmpXElement.Attributes("LockName").FirstOrDefault();
-                    // DONE: austesten, ob bei der auskommentierten Variante unten auch eine Zuweisung erfolgt,
-                    //       wenn tmpXAttribute?.Value == null ist.
-                    //       24.03.2023 Erik Nagel: es wird null zugewiesen!
-                    jobPackage.Job.LockName = tmpXAttribute?.Value;
-                }
-
-                jobPackage.Job.StartCollapsed
-                    = (subJobRoot.Elements("StartCollapsed").FirstOrDefault()?.Value) != null
-                        && Convert.ToBoolean(subJobRoot.Elements("StartCollapsed").FirstOrDefault()?.Value);
-                if (startCollapsed) // Parameter
-                {
-                    jobPackage.Job.StartCollapsed = true;
-                }
-
-                //tmpvar = subJobRoot.Elements("InitNodes").FirstOrDefault();
-                //jobPackage.Job.InitNodes = tmpVar == null ? false : Convert.ToBoolean(tmpVar.Value);
-                jobPackage.Job.InitNodes
-                    = (subJobRoot.Elements("InitNodes").FirstOrDefault()?.Value) != null
-                        && Convert.ToBoolean(subJobRoot.Elements("InitNodes").FirstOrDefault()?.Value);
-
-                tmpString = subJobRoot.Elements("TriggeredRunDelay").FirstOrDefault()?.Value;
-                jobPackage.Job.TriggeredRunDelay = tmpString == null ? 0 : Convert.ToInt32(tmpString);
-
-                //tmpString = subJobRoot.Elements("IsVolatile").FirstOrDefault()?.Value;
-                //jobPackage.Job.IsVolatile = tmpString == null ? false : Convert.ToBoolean(tmpString);
-                jobPackage.Job.IsVolatile
-                    = (subJobRoot.Elements("IsVolatile").FirstOrDefault()?.Value) != null
-                        && Convert.ToBoolean(subJobRoot.Elements("IsVolatile").FirstOrDefault()?.Value);
-            }
-            catch (Exception ex)
-            {
-                throw new ArgumentException(String.Format("Fehler in {0}({1})\n{2}", logicalJobName, jobXML, ex.Message), ex);
-            }
-
-            //====================== JobSnapshotTrigger ==============================================================================
-            // Trigger, der steuert, wann ein Snapshot des aktuellen Jobs erzeugt werden soll (geht nur bei isRootJob == true).
-            if (isRootJob)
-            {
-                string snapshotDirectory = _appSettings.ReplaceWildcards(_appSettings.SnapshotDirectory);
-                if (!Directory.Exists(_appSettings.SnapshotDirectory))
-                {
-                    Directory.CreateDirectory(_appSettings.SnapshotDirectory);
-                }
-                tmpXElement = (subJobRoot.Elements("JobSnapshotTrigger").FirstOrDefault());
-                if (tmpXElement != null)
-                {
-                    //string? paraString = null;
-                    //XElement? para = tmpXElement.Element("Parameters");
-                    //if (para != null)
-                    //{
-                    //    paraString = replaceWildcardsNPathes(para.Value, _appSettings.AssemblyDirectories.ToArray());
-                    //}
-
-                    tmpString = tmpXElement.Element("Parameters")?.Value;
-                    paraString = tmpString
-                        == null ? null : ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
-                    tmpString = tmpXElement.Element("Reference")?.Value;
-                    if (tmpString != null)
+                    if (physicalJobPath.ToLower().EndsWith(".json"))
                     {
-                        if (paraString == xmlLogicalJobName)
+                        string jsonString = File.ReadAllText(physicalJobPath);
+                        // Parse das JSON-Dokument
+                        using JsonDocument document = JsonDocument.Parse(jsonString);
+                        if (!isSnapshot)
                         {
-                            paraString = logicalJobName; // Referenz ggf. umbiegen
-                        }
-                        if (paraString != null)
-                        {
-                            jobPackage.Job.JobSnapshotTrigger
-                                = new TriggerShell(tmpString, paraString, false);
+                            // Greife auf das "JobDescription"-Element zu
+                            JsonElement rootElement = document.RootElement.GetProperty("JobDescription");
+
+                            // Deserialisiere das "JobDescription"-Element in die JobContainer-Klasse
+                            jobContainer =
+                                JsonSerializer.Deserialize<JobContainer>(rootElement.GetRawText());
                         }
                         else
                         {
-                            throw new ArgumentException(
-                                "Wenn 'Reference' gesetzt ist, muss auch 'Parameters' gesetzt werden (JobSnapshotTrigger).");
+                            // Greife auf das "Snapshot"-Element zu
+                            JsonElement rootElement = document.RootElement.GetProperty("Snapshot");
+
+                            // Deserialisiere das "Snapshot"-Element in die SnapshotJobContainer-Klasse
+                            SnapshotJobContainer? snapshotJobContainer =
+                                JsonSerializer.Deserialize<SnapshotJobContainer>(rootElement.GetRawText());
+
+                            jobContainer = snapshotJobContainer?.JobDescription;
+                            if (jobContainer != null)
+                            {
+                                jobContainer.Path = snapshotJobContainer?.Path;
+                                jobContainer.TimeStamp = snapshotJobContainer?.TimeStamp;
+                            }
+                        }
+                        if (jobContainer != null)
+                        {
+                            jobContainer.Format = JobDescriptionFormat.Json;
                         }
                     }
                     else
                     {
-                        tmpString = tmpXElement.Element("PhysicalPath")?.Value;
-                        if (tmpString != null)
-                        {
-                            jobPackage.Job.JobSnapshotTrigger
-                                = new TriggerShell(ReplaceWildcardsAndPathes(tmpString,
-                              _appSettings.AssemblyDirectories.ToArray()), paraString);
-                        }
-                        else
-                        {
-                            throw new ArgumentException(
-                                "Wenn 'Reference' nicht gesetzt ist, muss 'PhysicalPath' gesetzt werden (JobSnapshotTrigger).");
-                        }
+                        throw new ArgumentException(
+                            $"Unbekanntes JobDescription-Format: {physicalJobPath}");
                     }
                 }
             }
+            return jobContainer;
+        }
 
-            //====================== JobTrigger ======================================================================================
+        #endregion FindAndLoadJobDescription
+
+        #region LoadUserControlPathes
+
+        //===================================================================================================
+        // UserControlPathes: lädt optional im Job definierte Pfade zu User-spezifischen Controls zur
+        // Darstellung im Vishnu-Tree. Berücksichtigt dabei Hierarchien von bei Jobs, SubJobs, Checkern
+        // und verschiedene Typen von User-Controls.
+        //===================================================================================================
+        private void LoadUserControlPathes(Job? mother, JobContainer jobContainer, JobPackage jobPackage)
+        {
+            // Die UserControl-Pfade sind alle mit Default ungleich null vor-initialisiert
+            // (JobPackage.Job-Konstruktor), deshalb kann hier keine vereinfachende
+            // null-propagation kodiert werden, da sonst die Vorbelegungen ggf. mit null
+            // überschrieben würden.
+            // Die Variante: "jobPackage.Job.JobListUserControlPath
+            //                = tmpVar ??= jobPackage.Job.JobListUserControlPath;"
+            // würde zwar funktionieren, hätte aber im Fall "tmpVar == null" eine unnötige
+            // Zuweisung "jobPackage.Job.JobListUserControlPath = jobPackage.Job.JobListUserControlPath;"
+            // zur Folge.
+
+            string? tmpString = jobContainer.JobListUserControlPath ?? mother?.JobListUserControlPath;
+            if (tmpString != null)
+            {
+                jobPackage.Job.JobListUserControlPath = tmpString;
+            }
+            tmpString = jobContainer.JobListUserControlPath;
+            if (tmpString != null)
+            {
+                jobPackage.Job.JobListUserControlPath = tmpString;
+            }
+            tmpString = jobContainer.JobListUserControlPath ?? mother?.JobConnectorUserControlPath;
+            if (tmpString != null)
+            {
+                jobPackage.Job.JobConnectorUserControlPath = tmpString;
+            }
+            tmpString = jobContainer.JobListUserControlPath ?? mother?.NodeListUserControlPath;
+            if (tmpString != null)
+            {
+                jobPackage.Job.NodeListUserControlPath = tmpString;
+            }
+            tmpString = jobContainer.JobListUserControlPath ?? mother?.SingleNodeUserControlPath;
+            if (tmpString != null)
+            {
+                jobPackage.Job.SingleNodeUserControlPath = tmpString;
+            }
+            tmpString = jobContainer.JobListUserControlPath ?? mother?.ConstantNodeUserControlPath;
+            if (tmpString != null)
+            {
+                jobPackage.Job.ConstantNodeUserControlPath = tmpString;
+            }
+            tmpString = jobContainer.JobListUserControlPath ?? mother?.SnapshotUserControlPath;
+            if (tmpString != null)
+            {
+                jobPackage.Job.SnapshotUserControlPath = tmpString;
+            }
+        }
+
+        #endregion LoadUserControlPathes
+
+        #region LoadJobProperties
+
+        //===================================================================================================
+        // Job-Properties: lädt alle einfachen Properties des Jobs.
+        //===================================================================================================
+        private static void LoadJobProperties(string physicalJobPath, string logicalJobName,
+            JobContainer jobContainer, JobPackage jobPackage)
+        {
+            try
+            {
+                jobPackage.Job.Format = jobContainer.Format;
+                jobPackage.Job.BreakWithResult
+                    = (jobContainer.JobListUserControlPath) != null
+                        && Convert.ToBoolean(jobContainer.BreakWithResult);
+
+                jobPackage.Job.ThreadLocked = false;
+                JobContainerThreadLock? threadLock = jobContainer.ThreadLocked;
+                if (threadLock != null)
+                {
+                    jobPackage.Job.ThreadLocked = true;
+                    jobPackage.Job.LockName = threadLock.LockName;
+                }
+                jobPackage.Job.StartCollapsed = jobContainer.StartCollapsed;
+                jobPackage.Job.InitNodes = jobContainer.InitNodes;
+                jobPackage.Job.TriggeredRunDelay = jobContainer.TriggeredRunDelay;
+                jobPackage.Job.IsVolatile = jobContainer.IsVolatile;
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(String.Format("Fehler in {0}({1})\n{2}",
+                    logicalJobName, physicalJobPath, ex.Message), ex);
+            }
+        }
+
+        #endregion LoadJobProperties
+
+        #region LoadJobJriggers
+
+        //===================================================================================================
+        // JobSnapshotTrigger, JobTrigger: lädt einen optionalen Trigger zur Erzeugung von Snapshots
+        //                                 und einen optionalen Trigger zum Neustart für den Job.
+        //===================================================================================================
+        private void LoadJobJriggers(string logicalJobName, TriggerShell? snapshotTrigger,
+            bool isRootJob, string? loadedLogicalJobName, JobContainer jobContainer, JobPackage jobPackage)
+        {
+            //===============================================================================================
+            LoadJobSnapshotTrigger(logicalJobName, isRootJob, loadedLogicalJobName, jobContainer, jobPackage);
+            //===============================================================================================
+            LoadJobTrigger(logicalJobName, snapshotTrigger, loadedLogicalJobName, jobContainer, jobPackage);
+            //===============================================================================================
+        }
+
+        //===================================================================================================
+        // JobTrigger: lädt einen optionalen Trigger zum Neustart für den Job.
+        //===================================================================================================
+        private void LoadJobTrigger(string logicalJobName, TriggerShell? snapshotTrigger,
+            string? loadedLogicalJobName, JobContainer jobContainer, JobPackage jobPackage)
+        {
             if (snapshotTrigger != null) // Wenn dieser Job ein SubSnapshot in einem übergeordneten Job ist,
             {
                 // wird von dort der JobTrigger für diesen (Snapshot-)Job übergeben.
                 jobPackage.Job.JobTrigger = snapshotTrigger;
             }
-            tmpXElement = (subJobRoot.Elements("JobTrigger").FirstOrDefault());
-            if (tmpXElement != null)
+            JobContainerTrigger? jobTrigger = jobContainer.JobTrigger;
+            if (jobTrigger != null)
             {
                 //string? paraString = null;
                 //XElement? para = tmpXElement.Element("Parameters");
@@ -532,7 +517,7 @@ namespace LogicalTaskTree.Provider
                 //    paraString = replaceWildcardsNPathes(para.Value, _appSettings.AssemblyDirectories.ToArray());
                 //}
 
-                //tmpString = (subJobRoot.Elements("JobTrigger").FirstOrDefault());
+                //tmpString = (jobContainer("JobTrigger").FirstOrDefault());
                 //if (tmpString != null)
                 //{
                 //    string paraString = null;
@@ -555,13 +540,14 @@ namespace LogicalTaskTree.Provider
                 //          _appSettings.AssemblyDirectories.ToArray()), paraString);
                 //    }
                 //}
-                tmpString = tmpXElement.Element("Parameters")?.Value;
-                paraString = tmpString
-                    == null ? null : ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
-                tmpString = tmpXElement.Element("Reference")?.Value;
+                string? tmpString = jobTrigger.Parameters;
+                string? paraString = tmpString
+                    == null ? null : this._appSettings.ReplaceWildcardsAndPathes(
+                        tmpString, _appSettings.AssemblyDirectories.ToArray());
+                tmpString = jobTrigger.Reference;
                 if (tmpString != null)
                 {
-                    if (paraString == xmlLogicalJobName)
+                    if (paraString == loadedLogicalJobName)
                     {
                         paraString = logicalJobName; // Referenz ggf. umbiegen
                     }
@@ -569,12 +555,12 @@ namespace LogicalTaskTree.Provider
                 }
                 else
                 {
-                    tmpString = tmpXElement.Element("PhysicalPath")?.Value;
+                    tmpString = jobTrigger.PhysicalPath;
                     if (tmpString != null)
                     {
                         jobPackage.Job.JobTrigger
-                            = new TriggerShell(ReplaceWildcardsAndPathes(tmpString,
-                          _appSettings.AssemblyDirectories.ToArray()), paraString);
+                            = new TriggerShell(this._appSettings.ReplaceWildcardsAndPathes(
+                                tmpString, _appSettings.AssemblyDirectories.ToArray()), paraString);
                     }
                     else
                     {
@@ -583,30 +569,108 @@ namespace LogicalTaskTree.Provider
                     }
                 }
             }
-            //====================== JobLogger =======================================================================================
-            tmpXElement = (subJobRoot.Elements("JobLogger").FirstOrDefault());
-            if (tmpXElement != null)
+        }
+
+        //===================================================================================================
+        // JobSnapshotTrigger: lädt einen optionalen Trigger zur Erzeugung von Snapshots für den Job.
+        //===================================================================================================
+        private void LoadJobSnapshotTrigger(string logicalJobName, bool isRootJob,
+            string? loadedLogicalJobName, JobContainer jobContainer, JobPackage jobPackage)
+        {
+            // Trigger, der steuert, wann ein Snapshot des aktuellen Jobs erzeugt werden soll
+            // (geht nur bei isRootJob == true).
+            if (isRootJob)
             {
-                tmpString = tmpXElement.Element("Parameters")?.Value;
-                paraString = tmpString
-                    == null ? null : ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
-                if (paraString == xmlLogicalJobName)
+                string snapshotDirectory = _appSettings.ReplaceWildcards(_appSettings.SnapshotDirectory);
+                if (!Directory.Exists(_appSettings.SnapshotDirectory))
+                {
+                    Directory.CreateDirectory(_appSettings.SnapshotDirectory);
+                }
+                JobContainerTrigger? jobSnapshotTrigger = jobContainer.JobSnapshotTrigger;
+                if (jobSnapshotTrigger != null)
+                {
+                    //string? paraString = null;
+                    //XElement? para = tmpXElement.Element("Parameters");
+                    //if (para != null)
+                    //{
+                    //    paraString = replaceWildcardsNPathes(para.Value, _appSettings.AssemblyDirectories.ToArray());
+                    //}
+
+                    string? tmpString = jobSnapshotTrigger.Parameters;
+                    string? paraString = tmpString
+                        == null ? null : this._appSettings.ReplaceWildcardsAndPathes(
+                            tmpString, _appSettings.AssemblyDirectories.ToArray());
+                    tmpString = jobSnapshotTrigger.Reference;
+                    if (tmpString != null)
+                    {
+                        if (paraString == loadedLogicalJobName)
+                        {
+                            paraString = logicalJobName; // Referenz ggf. umbiegen
+                        }
+                        if (paraString != null)
+                        {
+                            jobPackage.Job.JobSnapshotTrigger
+                                = new TriggerShell(tmpString, paraString, false);
+                        }
+                        else
+                        {
+                            throw new ArgumentException(
+                                "Wenn 'Reference' gesetzt ist, muss auch 'Parameters' gesetzt werden (JobSnapshotTrigger).");
+                        }
+                    }
+                    else
+                    {
+                        tmpString = jobSnapshotTrigger.PhysicalPath;
+                        if (tmpString != null)
+                        {
+                            jobPackage.Job.JobSnapshotTrigger
+                                = new TriggerShell(this._appSettings.ReplaceWildcardsAndPathes(
+                                    tmpString, _appSettings.AssemblyDirectories.ToArray()), paraString);
+                        }
+                        else
+                        {
+                            throw new ArgumentException(
+                                "Wenn 'Reference' nicht gesetzt ist, muss 'PhysicalPath' gesetzt werden (JobSnapshotTrigger).");
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion LoadJobJriggers
+
+        #region LoadJobLogger
+
+        //===================================================================================================
+        // JobLogger: lädt einen optionalen Logger für den Job selbst.
+        //===================================================================================================
+        private void LoadJobLogger(string logicalJobName, string? loadedLogicalJobName,
+            JobContainer jobContainer, JobPackage jobPackage)
+        {
+            JobContainerLogger? jobLogger = jobContainer.JobLogger;
+            if (jobLogger != null)
+            {
+                string? tmpString = jobLogger.Parameters;
+                string? paraString = tmpString
+                    == null ? null : this._appSettings.ReplaceWildcardsAndPathes(
+                        tmpString, _appSettings.AssemblyDirectories.ToArray());
+                if (paraString == loadedLogicalJobName)
                 {
                     paraString = logicalJobName; // Referenz ggf. umbiegen
                 }
-                tmpString = tmpXElement.Element("Reference")?.Value;
+                tmpString = jobLogger.Reference;
                 if (tmpString != null)
                 {
                     jobPackage.Job.JobLogger = new LoggerShell(tmpString);
                 }
                 else
                 {
-                    tmpString = tmpXElement.Element("PhysicalPath")?.Value;
+                    tmpString = jobLogger.PhysicalPath;
                     if (tmpString != null && paraString != null)
                     {
                         jobPackage.Job.JobLogger
-                            = new LoggerShell(ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray()),
-                                paraString);
+                            = new LoggerShell(this._appSettings.ReplaceWildcardsAndPathes(
+                                tmpString, _appSettings.AssemblyDirectories.ToArray()), paraString);
                     }
                     else
                     {
@@ -615,21 +679,36 @@ namespace LogicalTaskTree.Provider
                     }
                 }
             }
-            //====================== Checkers ========================================================================================
-            IEnumerable<XElement> jobCheckers = from item in subJobRoot.Elements("Checkers").Elements() select item;
-            foreach (XElement jobChecker in jobCheckers)
+        }
+
+        #endregion LoadJobLogger
+
+        #endregion Job
+
+        #region LoadCheckers
+
+        //===================================================================================================
+        // Checkers: lädt alle Checker, die dem aktuellen Job zugeordnet sind.
+        //===================================================================================================
+        private void LoadCheckers(string physicalJobPath, string logicalJobName,
+            string? loadedLogicalJobName, JobContainer jobContainer, JobPackage jobPackage)
+        {
+            string? tmpString;
+            string? paraString;
+            foreach (JobContainerChecker jobChecker in jobContainer.Checkers.CheckersList)
             {
                 TriggerShell? trigger = null;
-                tmpXElement = jobChecker.Element("Trigger");
-                if (tmpXElement != null)
+                JobContainerTrigger? checkerTrigger = jobChecker.Trigger;
+                if (checkerTrigger != null)
                 {
-                    tmpString = tmpXElement.Element("Parameters")?.Value;
+                    tmpString = checkerTrigger.Parameters;
                     paraString = tmpString
-                        == null ? null : ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
-                    tmpString = tmpXElement.Element("Reference")?.Value;
+                        == null ? null : this._appSettings.ReplaceWildcardsAndPathes(
+                            tmpString, _appSettings.AssemblyDirectories.ToArray());
+                    tmpString = checkerTrigger.Reference;
                     if (tmpString != null)
                     {
-                        if (paraString != null && paraString == xmlLogicalJobName)
+                        if (paraString != null && paraString == loadedLogicalJobName)
                         {
                             paraString = logicalJobName; // Referenz ggf. umbiegen
                         }
@@ -637,11 +716,11 @@ namespace LogicalTaskTree.Provider
                     }
                     else
                     {
-                        tmpString = tmpXElement.Element("PhysicalPath")?.Value;
+                        tmpString = checkerTrigger.PhysicalPath;
                         if (tmpString != null)
                         {
-                            trigger = new TriggerShell(ReplaceWildcardsAndPathes(tmpString,
-                              _appSettings.AssemblyDirectories.ToArray()), paraString);
+                            trigger = new TriggerShell(this._appSettings.ReplaceWildcardsAndPathes(
+                                tmpString, _appSettings.AssemblyDirectories.ToArray()), paraString);
                         }
                         else
                         {
@@ -651,28 +730,30 @@ namespace LogicalTaskTree.Provider
                     }
                 }
                 LoggerShell? logger = null;
-                tmpXElement = jobChecker.Element("Logger");
-                if (tmpXElement != null)
+                JobContainerLogger? checkerLogger = jobChecker.Logger;
+                if (checkerLogger != null)
                 {
-                    tmpString = tmpXElement.Element("Reference")?.Value;
+                    tmpString = checkerLogger.Reference;
                     if (tmpString != null)
                     {
                         logger = new LoggerShell(tmpString);
                     }
                     else
                     {
-                        tmpString = tmpXElement.Element("Parameters")?.Value;
+                        tmpString = checkerLogger.Parameters;
                         paraString = tmpString
-                            == null ? null : ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
-                        if (paraString == xmlLogicalJobName)
+                            == null ? null : this._appSettings.ReplaceWildcardsAndPathes(
+                                tmpString, _appSettings.AssemblyDirectories.ToArray());
+                        if (paraString == loadedLogicalJobName)
                         {
                             paraString = logicalJobName; // Referenz ggf. umbiegen
                         }
-                        tmpString = tmpXElement.Element("PhysicalPath")?.Value;
+                        tmpString = checkerLogger.PhysicalPath;
                         if (paraString != null && tmpString != null)
                         {
                             logger = new LoggerShell(
-                                ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray()), paraString);
+                                this._appSettings.ReplaceWildcardsAndPathes(
+                                    tmpString, _appSettings.AssemblyDirectories.ToArray()), paraString);
                         }
                         else
                         {
@@ -682,43 +763,40 @@ namespace LogicalTaskTree.Provider
                     }
                 }
                 bool isMirror = false;
-                tmpString = jobChecker.Element("Parameters")?.Value;
+                tmpString = jobChecker.Parameters;
                 paraString = tmpString
-                    == null ? null : ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
+                    == null ? null : this._appSettings.ReplaceWildcardsAndPathes(
+                        tmpString, _appSettings.AssemblyDirectories.ToArray());
                 isMirror = paraString != null && paraString.ToUpper().Equals("ISMIRROR");
-                tmpXElement = jobChecker.Elements("PhysicalPath").FirstOrDefault();
-                if (tmpXElement == null)
+                string? physicalPath = jobChecker.PhysicalPath;
+                if (physicalPath == null)
                 {
                     throw new ArgumentException("Ein Checker muss einen PhysicalPath zugeordnet bekommen.");
                 }
                 string physicalDllPath
-                  = ReplaceWildcardsAndPathes(tmpXElement.Value, _appSettings.AssemblyDirectories.ToArray());
+                  = this._appSettings.ReplaceWildcardsAndPathes(
+                      physicalPath, _appSettings.AssemblyDirectories.ToArray());
                 isMirror |= Path.GetFileNameWithoutExtension(physicalDllPath).ToUpper().Equals("TRIGGEREVENTMIRRORCHECKER");
                 bool alwaysReloadChecker = _appSettings.UncachedCheckers.Contains(
                     Path.GetFileNameWithoutExtension(physicalDllPath));
 
-                tmpXElement = jobChecker.Elements("SingleNodeUserControlPath").FirstOrDefault();
-                string? singleNodeUserControlPath = tmpXElement?.Value;
-                tmpXElement = jobChecker.Elements("UserControlPath").FirstOrDefault();
-                singleNodeUserControlPath = tmpXElement == null ? singleNodeUserControlPath : tmpXElement.Value;
+                string? singleNodeUserControlPath = jobChecker.SingleNodeUserControlPath;
+                tmpString = jobChecker.UserControlPath;
+                singleNodeUserControlPath = tmpString == null ? singleNodeUserControlPath : tmpString;
 
                 bool threadLocked = false;
                 string? lockName = null;
                 try
                 {
-                    tmpXElement = jobChecker.Element("ThreadLocked");
-                    if (tmpXElement != null)
+                    JobContainerThreadLock? threadLock = jobChecker.ThreadLocked;
+                    if (threadLock != null)
                     {
-                        threadLocked = Convert.ToBoolean(tmpXElement.Value);
-                        XAttribute? xVar = tmpXElement.Attributes("LockName").FirstOrDefault();
-                        lockName = xVar?.Value;
+                        threadLocked = true;
+                        lockName = threadLock.LockName;
                     }
-                    tmpXElement = jobChecker.Element("InitNodes");
-                    bool initNodes = tmpXElement != null && Convert.ToBoolean(tmpXElement.Value);
-                    tmpXElement = jobChecker.Element("TriggeredRunDelay");
-                    int triggeredRunDelay = tmpXElement == null ? 0 : Convert.ToInt32(tmpXElement.Value);
-                    tmpXElement = jobChecker.Element("IsGlobal");
-                    bool isGlobal = tmpXElement != null && Convert.ToBoolean(tmpXElement.Value);
+                    bool initNodes = jobChecker.InitNodes;
+                    int triggeredRunDelay = jobChecker.TriggeredRunDelay;
+                    bool isGlobal = jobChecker.IsGlobal;
                     CheckerShell checkerShell = new CheckerShell(
                         physicalDllPath, paraString, paraString, trigger, logger, alwaysReloadChecker);
                     if (threadLocked)
@@ -732,17 +810,14 @@ namespace LogicalTaskTree.Provider
                     checkerShell.InitNodes = initNodes;
                     checkerShell.IsGlobal = isGlobal;
                     checkerShell.TriggeredRunDelay = triggeredRunDelay;
-                    tmpXElement = jobChecker.Element("CanRunDllPath");
-                    if (tmpXElement != null)
-                    {
-                        checkerShell.CanRunDllPath = tmpXElement.Value;
-                    }
+                    checkerShell.CanRunDllPath = jobChecker.CanRunDllPath;
                     // string pluginDirectory = Path.Combine(this._resolvedJobDir, "Plugin");
                     if (checkerShell.CheckerParameters != null)
                     {
-                        checkerShell.CheckerParameters = ReplaceWildcardsAndPathes(checkerShell.CheckerParameters, _appSettings.AssemblyDirectories.ToArray());
+                        checkerShell.CheckerParameters = this._appSettings.ReplaceWildcardsAndPathes(
+                            checkerShell.CheckerParameters, _appSettings.AssemblyDirectories.ToArray());
                     }
-                    tmpString = jobChecker.Element("LogicalName")?.Value;
+                    tmpString = jobChecker.LogicalName;
                     if (String.IsNullOrEmpty(tmpString))
                     {
                         throw new ArgumentException("'LogicalName' muss gesetzt werden(Checker).");
@@ -751,36 +826,47 @@ namespace LogicalTaskTree.Provider
                 }
                 catch (Exception ex)
                 {
-                    throw new ArgumentException(String.Format("Fehler in {0}({1})\n{2}", logicalJobName, jobXML, ex.Message), ex);
+                    throw new ArgumentException(String.Format("Fehler in {0}({1})\n{2}", logicalJobName, physicalJobPath, ex.Message), ex);
                 }
             }
+        }
 
-            //====================== ValueModifiers ==================================================================================
-            IEnumerable<XElement> jobValueModifiers = from item in subJobRoot.Elements("ValueModifiers").Elements() select item;
-            foreach (XElement jobValueModifier in jobValueModifiers)
+        #endregion LoadCheckers
+
+        #region LoadValueModifiers
+
+        //===================================================================================================
+        // ValueModifiers: lädt alle ValueModifier, die dem aktuellen Job zugeordnet sind.
+        //===================================================================================================
+        private void LoadValueModifiers(string physicalJobPath, string logicalJobName,
+            JobContainer jobContainer, JobPackage jobPackage)
+        {
+            foreach (JobContainerValueModifier jobValueModifier
+                in jobContainer.ValueModifiers.ValueModifiersList)
             {
-                XElement? item = jobValueModifier.Element("PhysicalPath");
-                string? jobValueModifierSlave = item == null ? null : ReplaceWildcardsAndPathes(item.Value, _appSettings.AssemblyDirectories.ToArray());
-                item = jobValueModifier.Element("Format");
-                string? jobValueModifierFormat = item?.Value;
-                item = jobValueModifier.Elements("SingleNodeUserControlPath").FirstOrDefault();
-                string singleNodeUserControlPath = item == null ? jobPackage.Job.SingleNodeUserControlPath : Convert.ToString(item.Value);
-                item = jobValueModifier.Elements("UserControlPath").FirstOrDefault();
-                singleNodeUserControlPath = item == null ? singleNodeUserControlPath : Convert.ToString(item.Value);
-                string? logicalName = jobValueModifier.Element("LogicalName")?.Value;
+                string? tmpString = jobValueModifier.PhysicalPath;
+                string? jobValueModifierSlave
+                    = tmpString == null ? null : this._appSettings.ReplaceWildcardsAndPathes(
+                    tmpString, _appSettings.AssemblyDirectories.ToArray());
+                string? jobValueModifierFormat = jobValueModifier.Format;
+                string singleNodeUserControlPath = jobValueModifier.SingleNodeUserControlPath == null ?
+                    jobPackage.Job.SingleNodeUserControlPath : jobValueModifier.SingleNodeUserControlPath;
+                singleNodeUserControlPath = jobValueModifier.UserControlPath == null ?
+                    singleNodeUserControlPath : jobValueModifier.UserControlPath;
+                string? logicalName = jobValueModifier.LogicalName;
                 if (logicalName != null)
                 {
                     try
                     {
-                        item = jobValueModifier.Element("IsGlobal");
-                        bool isGlobal = item != null && Convert.ToBoolean(item.Value);
-                        tmpString = jobValueModifier.Element("Reference")?.Value;
+                        bool isGlobal = jobValueModifier.IsGlobal;
+                        tmpString = jobValueModifier.Reference;
                         if (String.IsNullOrEmpty(tmpString))
                         {
-                            throw new ArgumentException("Referenz nicht gefunden. Ein ValueModifier braucht zwingend eine gültige 'Reference'.");
+                            throw new ArgumentException("Referenz nicht gefunden."
+                                + " Ein ValueModifier braucht zwingend eine gültige 'Reference'.");
                         }
                         string reference = tmpString;
-                        switch (jobValueModifier.Element("Type")?.Value.ToUpper())
+                        switch ((jobValueModifier.Type ?? "").ToUpper())
                         {
                             case "STRING":
                                 jobPackage.Job.Checkers.Add(logicalName,
@@ -828,378 +914,15 @@ namespace LogicalTaskTree.Provider
                     }
                     catch (Exception ex)
                     {
-                        throw new ArgumentException(String.Format("Fehler in {0}({1})\n{2}", logicalJobName, jobXML, ex.Message), ex);
+                        throw new ArgumentException(String.Format("Fehler in {0}({1})\n{2}",
+                            logicalJobName, physicalJobPath, ex.Message), ex);
                     }
                 }
             }
-
-            //====================== Triggers ========================================================================================
-            IEnumerable<XElement> jobTriggers = from item in subJobRoot.Elements("Triggers").Elements() select item;
-            foreach (XElement singleJobTrigger in jobTriggers)
-            {
-                TriggerShell trigger;
-                paraString = null;
-                tmpXElement = singleJobTrigger.Element("Parameters");
-                if (tmpXElement != null)
-                {
-                    paraString = ReplaceWildcardsAndPathes(tmpXElement.Value, _appSettings.AssemblyDirectories.ToArray());
-                }
-                tmpString = singleJobTrigger.Element("Reference")?.Value;
-                if (tmpString != null)
-                {
-                    if (paraString != null && paraString == xmlLogicalJobName)
-                    {
-                        paraString = logicalJobName; // Referenz ggf. umbiegen
-                    }
-                    trigger = new TriggerShell(tmpString, paraString, false);
-                    XElement? name = singleJobTrigger.Element("LogicalName");
-                    if (name != null)
-                    {
-                        jobPackage.Job.Triggers.Add(name.Value, trigger);
-                    }
-                }
-                else
-                {
-                    string? tmpPhysicalPath = singleJobTrigger.Element("PhysicalPath")?.Value;
-                    string? tmpLogicalName = singleJobTrigger.Element("LogicalName")?.Value;
-                    if (tmpPhysicalPath == null || tmpLogicalName == null)
-                    {
-                        throw new ArgumentException(
-                            "'Reference' und/oder 'PhysicalPath' nicht gefunden. Ein Trigger ohne 'Reference' muss einen 'PhysicalPath' und einen 'LogicalName' haben?");
-                    }
-                    trigger = new TriggerShell(ReplaceWildcardsAndPathes(tmpPhysicalPath,
-                      _appSettings.AssemblyDirectories.ToArray()), paraString);
-                    jobPackage.Job.Triggers.Add(tmpLogicalName, trigger);
-                }
-            }
-
-            //====================== Loggers =========================================================================================
-            IEnumerable<XElement> jobLoggers = from item in subJobRoot.Elements("Loggers").Elements() select item;
-            foreach (XElement singleJobLogger in jobLoggers)
-            {
-                tmpString = singleJobLogger.Element("Parameters")?.Value;
-                paraString = tmpString
-                    == null ? null : ReplaceWildcardsAndPathes(tmpString, _appSettings.AssemblyDirectories.ToArray());
-                if (paraString == xmlLogicalJobName)
-                {
-                    paraString = logicalJobName; // Referenz ggf. umbiegen
-                }
-                tmpString = singleJobLogger.Element("PhysicalPath")?.Value;
-                if (tmpString != null && paraString != null)
-                {
-                    LoggerShell logger = new LoggerShell(ReplaceWildcardsAndPathes(tmpString,
-                      _appSettings.AssemblyDirectories.ToArray()), paraString);
-                    tmpString = singleJobLogger.Element("LogicalName")?.Value;
-                    if (String.IsNullOrEmpty(tmpString))
-                    {
-                        throw new ArgumentException(
-                            "'LogicalName' ist nicht gesetzt (Logger).");
-                    }
-                    jobPackage.Job.Loggers.Add(tmpString, logger);
-                }
-                else
-                {
-                    throw new ArgumentException(
-                        "'PhysicalPath' und/oder 'Parameters' sind nicht gesetzt (Logger).");
-                }
-            }
-
-            //====================== Workers =========================================================================================
-            IEnumerable<XElement> jobWorkers = from item in subJobRoot.Elements("Workers").Elements() select item;
-            foreach (XElement jobWorker in jobWorkers)
-            {
-                tmpString = jobWorker.Element("LogicalExpression")?.Value;
-                if (tmpString == null)
-                {
-                    throw new ArgumentException("'LogicalExpression' ist nicht gesetzt (Worker).");
-                }
-                string nodeId_Events = tmpString;
-                string nodeId = (nodeId_Events + ":").Split(new char[] { ':' })[0].Trim();
-                if (nodeId != null && nodeId == xmlLogicalJobName)
-                {
-                    nodeId_Events = nodeId_Events.Replace(nodeId, logicalJobName);
-                    nodeId = logicalJobName; // Referenz ggf. umbiegen
-                }
-                string events = (nodeId_Events + ":").Split(new char[] { ':' })[1].Trim();
-                if (!String.IsNullOrEmpty(events))
-                {
-                    List<WorkerShell> subWorkerList = new List<WorkerShell>();
-                    IEnumerable<XElement> subWorkers = from item in jobWorker.Elements("SubWorkers").Elements() select item;
-                    foreach (XElement subWorker in subWorkers)
-                    {
-                        TriggerShell? trigger = null;
-                        bool transportByFile = false;
-                        XElement? workerTrigger = subWorker.Element("Trigger");
-                        if (workerTrigger != null)
-                        {
-                            paraString = null;
-                            XElement? para = workerTrigger.Element("Parameters");
-                            if (para != null)
-                            {
-                                paraString = para.Value;
-                            }
-                            tmpString = workerTrigger.Element("Reference")?.Value;
-                            if (tmpString != null)
-                            {
-                                if (paraString != null && paraString == xmlLogicalJobName)
-                                {
-                                    paraString = logicalJobName; // Referenz ggf. umbiegen
-                                }
-                                trigger = new TriggerShell(tmpString, paraString, false);
-                            }
-                            else
-                            {
-                                tmpString = workerTrigger.Element("PhysicalPath")?.Value;
-                                if (tmpString != null)
-                                {
-                                    trigger = new TriggerShell(ReplaceWildcardsAndPathes(tmpString,
-                                      _appSettings.AssemblyDirectories.ToArray()), paraString);
-                                }
-                                else
-                                {
-                                    throw new ArgumentException(
-                                        "'PhysicalPath' ist nicht gesetzt (Trigger).");
-                                }
-                            }
-                        }
-                        XElement? subWorkerPara = subWorker.Element("Parameters");
-                        if (subWorkerPara != null)
-                        {
-                            XAttribute? xVar = subWorkerPara.Attributes("Transport").FirstOrDefault();
-                            transportByFile = xVar != null && xVar.Value.ToLower() == "file";
-                            IEnumerable<XElement> subWorkerParametersSubWorkers = from item in subWorkerPara.Elements("SubWorkers").Elements() select item;
-                            foreach (XElement subSubWorker in subWorkerParametersSubWorkers)
-                            {
-                                tmpString = subSubWorker.Element("PhysicalPath")?.Value;
-                                if (tmpString != null)
-                                {
-                                    string newPhysicalPath = ReplaceWildcardsAndPathes(tmpString,
-                                      _appSettings.AssemblyDirectories.ToArray());
-                                    subSubWorker.Element("PhysicalPath")?.ReplaceWith(new XElement("PhysicalPath", newPhysicalPath));
-                                }
-                            }
-                            tmpString = subWorker.Element("PhysicalPath")?.Value;
-                            if (tmpString != null)
-                            {
-                                subWorkerList.Add(new WorkerShell(ReplaceWildcardsAndPathes(tmpString,
-                                  _appSettings.AssemblyDirectories.ToArray()),
-                                  subWorkerPara, transportByFile, trigger));
-                            }
-                        }
-                    }
-                    if (subWorkerList.Count > 0)
-                    {
-                        WorkerShell[] subWorkerArray = new WorkerShell[subWorkerList.Count];
-                        subWorkerList.CopyTo(subWorkerArray);
-                        jobPackage.Job.Workers.Add(nodeId_Events, subWorkerArray);
-                    }
-                }
-            }
-
-            //====================== SubJobs =========================================================================================
-            IEnumerable<XElement> subJobs = from item in subJobRoot.Elements("SubJobs").Elements() select item;
-            jobPackage.Job.MaxSubJobDepth = 0;
-            int hasSubJobs = 0;
-            bool startSubJobCollapsed;
-            foreach (XElement subJob in subJobs)
-            {
-                hasSubJobs = 1;
-                try
-                {
-                    XElement? tmpVar2 = (subJob.Elements("StartCollapsed").FirstOrDefault());
-                    startSubJobCollapsed = tmpVar2 != null && Convert.ToBoolean(tmpVar2.Value);
-                }
-                catch (Exception ex)
-                {
-                    throw new ArgumentException(String.Format("Fehler in {0}({1})\n{2}", logicalJobName, jobXML, ex.Message), ex);
-                }
-                string physicalPath = "";
-                XElement? xvar = subJob.Element("PhysicalPath");
-                tmpString = subJob.Element("LogicalName")?.Value;
-                if (xvar != null)
-                {
-                    physicalPath = ReplaceWildcardsAndPathes(xvar.Value, _appSettings.JobDirPathes.ToArray());
-                }
-                else
-                {
-                    xvar = subJob.Element("LogicalExpression");
-                    if (xvar == null)
-                    {
-                        if (tmpString != null)
-                        {
-                            physicalPath = ReplaceWildcardsAndPathes(tmpString, _appSettings.JobDirPathes.ToArray());
-                        }
-                        else
-                        {
-                            throw new ArgumentException("");
-                        }
-                    }
-                }
-                //====================== Rekursion ======================================================================================
-                int depth = 0;
-                try
-                {
-                    loadJob(jobPackage.Job, physicalPath, tmpString, subJob,
-                      startSubJobCollapsed, null, null, false, false, out depth);
-                }
-                catch (Exception ex)
-                {
-                    throw new ApplicationException(String.Format($"Ladefehler auf {physicalPath}\r\n{ex.Message}"));
-                }
-                if (depth > jobPackage.Job.MaxSubJobDepth)
-                {
-                    jobPackage.Job.MaxSubJobDepth = depth;
-                }
-            }
-            jobPackage.Job.MaxSubJobDepth += hasSubJobs;
-            subJobDepth = jobPackage.Job.MaxSubJobDepth;
-            //int calcDepth = (jobPackage.Job.MaxSubJobDepth + 1);
-            //jobPackage.Job.LogicalChangedDelay = this._appSettings.LogicalChangedDelay
-            //  * (calcDepth * (calcDepth + 1) / 2);
-            int calcDepth = jobPackage.Job.MaxSubJobDepth;
-            jobPackage.Job.LogicalChangedDelay = (int)(_appSettings.LogicalChangedDelay
-                                                        * Math.Pow(_appSettings.LogicalChangedDelayPower, calcDepth));
-            //====================== Snapshots =======================================================================================
-            IEnumerable<XElement> snapshots = from item in subJobRoot.Elements("Snapshots").Elements() select item;
-            foreach (XElement snapshot in snapshots)
-            {
-                bool startSnapshotCollapsed;
-                string physicalSnapshotName;
-                string physicalSnapshotPath;
-                TriggerShell? trigger = null;
-                string logicalTriggerName;
-                string logicalSnapshotName;
-                try
-                {
-                    tmpString = snapshot.Element("LogicalName")?.Value;
-                    logicalSnapshotName = tmpString ?? throw new ArgumentException("'LogicalName' ist nicht angegeben (Snapshot).");
-                    jobPackage.Job.SnapshotNames.Add(logicalSnapshotName);
-                    physicalSnapshotName = logicalSnapshotName.TrimStart('#');
-                    startSnapshotCollapsed
-                        = (snapshot.Elements("StartCollapsed").FirstOrDefault()?.Value) != null
-                            && Convert.ToBoolean(snapshot.Elements("StartCollapsed").FirstOrDefault()?.Value);
-                    tmpXElement = snapshot.Element("PhysicalPath");
-                    if (tmpXElement == null)
-                    {
-                        physicalSnapshotPath = physicalSnapshotName;
-                    }
-                    else
-                    {
-                        physicalSnapshotPath = _appSettings.ReplaceWildcards(tmpXElement.Value);
-                        if (physicalSnapshotPath.ToLower().EndsWith("jobsnapshot.xml")
-                            || physicalSnapshotPath.ToLower().EndsWith("sobsnapshot.info"))
-                        {
-                            physicalSnapshotPath = Path.GetDirectoryName(physicalSnapshotPath) ?? Directory.GetCurrentDirectory();
-                        }
-                    }
-                    if (!(physicalSnapshotPath.Contains(":")
-                          || physicalSnapshotPath.StartsWith(@"/")
-                          || physicalSnapshotPath.StartsWith(@"\")))
-                    {
-                        //if (!physicalSnapshotPath.ToLower().EndsWith(physicalSnapshotName.ToLower()))
-                        //{
-                        //  physicalSnapshotPath = Path.Combine(_appSettings.SnapshotDirectory, physicalSnapshotName, physicalSnapshotPath);
-                        //}
-                        //else
-                        //{
-                        physicalSnapshotPath = Path.Combine(_appSettings.SnapshotDirectory, physicalSnapshotPath);
-                        //}
-                    }
-                    physicalSnapshotPath = Path.Combine(physicalSnapshotPath, "JobSnapshot.info");
-                    logicalTriggerName = logicalSnapshotName + "Trigger";
-                    tmpXElement = snapshot.Element("Trigger");
-                    if (tmpXElement != null)
-                    {
-                        paraString = null;
-                        tmpString = tmpXElement.Element("Parameters")?.Value;
-                        if (tmpString != null)
-                        {
-                            paraString = ReplaceWildcardsAndPathes(tmpString.Replace("JobSnapshot.xml", "JobSnapshot.info"), new string[] { });
-                        }
-                        else
-                        {
-                            paraString = physicalSnapshotPath + "|InitialFire";
-                        }
-                        if (paraString.ToUpper().Contains("%SNAPSHOTDIRECTORIES%"))
-                        {
-                            paraString = Regex.Replace(paraString, "%SNAPSHOTDIRECTORIES%", String.Join(",", Path.GetDirectoryName(physicalSnapshotPath)), RegexOptions.IgnoreCase);
-                        }
-                        tmpString = tmpXElement.Element("Reference")?.Value;
-                        if (tmpString != null)
-                        {
-                            if (paraString != null && paraString == xmlLogicalJobName)
-                            {
-                                paraString = logicalJobName; // Referenz ggf. umbiegen
-                            }
-                            trigger = new TriggerShell(tmpString, paraString, false);
-                        }
-                        else
-                        {
-                            tmpString = tmpXElement.Element("PhysicalPath")?.Value
-                                ?? throw new ArgumentException("'Reference' und/oder 'PhysicalPath' nicht gefunden. Ein Trigger ohne 'Reference' muss einen 'PhysicalPath' haben?");
-                            trigger = new TriggerShell(ReplaceWildcardsAndPathes(tmpString,
-                              _appSettings.AssemblyDirectories.ToArray()), paraString);
-                        }
-                        tmpString = tmpXElement.Element("LogicalName")?.Value;
-                        if (tmpString != null)
-                        {
-                            logicalTriggerName = tmpString;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw new ArgumentException(String.Format("Fehler in {0}({1})\n{2}", logicalJobName, jobXML, ex.Message), ex);
-                }
-                //====================== Rekursion ======================================================================================
-                int depth = 0;
-                try
-                {
-                    loadJob(jobPackage.Job, physicalSnapshotPath, logicalSnapshotName, snapshot,
-                      startSnapshotCollapsed, trigger, logicalTriggerName, false, true, out depth);
-                }
-                catch (Exception ex)
-                {
-                    throw new ApplicationException(String.Format($"Ladefehler auf {physicalSnapshotPath}\r\n{ex.Message}"));
-                }
-            }
-            try
-            {
-                LoadedJobPackages.Add(jobPackage.JobName, jobPackage);
-            }
-            catch
-            {
-                throw new ApplicationException(String.Format("Job {0}: Ein Job kann nur einmal hinzugefügt werden."
-                    + "\nHinweis: eine mehrfache Referenzierung in einem logischen Ausdruck ist jedoch möglich.", jobPackage.JobName));
-            }
-            if (popDirs)
-            {
-                _appSettings.JobDirPathes.Pop();
-            }
-            return logicalJobName;
         }
 
-        private string ReplaceWildcardsAndPathes(string para, string[] searchDirectories)
-        {
-            para = _appSettings.ReplaceWildcards(para);
-            string paraString = "";
-            string delimiter = "";
-            foreach (string paraPart in para.Split('|'))
-            {
-                string modifiedParaPart = paraPart;
-                if (modifiedParaPart.Trim() != String.Empty)
-                {
-                    string path = NetworkMappingsRefresher.GetNextReachablePath(
-                        modifiedParaPart, searchDirectories) ?? modifiedParaPart;
-                    modifiedParaPart = path.Replace(@"Plugin\Plugin", "Plugin");
-                }
-                paraString += delimiter + modifiedParaPart;
-                delimiter = "|";
-            }
-            return paraString;
-        }
-
-        private ValueModifier<T> createTypedValueModifier<T>(string referenceName, string? slavePath, string? format, string userControlPath, bool isGlobal)
+        private ValueModifier<T> createTypedValueModifier<T>(
+            string referenceName, string? slavePath, string? format, string userControlPath, bool isGlobal)
         {
             if (slavePath != null)
             {
@@ -1216,6 +939,399 @@ namespace LogicalTaskTree.Provider
                 return typedValueModifier;
             }
         }
+
+        #endregion LoadValueModifiers
+
+        #region LoadTriggers
+
+        //===================================================================================================
+        // Triggers: lädt alle Trigger, die dem aktuellen Job zugeordnet sind.
+        //===================================================================================================
+        private void LoadTriggers(string logicalJobName, string? loadedLogicalJobName,
+            JobContainer jobContainer, JobPackage jobPackage)
+        {
+            foreach (JobContainerTrigger singleJobTrigger in jobContainer.Triggers.TriggersList)
+            {
+                TriggerShell trigger;
+                string? paraString = null;
+                string? tmpString = singleJobTrigger.Parameters;
+                if (tmpString != null)
+                {
+                    paraString = this._appSettings.ReplaceWildcardsAndPathes(
+                        tmpString, _appSettings.AssemblyDirectories.ToArray());
+                }
+                tmpString = singleJobTrigger.Reference;
+                if (tmpString != null)
+                {
+                    if (paraString != null && paraString == loadedLogicalJobName)
+                    {
+                        paraString = logicalJobName; // Referenz ggf. umbiegen
+                    }
+                    trigger = new TriggerShell(tmpString, paraString, false);
+                    string? name = singleJobTrigger.LogicalName;
+                    if (name != null)
+                    {
+                        jobPackage.Job.Triggers.Add(name, trigger);
+                    }
+                }
+                else
+                {
+                    string? tmpPhysicalPath = singleJobTrigger.PhysicalPath;
+                    string? tmpLogicalName = singleJobTrigger.LogicalName;
+                    if (tmpPhysicalPath == null || tmpLogicalName == null)
+                    {
+                        throw new ArgumentException(
+                            "'Reference' und/oder 'PhysicalPath' nicht gefunden. Ein Trigger ohne"
+                            + " 'Reference' muss einen 'PhysicalPath' und einen 'LogicalName' haben?");
+                    }
+                    trigger = new TriggerShell(this._appSettings.ReplaceWildcardsAndPathes(
+                        tmpPhysicalPath, _appSettings.AssemblyDirectories.ToArray()), paraString);
+                    jobPackage.Job.Triggers.Add(tmpLogicalName, trigger);
+                }
+            }
+        }
+
+        #endregion LoadTriggers
+
+        #region LoadLoggers
+
+        //===================================================================================================
+        // Loggers: lädt alle Logger, die dem aktuellen Job zugeordnet sind.
+        //===================================================================================================
+        private void LoadLoggers(string logicalJobName, string? loadedLogicalJobName,
+            JobContainer jobContainer, JobPackage jobPackage)
+        {
+            foreach (JobContainerLogger singleJobLogger in jobContainer.Loggers.LoggersList)
+            {
+                string? tmpString = singleJobLogger.Parameters;
+                string? paraString = tmpString
+                    == null ? null : this._appSettings.ReplaceWildcardsAndPathes(
+                        tmpString, _appSettings.AssemblyDirectories.ToArray());
+                if (paraString == loadedLogicalJobName)
+                {
+                    paraString = logicalJobName; // Referenz ggf. umbiegen
+                }
+                tmpString = singleJobLogger.PhysicalPath;
+                if (tmpString != null && paraString != null)
+                {
+                    LoggerShell logger = new LoggerShell(this._appSettings.ReplaceWildcardsAndPathes(
+                        tmpString, _appSettings.AssemblyDirectories.ToArray()), paraString);
+                    tmpString = singleJobLogger.LogicalName;
+                    if (String.IsNullOrEmpty(tmpString))
+                    {
+                        throw new ArgumentException(
+                            "'LogicalName' ist nicht gesetzt (Logger).");
+                    }
+                    jobPackage.Job.Loggers.Add(tmpString, logger);
+                }
+                else
+                {
+                    throw new ArgumentException(
+                        "'PhysicalPath' und/oder 'Parameters' sind nicht gesetzt (Logger).");
+                }
+            }
+        }
+
+        #endregion LoadLoggers
+
+        #region LoadWorkers
+
+        //===================================================================================================
+        // Workers: lädt alle Worker, die im aktuellen Job definiert sind.
+        //===================================================================================================
+        private void LoadWorkers(string logicalJobName, string? loadedLogicalJobName,
+            JobContainer jobContainer, JobPackage jobPackage)
+        {
+            foreach (JobContainerWorker jobWorker in jobContainer.Workers.WorkersList)
+            {
+                string? tmpString = jobWorker.LogicalExpression;
+                if (tmpString == null)
+                {
+                    throw new ArgumentException("'LogicalExpression' ist nicht gesetzt (Worker).");
+                }
+                string nodeId_Events = tmpString;
+                string nodeId = (nodeId_Events + ":").Split(new char[] { ':' })[0].Trim();
+                if (nodeId != null && nodeId == loadedLogicalJobName)
+                {
+                    nodeId_Events = nodeId_Events.Replace(nodeId, logicalJobName);
+                    nodeId = logicalJobName; // Referenz ggf. umbiegen
+                }
+                string events = (nodeId_Events + ":").Split(new char[] { ':' })[1].Trim();
+                if (!String.IsNullOrEmpty(events))
+                {
+                    List<WorkerShell> subWorkerList = new List<WorkerShell>();
+                    foreach (JobContainerSubWorker subWorker in jobWorker.SubWorkers.SubWorkersList)
+                    {
+                        TriggerShell? trigger = null;
+                        JobContainerTrigger? workerTrigger = subWorker.Trigger;
+                        if (workerTrigger != null)
+                        {
+                            string? paraString = workerTrigger.Parameters;
+                            tmpString = workerTrigger.Reference;
+                            if (tmpString != null)
+                            {
+                                if (paraString != null && paraString == loadedLogicalJobName)
+                                {
+                                    paraString = logicalJobName; // Referenz ggf. umbiegen
+                                }
+                                trigger = new TriggerShell(tmpString, paraString, false);
+                            }
+                            else
+                            {
+                                tmpString = workerTrigger.PhysicalPath;
+                                if (tmpString != null)
+                                {
+                                    trigger = new TriggerShell(this._appSettings.ReplaceWildcardsAndPathes(
+                                        tmpString, _appSettings.AssemblyDirectories.ToArray()), paraString);
+                                }
+                                else
+                                {
+                                    throw new ArgumentException(
+                                        "'PhysicalPath' ist nicht gesetzt (Trigger).");
+                                }
+                            }
+                        }
+                        string? subWorkerPara = subWorker.Parameters;
+                        if (subWorkerPara != null)
+                        {
+                            bool transportByFile = false;
+                            subWorker.StructuredParameters =
+                                SerializationUtility.DeserializeFromJsonOrXml<StructuredParameters>(subWorkerPara, noException: true);
+                            if (subWorker.StructuredParameters != null)
+                            {
+                                transportByFile = 
+                                    subWorker.StructuredParameters.Transport?.ToLower().Equals("file") ?? false;
+                                foreach (JobContainerSubWorker subSubWorker
+                                    in subWorker.StructuredParameters.SubWorkers.SubWorkersList)
+                                {
+                                    tmpString = subSubWorker.PhysicalPath;
+                                    if (tmpString != null)
+                                    {
+                                        string newPhysicalPath = this._appSettings.ReplaceWildcardsAndPathes(
+                                            tmpString, _appSettings.AssemblyDirectories.ToArray());
+                                        subSubWorker.PhysicalPath = newPhysicalPath;
+                                    }
+                                }
+                            }
+                            if (!transportByFile)
+                            {
+                                subWorkerPara = Regex.Replace(subWorkerPara,
+                                    @"\<\/{0,1}parameters\.*?\>", "", RegexOptions.IgnoreCase);
+                                if (subWorkerPara.StartsWith(@"""") && subWorkerPara.EndsWith(@""""))
+                                {
+                                    subWorkerPara = Regex.Replace(subWorkerPara, @"^""|""$", "");
+                                }
+                                subWorkerPara = Regex.Unescape(subWorkerPara);
+                            }
+                            tmpString = subWorker.PhysicalPath;
+                            if (tmpString != null)
+                            {
+                                subWorkerList.Add(new WorkerShell(this._appSettings.ReplaceWildcardsAndPathes(
+                                    tmpString, _appSettings.AssemblyDirectories.ToArray()),
+                                  subWorkerPara, transportByFile, trigger));
+                            }
+                        }
+                    }
+                    if (subWorkerList.Count > 0)
+                    {
+                        WorkerShell[] subWorkerArray = new WorkerShell[subWorkerList.Count];
+                        subWorkerList.CopyTo(subWorkerArray);
+                        jobPackage.Job.Workers.Add(nodeId_Events, subWorkerArray);
+                    }
+                }
+            }
+        }
+
+        #endregion LoadWorkers
+
+        #region LoadSubJobs
+
+        //===================================================================================================
+        // SubJobs: rekursiv - lädt alle Snapshots, die im aktuellen Job definiert sind.
+        //===================================================================================================
+        private int LoadSubJobs(JobContainer jobContainer, JobPackage jobPackage)
+        {
+            int subJobDepth;
+            jobPackage.Job.MaxSubJobDepth = 0;
+            int hasSubJobs = 0;
+            bool startSubJobCollapsed;
+            foreach (JobContainer subJob in jobContainer.SubJobs.SubJobsList)
+            {
+                hasSubJobs = 1;
+                startSubJobCollapsed = subJob.StartCollapsed;
+                string physicalPath = "";
+                string? tmpString = subJob.PhysicalPath;
+                string? logicalName = subJob.LogicalName;
+                if (tmpString != null)
+                {
+                    physicalPath = this._appSettings.ReplaceWildcardsAndPathes(
+                        tmpString, _appSettings.JobDirPathes.ToArray());
+                }
+                else
+                {
+                    if (subJob?.LogicalExpression == null)
+                    {
+                        if (logicalName != null)
+                        {
+                            physicalPath = this._appSettings.ReplaceWildcardsAndPathes(
+                                logicalName, _appSettings.JobDirPathes.ToArray());
+                        }
+                        else
+                        {
+                            throw new ArgumentException(
+                                "Ladefehler: SubJob ohne externen Pfad und ohne LogicalExpression.");
+                        }
+                    }
+                }
+                int depth = 0;
+                try
+                {
+                    //====================== Rekursion ======================================================
+                    LoadJob(jobPackage.Job, physicalPath, logicalName, subJob,
+                      startSubJobCollapsed, null, null, false, false, out depth);
+                    //====================== Rekursion ======================================================
+                }
+                catch (Exception ex)
+                {
+                    throw new ApplicationException(
+                        String.Format($"Ladefehler auf {physicalPath}\r\n{ex.Message}"));
+                }
+                if (depth > jobPackage.Job.MaxSubJobDepth)
+                {
+                    jobPackage.Job.MaxSubJobDepth = depth;
+                }
+            }
+            jobPackage.Job.MaxSubJobDepth += hasSubJobs;
+            subJobDepth = jobPackage.Job.MaxSubJobDepth;
+            //int calcDepth = (jobPackage.Job.MaxSubJobDepth + 1);
+            //jobPackage.Job.LogicalChangedDelay = this._appSettings.LogicalChangedDelay
+            //  * (calcDepth * (calcDepth + 1) / 2);
+            int calcDepth = jobPackage.Job.MaxSubJobDepth;
+            jobPackage.Job.LogicalChangedDelay =
+                (int)(_appSettings.LogicalChangedDelay
+                * Math.Pow(_appSettings.LogicalChangedDelayPower, calcDepth));
+            return subJobDepth;
+        }
+
+        #endregion LoadSubJobs
+
+        #region LoadSnapshots
+
+        //===================================================================================================
+        // Snapshots: rekursiv - lädt alle Snapshots, die im aktuellen Job definiert sind.
+        //===================================================================================================
+        private void LoadSnapshots(string physicalJobPath, string logicalJobName,
+            string? loadedLogicalJobName, JobContainer jobContainer, JobPackage jobPackage)
+        {
+            foreach (JobContainer snapshot in jobContainer.Snapshots.SnapshotsList)
+            {
+                bool startSnapshotCollapsed;
+                string physicalSnapshotName;
+                string physicalSnapshotPath;
+                TriggerShell? trigger = null;
+                string logicalTriggerName;
+                string logicalSnapshotName;
+                try
+                {
+                    string? tmpString = snapshot.LogicalName;
+                    logicalSnapshotName = tmpString ?? throw new ArgumentException(
+                        "'LogicalName' ist nicht angegeben (Snapshot).");
+                    jobPackage.Job.SnapshotNames.Add(logicalSnapshotName);
+                    physicalSnapshotName = logicalSnapshotName.TrimStart('#');
+                    startSnapshotCollapsed = snapshot.StartCollapsed;
+                    if (snapshot.PhysicalPath != null)
+                    {
+                        physicalSnapshotPath = snapshot.PhysicalPath;
+                    }
+                    else
+                    {
+                        physicalSnapshotPath = physicalSnapshotName;
+                    }
+                    physicalSnapshotPath =
+                        _appSettings.ReplaceWildcards(physicalSnapshotPath);
+                    if (physicalSnapshotPath.ToLower().EndsWith("jobsnapshot.xml")
+                        || physicalSnapshotPath.ToLower().EndsWith("jobsnapshot.info"))
+                    {
+                        physicalSnapshotPath = Path.GetDirectoryName(physicalSnapshotPath) ??
+                            Directory.GetCurrentDirectory();
+                    }
+                    if (!(physicalSnapshotPath.Contains(":")
+                          || physicalSnapshotPath.StartsWith(@"/")
+                          || physicalSnapshotPath.StartsWith(@"\")))
+                    {
+                        physicalSnapshotPath =
+                            Path.Combine(_appSettings.SnapshotDirectory, physicalSnapshotPath);
+                    }
+                    physicalSnapshotPath = Path.Combine(physicalSnapshotPath, "JobSnapshot.info");
+                    logicalTriggerName = logicalSnapshotName + "Trigger";
+                    JobContainerTrigger? jobContainerTrigger = snapshot.Trigger;
+                    if (jobContainerTrigger != null)
+                    {
+                        string? paraString = null;
+                        tmpString = jobContainerTrigger.Parameters;
+                        if (tmpString != null)
+                        {
+                            paraString = this._appSettings.ReplaceWildcardsAndPathes(
+                                tmpString.Replace("JobSnapshot.xml", "JobSnapshot.info"), new string[] { });
+                        }
+                        else
+                        {
+                            paraString = physicalSnapshotPath + "|InitialFire";
+                        }
+                        if (paraString.ToUpper().Contains("%SNAPSHOTDIRECTORIES%"))
+                        {
+                            paraString = Regex.Replace(paraString, "%SNAPSHOTDIRECTORIES%",
+                                String.Join(",", Path.GetDirectoryName(physicalSnapshotPath)),
+                                RegexOptions.IgnoreCase);
+                        }
+                        tmpString = jobContainerTrigger.Reference;
+                        if (tmpString != null)
+                        {
+                            if (paraString != null && paraString == loadedLogicalJobName)
+                            {
+                                paraString = logicalJobName; // Referenz ggf. umbiegen
+                            }
+                            trigger = new TriggerShell(tmpString, paraString, false);
+                        }
+                        else
+                        {
+                            tmpString = jobContainerTrigger.PhysicalPath
+                                ?? throw new ArgumentException(
+                                    "'Reference' und/oder 'PhysicalPath' nicht gefunden." +
+                                    " Ein Trigger ohne 'Reference' muss einen 'PhysicalPath' haben?");
+                            trigger = new TriggerShell(this._appSettings.ReplaceWildcardsAndPathes(
+                                tmpString, _appSettings.AssemblyDirectories.ToArray()), paraString);
+                        }
+                        tmpString = jobContainerTrigger.LogicalName;
+                        if (tmpString != null)
+                        {
+                            logicalTriggerName = tmpString;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new ArgumentException(String.Format("Fehler in {0}({1})\n{2}",
+                        logicalJobName, physicalJobPath, ex.Message), ex);
+                }
+                int depth = 0;
+                try
+                {
+                    string logicalName = String.Empty;
+                    //====================== Rekursion ======================================================
+                    LoadJob(jobPackage.Job, physicalSnapshotPath, logicalSnapshotName, snapshot,
+                      startSnapshotCollapsed, trigger, logicalTriggerName, false, true, out depth);
+                    //====================== Rekursion ======================================================
+                }
+                catch (Exception ex)
+                {
+                    throw new ApplicationException(
+                        String.Format($"Ladefehler auf {physicalSnapshotPath}\r\n{ex.Message}"));
+                }
+            }
+        }
+
+        #endregion LoadSnapshots
 
         #endregion private members
     }

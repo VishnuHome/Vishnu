@@ -6,6 +6,9 @@ using NetEti.ApplicationControl;
 using NetEti.Globals;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using NetEti.ObjectSerializer;
 
 namespace Vishnu.Interchange
 {
@@ -23,6 +26,65 @@ namespace Vishnu.Interchange
     public class VishnuAssemblyLoader
     {
         #region public members
+
+        /// <summary>
+        /// Löst den übergebenen Pfad unter Berücksichtigung der Suchreihenfolge
+        /// in einen gesicherten Pfad auf, wenn möglich.
+        /// </summary>
+        /// <param name="path">Pfad zur Dll/Exe.</param>
+        /// <param name="handle">Die Prozess-Id des aufrufenden Vishnu-Prozesses.</param>
+        /// <returns>Gesicherter Pfad zur Dll/Exe</returns>
+        /// <exception cref="IOException" />
+        public static string GetResolvedAssemblyPath(string path, string handle)
+        {
+            string tempDirectory = Path.Combine(".\\Plugin", path);
+            if (File.Exists(tempDirectory) || Directory.Exists(tempDirectory))
+            {
+                return tempDirectory;
+            }
+            string jsonJobLog = GetJobPathesLogPath(handle);
+            List<string>? jobPathes = null;
+            if (File.Exists(jsonJobLog))
+            {
+                try
+                {
+                    JsonPathData? jobPathesContainer = SerializationUtility.LoadFromJsonFile<JsonPathData>(jsonJobLog);
+                    if (jobPathesContainer != null && jobPathesContainer.Values != null)
+                    {
+                        jobPathes = jobPathesContainer.Values;
+                    }
+                }
+                catch { }
+            }
+            if (jobPathes != null)
+            {
+                foreach (string tmpDirectory in jobPathes)
+                {
+                    if (tmpDirectory == "" || Directory.Exists(tmpDirectory))
+                    {
+                        string tmpPath = Path.Combine(tmpDirectory, path).Replace(@"Plugin\Plugin", "Plugin");
+                        if (File.Exists(tmpPath) || Directory.Exists(tmpPath))
+                        {
+                            return tmpPath;
+                        }
+                    }
+                }
+            }
+            return path;
+        }
+
+        /// <summary>
+        /// Liefert den Pfad zu einer temporären Datei zurück,
+        /// in der die möglichen Assembly-Pfade gespeichert werden.
+        /// </summary>
+        /// <param name="logHandle">Die Prozess-Id des aufrufenden Vishnu-Prozesses.</param>
+        /// <returns>Pfad zu eine temporären Json-Datei mit möglichen Assembly-Pfaden.</returns>
+        public static string GetJobPathesLogPath(string logHandle)
+        {
+            string jsonJobLog = Path.Combine(Path.GetTempPath(),
+                String.Format($"JobPathes_{logHandle}.json"));
+            return jsonJobLog;
+        }
 
         /// <summary>
         /// Singleton-Provider - übernimmt Pfade zu Verzeichnissen, in denen zusätzlich
@@ -143,6 +205,33 @@ namespace Vishnu.Interchange
                 throw new TypeLoadException(msg);
             }
             return null;
+        }
+
+        /// <summary>
+        /// Deserialisierungsklasse für gespeicherte Assembly-Pfade.
+        /// </summary>
+        public class JsonPathData
+        {
+            /// <summary>
+            /// ID - wird nicht weiter verwendet.
+            /// </summary>            
+            [JsonPropertyName("$id")]
+            public string Id { get; set; }
+
+            /// <summary>
+            /// Die Assembly-Pfade.
+            /// </summary>
+            [JsonPropertyName("$values")]
+            public List<string> Values { get; set; }
+
+            /// <summary>
+            /// Standard-Konstruktor.
+            /// </summary>
+            public JsonPathData()
+            {
+                this.Id = String.Empty;
+                this.Values = new List<string>();
+            }
         }
 
         #endregion public members

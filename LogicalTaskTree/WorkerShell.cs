@@ -183,7 +183,7 @@ namespace LogicalTaskTree
         /// </summary>
         /// <param name="slavePathName">Dateipfad und Name einer Exe.</param>
         /// <param name="slaveParameters">Aufrufparameter der Exe als XML.</param>
-        public WorkerShell(string slavePathName, XElement slaveParameters) : this(slavePathName, slaveParameters, false, null) { }
+        public WorkerShell(string slavePathName, string slaveParameters) : this(slavePathName, slaveParameters, false, null) { }
 
         /// <summary>
         /// Konstruktor - übernimmt den Pfad zur Worker-Exe, und einen Parameter-String, der beim
@@ -203,11 +203,12 @@ namespace LogicalTaskTree
         /// <param name="slaveParameters">Aufrufparameter der Exe als XML.</param>
         /// <param name="transportByFile">Bei True werden die Parameter über eine XML-Datei übergeben, ansonsten über die Kommandozeile.</param>
         /// <param name="workerTrigger">Ein Trigger, der den Job wiederholt aufruft oder null.</param>
-        public WorkerShell(string slavePathName, XElement slaveParameters, bool transportByFile, INodeTrigger? workerTrigger)
+        public WorkerShell(string slavePathName, string slaveParameters, bool transportByFile, INodeTrigger? workerTrigger)
         {
+            this._appSettings = GenericSingletonProvider.GetInstance<AppSettings>();
             this.Trigger = workerTrigger;
-            this._dontExecute = GenericSingletonProvider.GetInstance<AppSettings>().GetValue<bool>("NoWorkers", false);
-            this.SlavePathName = GenericSingletonProvider.GetInstance<AppSettings>().GetStringValue("__NOPPES__", slavePathName);
+            this._dontExecute = this._appSettings.GetValue<bool>("NoWorkers", false);
+            this.SlavePathName = this._appSettings.GetStringValue("__NOPPES__", slavePathName);
             // Regex.Replace(slavePathName, @"%HOME%", AppDomain.CurrentDomain.BaseDirectory, RegexOptions.IgnoreCase);
             this._slaveParameters = slaveParameters;
             this.TransportByFile = transportByFile;
@@ -255,6 +256,8 @@ namespace LogicalTaskTree
         private object _workerLocker;
         private ConcurrentQueue<WorkerArguments> _workerArgumentsEventQueue;
         private Process? _externalProcess;
+
+        private AppSettings _appSettings;
 
         /// <summary>
         /// Eigene (Timer-)Task Action für den Exec eines Workers.
@@ -307,14 +310,7 @@ namespace LogicalTaskTree
                 string countString = callCounter.ToString();
                 string logicalString = eventParameters.Logical == null ? "null" : eventParameters.Logical.ToString() ?? "";
                 string konvertedSlaveParameters;
-                if (!this.TransportByFile)
-                {
-                    konvertedSlaveParameters = this._slaveParameters.Value;
-                }
-                else
-                {
-                    konvertedSlaveParameters = this._slaveParameters.ToString().Replace('\xA0', ' ').Replace('\x09', ' ');
-                }
+                konvertedSlaveParameters = this._slaveParameters.ToString().Replace('\xA0', ' ').Replace('\x09', ' ');
                 string delimiter = "";
                 string resultsString = "";
                 string msg = "";
@@ -338,7 +334,7 @@ namespace LogicalTaskTree
                         }
                     }
                 }
-                konvertedSlaveParameters = GenericSingletonProvider.GetInstance<AppSettings>()
+                konvertedSlaveParameters = this._appSettings
                   .ReplaceWildcards(konvertedSlaveParameters)
                   .Replace("%Event%", eventParameters.Name)
                   .Replace("%Source%", eventParameters.SourceId)
@@ -348,7 +344,7 @@ namespace LogicalTaskTree
                   .Replace("%Logical%", logicalString).Replace("%Counter%", countString)
                   .Replace("%Result%", resultsString)
                   .Replace("%Exception%", msg);
-                string? strVal = GenericSingletonProvider.GetInstance<AppSettings>()
+                string? strVal = this._appSettings
                     .GetStringValue("__NOPPES__", konvertedSlaveParameters);
                 if (strVal != null)
                 {
@@ -359,30 +355,44 @@ namespace LogicalTaskTree
                                            " -Vishnu.TreeInfo=" + "\"" + treeParameters.Name.Replace("|", "\" \"") + "\""
                                          + " -Vishnu.NodeInfo=" + "\"" + nodeId + "\""
                                          + " -Position=" + "\"" + position.X + ";" + position.Y + "\""
-                                         + " -EscalationCounter=" + countString;
+                                         + " -EscalationCounter=" + countString
+                                         + " -Handle=" + (Process.GetCurrentProcess().Id).ToString();
+                if (this._appSettings.DebugMode)
+                {
+                    this._externalProcess.StartInfo.Arguments += " -DebugMode=true";
+                }
                 if (!this.TransportByFile)
                 {
                     this._externalProcess.StartInfo.Arguments += " " + konvertedSlaveParameters;
                 }
                 else
                 {
-                    //string parameterFilePath
-                    //    = Path.Combine(GenericSingletonProvider.GetInstance<AppSettings>().WorkingDirectory,
-                    //        eventParameters.SenderId + "_" + eventParameters.Name + "_" + countString + ".para");
                     string parameterFilePath
-                        = Path.Combine(GenericSingletonProvider.GetInstance<AppSettings>().WorkingDirectory,
+                        = Path.Combine(this._appSettings.WorkingDirectory,
                             eventParameters.SenderId + "_" + eventParameters.Name + ".para");
-                    string[] lines = { "<?xml version=\"1.0\" encoding=\"utf-8\"?>", konvertedSlaveParameters };
+                    // string[] lines = { "<?xml version=\"1.0\" encoding=\"utf-8\"?>", konvertedSlaveParameters };
+                    string[] lines = { konvertedSlaveParameters };
                     System.IO.File.WriteAllLines(parameterFilePath, lines);
                     this._externalProcess.StartInfo.Arguments += " -ParameterFile=\"" + parameterFilePath + "\"";
                 }
                 this._externalProcess.StartInfo.Arguments
                     = Regex.Replace(this._externalProcess.StartInfo.Arguments,
                       "\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*$)", " ", RegexOptions.IgnoreCase).Trim();
+                // Der reguläre Ausdruck \s+(?=([^\"]*\"[^\"]*\")*[^\"]*$)
+                // funktioniert wie folgt:
+                // \s+ sucht nach einem oder mehreren Leerzeichen.
+                // Das Lookahead (?=([^\"]*\"[^\"]*\")*[^\"]*$) stellt sicher,
+                // dass die Anzahl der nachfolgenden Anführungszeichen gerade ist.
+                // Dadurch wird sichergestellt, dass die Leerzeichen außerhalb
+                // von Anführungszeichen liegen.
+                // Angenommen, der ursprüngliche Argumentstring lautet:
+                // "  cmd   /c   echo   \"Hello   World\"  "
+                // Nach Anwendung des regulären Ausdrucks wird dieser zu:
+                // " cmd /c echo \"Hello   World\" "
                 if (!this._dontExecute)
                 {
                     this._externalProcess.Start();
-                    if (GenericSingletonProvider.GetInstance<AppSettings>().GetValue<bool>("DebugMode", false))
+                    if (this._appSettings.GetValue<bool>("DebugMode", false))
                     {
                         InfoController.Say(
                             String.Format($"Vishnu.WorkerShell Parameter: {this._externalProcess.StartInfo.Arguments}."));
@@ -411,7 +421,7 @@ namespace LogicalTaskTree
 
         private string? _slavePathName;
         private INodeWorker? _slave;
-        private XElement _slaveParameters;
+        private string _slaveParameters;
         private WorkerArguments? _lastWorkerArguments;
         private bool _dontExecute;
 

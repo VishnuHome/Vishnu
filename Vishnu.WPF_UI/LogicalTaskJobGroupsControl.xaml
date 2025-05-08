@@ -188,9 +188,10 @@
                                     <!--Setter
                                                     Property="TextElement.Foreground"                   
                                                     Value="{x:Static SystemColors.ControlLightBrush}" /-->
-                                    <Setter
+                                    <!--Setter
                                                     Property="BitmapEffect"                  
-                                                    Value="{StaticResource DropShadowEffect}" />
+                                                    Value="{StaticResource DropShadowEffect}" /-->
+                                    <Setter Property="Effect" Value="{StaticResource DropShadowEffect}" />
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
@@ -262,9 +263,10 @@
                                     <!--Setter
                                                     Property="TextElement.Foreground"                   
                                                     Value="{x:Static SystemColors.ControlLightBrush}" /-->
-                                    <Setter
+                                    <!-- Setter
                                                     Property="BitmapEffect"                  
-                                                    Value="{StaticResource DropShadowEffect}" />
+                                                    Value="{StaticResource DropShadowEffect}" /-->
+                                    <Setter Property="Effect" Value="{StaticResource DropShadowEffect}" />
                                 </Trigger>
                             </Style.Triggers>
                         </Style>

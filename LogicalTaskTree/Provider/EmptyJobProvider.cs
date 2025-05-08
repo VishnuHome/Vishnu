@@ -18,8 +18,9 @@ namespace LogicalTaskTree.Provider
         /// in einem LogicalTaskTree.
         /// </summary>
         /// <param name="name">Namen/Suchbegriff/Pfad des Jobs oder null</param>
+        /// <param name="physicalJobPath">Der physikalische Pfad zur JobDescription oder zum Job-Verzeichnis oder null beim Root-Job.</param>
         /// <returns>Instanz des Jobs, der zu dem Namen gehört.</returns>
-        public virtual Job GetJob(ref string name)
+        public virtual Job GetJob(ref string name, string? physicalJobPath = null)
         {
             throw new NotImplementedException();
         }
@@ -42,6 +43,17 @@ namespace LogicalTaskTree.Provider
         /// <param name="name">Logischer oder physischer Name des Jobs oder JobPackages.</param>
         /// <returns>Physischer Name des JobPackages oder null.</returns>
         public virtual string? GetPhysicalJobPath(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Ersetzt Wildcards und Pfade in einem Parameter-String.
+        /// </summary>
+        /// <param name="para">String mit Parametern, in denen Wildcards ersetzt werden sollen.</param>
+        /// <param name="searchDirectories">Array von Pfaden, die ggf. durchsucht/eingesetzt werden.</param>
+        /// <returns>Der "para"-String mit ersetzten Wildcards.</returns>
+        public string ReplaceWildcardsAndPathes(string para, string[] searchDirectories)
         {
             throw new NotImplementedException();
         }
