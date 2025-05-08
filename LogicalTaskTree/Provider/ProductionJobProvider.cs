@@ -35,28 +35,26 @@ namespace LogicalTaskTree.Provider
         #region protected members
 
         /// <summary>
-        ///   Fügt dem Dictionary LoadedJobPackages das JobPackage
-        ///   mit dem logischen Pfad logicalJobName hinzu.
-        ///   Im Fehlerfall wird einfach nichts hinzugefügt.
+        /// Fügt dem Dictionary LoadedJobPackages das JobPackage
+        /// mit dem logischen Pfad logicalJobName hinzu.
+        /// Im Fehlerfall wird einfach nichts hinzugefügt.
         /// </summary>
         /// <param name="physicalJobPath">Der physikalische Pfad zur JobDescription oder zum Job-Verzeichnis.</param>
         /// <param name="logicalJobName">Der logische Name des Jobs oder null beim Root-Job.</param>
         /// <returns>Neu gesetzter, angepasster oder übergebener logicalJobName.</returns>
         protected override string TryLoadJobPackage(string physicalJobPath, string? logicalJobName = null)
         {
-                //string rootJobPath = this._appSettings.LocateAndPrepareJob();
-
-                try
-                {
-                    int depth = 0;
-                    logicalJobName = LoadJob(null, physicalJobPath, logicalJobName,
-                      null, false, null, null, true, false, out depth);
-                }
-                catch (Exception ex)
-                {
-                    throw new ApplicationException(String.Format($"Ladefehler auf {physicalJobPath} ({Directory.GetCurrentDirectory()}" +
-                    $" {(System.Reflection.Assembly.GetExecutingAssembly().Location)})\r\n{ex.Message}"));
-                }
+            try
+            {
+                int depth = 0;
+                logicalJobName = LoadJob(null, physicalJobPath, logicalJobName,
+                  null, false, null, null, true, false, out depth);
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException(String.Format($"Ladefehler auf {physicalJobPath} ({Directory.GetCurrentDirectory()}" +
+                $" {(System.Reflection.Assembly.GetExecutingAssembly().Location)})\r\n{ex.Message}"));
+            }
             return logicalJobName;
         }
 
@@ -202,7 +200,6 @@ namespace LogicalTaskTree.Provider
         private string FindAndLoadJobDescription(string physicalJobPath, bool isRootJob, bool isSnapshot,
                                       ref JobContainer? jobContainer, ref bool isDefaultSnapshot)
         {
-            // string resolvedJobDir;
             if (!isSnapshot)
             {
                 string resolvedJobDir;
@@ -233,7 +230,6 @@ namespace LogicalTaskTree.Provider
                     if (Directory.Exists(Path.GetDirectoryName(tmpDir)))
                     {
                         Directory.CreateDirectory(tmpDir);
-                        // resolvedJobDir = tmpDir;
                     }
                     else
                     {
@@ -249,7 +245,6 @@ namespace LogicalTaskTree.Provider
                         // Im .info File steht der Pfad zum Job
                         physicalJobPath = File.ReadAllText(tmpPath);
                     }
-                    // resolvedJobDir = tmpDir;
                 }
             }
             this._appSettings.SaveJobPathes();
@@ -510,36 +505,6 @@ namespace LogicalTaskTree.Provider
             JobContainerTrigger? jobTrigger = jobContainer.JobTrigger;
             if (jobTrigger != null)
             {
-                //string? paraString = null;
-                //XElement? para = tmpXElement.Element("Parameters");
-                //if (para != null)
-                //{
-                //    paraString = replaceWildcardsNPathes(para.Value, _appSettings.AssemblyDirectories.ToArray());
-                //}
-
-                //tmpString = (jobContainer("JobTrigger").FirstOrDefault());
-                //if (tmpString != null)
-                //{
-                //    string paraString = null;
-                //    XElement para = tmpString.Element("Parameters");
-                //    if (para != null)
-                //    {
-                //        paraString = replaceWildcardsNPathes(para.Value, _appSettings.AssemblyDirectories.ToArray());
-                //    }
-                //    if (tmpString.Element("Reference") != null)
-                //    {
-                //        if (paraString != null && paraString == xmlLogicalJobName)
-                //        {
-                //            paraString = logicalJobName; // Referenz ggf. umbiegen
-                //        }
-                //        jobPackage.Job.JobTrigger = new TriggerShell(tmpString.Element("Reference").Value, paraString, false);
-                //    }
-                //    else
-                //    {
-                //        jobPackage.Job.JobTrigger = new TriggerShell(replaceWildcardsNPathes(tmpString.Element("PhysicalPath").Value,
-                //          _appSettings.AssemblyDirectories.ToArray()), paraString);
-                //    }
-                //}
                 string? tmpString = jobTrigger.Parameters;
                 string? paraString = tmpString
                     == null ? null : this._appSettings.ReplaceWildcardsAndPathes(
@@ -589,13 +554,6 @@ namespace LogicalTaskTree.Provider
                 JobContainerTrigger? jobSnapshotTrigger = jobContainer.JobSnapshotTrigger;
                 if (jobSnapshotTrigger != null)
                 {
-                    //string? paraString = null;
-                    //XElement? para = tmpXElement.Element("Parameters");
-                    //if (para != null)
-                    //{
-                    //    paraString = replaceWildcardsNPathes(para.Value, _appSettings.AssemblyDirectories.ToArray());
-                    //}
-
                     string? tmpString = jobSnapshotTrigger.Parameters;
                     string? paraString = tmpString
                         == null ? null : this._appSettings.ReplaceWildcardsAndPathes(
@@ -811,7 +769,6 @@ namespace LogicalTaskTree.Provider
                     checkerShell.IsGlobal = isGlobal;
                     checkerShell.TriggeredRunDelay = triggeredRunDelay;
                     checkerShell.CanRunDllPath = jobChecker.CanRunDllPath;
-                    // string pluginDirectory = Path.Combine(this._resolvedJobDir, "Plugin");
                     if (checkerShell.CheckerParameters != null)
                     {
                         checkerShell.CheckerParameters = this._appSettings.ReplaceWildcardsAndPathes(
@@ -1203,9 +1160,6 @@ namespace LogicalTaskTree.Provider
             }
             jobPackage.Job.MaxSubJobDepth += hasSubJobs;
             subJobDepth = jobPackage.Job.MaxSubJobDepth;
-            //int calcDepth = (jobPackage.Job.MaxSubJobDepth + 1);
-            //jobPackage.Job.LogicalChangedDelay = this._appSettings.LogicalChangedDelay
-            //  * (calcDepth * (calcDepth + 1) / 2);
             int calcDepth = jobPackage.Job.MaxSubJobDepth;
             jobPackage.Job.LogicalChangedDelay =
                 (int)(_appSettings.LogicalChangedDelay
