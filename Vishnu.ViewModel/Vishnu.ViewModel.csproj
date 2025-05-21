@@ -12,8 +12,8 @@
     <Company>NetEti</Company>
     <Description>Assembly mit dem VievModel für die MVVM-Anwendung Vishnu</Description>
     <Copyright>Copyright © $(Authors) 2012-$([System.DateTime]::Now.Year)</Copyright>
-    <AssemblyVersion>8.4.0.1</AssemblyVersion>
-    <FileVersion>8.4.0.1</FileVersion>
+    <AssemblyVersion>8.4.0.2</AssemblyVersion>
+    <FileVersion>8.4.0.2</FileVersion>
     <PackageTags>NetEti Vishnu Main View Model</PackageTags>
   </PropertyGroup>
 

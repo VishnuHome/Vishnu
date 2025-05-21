@@ -163,8 +163,8 @@ namespace Vishnu.ViewModel
             this._jobGroupsVM = this.SelectJobGroups(null) ?? new ObservableCollection<JobGroupViewModel>();
 
             this._windowTitle = "Vishnu Logical Process Monitor"
-                + " - " + System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? ""
-                + "  " + additionalWindowHeaderInfo;
+                + " - " + System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "";
+            this._windowTitle += "  " + additionalWindowHeaderInfo;
             //this.MoveWindowToStartPosition();
 
         }

@@ -561,7 +561,7 @@ namespace Vishnu.Interchange
             bool defaultDemo = false;
             if (rootJobPackagePath == null)
             {
-                this.RootJobPackagePath = @"DemoJobs\Simple\CheckAll";
+                rootJobPackagePath = @"DemoJobs\Simple\CheckAll";
                 defaultDemo = true;
             }
             this.DemoModus = this.GetValue<bool>("DemoModus", defaultDemo);

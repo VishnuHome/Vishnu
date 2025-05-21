@@ -74,6 +74,7 @@
 
 	<ItemGroup>
 	  <Compile Remove="Result - Kopie.cs" />
+	  <Compile Remove="SubWorkerSerialisationTools.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

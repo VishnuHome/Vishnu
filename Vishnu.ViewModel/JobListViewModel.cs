@@ -35,6 +35,7 @@ namespace Vishnu.ViewModel
         {
             get
             {
+                // return ((JobList)this._myLogicalNode.RootJobList).Format;
                 return ((JobList)this._myLogicalNode).Format;
             }
         }

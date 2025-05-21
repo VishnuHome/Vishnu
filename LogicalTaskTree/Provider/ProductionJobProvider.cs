@@ -100,6 +100,10 @@ namespace LogicalTaskTree.Provider
             {
                 // inline definierter SubJob
                 jobContainer = subJobContainer;
+                if (jobContainer != null && mother != null)
+                {
+                    jobContainer.Format = mother.Format;
+                }
             }
             if (String.IsNullOrEmpty(logicalJobName))
             {
@@ -297,13 +301,18 @@ namespace LogicalTaskTree.Provider
                 {
                     if (!(new List<string>() { "7z64.dll", "7z32.dll" }).Contains(Path.GetFileName(dll)))
                     {
-                        userJobProvider = (IVishnuJobProvider?)
-                            VishnuAssemblyLoader.GetAssemblyLoader().DynamicLoadObjectOfTypeFromAssembly(
-                                dll, typeof(IVishnuJobProvider));
-                        if (userJobProvider != null)
+                        userJobProvider = null;
+                        try
                         {
-                            return userJobProvider.GetVishnuJobDescription(physicalJobPath);
+                            userJobProvider = (IVishnuJobProvider?)
+                                                VishnuAssemblyLoader.GetAssemblyLoader().DynamicLoadObjectOfTypeFromAssembly(
+                                                    dll, typeof(IVishnuJobProvider));
+                            if (userJobProvider != null)
+                            {
+                                return userJobProvider.GetVishnuJobDescription(physicalJobPath);
+                            }
                         }
+                        catch { }
                     }
                 }
             }
@@ -455,10 +464,10 @@ namespace LogicalTaskTree.Provider
                         && Convert.ToBoolean(jobContainer.BreakWithResult);
 
                 jobPackage.Job.ThreadLocked = false;
-                JobContainerThreadLock? threadLock = jobContainer.ThreadLocked;
+                JobContainerThreadLock? threadLock = jobContainer.StructuredThreadLock;
                 if (threadLock != null)
                 {
-                    jobPackage.Job.ThreadLocked = true;
+                    jobPackage.Job.ThreadLocked = threadLock.ThreadLocked;
                     jobPackage.Job.LockName = threadLock.LockName;
                 }
                 jobPackage.Job.StartCollapsed = jobContainer.StartCollapsed;
@@ -746,10 +755,10 @@ namespace LogicalTaskTree.Provider
                 string? lockName = null;
                 try
                 {
-                    JobContainerThreadLock? threadLock = jobChecker.ThreadLocked;
+                    JobContainerThreadLock? threadLock = jobChecker.StructuredThreadLock;
                     if (threadLock != null)
                     {
-                        threadLocked = true;
+                        threadLocked = threadLock.ThreadLocked;
                         lockName = threadLock.LockName;
                     }
                     bool initNodes = jobChecker.InitNodes;

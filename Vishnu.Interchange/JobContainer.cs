@@ -1,3 +1,4 @@
+using NetEti.ObjectSerializer;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,6 +24,8 @@ namespace Vishnu.Interchange
         Json
     }
 
+    #region SnapshotJobContainer
+
     /// <summary>
     /// Klasse zum Laden und Speichern von Jobs in XML- und JSON-Format.
     /// </summary>
@@ -47,6 +50,10 @@ namespace Vishnu.Interchange
         [JsonPropertyName("JobDescription")]
         public JobContainer? JobDescription { get; set; }
     }
+
+    #endregion SnapshotJobContainer
+
+    #region JobContainer
 
     /// <summary>
     /// Klasse zum Laden und Speichern von Jobs in XML- und JSON-Format.
@@ -128,11 +135,33 @@ namespace Vishnu.Interchange
         [JsonPropertyName("InitNodes")]
         public bool InitNodes { get; set; }
 
+
+        /// <summary>
+        /// String-Property zur Vermeidung von Serialisierungsfehlern wegen Int32 und String.
+        /// </summary>
+        [XmlElement("TriggeredRunDelay")]
+        public string TriggeredRunDelayString
+        {
+            get => TriggeredRunDelay.ToString().ToLowerInvariant();
+            set
+            {
+                if (int.TryParse(value, out int result))
+                {
+                    TriggeredRunDelay = result;
+                }
+                else
+                {
+                    TriggeredRunDelay = 0;
+                }
+            }
+        }
+
         /// <summary>
         /// Verzögert den Start eines Knotens (und InitNodes).
         /// Kann für Loops in Controlled-Jobs verwendet werden.
         /// Default: 0 (Millisekunden).
         /// </summary>
+        [XmlIgnore]
         [JsonPropertyName("TriggeredRunDelay")]
         public int TriggeredRunDelay { get; set; }
 
@@ -175,14 +204,89 @@ namespace Vishnu.Interchange
         [JsonPropertyName("BreakWithResult")]
         public bool BreakWithResult { get; set; }
 
+        #region ThreadLocked
+
         /// <summary>
-        /// Bei True wird jeder Thread über die Klasse gesperrt, so dass
-        /// nicht Thread-sichere Checker serialisiert werden;
+        /// Enthält eine Property "ThreadLocked" und einen optionalen "LockName"
+        /// zur Differenzierung verschiedener Locking-Gruppen.
+        /// Bei "ThreadLocked": True wird jeder Thread über die Klasse gesperrt,
+        /// so dass nicht Thread-sichere Checker serialisiert werden;
+        /// Ist darüber hinaus "LockName" gesetzt, wird nur gegen Checker mit dem
+        /// gleichen LockName gesperrt.
         /// Default: False;
         /// </summary>
-        [XmlElement("ThreadLocked")]
+        public JobContainerThreadLock? StructuredThreadLock { get; set; }
+
+        /// <summary>
+        /// Wenn gesetzt, wird der Checker nicht gleichzeitig mit anderen Checkern
+        /// ausgeführt, die auch ThreadLocked gesetzt haben.
+        /// Wenn LockName gesetzt ist, wird nur gegen Checker mit dem gleichen
+        /// LockName gesperrt.
+        /// Default: False;
+        /// </summary>
+        [XmlIgnore]
         [JsonPropertyName("ThreadLocked")]
-        public JobContainerThreadLock? ThreadLocked { get; set; }
+        [JsonConverter(typeof(CustomJsonConverter))]
+        public string? ThreadLockedString {
+            get
+            {
+                return this._threadLockedString;
+            }
+            set
+            {
+                if (value != null && value != this._threadLockedString)
+                {
+                    this._threadLockedString = value.Replace("true", "true", true, System.Globalization.CultureInfo.InvariantCulture);
+                    this._threadLockedString = value.Replace("false", "false", true, System.Globalization.CultureInfo.InvariantCulture);
+                    if (!string.IsNullOrEmpty(this._threadLockedString))
+                    {
+                        this.StructuredThreadLock = SerializationUtility.
+                            DeserializeFromJsonOrXml<JobContainerThreadLock>(this._threadLockedString, noException: true);
+                    }
+                }
+            }
+        }
+        private string? _threadLockedString;
+
+        /// <summary>
+        /// Ist für die XML-Serialisierung notwendig.
+        /// </summary>
+        [XmlAnyElement("ThreadLocked")]
+        public XmlElement?[]? ThreadLockedXml
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(ThreadLockedString))
+                    return null;
+
+                var doc = new XmlDocument();
+                doc.LoadXml(ThreadLockedString);
+                return new[] { doc.DocumentElement };
+            }
+            set
+            {
+                if (value != null && value.Length > 0)
+                {
+                    ThreadLockedString = value[0]?.OuterXml;
+                    StructuredThreadLock =
+                        SerializationUtility.DeserializeFromJsonOrXml<JobContainerThreadLock>(
+                            ThreadLockedString ?? "", noException: true);
+                    // Debug-Tipp von ChatGPT:
+                    //   Wenn du sehen willst, was der Serializer eigentlich erwartet,
+                    //   kannst du den erwarteten XML-Code mit XmlSerializer auch erzeugen:
+                    //   <?xml version="1.0" encoding="utf-16"?>
+                    //   <ThreadLocked xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    // 	   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    // 	   LockName="ConcurrentTest">true</ThreadLocked>
+                    //   var obj = new JobContainerThreadLock { LockName = "ConcurrentTest", ThreadLocked = true };
+                    //   var xmlSerializer = new XmlSerializer(typeof(JobContainerThreadLock));
+                    //   using TextWriter textWriter = new StringWriter();
+                    //   xmlSerializer.Serialize(textWriter, obj);
+                }
+            }
+        }
+
+        #endregion ThreadLocked
 
         /// <summary>
         /// Ein optionaler Trigger, der den Job wiederholt aufruft
@@ -310,17 +414,43 @@ namespace Vishnu.Interchange
         }
     }
 
+    #endregion JobContainer
+
+    #region ThreadLocked
+
     /// <summary>
-    /// Klasse, die einen ThreadLock repräsentiert mit der optionalen Property LockName.
+    /// Enthält eine Property "ThreadLocked" und einen optionalen "LockName"
+    /// zur Differenzierung verschiedener Locking-Gruppen.
+    /// Bei "ThreadLocked": True wird jeder Thread über die Klasse gesperrt,
+    /// so dass nicht Thread-sichere Checker serialisiert werden;
+    /// Ist darüber hinaus "LockName" gesetzt, wird nur gegen Checker mit dem
+    /// gleichen LockName gesperrt.
+    /// Default: False;
     /// </summary>
+    [XmlRoot("ThreadLocked", Namespace = "")]
     public class JobContainerThreadLock
     {
         /// <summary>
         /// Ein optionaler Key zur Differenzierung verschiedener Locking-Gruppen.
         /// </summary>
-        [JsonPropertyName("LockName")]
+        [XmlAttribute("LockName")]
+        [JsonPropertyName("@LockName")]
         public string? LockName { get; set; }
+
+        /// <summary>
+        /// Bei True wird jeder Thread über die Klasse gesperrt, so dass
+        /// nicht Thread-sichere Checker serialisiert werden;
+        /// Default: False;
+        /// </summary>
+        [XmlText]
+        [JsonPropertyName("#Text")]
+        public bool ThreadLocked { get; set; }
+
     }
+
+    #endregion ThreadLocked
+
+    #region JobContainerTrigger
 
     /// <summary>
     /// Kapselt einen Trigger für einen Job.
@@ -352,6 +482,10 @@ namespace Vishnu.Interchange
         public string? Parameters { get; set; }
     }
 
+    #endregion JobContainerTrigger
+
+    #region JobContainerLogger
+
     /// <summary>
     /// Kapselt einen Logger für einen Job.
     /// </summary>
@@ -381,6 +515,10 @@ namespace Vishnu.Interchange
         [JsonPropertyName("Reference")]
         public string? Reference { get; set; }
     }
+
+    #endregion
+
+    #region JobContainerChecker
 
     /// <summary>
     /// Kapselt den Aufruf einer externen Arbeitsroutine,
@@ -451,15 +589,89 @@ namespace Vishnu.Interchange
         [JsonPropertyName("SingleNodeUserControlPath")]
         public string? SingleNodeUserControlPath { get; set; }
 
+        #region ThreadLocked
+
         /// <summary>
-        /// Wenn gesetzt, wird der Checker nicht gleichzeitig mit anderen
-        /// Checkern ausgeführt, die auch ThreadLocked gesetzt haben.
+        /// Enthält eine Property "ThreadLocked" und einen optionalen "LockName"
+        /// zur Differenzierung verschiedener Locking-Gruppen.
+        /// Bei "ThreadLocked": True wird jeder Thread über die Klasse gesperrt,
+        /// so dass nicht Thread-sichere Checker serialisiert werden;
+        /// Ist darüber hinaus "LockName" gesetzt, wird nur gegen Checker mit dem
+        /// gleichen LockName gesperrt.
+        /// Default: False;
+        /// </summary>
+        public JobContainerThreadLock? StructuredThreadLock { get; set; }
+
+        /// <summary>
+        /// Wenn gesetzt, wird der Checker nicht gleichzeitig mit anderen Checkern
+        /// ausgeführt, die auch ThreadLocked gesetzt haben.
         /// Wenn LockName gesetzt ist, wird nur gegen Checker mit dem gleichen
         /// LockName gesperrt.
+        /// Default: False;
         /// </summary>
-        [XmlElement("ThreadLocked")]
+        [XmlIgnore]
         [JsonPropertyName("ThreadLocked")]
-        public JobContainerThreadLock? ThreadLocked { get; set; }
+        [JsonConverter(typeof(CustomJsonConverter))]
+        public string? ThreadLockedString
+        {
+            get
+            {
+                return this._threadLockedString;
+            }
+            set
+            {
+                if (value != this._threadLockedString)
+                {
+                    this._threadLockedString = value;
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        this.StructuredThreadLock = SerializationUtility.
+                            DeserializeFromJsonOrXml<JobContainerThreadLock>(value, noException: true);
+                    }
+                }
+            }
+        }
+        private string? _threadLockedString;
+
+        /// <summary>
+        /// Ist für die XML-Serialisierung notwendig.
+        /// </summary>
+        [XmlAnyElement("ThreadLocked")]
+        public XmlElement?[]? ThreadLockedXml
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(ThreadLockedString))
+                    return null;
+
+                var doc = new XmlDocument();
+                doc.LoadXml(ThreadLockedString);
+                return new[] { doc.DocumentElement };
+            }
+            set
+            {
+                if (value != null && value.Length > 0)
+                {
+                    ThreadLockedString = value[0]?.OuterXml;
+                    StructuredThreadLock =
+                        SerializationUtility.DeserializeFromJsonOrXml<JobContainerThreadLock>(
+                            ThreadLockedString ?? "", noException: true);
+                    // Debug-Tipp von ChatGPT:
+                    //   Wenn du sehen willst, was der Serializer eigentlich erwartet,
+                    //   kannst du den erwarteten XML-Code mit XmlSerializer auch erzeugen:
+                    //   <?xml version="1.0" encoding="utf-16"?>
+                    //   <ThreadLocked xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    // 	   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    // 	   LockName="ConcurrentTest">true</ThreadLocked>
+                    //   var obj = new JobContainerThreadLock { LockName = "ConcurrentTest", ThreadLocked = true };
+                    //   var xmlSerializer = new XmlSerializer(typeof(JobContainerThreadLock));
+                    //   using TextWriter textWriter = new StringWriter();
+                    //   xmlSerializer.Serialize(textWriter, obj);
+                }
+            }
+        }
+
+        #endregion ThreadLocked
 
         /// <summary>
         /// String-Property zur Vermeidung von Serialisierungsfehlern wegen Groß- Kleinschreibung
@@ -516,7 +728,11 @@ namespace Vishnu.Interchange
         [JsonPropertyName("CanRunDllPath")]
         public string? CanRunDllPath { get; set; }
     }
-    
+
+    #endregion JobContainerChecker
+
+    #region JobContainerValueModifier
+
     /// <summary>
     /// Kapselt einen Wertmodifikator für einen Checker.
     /// </summary>
@@ -582,7 +798,11 @@ namespace Vishnu.Interchange
         [JsonPropertyName("SingleNodeUserControlPath")]
         public string? SingleNodeUserControlPath { get; set; }
     }
-    
+
+    #endregion JobContainerValueModifier
+
+    #region JobContainerWorker
+
     /// <summary>
     /// Kapselt einen Worker, der externe Arbeitsroutinen ausführt.
     /// </summary>
@@ -607,41 +827,74 @@ namespace Vishnu.Interchange
             SubWorkers = new SubWorkersContainer();
         }
     }
-    
+
+    #endregion JobContainerWorker
+
+    #region JobContainerSubWorker
+
     /// <summary>
-    /// Hilfsklasse, die einen RawJsonConverter implementiert.
-    /// Deserialisiert eine Json-Struktur in einen String.
+    /// Kapselt einen SubWorker für einen Worker.
     /// </summary>
-    public class RawJsonConverter : JsonConverter<string>
+    public class JobContainerSubWorker
     {
         /// <summary>
-        /// Liest eine Json-Struktur und gibt diese als String zurück.
-        /// Diese Routine wird beim Deserialisieren direkt von der betroffenen Property
-        /// aufgerufen (über das Attribut [JsonConverter(typeof(RawJsonConverter))]).
+        /// Der physiche Path zur SubWorker-Dll.
         /// </summary>
-        /// <param name="reader">Der Reader.</param>
-        /// <param name="typeToConvert">Zu konvertierender Typ, hier immer String.</param>
-        /// <param name="options">Serializer Optionen, z.B. PropertyNameCaseInsensitive.</param>
-        /// <returns>Die in einen String konvertierte Json Struktur.</returns>
-        public override string Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        [JsonPropertyName("PhysicalPath")]
+        public string? PhysicalPath { get; set; }
+
+        /// <summary>
+        /// Optionale SubWorker-Parameter.
+        /// </summary>
+        [XmlIgnore]
+        [JsonPropertyName("Parameters")]
+        [JsonConverter(typeof(CustomJsonConverter))]
+        public string? Parameters { get; set; }
+
+        /// <summary>
+        /// Ist für die XML-Serialisierung notwendig.
+        /// </summary>
+        [XmlAnyElement("Parameters")]
+        public XmlElement?[]? ParametersXml
         {
-            using var jsonDoc = JsonDocument.ParseValue(ref reader);
-            return jsonDoc.RootElement.GetRawText();
+            get
+            {
+                if (string.IsNullOrEmpty(Parameters))
+                    return null;
+
+                var doc = new XmlDocument();
+                doc.LoadXml(Parameters);
+                return new[] { doc.DocumentElement };
+            }
+            set
+            {
+                if (value != null && value.Length > 0)
+                {
+                    Parameters = value[0]?.OuterXml;
+                }
+            }
         }
 
         /// <summary>
-        /// Schreibt einen String in eine Json-Struktur.
+        /// Optionale SubWorker-Parameter.
         /// </summary>
-        /// <param name="writer">Der Writer.</param>
-        /// <param name="value">Der Json-String.</param>
-        /// <param name="options">Serializer Optionen, z.B. PropertyNameCaseInsensitive.</param>
-        public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
-        {
-            using var jsonDoc = JsonDocument.Parse(value);
-            jsonDoc.RootElement.WriteTo(writer);
-        }
-    }    
-    
+        [JsonPropertyName("StructuredParameters")]
+        public StructuredParameters? StructuredParameters { get; set; }
+
+        /// <summary>
+        /// Ein optionaler Trigger, der den SubWorker wiederholt aufruft
+        /// oder null.
+        /// </summary>
+        [XmlElement("Trigger")]
+        [JsonPropertyName("Trigger")]
+        public JobContainerTrigger? Trigger { get; set; }
+
+    }
+
+    #endregion JobContainerSubWorker
+
+    #region JobContainerListContainers
+
     /// <summary>
     /// Enthält eine Liste von SubJobs des aktuellen Jobs.
     /// </summary>
@@ -818,4 +1071,88 @@ namespace Vishnu.Interchange
         }
     }
 
+    #endregion JobContainerListContainers
+
+    /// <summary>
+    /// Klasse, die einen strukturierten Parameter repräsentiert, wie er z.B.
+    /// bei SubJobs von Escalatoren Verwendung findet.
+    /// </summary>
+    [XmlRoot("Parameters", Namespace = "")]
+    public class StructuredParameters
+    {
+        /// <summary>
+        /// Optionales Attribut; wenn gesetzt = "File".
+        /// </summary>
+        [XmlAttribute("Transport")]
+        [JsonPropertyName("@Transport")]
+        public string? Transport { get; set; }
+
+        /// <summary>
+        /// Liste von SubWorkern des aktuellen Workers.
+        /// </summary>
+        public SubWorkersContainer SubWorkers { get; set; }
+
+        /// <summary>
+        /// Standard Konstruktor.
+        /// </summary>
+        public StructuredParameters()
+        {
+            SubWorkers = new SubWorkersContainer();
+        }
+    }
+
+    /// <summary>
+    /// Custom-JsonConverter - deserialisiert eine Json-Struktur in einen String.
+    /// </summary>
+    public class CustomJsonConverter : JsonConverter<string>
+    {
+        /// <summary>
+        /// Liest eine Json-Struktur oder einen Boolean-Skalar und gibt diese als String zurück.
+        /// Diese Routine wird beim Deserialisieren direkt von der betroffenen Property
+        /// aufgerufen (über das Attribut [JsonConverter(typeof(CustomJsonConverter))]).
+        /// </summary>
+        /// <param name="reader">Der Reader.</param>
+        /// <param name="typeToConvert">Zu konvertierender Typ, hier immer String.</param>
+        /// <param name="options">Serializer Optionen, z.B. PropertyNameCaseInsensitive.</param>
+        /// <returns>Die in einen String konvertierte Json Struktur oder ein Boolean als String.</returns>
+        public override string Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonTokenType.True:
+                case JsonTokenType.False:
+                    // Direkt übergebenen bool-Wert in json-String umwandeln
+                    return "{ \"#text\": " + reader.GetBoolean().ToString().ToLower() + " }";
+                case JsonTokenType.StartObject:
+                case JsonTokenType.StartArray:
+                case JsonTokenType.String:
+                    using (var doc = JsonDocument.ParseValue(ref reader))
+                    {
+                        return doc.RootElement.GetRawText();
+                    }
+                default:
+                    throw new JsonException($"Unsupported token type: {reader.TokenType}");
+            }
+        }
+
+        /// <summary>
+        /// Schreibt einen String in eine Json-Struktur.
+        /// </summary>
+        /// <param name="writer">Der Writer.</param>
+        /// <param name="value">Der Json-String.</param>
+        /// <param name="options">Serializer Optionen, z.B. PropertyNameCaseInsensitive.</param>
+        public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
+        {
+            // Wenn "true"/"false", als Boolean schreiben
+            if (value == "true" || value == "false")
+            {
+                writer.WriteBooleanValue(bool.Parse(value));
+            }
+            else
+            {
+                using var jsonDoc = JsonDocument.Parse(value);
+                jsonDoc.RootElement.WriteTo(writer);
+            }
+        }
+    }
 }
