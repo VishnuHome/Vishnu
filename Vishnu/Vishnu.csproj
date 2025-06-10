@@ -55,9 +55,6 @@
 		    <Reference Include="NetEti.SettingsAccess">
 		      <HintPath>$(AssemblyRoot)/NetEti.SettingsAccess.dll</HintPath>
 		    </Reference>
-		    <Reference Include="NetEti.XMLAccess">
-		      <HintPath>$(AssemblyRoot)/NetEti.XMLAccess.dll</HintPath>
-		    </Reference>
 		    <Reference Include="NetEti.AppEnvReader">
 		      <HintPath>$(AssemblyRoot)/NetEti.AppEnvReader.dll</HintPath>
 		    </Reference>
@@ -88,7 +85,6 @@
 		    <PackageReference Include="NetEti.PropertyAccess" Version="1.0.0" />
 		    <PackageReference Include="NetEti.RegAccess" Version="1.0.0" />
 		    <PackageReference Include="NetEti.SettingsAccess" Version="1.0.0" />
-		    <PackageReference Include="NetEti.XMLAccess" Version="1.0.0" />
 		    <PackageReference Include="NetEti.AppEnvReader" Version="1.0.0" />
 		    <PackageReference Include="NetEti.BasicAppSettings" Version="1.0.0" />
 		    <PackageReference Include="NetEti.MVVMini" Version="1.0.0" />
@@ -122,6 +118,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Update="appsettings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Microsoft.Data.SqlClient.SNI.dll">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

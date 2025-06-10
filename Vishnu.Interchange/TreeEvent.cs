@@ -248,7 +248,7 @@ namespace Vishnu.Interchange
         /// <param name="path">Pfad zur Dll/Exe.</param>
         /// <returns>Gesicherter Pfad zur Dll/Exe</returns>
         /// <exception cref="IOException" />
-        public static string GetResolvedPath(string path)
+        public string GetResolvedPath(string path)
         {
             return AppSettings.GetResolvedPath(path);
         }
