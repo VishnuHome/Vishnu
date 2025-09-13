@@ -1,0 +1,5 @@
+{
+  "UserParameterReaderPath": "%UserAssemblyDirectory%\\DemoParameterProvider.dll|PARA-1|PARA-2|M:1",
+  "DumpAppSettings": true,
+  "Autostart": true
+}
