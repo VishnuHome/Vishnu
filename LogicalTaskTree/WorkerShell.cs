@@ -46,13 +46,13 @@ namespace LogicalTaskTree
         {
             WorkerArguments args;
             System.Windows.Point winPoint = treeParameters.LastParentViewAbsoluteScreenPosition;
-            if (winPoint.X > AppSettings.ActScreenBounds.Right - 50)
+            if (winPoint.X > AppSettings.ActScreenBounds.Right - 100)
             {
-                winPoint.X = AppSettings.ActScreenBounds.Right - 50;
+                winPoint.X = AppSettings.ActScreenBounds.Right - 100;
             }
-            if (winPoint.Y > AppSettings.ActScreenBounds.Bottom - 35)
+            if (winPoint.Y > AppSettings.ActScreenBounds.Bottom - 70)
             {
-                winPoint.Y = AppSettings.ActScreenBounds.Bottom - 35;
+                winPoint.Y = AppSettings.ActScreenBounds.Bottom - 70;
             }
             if (this.Trigger != null)
             {

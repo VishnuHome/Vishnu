@@ -322,6 +322,8 @@ namespace Vishnu
                 }
                 File.Copy(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "Vishnu.exe.config.user.default"),
                           Path.Combine(userCfgDir, "Vishnu.exe.config.user"), true);
+                File.Copy(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "Vishnu.exe.config.user.default.json"),
+                          Path.Combine(userCfgDir, "Vishnu.exe.config.user.json"), true);
                 appSettings.LoadSettings();
             }
             if (String.IsNullOrEmpty(appSettings.MainJobName))

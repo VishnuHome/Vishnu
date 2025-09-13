@@ -127,6 +127,9 @@
 	  <None Update="Vishnu.exe.config.user.default">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	  <None Update="Vishnu.exe.config.user.default.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">

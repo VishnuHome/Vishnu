@@ -43,6 +43,7 @@ namespace LogicalTaskTree
             /// </summary>
             /// <param name="logicalJobName">Der logische Name des Jobs oder null beim Root-Job.</param>
             /// <param name="physicalJobPath">Der physikalische Pfad zur JobDescription oder zum Job-Verzeichnis oder null beim Root-Job.</param>
+            /// <returns>Hier: immer String.Empty.</returns>
             protected override string TryLoadJobPackage(string? logicalJobName = null, string? physicalJobPath = null)
             {
                 return String.Empty;
