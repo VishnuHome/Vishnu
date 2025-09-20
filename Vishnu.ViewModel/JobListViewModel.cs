@@ -29,6 +29,18 @@ namespace Vishnu.ViewModel
         #region published members
 
         /// <summary>
+        /// Das Format, in dem dieser Job gespeichert wurde (Json oder Xml).
+        /// </summary>
+        public JobDescriptionFormat? Format
+        {
+            get
+            {
+                // return ((JobList)this._myLogicalNode.RootJobList).Format;
+                return ((JobList)this._myLogicalNode).Format;
+            }
+        }
+
+        /// <summary>
         /// Bei true befindet sich der Job in aktivem, gleich gestartetem Zustand.
         /// </summary>
         public bool IsActive
@@ -83,6 +95,19 @@ namespace Vishnu.ViewModel
             get
             {
                 return "Break";
+            }
+        }
+
+        /// <summary>
+        /// Name + (Id + gegebenenfalls ReferencedNodeId) der ursprünglich referenzierten SingleNode.
+        /// </summary>
+        public override string DebugNodeInfos
+        {
+            get
+            {
+                string debugNodeInfos = base.DebugNodeInfos
+                + ", " + this.Format;
+                return debugNodeInfos;
             }
         }
 

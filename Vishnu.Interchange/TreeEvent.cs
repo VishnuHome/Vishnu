@@ -224,6 +224,24 @@ namespace Vishnu.Interchange
         }
 
         /// <summary>
+        /// Übernimmt einen Pfad-Kandidaten zu einer Datei oder einem Verzeichnis.
+        /// Ersetzt Wildcards der Form "%Name%" innerhalb des Pfad-Kandidaten,
+        /// ergänzt diesen anhand der zusätzlich übergebenen verschiedenen pathCandidates,
+        /// versucht verschiedene Endungen (z.B. ".zip") und/oder ".xml" oder ".json"
+        /// und prüft die Existenz bzw. Erreichbarkeit.
+        /// </summary>
+        /// <param name="rawPath">Absoluter oder relativer Pfad, der zu ergänzen und zu prüfen ist.</param>
+        /// <param name="pathCandidates">Mögliche Pfad-Teile zum Kombinieren; Default: this.JobDirPathes.ToArray().</param>
+        /// <param name="throwIfFail">Wenn der Path nicht existiert und throwIfFail true ist, wird eine Exception geworfen; defaule: true.</param>
+        /// <returns>Modifizierter und verifizierter Pfad zu einer Datei oder leerer String.</returns>
+        /// <exception cref="ArgumentException">Exception, wenn kein Pfad übergeben wurde.</exception>
+        /// <exception cref="FileNotFoundException">Exception, wenn kein möglicher Pfad existiert.</exception>
+        public string PrepareAndLocatePath(string? rawPath, string[]? pathCandidates = null, bool throwIfFail = true)
+        {
+            return GenericSingletonProvider.GetInstance<AppSettings>().PrepareAndLocatePath(rawPath, pathCandidates, throwIfFail);
+        }
+
+        /// <summary>
         /// Löst den übergebenen Pfad unter Berücksichtigung der Suchreihenfolge
         /// in einen gesicherten Pfad auf, wenn möglich.
         /// </summary>

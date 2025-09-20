@@ -11,8 +11,8 @@
     <Company>NetEti</Company>
     <Description>$(AssemblyName) - Bibliothek mit gemeinsamen Klassen für Vishnu und Plugins</Description>
     <Copyright>Copyright © $(Authors) 2012-$([System.DateTime]::Now.Year)</Copyright>
-    <AssemblyVersion>8.2.1.0</AssemblyVersion>
-    <FileVersion>8.2.1.0</FileVersion>
+    <AssemblyVersion>8.4.0.1</AssemblyVersion>
+    <FileVersion>8.4.0.1</FileVersion>
     <PackageTags>NetEti Vishnu Basics</PackageTags>
   </PropertyGroup>
 
@@ -74,6 +74,13 @@
 
 	<ItemGroup>
 	  <Compile Remove="Result - Kopie.cs" />
+	  <Compile Remove="SubWorkerSerialisationTools.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="NetEti.ZipAccess">
+	    <HintPath>..\..\..\ReadyBin\Assemblies\NetEti.ZipAccess.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 </Project>

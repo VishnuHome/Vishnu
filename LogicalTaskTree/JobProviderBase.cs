@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NetEti.FileTools;
 using NetEti.Globals;
 using Vishnu.Interchange;
 
@@ -19,6 +20,8 @@ namespace LogicalTaskTree
     public abstract class JobProviderBase : IJobProvider
     {
         #region public members
+
+        #region UndefinedJobProvider
 
         /// <summary>
         /// Klassendefinition für einen undefinierten JobProvider.
@@ -39,8 +42,11 @@ namespace LogicalTaskTree
             ///   Im Fehlerfall wird einfach nichts hinzugefügt.
             /// </summary>
             /// <param name="logicalJobName">Der logische Name des Jobs oder null beim Root-Job.</param>
-            protected override void TryLoadJobPackage(ref string logicalJobName)
+            /// <param name="physicalJobPath">Der physikalische Pfad zur JobDescription oder zum Job-Verzeichnis oder null beim Root-Job.</param>
+            /// <returns>Hier: immer String.Empty.</returns>
+            protected override string TryLoadJobPackage(string? logicalJobName = null, string? physicalJobPath = null)
             {
+                return String.Empty;
                 // throw new NotImplementedException();
             }
 
@@ -58,6 +64,8 @@ namespace LogicalTaskTree
             public static readonly UndefinedJobProvider undefinedJobProvider = new();
         }
 
+        #endregion UndefinedJobProvider
+
         #region IJobProvider implementation
 
         /// <summary>
@@ -65,8 +73,9 @@ namespace LogicalTaskTree
         /// in einem LogicalTaskTree.
         /// </summary>
         /// <param name="name">Namen/Suchbegriff/Pfad des Jobs oder null</param>
+        /// <param name="physicalJobPath">Der physikalische Pfad zur JobDescription oder zum Job-Verzeichnis oder null.</param>
         /// <returns>Instanz des Jobs, der zu dem Namen gehört.</returns>
-        public virtual Job GetJob(ref string name)
+        public virtual Job GetJob(ref string name, string? physicalJobPath = null)
         {
             if (this is UndefinedJobProvider)
             {
@@ -74,7 +83,14 @@ namespace LogicalTaskTree
             }
             if (String.IsNullOrEmpty(name) || !this.LoadedJobPackages.ContainsKey(name))
             {
-                this.TryLoadJobPackage(ref name); // lädt ggf. auch alle SubJobs
+                if (!String.IsNullOrEmpty(physicalJobPath))
+                {
+                    name = this.TryLoadJobPackage(physicalJobPath, name); // lädt ggf. auch alle SubJobs
+                }
+                else
+                {
+                    throw new ArgumentException("Der Pfad zum Job darf hier nicht leer sein.");
+                }
             }
             if (!String.IsNullOrEmpty(name) && this.LoadedJobPackages.ContainsKey(name))
             {
@@ -82,7 +98,9 @@ namespace LogicalTaskTree
             }
             else
             {
-                throw new ArgumentException(String.Format("Der Job oder Checker '{0}' wurde nicht gefunden (bitte auch auf Groß- und Kleinschreibung achten).", name));
+                throw new ArgumentException(String.Format(
+                    "Der Job oder Checker '{0}' wurde nicht gefunden"
+                    + " (bitte auch auf Groß- und Kleinschreibung achten).", name));
             }
         }
 
@@ -145,8 +163,10 @@ namespace LogicalTaskTree
         /// Im Fehlerfall wird einfach nichts hinzugefügt.
         /// Muss überschrieben werden.
         /// </summary>
+        /// <param name="physicalJobPath">Der physikalische Pfad zur JobDescription oder zum Job-Verzeichnis.</param>
         /// <param name="logicalJobName">Der logische Name des Jobs oder null beim Root-Job.</param>
-        protected abstract void TryLoadJobPackage(ref string logicalJobName);
+        /// <returns>Neu gesetzter, angepasster oder übergebener logicalJobName.</returns>
+        protected abstract string TryLoadJobPackage(string physicalJobPath, string? logicalJobName = null);
 
         /// <summary>
         /// Dictionary mit allen bisher geladenen JobPackages.

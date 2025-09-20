@@ -825,7 +825,7 @@ namespace Vishnu.ViewModel
         /// <summary>
         /// Name + (Id + gegebenenfalls ReferencedNodeId) der ursprünglich referenzierten SingleNode.
         /// </summary>
-        public string DebugNodeInfos
+        public virtual string DebugNodeInfos
         {
             get
             {

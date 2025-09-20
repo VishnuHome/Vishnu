@@ -1,4 +1,8 @@
-﻿using System;
+﻿using NetEti.Globals;
+using NetEti.ObjectSerializer;
+using System;
+using System.IO;
+using System.Xml;
 using Vishnu.Interchange;
 
 namespace LogicalTaskTree
@@ -158,7 +162,13 @@ namespace LogicalTaskTree
         {
             treeParams.BusinessLogicRoot = this;
             this.TreeParams = treeParams;
-            this._rootJobList = new JobList(treeParams, jobProvider);
+            this._appSettings = GenericSingletonProvider.GetInstance<AppSettings>();
+            this._rootJobList = new JobList(treeParams, jobProvider, this._appSettings.RootJobPackagePath);
+            if (this._appSettings.DumpLoadedJobs)
+            {
+                string jsonJobLog = Path.Combine(this._appSettings.WorkingDirectory, "LoadedJobs.json");
+                SerializationUtility.SaveToJsonFile<JobList>(this._rootJobList, jsonJobLog, includeFields: true);
+            }
         }
 
         static LogicalTaskTree()
@@ -170,7 +180,9 @@ namespace LogicalTaskTree
 
         #region private members
 
-        JobList _rootJobList;
+        private JobList _rootJobList;
+
+        private AppSettings _appSettings;
 
         #endregion private members
 

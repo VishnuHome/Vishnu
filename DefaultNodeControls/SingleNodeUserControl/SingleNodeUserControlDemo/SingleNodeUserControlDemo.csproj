@@ -11,8 +11,8 @@
     <Company>NetEti</Company>
     <Description>$(AssemblyName) - Demoprogramm</Description>
     <Copyright>Copyright © $(Authors) 2023-$([System.DateTime]::Now.Year)</Copyright>
-    <AssemblyVersion>8.1.6.0</AssemblyVersion>
-    <FileVersion>8.1.6.0</FileVersion>
+    <AssemblyVersion>8.4.0.1</AssemblyVersion>
+    <FileVersion>8.4.0.1</FileVersion>
   </PropertyGroup>
 
  	<PropertyGroup>

@@ -6,6 +6,9 @@ using NetEti.Globals;
 using System.Security;
 using System.Windows;
 using NetEti.FileTools;
+using NetEti.FileTools.Zip;
+using NetEti.ObjectSerializer;
+using System.Reflection.Metadata;
 
 namespace Vishnu.Interchange
 {
@@ -53,6 +56,42 @@ namespace Vishnu.Interchange
                 // this.FatalInitializationException = ex;
             }
         }
+
+        #region derived disposable
+
+        private bool _disposed = false;
+
+        /// <summary>
+        /// Abschlussarbeiten.
+        /// </summary>
+        /// <param name="disposing">False, wenn vom eigenen Destruktor aufgerufen.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
+            {
+                // Verwaltete Ressourcen der abgeleiteten Klasse freigeben
+                if (File.Exists(this._jsonJobPathesLog))
+                {
+                    try
+                    {
+                        File.Delete(this._jsonJobPathesLog);
+                    }
+                    catch { }
+                }
+            }
+
+            // Nicht verwaltete Ressourcen der abgeleiteten Klasse freigeben
+
+            _disposed = true;
+
+            // Basisklassen-Dispose aufrufen
+            base.Dispose(disposing);
+        }
+
+        #endregion derived disposable
 
         #region Properties (alphabetic)
 
@@ -117,6 +156,13 @@ namespace Vishnu.Interchange
         /// Default: false.
         /// </summary>
         public bool DemoModus { get; set; }
+
+        /// <summary>
+        /// Bei true wird wird der Main-Job und rekursiv alle Properties
+        /// und Unterklassen inklusive SubJobs in eine Json-Datei geschrieben.
+        /// Default: false
+        /// </summary>
+        public bool DumpLoadedJobs { get; set; }
 
         ///// <summary>
         ///// Bei true gibt Vishnu über den InfoController am Ende der
@@ -190,6 +236,13 @@ namespace Vishnu.Interchange
         private bool LoadJobDialog { get; set; }
 
         /// <summary>
+        /// Das bevorzugte Format für JobDescription-Dateien:
+        /// "xml" für "JobDescription.xml" oder "json" für "JobDescription.json".
+        /// Default: "xml".
+        /// </summary>
+        public string? PreferredJobDescriptionFormat { get; set; }
+
+        /// <summary>
         /// Der Dateipfad zum Verzeichnis der lokalen Konfiguration.
         /// Default: Pfad zum AppConfigUser-Verzeichnis.
         /// </summary>
@@ -244,12 +297,6 @@ namespace Vishnu.Interchange
         /// Dateipfad zum obersten Job.
         /// </summary>
         public string? RootJobPackagePath { get; set; }
-
-        /// <summary>
-        /// XML-Name des obersten Jobs.
-        /// Default: JobDescription.xml.
-        /// </summary>
-        public string RootJobXmlName { get; set; }
 
         /// <summary>
         /// Bei true werden mehrere Bildschirme als ein einziger
@@ -336,6 +383,12 @@ namespace Vishnu.Interchange
         public List<string> UncachedCheckers { get; set; }
 
         /// <summary>
+        /// Liste von Extensions von unterstützten JobDescriptions;
+        /// Default: ".xml".
+        /// </summary>
+        public List<string> ValidJobDescriptionExtensions { get; set; }
+
+        /// <summary>
         /// Verzeichnis, in dem Job-übergreifende Assemblies des Users abgelegt sind.
         /// </summary>
         public string UserAssemblyDirectory { get; set; }
@@ -416,15 +469,14 @@ namespace Vishnu.Interchange
             this.AppEnvAccessor.UnregisterKey("SnapshotDirectory");
             this.AppEnvAccessor.UnregisterKey("DebugFile");
             this.AppEnvAccessor.UnregisterKey("StatisticsFile");
-            bool defaultDemo = false;
 
             // Ermittlung der Properties VishnuRoot und UserAssemblyDirectory zur Laufzeit.
             string userAssemblyDirectoryCandidate = Path.Combine(this.ApplicationRootPath, @"../UserAssemblies");
             string relativeVishnuRoot = String.Empty;
-            string? vr = this.GetStringValue("VishnuRoot", null);
-            if (vr != null)
+            string? vishnuRoot = this.GetStringValue("VishnuRoot", null);
+            if (vishnuRoot != null)
             {
-                this.VishnuRoot = vr;
+                this.VishnuRoot = vishnuRoot;
                 this.VishnuSourceRoot = this.VishnuRoot;
             }
             else
@@ -475,43 +527,53 @@ namespace Vishnu.Interchange
                 this.AppEnvAccessor.RegisterKeyValue("UserAssemblyDirectory", this.UserAssemblyDirectory);
             }
 
-            string? tmpRootJobPackagePath = this.GetStringValue("Job", this.GetStringValue("1", null));
-            if (tmpRootJobPackagePath != null)
+            string? preferredJobDescriptionFormat = this.GetStringValue("PreferredJobDescriptionFormat", "xml");
+            preferredJobDescriptionFormat = preferredJobDescriptionFormat?.ToLower().Trim().TrimStart('.');
+            if (preferredJobDescriptionFormat == "json")
             {
-                this.RootJobPackagePath = this.ReplaceWildcards(tmpRootJobPackagePath);
+                this.PreferredJobDescriptionFormat = "json";
+                this.ValidJobDescriptionExtensions =
+                    new List<string>(".json;.xml".Split(';'));
             }
             else
             {
-                this.RootJobPackagePath = @"DemoJobs\Simple\CheckAll";
-                if (Directory.Exists(this.RootJobPackagePath))
-                {
-                    defaultDemo = true;
-                }
-                else
-                {
-                    this.RootJobPackagePath = "";
-                }
-            }
-            this.RootJobXmlName = "jobdescription.xml";
-            if (!String.IsNullOrEmpty(this.RootJobPackagePath))
-            {
-                if (this.RootJobPackagePath.ToLower().EndsWith(".xml"))
-                {
-                    this.RootJobXmlName = Path.GetFileName(this.RootJobPackagePath);
-                    this.RootJobPackagePath = Path.GetDirectoryName(this.RootJobPackagePath);
-                }
-                string? tmpPath = this.RootJobPackagePath;
-                if (this.RootJobXmlName.ToLower() != "jobdescription.xml")
-                {
-                    tmpPath = Path.Combine(tmpPath ?? "", Path.GetFileNameWithoutExtension(this.RootJobXmlName));
-                }
-                this.MainJobName = Path.GetFileNameWithoutExtension(tmpPath) ?? String.Empty;
-            }
-            else
-            {
-                this.MainJobName = String.Empty;
+                this.PreferredJobDescriptionFormat = "xml";
+                this.ValidJobDescriptionExtensions =
+                    new List<string>(".xml;.json".Split(';'));
             }
 
+            // --------------------------------------------------------------------------------------------------------
+            // Ab hier wird der Job-Pfad übernommen oder auf Demo-Job-Pfad gesetzt, ein Job-Name gesetzt und
+            // RootJobPhysicalName von RootJobPackagePath separiert.
+            // --------------------------------------------------------------------------------------------------------
+            this.JobDirPathes = new Stack<string>();
+            this.JobDirPathes.Push(Path.Combine(Path.GetDirectoryName(this.UserAssemblyDirectory) ?? "", "Vishnu.bin"));
+            this.JobDirPathes.Push(Path.Combine(this.VishnuSourceRoot, "VishnuHome/Tests"));
+            this.JobDirPathes.Push(Path.Combine(this.VishnuSourceRoot, "VishnuHome/Documentation"));
+            this.JobDirPathes.Push(this.ApplicationRootPath);
+            this.JobDirPathes.Push("");
+            string? rootJobPackagePath = this.GetStringValue("Job", this.GetStringValue("1", null));
+            // mögliche Belegungen (bei allen sind Wildcards '%xyz%' möglich):
+            // 1. Pfad zum Jobverzeichnis
+            // 2. Pfad inklusive JobDescription.{xml|json}
+            // 3. Pfad mit Endung .zip oder ohne Endung, aber gezipptes File
+            // 4. null
+            bool defaultDemo = false;
+            if (rootJobPackagePath == null)
+            {
+                rootJobPackagePath = @"DemoJobs\Simple\CheckAll";
+                defaultDemo = true;
+            }
+            this.DemoModus = this.GetValue<bool>("DemoModus", defaultDemo);
+            this.RootJobPackagePath = this.PrepareAndLocatePath(rootJobPackagePath, this.JobDirPathes.ToArray());
+            this.MainJobName = Path.GetFileNameWithoutExtension(this.RootJobPackagePath);
+            if (this.MainJobName.ToLower() == "jobdescription")
+            {
+                this.MainJobName = Path.GetFileName(Path.GetDirectoryName(
+                    this.RootJobPackagePath)) ?? "";
+            }
+            this.AppEnvAccessor.RegisterKeyValue("JobDirectory", this.RootJobPackagePath);
+            // --------------------------------------------------------------------------------------------------------
             string? tmpDirectory = null;
             if (this.AppEnvAccessor.IsDefault("WorkingDirectory"))
             {
@@ -534,23 +596,20 @@ namespace Vishnu.Interchange
             this.AppEnvAccessor.RegisterKeyValue("WorkingDirectory", this.WorkingDirectory);
             this.LocalConfigurationDirectory = this.GetStringValue("LocalConfigurationDirectory", Path.GetDirectoryName(this.AppConfigUser));
 
-            this.DemoModus = this.GetValue<bool>("DemoModus", defaultDemo);
-            this.JobDirPathes = new Stack<string>();
-            this.JobDirPathes.Push(Path.Combine(Path.GetDirectoryName(this.UserAssemblyDirectory) ?? "", "Vishnu.bin"));
-            this.JobDirPathes.Push(Path.Combine(this.VishnuSourceRoot, "VishnuHome/Tests"));
-            this.JobDirPathes.Push(Path.Combine(this.VishnuSourceRoot, "VishnuHome/Documentation"));
-            this.JobDirPathes.Push(this.ApplicationRootPath);
-            this.JobDirPathes.Push("");
-            this.RootJobPackagePath = NetworkMappingsRefresher.GetNextReachablePath(this.RootJobPackagePath, this.JobDirPathes.ToArray())
-                ?? throw new ApplicationException("Es wurde kein gültiger Job-Pfad gefunden.");
-            this.AppEnvAccessor.RegisterKeyValue("JobDirectory", this.RootJobPackagePath);
-
             this.SnapshotDirectory = this.GetStringValue("SnapshotDirectory", "..\\Snapshots") ?? String.Empty;
             if (!(this.SnapshotDirectory.Contains(":")
                   || this.SnapshotDirectory.StartsWith(@"/")
                   || this.SnapshotDirectory.StartsWith(@"\")))
             {
-                this.SnapshotDirectory = Path.Combine(this.RootJobPackagePath, this.SnapshotDirectory);
+                if (!Directory.Exists(this.RootJobPackagePath))
+                {
+                    this.SnapshotDirectory = Path.Combine(
+                        Path.GetDirectoryName(this.RootJobPackagePath) ?? "", this.SnapshotDirectory);
+                }
+                else
+                {
+                    this.SnapshotDirectory = Path.Combine(this.RootJobPackagePath, this.SnapshotDirectory);
+                }
             }
             this.AppEnvAccessor.RegisterKeyValue("SnapshotDirectory", this.SnapshotDirectory);
 
@@ -563,7 +622,7 @@ namespace Vishnu.Interchange
             this.AcceptNullResults = this.GetValue<bool>("AcceptNullResults", false);
 
             this.UserParameterReaderPath = this.GetStringValue("UserParameterReaderPath", null);
-            this.StartTreeOrientation = (TreeOrientation)Enum.Parse(typeof(TreeOrientation), 
+            this.StartTreeOrientation = (TreeOrientation)Enum.Parse(typeof(TreeOrientation),
                 this.GetStringValue("StartTreeOrientation", "AlternatingHorizontal") ?? "AlternatingHorizontal");
             this.StartWithJobs = this.GetValue<bool>("StartWithJobs", false);
             string? userCheckerArrayString = this.GetStringValue("UncachedCheckers", null);
@@ -658,7 +717,7 @@ namespace Vishnu.Interchange
             }
             this.XUnlock.MakeReadOnly();
             this.NoWorkers = this.GetValue<bool>("NoWorkers", false);
-            //this.DumpAppSettings = this.GetValue<bool>("DumpAppSettings", false);
+            this.DumpLoadedJobs = this.GetValue<bool>("DumpLoadedJobs", false);
             if (!String.IsNullOrEmpty(this.UserParameterReaderPath))
             {
                 string resolvedUserParameterReaderPath = "???";
@@ -678,6 +737,90 @@ namespace Vishnu.Interchange
             this.SetSleepTime(sleepTimeString);
             string snapshotSustainString = this.GetStringValue("SnapshotSustain", "00:00:02") ?? "00:00:02";
             this.SetSnapshotSustain(snapshotSustainString);
+        }
+
+        /// <summary>
+        /// Übernimmt einen Pfad-Kandidaten zu einer Datei oder einem Verzeichnis.
+        /// Ersetzt Wildcards der Form "%Name%" innerhalb des Pfad-Kandidaten,
+        /// ergänzt diesen anhand der zusätzlich übergebenen verschiedenen pathCandidates,
+        /// versucht verschiedene Endungen (z.B. ".zip") und/oder ".xml" oder ".json"
+        /// und prüft die Existenz bzw. Erreichbarkeit.
+        /// </summary>
+        /// <param name="rawPath">Absoluter oder relativer Pfad, der zu ergänzen und zu prüfen ist.</param>
+        /// <param name="pathCandidates">Mögliche Pfad-Teile zum Kombinieren; Default: this.JobDirPathes.ToArray().</param>
+        /// <param name="throwIfFail">Wenn der Path nicht existiert und throwIfFail true ist, wird eine Exception geworfen; defaule: true.</param>
+        /// <returns>Modifizierter und verifizierter Pfad zu einer Datei oder leerer String.</returns>
+        /// <exception cref="ArgumentException">Exception, wenn kein Pfad übergeben wurde.</exception>
+        /// <exception cref="FileNotFoundException">Exception, wenn kein möglicher Pfad existiert.</exception>
+        public string PrepareAndLocatePath(string? rawPath, string[]? pathCandidates = null, bool throwIfFail = true)
+        {
+            if (rawPath == null)
+            {
+                throw new ArgumentException("Es wurde kein gültiger Job-Pfad gefunden.");
+            }
+            if (pathCandidates == null)
+            {
+                pathCandidates = this.JobDirPathes.ToArray();
+            }
+            string tmpPath = ReplaceWildcardsAndPathes(rawPath, pathCandidates);
+            tmpPath = UnpackIfPacked(tmpPath);
+            if (!Directory.Exists(tmpPath) && !File.Exists(tmpPath))
+            {
+                foreach (string extension in this.ValidJobDescriptionExtensions)
+                {
+                    string tmpPath2 = tmpPath + extension;
+                    if (File.Exists(tmpPath2))
+                    {
+                        tmpPath = tmpPath2;
+                        break;
+                    }
+                }
+            }
+            if (Directory.Exists(tmpPath))
+            {
+                tmpPath = Path.Combine(tmpPath, "JobDescription");
+                foreach (string extension in this.ValidJobDescriptionExtensions)
+                {
+                    string tmpPath2 = tmpPath + extension;
+                    if (File.Exists(tmpPath2))
+                    {
+                        tmpPath = tmpPath2;
+                        break;
+                    }
+                }
+            }
+            if (throwIfFail && !File.Exists(tmpPath))
+            {
+                throw new FileNotFoundException(String.Format(
+                    $"Der Pfad wurde nicht gefunden: {rawPath}."));
+            }
+            return tmpPath;
+        }
+
+        /// <summary>
+        /// Ersetzt Wildcards und Pfade in einem Parameter-String.
+        /// </summary>
+        /// <param name="para">String mit Parametern, in denen Wildcards ersetzt werden sollen.</param>
+        /// <param name="searchDirectories">Array von Pfaden, die ggf. durchsucht/eingesetzt werden.</param>
+        /// <returns>Der "para"-String mit ersetzten Wildcards.</returns>
+        public string ReplaceWildcardsAndPathes(string para, string[] searchDirectories)
+        {
+            para = this.ReplaceWildcards(para);
+            string paraString = "";
+            string delimiter = "";
+            foreach (string paraPart in para.Split('|'))
+            {
+                string modifiedParaPart = paraPart;
+                if (modifiedParaPart.Trim() != String.Empty)
+                {
+                    string path = NetworkMappingsRefresher.GetNextReachablePath(
+                        modifiedParaPart, searchDirectories) ?? modifiedParaPart;
+                    modifiedParaPart = path.Replace(@"Plugin\Plugin", "Plugin");
+                }
+                paraString += delimiter + modifiedParaPart;
+                delimiter = "|";
+            }
+            return paraString;
         }
 
         // Alter Kommentar: Achtung: diese String-Ersetzung verursacht Memory-Leaks! Deshalb nicht in Loops verwenden.
@@ -753,6 +896,7 @@ namespace Vishnu.Interchange
         private IParameterReader? _userParameterReader;
         private string? _userParameterReaderParameters;
         private bool _sleepTimeSet;
+        private string _jsonJobPathesLog;
 
         /// <summary>
         /// Private Konstruktor, wird ggf. über Reflection vom externen statischen
@@ -787,6 +931,69 @@ namespace Vishnu.Interchange
         private void OnUserParametersReloaded()
         {
             UserParametersReloaded?.Invoke(this, new EventArgs());
+        }
+
+        // Wenn der Job ein ZIP-Archiv ist, wird der Job ins WorkingDirectory
+        // entpackt und ein angepasster Pfad zum Job zurückgeliefert.
+        private string UnpackIfPacked(string physicalJobPath)
+        {
+            string tmpPath = physicalJobPath;
+            if (!File.Exists(tmpPath))
+            {
+                tmpPath = tmpPath.TrimEnd('\\').TrimEnd('/') + ".zip";
+            }
+            if (File.Exists(tmpPath))
+            {
+                ZipAccess zipAccess = new ZipAccess();
+                try
+                {
+                    if (zipAccess.IsZip(tmpPath))
+                    {
+                        if (String.IsNullOrEmpty(this.ZipRelativeDummyDirectory)
+                            || !Directory.Exists(this.ZipRelativeDummyDirectory))
+                        {
+                            this.CreateAndRememberZipRelativeDummyDirectory(tmpPath);
+                        }
+                        physicalJobPath = this.Unpack(tmpPath, zipAccess);
+                    }
+                }
+                finally
+                {
+                    zipAccess.Dispose();
+                }
+            }
+            return physicalJobPath;
+        }
+
+        // Entpackt einen Job aus einem ZIP-Archiv.
+        private string Unpack(string archive, ZipAccess zipAccess)
+        {
+            string rtn = Directory.GetCurrentDirectory();
+            zipAccess.UnZipArchive(archive, this.WorkingDirectory, null, false);
+            string archivePath = Path.Combine(Path.GetDirectoryName(archive) ?? "", Path.GetFileNameWithoutExtension(archive));
+            if (!this.AssemblyDirectories.Contains(archivePath))
+            {
+                this.AssemblyDirectories.Add(archivePath);
+            }
+            if (!this.JobDirPathes.Contains(archivePath))
+            {
+                this.JobDirPathes.Push(archivePath);
+            }
+            rtn = Path.Combine(this.WorkingDirectory, Path.GetFileNameWithoutExtension(archive));
+            return rtn;
+        }
+
+        private void CreateAndRememberZipRelativeDummyDirectory(string zipPath)
+        {
+            string fallbackDirectory = Directory.GetCurrentDirectory();
+            string randomDirectoryName = Path.Combine(Path.GetDirectoryName(zipPath) ?? fallbackDirectory,
+                Path.GetRandomFileName() + ".v");
+            Directory.CreateDirectory(randomDirectoryName);
+            this.ZipRelativeDummyDirectory = randomDirectoryName;
+            if (!this.JobDirPathes.Contains(randomDirectoryName))
+            {
+                this.JobDirPathes.Push(randomDirectoryName);
+            }
         }
 
         private void SetSnapshotSustain(string snapshotSustainString)
@@ -942,6 +1149,21 @@ namespace Vishnu.Interchange
 
             private IParameterReader _parameterReader;
             private string _pathToReader;
+        }
+
+        /// <summary>
+        /// Speichert die aktuellen Suchpfade in eine externe Json-Datei
+        /// zur weiteren Verwendung in anderen Prozessen über GetResolvedVishnuPath.
+        /// </summary>
+        public void SaveJobPathes()
+        {
+            string jsonJobLog = VishnuAssemblyLoader.GetJobPathesLogPath(this.ProcessId.ToString());
+            List<string> jobPathes =
+                new List<string>(this.AssemblyDirectories);
+            SerializationUtility.SaveToJsonFile<List<string>>(jobPathes, jsonJobLog, includeFields: true);
+            this._jsonJobPathesLog = jsonJobLog;
+            string fallbackJsonJobLog = VishnuAssemblyLoader.GetJobPathesLogPath("0");
+            SerializationUtility.SaveToJsonFile<List<string>>(jobPathes, fallbackJsonJobLog, includeFields: true);
         }
 
         #endregion private members

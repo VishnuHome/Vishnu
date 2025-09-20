@@ -12,8 +12,8 @@
     <Company>NetEti</Company>
     <Description>Haupt-Verarbeitungslogik von Vishnu</Description>
     <Copyright>Copyright © $(Authors) 2012-$([System.DateTime]::Now.Year)</Copyright>
-    <AssemblyVersion>8.2.0.0</AssemblyVersion>
-    <FileVersion>8.2.0.0</FileVersion>
+    <AssemblyVersion>8.4.0.2</AssemblyVersion>
+    <FileVersion>8.4.0.2</FileVersion>
     <PackageTags>NetEti Vishnu Businesslogic</PackageTags>
   </PropertyGroup>
 
@@ -84,6 +84,10 @@
 		  </ItemGroup>
     </Otherwise>
 	</Choose>
+
+	<ItemGroup>
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Vishnu.Interchange\Vishnu.Interchange.csproj" />

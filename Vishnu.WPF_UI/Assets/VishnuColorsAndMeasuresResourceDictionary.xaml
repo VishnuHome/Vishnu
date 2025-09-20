@@ -72,8 +72,13 @@
     <SolidColorBrush x:Key="MenuButtonForeground.Brush">DarkGreen</SolidColorBrush>
     <SolidColorBrush x:Key="MenuItemBorder.Brush">Green</SolidColorBrush>
     <SolidColorBrush x:Key="ContextMenuBorder.Brush">Black</SolidColorBrush>
-    <DropShadowBitmapEffect x:Key="DropShadowEffect" />
-
+    <!-- deprecated: DropShadowBitmapEffect x:Key="DropShadowEffect" /-->
+    <DropShadowEffect x:Key="DropShadowEffect"
+            Color="Black"
+            Direction="315"
+            ShadowDepth="5"
+            BlurRadius="10"
+            Opacity="1.0" />
     <sys:Double x:Key="ColorRing.Width">9</sys:Double>
     <sys:Double x:Key="ColorPoint.Width">7</sys:Double>
     <CornerRadius x:Key="ItemBorder.CornerRadius">1</CornerRadius>
