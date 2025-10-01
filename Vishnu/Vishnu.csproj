@@ -13,8 +13,8 @@
     <Company>NetEti</Company>
     <Description>Monitoring- und Prozesssteuerungssoftware mit integrierter Verarbeitung erweiterter logischer Ausdrücke.</Description>
     <Copyright>Copyright © $(Authors) 2012-$([System.DateTime]::Now.Year)</Copyright>
-    <AssemblyVersion>8.4.0.2</AssemblyVersion>
-    <FileVersion>8.4.0.2</FileVersion>
+    <AssemblyVersion>8.4.0.3</AssemblyVersion>
+    <FileVersion>8.4.0.3</FileVersion>
     <PackageTags>NetEti Vishnu Node Control View</PackageTags>
   </PropertyGroup>
 
@@ -100,6 +100,7 @@
 	</ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Management" Version="8.0.0" />
   </ItemGroup>

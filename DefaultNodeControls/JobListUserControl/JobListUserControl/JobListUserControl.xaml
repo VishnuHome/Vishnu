@@ -9,6 +9,7 @@
              xmlns:convert="clr-namespace:Vishnu.WPF_UI.ValueConverter;assembly=Vishnu.WPF_UI"
              xmlns:vm="clr-namespace:Vishnu.ViewModel;assembly=Vishnu.ViewModel"
              xmlns:attached="clr-namespace:Vishnu.WPF_UI.DependencyProperties;assembly=Vishnu.WPF_UI"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
              mc:Ignorable="d" 
              x:Name="JobListUserControlXaml"
@@ -70,6 +71,11 @@
                                 </ctrl:CustomProgressBar.Foreground>
                             </ctrl:CustomProgressBar>
                             <Grid x:Name="ToggleButtonBorderLogicalChild" Margin="4,7,4,7" Grid.Row="0" Grid.Column="0">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseEnter">
+                                        <i:InvokeCommandAction Command="{Binding RefreshCanExecuteCommand}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />

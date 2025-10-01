@@ -43,6 +43,10 @@
 	</Choose>
 
 	<ItemGroup>
+	  <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\..\..\Vishnu.Interchange\Vishnu.Interchange.csproj" />
 	  <ProjectReference Include="..\..\..\Vishnu.ViewModel\Vishnu.ViewModel.csproj" />
 	  <ProjectReference Include="..\..\..\Vishnu.WPF_UI\Vishnu.WPF_UI.csproj" />

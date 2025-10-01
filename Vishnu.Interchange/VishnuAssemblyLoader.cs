@@ -264,18 +264,33 @@ namespace Vishnu.Interchange
         /// <returns>Geladene Assembly oder null</returns>
         private Assembly? dynamicLoadAssembly(string slavePathName, bool quiet, bool force = false)
         {
-            Assembly? candidate = null;
-            foreach (string assemblyDirectory in (new List<string> { "" }).Union(this._assemblyDirectories))
+            string slaveFileName = Path.GetFileName(slavePathName.Trim());
+            if (!slaveFileName.ToLower().EndsWith(".dll"))
             {
-                string dllPath = Path.Combine(assemblyDirectory, slavePathName).Replace(@"Plugin\Plugin", "Plugin");
-                if (!dllPath.ToLower().EndsWith(".dll"))
-                {
-                    dllPath += ".dll";
-                }
+                slaveFileName += ".dll";
+            }
+            string slaveDirectoryName = Path.GetDirectoryName(slavePathName.Trim()) ?? "";
+            IEnumerable<string> searchDirectories = (new List<string> { "" }).Union(this._assemblyDirectories);
+            Assembly? candidate = null;
+            foreach (string assemblyDirectory in searchDirectories)
+            {
+                string dllPath = Path.Combine(assemblyDirectory, slaveDirectoryName, slaveFileName).Replace(@"Plugin\Plugin", "Plugin");
                 candidate = this.directLoadAssembly(dllPath, quiet, force);
                 if (candidate != null)
                 {
                     break;
+                }
+            }
+            if (candidate == null)
+            {
+                foreach (string assemblyDirectory in searchDirectories)
+                {
+                    string dllPath = Path.Combine(assemblyDirectory, slaveFileName);
+                    candidate = this.directLoadAssembly(dllPath, quiet, force);
+                    if (candidate != null)
+                    {
+                        break;
+                    }
                 }
             }
             if (candidate == null)

@@ -11,8 +11,8 @@
     <Company>NetEti</Company>
     <Description>Assembly mit einem User-Interface für die MVVM-Anwendung Vishnu</Description>
     <Copyright>Copyright © $(Authors) 2012-$([System.DateTime]::Now.Year)</Copyright>
-    <AssemblyVersion>8.4.0.2</AssemblyVersion>
-    <FileVersion>8.4.0.2</FileVersion>
+    <AssemblyVersion>8.4.0.3</AssemblyVersion>
+    <FileVersion>8.4.0.3</FileVersion>
     <PackageTags>NetEti Vishnu Main View</PackageTags>
   </PropertyGroup>
 
@@ -102,6 +102,10 @@
     <Page Remove="Assets\LogicalTaskTreeControlResourceDictionary_LightTech.xaml" />
     <Page Remove="Assets\LogicalTaskTreeControlResourceDictionary_StandardGrey.xaml" />
     <Page Remove="LogicalTaskTreeControl_top.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
   </ItemGroup>
 
   <ItemGroup>

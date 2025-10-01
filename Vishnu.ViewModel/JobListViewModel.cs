@@ -126,6 +126,11 @@ namespace Vishnu.ViewModel
         /// </summary>
         public ICommand BreakLogicalTaskTree { get { return this._btnBreakTaskTreeRelayCommand; } }
 
+        /// <summary>
+        /// Zusatz-Command nur zum Auslösen der CanExecute-Abfrage
+        /// </summary>
+        public ICommand RefreshCanExecuteCommand { get { return this._btnRefreshCanExecuteCommand; } }
+
         #endregion published members
 
         /// <summary>
@@ -143,6 +148,7 @@ namespace Vishnu.ViewModel
             this._btnRunTaskTreeRelayCommand = new RelayCommand(runTaskTreeExecute, canRunTaskTreeExecute);
             this._btnRunOrBreakTaskTreeRelayCommand = new RelayCommand(runOrBreakTaskTreeExecute, canRunOrBreakTaskTreeExecute);
             this._btnBreakTaskTreeRelayCommand = new RelayCommand(breakTaskTreeExecute, canBreakTaskTreeExecute);
+            this._btnRefreshCanExecuteCommand = new RelayCommand(refreshCanExecuteExecute);
             this._myLogicalNode.NodeStateChanged -= this.treeElementStateChanged;
             this._myLogicalNode.NodeStateChanged += this.treeElementStateChanged;
         }
@@ -210,6 +216,7 @@ namespace Vishnu.ViewModel
         private RelayCommand _btnRunTaskTreeRelayCommand;
         private RelayCommand _btnRunOrBreakTaskTreeRelayCommand;
         private RelayCommand _btnBreakTaskTreeRelayCommand;
+        private RelayCommand _btnRefreshCanExecuteCommand;
 
         private void runTaskTreeExecute(object? parameter)
         {
@@ -267,6 +274,12 @@ namespace Vishnu.ViewModel
                 return false;
             }
             return true;
+        }
+
+        private void refreshCanExecuteExecute(object? parameter)
+        {
+            // CommandManager.InvalidateRequerySuggested();
+            this.treeElementStateChanged(this, NodeState.Null);
         }
 
         private void treeElementStateChanged(object sender, NodeState state)
