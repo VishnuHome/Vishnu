@@ -38,6 +38,11 @@
             <DataTemplate DataType="{x:Type vm:JobListViewModel}">
                 <Border Name="ItemBorder" HorizontalAlignment="Stretch" Padding="5" Background="Transparent" BorderThickness="3" BorderBrush="Transparent"
                         CornerRadius="6" MouseDown="ItemBorder_MouseDown" Visibility="{Binding Visibility}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseEnter">
+                            <i:InvokeCommandAction Command="{Binding RefreshCanExecuteCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                     <Grid Name="MainGrid" HorizontalAlignment="Stretch" ToolTip="{StaticResource cmToolTip}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
@@ -71,11 +76,6 @@
                                 </ctrl:CustomProgressBar.Foreground>
                             </ctrl:CustomProgressBar>
                             <Grid x:Name="ToggleButtonBorderLogicalChild" Margin="4,7,4,7" Grid.Row="0" Grid.Column="0">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="MouseEnter">
-                                        <i:InvokeCommandAction Command="{Binding RefreshCanExecuteCommand}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />

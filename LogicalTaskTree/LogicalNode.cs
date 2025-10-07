@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.Windows.Threading;
 using System.Windows.Shell;
 using NetEti.MultiScreen;
+using System.Runtime.CompilerServices;
 
 namespace LogicalTaskTree
 {
@@ -1155,9 +1156,14 @@ namespace LogicalTaskTree
 
                 // 02.12.2023 Nagel+
                 GC.Collect();
-                GC.WaitForPendingFinalizers();
-                GC.Collect();
-                LogMemory();
+                // 06.10.2025 Nagel+: Nur im DebugMode wegen möglicher Blockierung
+                //                    u.a. in "--job=TestJobs\CheckAnyTreeEvent"
+                if (GenericSingletonProvider.GetInstance<AppSettings>().DebugMode)
+                {
+                    GC.WaitForPendingFinalizers();
+                    GC.Collect();
+                    LogMemory();
+                } // 06.10.2025 Nagel-
                 // 02.12.2023 Nagel-
             }
         }
@@ -2461,9 +2467,14 @@ namespace LogicalTaskTree
         /// </summary>
         internal static void WaitWhileTreePausedOrFlushing()
         {
-            while (LogicalNode.IsTreeFlushing || LogicalNode.IsTreePaused)
+            int x = 0; // Notfallabbruch nach 5 Sekunden.
+            while ((LogicalNode.IsTreeFlushing || LogicalNode.IsTreePaused) && ++x < 500)
             {
                 Thread.Sleep(LogicalNode.HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
+            }
+            if (x >= 500)
+            {
+                InfoController.GetInfoPublisher().Publish(null, "Vishnu: WaitWhileTreePausedOrFlushing timeout.", InfoType.NoRegex);
             }
         }
 
@@ -2472,9 +2483,15 @@ namespace LogicalTaskTree
         /// </summary>
         internal static void WaitWhileTreePaused()
         {
-            while (LogicalNode.IsTreePaused)
+            int x = 0; // Notfallabbruch nach 5 Sekunden.
+            while (LogicalNode.IsTreePaused && ++x < 500)
             {
+
                 Thread.Sleep(LogicalNode.HOLDEDTREELOOPSLEEPTIMEMILLISECONDS);
+            }
+            if (x >= 500)
+            {
+                InfoController.GetInfoPublisher().Publish(null, "Vishnu: WaitWhileTreePausedOrFlushing timeout.", InfoType.NoRegex);
             }
         }
 
