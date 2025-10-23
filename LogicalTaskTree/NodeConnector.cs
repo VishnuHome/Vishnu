@@ -20,8 +20,9 @@ namespace LogicalTaskTree
     /// Autor: Erik Nagel
     ///
     /// 27.05.2013 Erik Nagel: erstellt
+    /// 23.10.2025 Erik Nagel: Berücksichtigung des neuen Interfaces IUntraversable.
     /// </remarks>
-    public class NodeConnector : NodeParent
+    public class NodeConnector : NodeParent, IUntraversableElement
     {
 
         #region public members

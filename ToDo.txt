@@ -1,5 +1,5 @@
 ERLEDIGT: UI. variable Ausrichtung pro Subtree
-ERLEDIGT: über Filter nachdenken (z.B. Datum -> Tag) => ValueModifier.
+ERLEDIGT: Ã¼ber Filter nachdenken (z.B. Datum -> Tag) => ValueModifier.
 ERLEDIGT: Rekursion bei Job-LogicalExpression abfangen
 ERLEDIGT: ReturnObject-Wert anzeigen (bei Maus-hover)
 		ERLEDIGT: Bei Anzeige von ReturnObject-Wert OperationCanceledException ausblenden
@@ -8,17 +8,17 @@ ERLEDIGT: Zustandsfehler bei Run/Break (Tag) beheben
 ERLEDIGT: Untere Scrollbar sichtbar halten, wenn vorhanden.
 ERLEDIGT: Endlosloop bei nur einem Ausdrucksteil beheben
 		ERLEDIGT: Folgeaufgabe: in diesem Fall den Pseudo-Operator 'IS' ausgeben
-ERLEDIGT: GUI-Freeze bei wiederholtem Betätigen des Run-Buttons untersuchen und beheben
-		ERLEDIGT: Aussagekräftigeres Logging implementieren
+ERLEDIGT: GUI-Freeze bei wiederholtem BetÃ¤tigen des Run-Buttons untersuchen und beheben
+		ERLEDIGT: AussagekrÃ¤ftigeres Logging implementieren
 		War eine Durch das erweiterte Logging (Statistics.Inc) analysierbar
-		gewordene Überlastung des Systems durch regelmäßige, rekursive Statusabfragen.
-		Durch Merken der letzten Zustände (wenn zulässig) massive Lastverringerung erreicht.
-ERLEDIGT: Exceptionhandling überarbeiten (Meldungen statt "funktioniert nicht mehr")
+		gewordene Ãœberlastung des Systems durch regelmÃ¤ÃŸige, rekursive Statusabfragen.
+		Durch Merken der letzten ZustÃ¤nde (wenn zulÃ¤ssig) massive Lastverringerung erreicht.
+ERLEDIGT: Exceptionhandling Ã¼berarbeiten (Meldungen statt "funktioniert nicht mehr")
 ERLEDIGT: Beim Start des Trees Timer-gesteuerte Knoten direkt mit dem Timer-Symbol anzeigen
 ERLEDIGT: Anzeige von Break bei Referenzen
 ERLEDIGT: Verbindung der Knoten zueinander darstellen (insbesondere bei alternierender Ausrichtung)
 ERLEDIGT: Run und Break in NodeConnector implementieren
-ERLEDIGT: ValueModifier mit zusätzlicher Logik zulassen (externe Dll).
+ERLEDIGT: ValueModifier mit zusÃ¤tzlicher Logik zulassen (externe Dll).
 ERLEDIGT: MAXWIDTH/MAXHEIGHT variabler gestalten
 ERLEDIGT: Bei Strg+Mausklick den Teilbaum komplett ein- ausklappen
 		ERLEDIGT: Bei Shift+Mausklick den kompletten Baum komplett ein- ausklappen
@@ -27,153 +27,153 @@ ERLEDIGT: Bei komplettem Expand (UserNode) und folgendem kompletten Collapse
 ERLEDIGT: Reihenfolgeproblem bei der Referenzierung in NodeConnectoren
 ERLEDIGT: Unterer Tag in 'UserJob' startet nicht alleine
 ERLEDIGT: User.dll erkennt den 15.07. nicht (meldet nach wie vor den 01.07.)
-ERLEDIGT: Möglicherweise lösen Worker zu oft aus - untersuchen!
+ERLEDIGT: MÃ¶glicherweise lÃ¶sen Worker zu oft aus - untersuchen!
 					LogicalNode.OnLogicalChanged
 					Multithreading-Problem!
-ERLEDIGT: Worker werden manchmal fälschlicherweise als ungültig klassifiziert (Locking)
-ERLEDIGT: Verschiedene, variable Aulöser, nicht nur Timer - Interface?
+ERLEDIGT: Worker werden manchmal fÃ¤lschlicherweise als ungÃ¼ltig klassifiziert (Locking)
+ERLEDIGT: Verschiedene, variable AulÃ¶ser, nicht nur Timer - Interface?
 		ERLEDIGT: Folgeaufgabe: benannte Trigger, die auch
-							von mehreren Knoten referenziert werden können
+							von mehreren Knoten referenziert werden kÃ¶nnen
 ERLEDIGT: Logischer Zustand kommt bei hoher Timer-Frequenz
 					(zB. UserJobProvider bei 200 MS Trigger) oben nicht mehr an.
-					Lösungsansatz: immer den letzten NotNullLogical berücksichtigen;
+					LÃ¶sungsansatz: immer den letzten NotNullLogical berÃ¼cksichtigen;
 					Schalter IsVolatile (default false).
-ERLEDIGT: Fortschritt % sollte höchstens den Anteil der Childs widerspiegeln,
+ERLEDIGT: Fortschritt % sollte hÃ¶chstens den Anteil der Childs widerspiegeln,
 					die ein LogicalNotNull haben;
 					Schalter IsVolatile (default false).
 ERLEDIGT: Letzten Logical immer mit anzeigen (als kleineren Kreis in der Mitte).
-		Erledigt: (nicht mehr erforderlich) Option für Sammeln von letzten Zuständen schaffen!
+		Erledigt: (nicht mehr erforderlich) Option fÃ¼r Sammeln von letzten ZustÃ¤nden schaffen!
 ERLEDIGT: Logger auslagern + benannte Logger, die auch von mehreren Knoten referenziert
-					werden können.
-ERLEDIGT: Durchgängigkeit von Checker und ValueModifier prüfen/herstellen:
+					werden kÃ¶nnen.
+ERLEDIGT: DurchgÃ¤ngigkeit von Checker und ValueModifier prÃ¼fen/herstellen:
 					kann der ValueModifier Trigger und Logger? - nicht sinnvoll, muss der referenzierte
 					Checker handeln.
-					ist der Checker evtl. als Spezialfall des ValueModifiers zu betrachten? - müßige Frage.
+					ist der Checker evtl. als Spezialfall des ValueModifiers zu betrachten? - mÃ¼ÃŸige Frage.
 ERLEDIGT: Thread-safe LockedCheckerShell implementieren.
-ERLEDIGT: JobProvider soll als Public-Property seinen Root-Job Namen veröffentlichen.
+ERLEDIGT: JobProvider soll als Public-Property seinen Root-Job Namen verÃ¶ffentlichen.
 ERLEDIGT: Verzeichnisse Plugins und Assemblies zusammenlegen.
-ERLEDIGT: Logger ausprogrammieren: alle Events berücksichtigen.
+ERLEDIGT: Logger ausprogrammieren: alle Events berÃ¼cksichtigen.
 		ERLEDIGT: Folgeaufgabe: Referenzen auf Logger oberhalb des aktuellen Jobs zulassen.
-ERLEDIGT: Dlls von Exen finden; Die Dlls müssen im selben Verzeichnis wie die Exen liegen.
-ERLEDIGT: Zusätzlich Exceptions (Events) nach oben weiter bubblen.
+ERLEDIGT: Dlls von Exen finden; Die Dlls mÃ¼ssen im selben Verzeichnis wie die Exen liegen.
+ERLEDIGT: ZusÃ¤tzlich Exceptions (Events) nach oben weiter bubblen.
 		ERLEDIGT: Zusatzaufgabe: die Original-Quelle erhalten.
 ERLEDIGT: Pfad zum Knoten beim Logging mitgeben.
 ERLEDIGT: Umschalten zwischen horizontaler, vertikaler und alternierender Darstellung
 					im Tree im Betrieb
-ERLEDIGT: Erweiterte Parameterübergabe an Logger, Checker, Worker überprüfen, realisieren
+ERLEDIGT: Erweiterte ParameterÃ¼bergabe an Logger, Checker, Worker Ã¼berprÃ¼fen, realisieren
 ERLEDIGT: Unterschiedliche Behandlung von Loggern, Workern, Triggern bereinigen;
 		Allgemein: TreeEvents anstelle von LogIfConfigured und Worker.LogicalExpression;
 		TreeEvent-Aufbau: Knoten[|ALL]:EventName[:Value]
-ERLEDIGT: Zwei-Vishnu-Kommunikation; Es dürfen nicht beide Vishnus dieselben Prozesse überwachen,
-					sondern ein Vishnu muss ein Satellit sein, der den Haupt-Vishnu überwacht und der Haupt-
-					Vishnu muss zusäzlich den Satelliten überwachen.
-		ERLEDIGT: Rumspielen: Trigger hört auf anderen Vishnu, Worker schaltet anderen Trigger ...
+ERLEDIGT: Zwei-Vishnu-Kommunikation; Es dÃ¼rfen nicht beide Vishnus dieselben Prozesse Ã¼berwachen,
+					sondern ein Vishnu muss ein Satellit sein, der den Haupt-Vishnu Ã¼berwacht und der Haupt-
+					Vishnu muss zusÃ¤zlich den Satelliten Ã¼berwachen.
+		ERLEDIGT: Rumspielen: Trigger hÃ¶rt auf anderen Vishnu, Worker schaltet anderen Trigger ...
 ERLEDIGT: Meldung mit Zeitpunkt des Events
 ERLEDIGT: Virtuelle Trigger mit Referenz auf TreeEvents
-ERLEDIGT: Exceptions immer die Message (verkürzt) anzeigen und auf MouseOver die ganze Exception.
-ERLEDIGT: Beim Laden von SubJobs mit verändertem LogicalName Referenzen innerhalb der SubJobs ggf. umbiegen. 
+ERLEDIGT: Exceptions immer die Message (verkÃ¼rzt) anzeigen und auf MouseOver die ganze Exception.
+ERLEDIGT: Beim Laden von SubJobs mit verÃ¤ndertem LogicalName Referenzen innerhalb der SubJobs ggf. umbiegen. 
 ERLEDIGT: Exceptions scheinen aus SubJobs nicht nach oben zu bubblen
 	ERLEDIGT: was ist mit Exceptions in Snapshots?
-ERLEDIGT: Schalter für automatische Fenstergröße (nach händischer Größenänderung geht das nicht mehr)
+ERLEDIGT: Schalter fÃ¼r automatische FenstergrÃ¶ÃŸe (nach hÃ¤ndischer GrÃ¶ÃŸenÃ¤nderung geht das nicht mehr)
 						reines GUI-Control
-ERLEDIGT: Platzhalter für Worker-Meldungen %Event%, %Logical%, etc.
+ERLEDIGT: Platzhalter fÃ¼r Worker-Meldungen %Event%, %Logical%, etc.
 ERLEDIGT: Abbrechen der getriggerten Worker ist noch falsch implementiert (nach TODO suchen)
 ERLEDIGT: Break bei JobList funktioniert nicht (wird auch deaktiv dargestellt).
-ERLEDIGT: Glow um False-Jobs - Balken auf Rot ? Balken auf Rot; CustomProgressBar überarbeitet.
+ERLEDIGT: Glow um False-Jobs - Balken auf Rot ? Balken auf Rot; CustomProgressBar Ã¼berarbeitet.
 ERLEDIGT: JobProvider - Job incl. allem als Verzeichnis und / oder ZIP
 		ERLEDIGT: Zusatzaufgabe: aus Job auch wieder externe Jobs aufrufen
 		ERLEDIGT: Zusatzaufgabe: StartCollapsed auch beim Aufruf an SubJobs weitergeben.
-		Nachdenken, ob Logs von SubJobs umgeleitet werden können sollten.
+		Nachdenken, ob Logs von SubJobs umgeleitet werden kÃ¶nnen sollten.
 ERLEDIGT: [ Folgeaufgabe: Bei gleichnamigen Checkern intern unterschiedliche Instanzen erzwingen. ]
-	ERLEDIGT: Folgeaufgabe geändert: Bei gleichnamigen Checkern dieselbe Instanz referenzieren.
+	ERLEDIGT: Folgeaufgabe geÃ¤ndert: Bei gleichnamigen Checkern dieselbe Instanz referenzieren.
 	ERLEDIGT: Folgeaufgabe: Referenzen auf Referenzen auf ... checken.
 		ERLERDIGT:	Folgeaufgabe: Referenzen auf Checker oberhalb des aktuellen Jobs zulassen.
-								Parallele Referenzen sind nicht sinnvoll, da SubJobs nicht voneinander abhhängig
+								Parallele Referenzen sind nicht sinnvoll, da SubJobs nicht voneinander abhhÃ¤ngig
 								sein sollen.
-								Nach oben hin erledigt, vorausgesetzt der OriginalChecker im übergeordneten Job
+								Nach oben hin erledigt, vorausgesetzt der OriginalChecker im Ã¼bergeordneten Job
 								wird vor dem SubJob interpretiert.
-				ERLEDIGT: Folgeaufgabe: Reihenfolge-Abhängigkeit beheben
+				ERLEDIGT: Folgeaufgabe: Reihenfolge-AbhÃ¤ngigkeit beheben
 ERLEDIGT:Worker auf TreeEvents umstellen
 	Folgeaufgaben:
 		ERLEDIGT: Worker mit Triggern neu checken
-		ERLEDIGT: Break checken, Tasks zählen
+		ERLEDIGT: Break checken, Tasks zÃ¤hlen
 		ERLEDIGT: spezieller interner JobSnapshotWorker der externe JobSnapshots einliest (aktualisiert)
 		ERLEDIGT: ANY-TreeEvents ausprogrammieren
-ERLEDIGT: Snapshot-ProgressBars übertragen? - werden mit 100% und Text "Snapshot" dargestellt.
+ERLEDIGT: Snapshot-ProgressBars Ã¼bertragen? - werden mit 100% und Text "Snapshot" dargestellt.
 ERLEDIGT: JobSnapshot.Path checken
-ERLEDIGT: Variablenauflösung in JobDescription.xml %SnapshotHome%, %irgendwas%
-					Zusatzaufgabe Ersetzung auch für %irgendwas% in allen Worker-Parametern
+ERLEDIGT: VariablenauflÃ¶sung in JobDescription.xml %SnapshotHome%, %irgendwas%
+					Zusatzaufgabe Ersetzung auch fÃ¼r %irgendwas% in allen Worker-Parametern
 					Parameter Ersetzung von Pfaden auch bei FileWatcherTriggern von Nicht-Snapshots
 					Variablen-Ersetzung %ProzessDirectory%
 		ERLEDIGT: Folgeaufgabe: Erweiterte Parameter-Ersetzung auch in Loggern.
-ERLEDIGT: TextFileLogger mit Pfad-Parameter. Über Parameter-Ersetzung im Logger gelöst.
+ERLEDIGT: TextFileLogger mit Pfad-Parameter. Ãœber Parameter-Ersetzung im Logger gelÃ¶st.
 ERLEDIGT: Einfachen TimerTrigger als optional eines von vielen TreeEvents implementieren
 ERLEDIGT: Verzeichnis GlobalUserPlugin
 ERLEDIGT: Deadlock bei UserJob - wurde durch lock in NodeConnector verursacht.
 ERLEDIGT: Hohe Prozessorlast bei UserJob
 					Durch Logging verursacht (PerfView-Analyse), kann aber weiter optimiert werden.
 ERLEDIGT: Keine ConsoleMessageBox bei UserJob - RootJobList Problem bei SubJobs
-ERLEDIGT: Einmal-Run für Nodes, die von einem nicht im Zweig befindlichen Trigger getriggert werden.
+ERLEDIGT: Einmal-Run fÃ¼r Nodes, die von einem nicht im Zweig befindlichen Trigger getriggert werden.
 ERLEDIGT: Im Logger implementiert (InfoController): globale Logging-Filter implementieren
 ERLEDIGT: Einzelne Zweige starten manchmal nicht mehr (Jobs/ShowAll - UserJob("ABC"))
-ERLEDIGT: Erstes Strg+Maus zum öffnen von UserJob öffnet nur die erste Ebene
+ERLEDIGT: Erstes Strg+Maus zum Ã¶ffnen von UserJob Ã¶ffnet nur die erste Ebene
 ERLEDIGT: Trigger mit Semaphore beenden
-ERLEDIGT: TreeEventTrigger prüfen wg. unerreichbarer Code
+ERLEDIGT: TreeEventTrigger prÃ¼fen wg. unerreichbarer Code
 ERLEDIGT: freier Checker, der nur hinter ValueModifier vorkommt
-ERLEDIGT: AppSettings-Mischmasch auflösen: Interfaces in eigene dll
+ERLEDIGT: AppSettings-Mischmasch auflÃ¶sen: Interfaces in eigene dll
 ERLEDIGT: (RootJob-Problematik), im Auge behalten:
-	Unterknoten Run => ganzer Baum läuft los bei UserJob
+	Unterknoten Run => ganzer Baum lÃ¤uft los bei UserJob
 	Run auf JobList ging garnicht
 ERLEDIGT: Bei UserJob wurde ein LogicalResultChanged um ca. 5:02 Uhr geloggt,
-	was aber keine Änderung von true auf false auslöste.
-	Logging überarbeitet - Fehler bei LogicalState behoben.
-ERLEDIGT: SetWorkersState überarbeiten
-ERLEDIGT: Testfall CheckTreeEventJobCascade einführen mit mehreren SubJob-Ebenen
+	was aber keine Ã„nderung von true auf false auslÃ¶ste.
+	Logging Ã¼berarbeitet - Fehler bei LogicalState behoben.
+ERLEDIGT: SetWorkersState Ã¼berarbeiten
+ERLEDIGT: Testfall CheckTreeEventJobCascade einfÃ¼hren mit mehreren SubJob-Ebenen
 		Testschwerpunkte: EventTrigger, Worker, Result/ReturnObject-Referenzen
-ERLEDIGT:RootJobList-Kaskaden auflösen: nur eine RootJobList pro Tree. Bleibt!
-ERLEDIGT: Testjobs bereinigen: ein Test-Checker für True, einer für false, einer
-		für FlipFlop und einer für FlipFlopxception.
-ERLEDIGT: Bei Exception werden übergeordnete Knoten nicht immer gelb dargestellt (TestJobs/ShowAll)
-		Alles neu gestartet -> Exception, Teilbaum ohne Exception läuft neu an -> 
+ERLEDIGT:RootJobList-Kaskaden auflÃ¶sen: nur eine RootJobList pro Tree. Bleibt!
+ERLEDIGT: Testjobs bereinigen: ein Test-Checker fÃ¼r True, einer fÃ¼r false, einer
+		fÃ¼r FlipFlop und einer fÃ¼r FlipFlopxception.
+ERLEDIGT: Bei Exception werden Ã¼bergeordnete Knoten nicht immer gelb dargestellt (TestJobs/ShowAll)
+		Alles neu gestartet -> Exception, Teilbaum ohne Exception lÃ¤uft neu an -> 
 		bleibt so.
-ERLEDIGT: (1)Worker lösen nach längerer, unbestimmter Zeit doppelt aus
+ERLEDIGT: (1)Worker lÃ¶sen nach lÃ¤ngerer, unbestimmter Zeit doppelt aus
 		(...\TestJobs\ShowAll)
 		Ursache sind zwei Probleme im UserJob.dll: um 00:00 Uhr herum funktioniert die Logik nicht und
 		ab und zu wird statt einer korrekten "Es konnten keine Verbindungsparameter..."
-		die Exception "...ist nicht aktuell." gemeldet - dadurch wechselt für Vishnu der Exception-Typ
-		und er löst korrekterweise neu aus.
-		Alles in allem kein Vishnu-Problem sondern im UserJob zu lösen (dort aber noch offen).
-		Neuer Erkenntnisstand: das doppelte Auslösen von Workern nach längerer Zeit ist doch auch
+		die Exception "...ist nicht aktuell." gemeldet - dadurch wechselt fÃ¼r Vishnu der Exception-Typ
+		und er lÃ¶st korrekterweise neu aus.
+		Alles in allem kein Vishnu-Problem sondern im UserJob zu lÃ¶sen (dort aber noch offen).
+		Neuer Erkenntnisstand: das doppelte AuslÃ¶sen von Workern nach lÃ¤ngerer Zeit ist doch auch
 		ein Vishnu-Problem (2)
-ERLEDIGT:(2)Worker lösen nach längerer, unbestimmter Zeit doppelt aus
+ERLEDIGT:(2)Worker lÃ¶sen nach lÃ¤ngerer, unbestimmter Zeit doppelt aus
 		(...\TestJobs\ShowAll)
 		Ist ein Vishnu-Problem (...\TestJobs\WrongFalseException und ChangingTreeExceptions):
 		Treten in mehreren Unter-Zweigen eines Knotens Exceptions auf und geht danach einer der Unter-Zweige
 		wieder auf nicht-Exception, wird im Knoten LastException auf null gesetzt, obwohl in den anderen
 		Unter-Zweigen noch Exceptions existieren.
-		Lösung: jeder Knoten muss eine Liste von LastExceptions mit deren jeweiligen Quellen erhalten,
-						aus der nur diejenigen Exceptions entfernt werden, deren Quellen auch tatsächlich auf
+		LÃ¶sung: jeder Knoten muss eine Liste von LastExceptions mit deren jeweiligen Quellen erhalten,
+						aus der nur diejenigen Exceptions entfernt werden, deren Quellen auch tatsÃ¤chlich auf
 						nicht-Exception gewechselt haben.
 ERLEDIGT: TreeEventTrigger Referenzen verhindern oder Start/Stop analog TriggerShell absichern
-ERLEDIGT: ShowRefCheckTreeEventTriggerSnapshot hängt in der Sanduhr (nach einer längeren Zeit)
+ERLEDIGT: ShowRefCheckTreeEventTriggerSnapshot hÃ¤ngt in der Sanduhr (nach einer lÃ¤ngeren Zeit)
 					auch nach Neustart von ShowRefCheckTreeEventTriggerSnapshot aktualisiert sich 
 					ShowRefRefCheckTreeEventTriggerSnapshot nicht mehr
-ERLEDIGT: Referenzierte Snapshots, die noch nicht existieren führen zum Absturz
-					Bedingte eine komplette Überarbeitung der Snapshot-Logik
+ERLEDIGT: Referenzierte Snapshots, die noch nicht existieren fÃ¼hren zum Absturz
+					Bedingte eine komplette Ãœberarbeitung der Snapshot-Logik
 ERLEDIGT: DemoCheckers (TrueFalseExceptionChecker) mit Zusatzparameter ReturnObject
 					und konfigurierbarem Ergebnis-Wechsel und konfigurierbarer Arbeitsdauer.
-ERLEDIGT: Auch bei Triggern müssen TreeEvents (mit Results) weitergegeben werden
+ERLEDIGT: Auch bei Triggern mÃ¼ssen TreeEvents (mit Results) weitergegeben werden
 ERLEDIGT: NodeConnectoren gehen bei Exceptions ihres Referenzknotens nicht auf gelb.
 ERLEDIGT: String-Parameter variabler gestalten
 ERLEDIGT: Bei Break gingen nicht alle Knoten auf Breaked
-ERLEDIGT: Distribution geänderter Checker, Trigger, Worker, Vishnu.bin automatisieren
-ERLEDIGT: AppSettings: Einführen von Flag "IsDefault" - zeigt, ob Werte noch Defaultwerte sind
-					oder schon von außen hineinparametrisiert wurden.
-ERLEDIGT: Filter für Statistics (analog zu Logger)
+ERLEDIGT: Distribution geÃ¤nderter Checker, Trigger, Worker, Vishnu.bin automatisieren
+ERLEDIGT: AppSettings: EinfÃ¼hren von Flag "IsDefault" - zeigt, ob Werte noch Defaultwerte sind
+					oder schon von auÃŸen hineinparametrisiert wurden.
+ERLEDIGT: Filter fÃ¼r Statistics (analog zu Logger)
 ERLEDIGT: Filter externalisieren (Parameter)
 ERLEDIGT: Caching von GetUserEventNamesForInternalEventNames
 ERLEDIGT: Beim Ladeversuch von nicht vorhandenem Snapshot einen Default-Snapshot laden,
-					der eine TreeException enthält
+					der eine TreeException enthÃ¤lt
 ERLEDIGT: Fehler nach ein paar Stunden TestJobs/ShowAll:
 		Index out of range bei JobList.RegisterResult
 		War ein Multithreading-Problem: auf ConcurrentDictionary umgestellt.
@@ -185,93 +185,93 @@ ERLEDIGT: Schwerwiegender Fehler in JobController_01:
 								 Liste eingetragen, wenn sie auf mehreren Hierarchie-Ebenen vertreten waren
 							2. in TreeEventQueue.AddTreeEventTrigger wurde bei direkt aufeinander folgenden
 								 gleichen TreeEvents das zweite Event verschluckt, was in den allermeisten
-								 Fällen den ersten Fehler korrigierte.
+								 FÃ¤llen den ersten Fehler korrigierte.
 ERLEDIGT: Der angezeigte Status eines gelaufenen, getriggerten Knotens geht nach
-					Break und Run nicht auf Triggered zurück.
+					Break und Run nicht auf Triggered zurÃ¼ck.
 					Es handelt sich um einen Doppelfehler:
 						1. TreeEventQueue.AddTreeEventTrigger behandelt mehrere gleiche Events kurz
-							 hintereinander nicht korrekt (timing-abhängig)
+							 hintereinander nicht korrekt (timing-abhÃ¤ngig)
 						2. das TreeEvent von Gruppe_2.1 wird immer doppelt geschleudert (Ursache war:
-							 im NodeConnector fehlte ein override für die parametisierte
+							 im NodeConnector fehlte ein override fÃ¼r die parametisierte
 							 Run(TreeEvent source) Methode)
 ERLEDIGT: Bei nicht-Root Joblists wurden TreeExternals nicht gestartet (Ursache war:
-							 in JobList fehlte ein override für die parametisierte
+							 in JobList fehlte ein override fÃ¼r die parametisierte
 							 Run(TreeEvent source) Methode)
 ERLEDIGT: Einstellbare optische Eigenschaften von LogicalTaskTree in Resource zentralisieren
 					und als Demo zweiten Skin entwerfen
 ERLEDIGT: UserRun erkennen?
 Themenkreis Prozessorientierung, Vishnu als Job-Steuerung:
-		ERLEDIGT: Checker dürfen auch null zurückgeben
-		ERLEDIGT: TreeEventTrigger, der erst auslöst, wenn mehrere Checker beendet sind
-				verworfen: evtl. TreeEventTrigger mit einer Liste von Auslösern
-				Wird schon über Bindung an einen SubJob gelöst
-		ERLEDIGT: TreeEventTrigger auch über TriggerShell kapseln
-		ERLEDIGT: Checker bekommt mehrere Results als Liste übergeben
+		ERLEDIGT: Checker dÃ¼rfen auch null zurÃ¼ckgeben
+		ERLEDIGT: TreeEventTrigger, der erst auslÃ¶st, wenn mehrere Checker beendet sind
+				verworfen: evtl. TreeEventTrigger mit einer Liste von AuslÃ¶sern
+				Wird schon Ã¼ber Bindung an einen SubJob gelÃ¶st
+		ERLEDIGT: TreeEventTrigger auch Ã¼ber TriggerShell kapseln
+		ERLEDIGT: Checker bekommt mehrere Results als Liste Ã¼bergeben
 		ERLEDIGT: Bei User-Run in SingleNodeViewModel direkt auf dem Knoten wird nur der Trigger
-				neu gestartet, ändern?, Parameter?, lassen? Root kann immer gestartet werden.
-				UserRun auf Knoten muss den Knoten bei nicht sofort auslösendem Trigger
-				selbst direkt starten, aber nur dann, wenn dessen Voraussetzungen erfüllt sind
+				neu gestartet, Ã¤ndern?, Parameter?, lassen? Root kann immer gestartet werden.
+				UserRun auf Knoten muss den Knoten bei nicht sofort auslÃ¶sendem Trigger
+				selbst direkt starten, aber nur dann, wenn dessen Voraussetzungen erfÃ¼llt sind
 				(vorangegangene Knoten waren schon erfolgreich, haben diesen schon getriggert).
 		ERLEDIGT: Es sind Ring-Referenzen denkbar (gewollte Endlosloops by Design), deshalb
-				müssen vorhandene Trigger auch immer mit gestartet werden.
+				mÃ¼ssen vorhandene Trigger auch immer mit gestartet werden.
 		ERLEDIGT: Run muss bei JobControllern den Knoten (und alle Unterknoten) resetten
 				(LastNotNullLogical)
 				User-Run muss LastNotNullLogical resetten (TreeEvents) (auf Parameter?)
-				Ein getriggerter Job muss neu gestartet werden können, aber nur, wenn seine
-				Voraussetzungen erfüllt sind.
+				Ein getriggerter Job muss neu gestartet werden kÃ¶nnen, aber nur, wenn seine
+				Voraussetzungen erfÃ¼llt sind.
 		ERLEDIGT: IsJobController aus AppSettings in JobDescription verlagern (IsControlled)
-		ERLEDIGT: Results von übergeordneten Jobs in "Environment"-Parameter aufnehmen
-		ERLEDIGT: TestJob mit Anzeige der übergebenen Results
+		ERLEDIGT: Results von Ã¼bergeordneten Jobs in "Environment"-Parameter aufnehmen
+		ERLEDIGT: TestJob mit Anzeige der Ã¼bergebenen Results
 		ERLEDIGT: TestJob mit Datenbank-Connection im Environment-Parameter
-		ERLEDIGT (nicht mehr nötig): Beim Laden eines Controlled-Jobs sollten alle TreeEventTrigger vorgestartet werden.
+		ERLEDIGT (nicht mehr nÃ¶tig): Beim Laden eines Controlled-Jobs sollten alle TreeEventTrigger vorgestartet werden.
 		ERLEDIGT: Beim Versuch, einen Unterknoten zu starten, sollte dieser ggf. auch noch bei seinem
-				Trigger-Knoten nachfragen, ob Results bereit liegen. Szenario: der abhängige Knoten
+				Trigger-Knoten nachfragen, ob Results bereit liegen. Szenario: der abhÃ¤ngige Knoten
 				wurde von Hand gestoppt (Break), bevor der triggernde Knoten gelaufen war
-				- jetzt wird der triggernde Knoten erfolgreich ausgeführt
+				- jetzt wird der triggernde Knoten erfolgreich ausgefÃ¼hrt
 				- zuletzt soll der vorher gestoppte Knoten von Hand wieder gestartet werden
 				- da dieser aber nicht getriggert wurde, fehlen ihm die notwendigen Results und
-				- das Environment des triggernden Knotens, obwohl der diese bereithält.
-		ERLEDIGT: Kommandozeilen-Parameter für von Vishnu gesteuerte Anwendungen als erste Parameter mit
-				übergeben und zu ladenden Job als benannten Parameter zuletzt übergeben ({/|-}Job=Jobname)
+				- das Environment des triggernden Knotens, obwohl der diese bereithÃ¤lt.
+		ERLEDIGT: Kommandozeilen-Parameter fÃ¼r von Vishnu gesteuerte Anwendungen als erste Parameter mit
+				Ã¼bergeben und zu ladenden Job als benannten Parameter zuletzt Ã¼bergeben ({/|-}Job=Jobname)
 		ERLEDIGT: Frameworks abgleichen
 		ERLEDIGT: Namespaces der Frameworks separieren und unterschiedliche Assembly-Namen
-ERLEDIGT: Worker für Exception
+ERLEDIGT: Worker fÃ¼r Exception
 ERLEDIGT: Log2MessageBox
 ERLEDIGT: ShowAll.zip findet CheckServers.zip nicht, ShowAll schon!
-	ERLEDIGT: Folgeaufgabe: Parameterübergabe überarbeiten.
+	ERLEDIGT: Folgeaufgabe: ParameterÃ¼bergabe Ã¼berarbeiten.
 ERLEDIGT: Fehler: nach Umstellung von Task auf Thread tritt manchmal beim ersten Start von QuickEventsResults
 					eine Threading Exception auf (irgendwie schon aktiv)
-ERLEDIGT: Checker mit WPF-Oberflächen entwickeln
+ERLEDIGT: Checker mit WPF-OberflÃ¤chen entwickeln
 		1. Schritt: eine normale WPF-Anwendung als Dll mit einer simplen, aus einer
 		   Console-Anwendung hervorgegangenen Starter.exe bauen
 		2. Schritt: auf dieser Basis einen WPFDialogChecker entwickeln
-ERLEDIGT: Bei allen Plugin-Projekten die Namespaces auf Vishnu.Plugin ändern.
+ERLEDIGT: Bei allen Plugin-Projekten die Namespaces auf Vishnu.Plugin Ã¤ndern.
 		Ansatz war falsch. Stattdessen Vishnu-dlls und das Framework (Prefix NetEti.) umbenannt.
-ERLEDIGT: Neuladen von Checker-Dlls für jeden Run zum Debugging von Memory-Leaks.
-		ERLEDIGT:	Folgeaufgabe: für einzelne Dlls extern konfigurierbar machen.
-ERLEDIGT: Dispose beim Beenden auf alle UserChecker; UserChecker auf IDisposable ändern
+ERLEDIGT: Neuladen von Checker-Dlls fÃ¼r jeden Run zum Debugging von Memory-Leaks.
+		ERLEDIGT:	Folgeaufgabe: fÃ¼r einzelne Dlls extern konfigurierbar machen.
+ERLEDIGT: Dispose beim Beenden auf alle UserChecker; UserChecker auf IDisposable Ã¤ndern
 ERLEDIGT: Knoten Viewer dynamisch laden
 ERLEDIGT: ToolTips einsetzen
 ERLEDIGT: Exception-Langtexte nicht im Knoten anzeigen, sondern in ToolTip
-ERLEDIGT: Exception.Message bei Hover auf Schraubenschlüssel anzeigen
-ERLEDIGT: Result/ReturnCode auch Mouse-Hover verfügbar machen
-ERLEDIGT: Hover-anzeigen zeitverzögert?
+ERLEDIGT: Exception.Message bei Hover auf SchraubenschlÃ¼ssel anzeigen
+ERLEDIGT: Result/ReturnCode auch Mouse-Hover verfÃ¼gbar machen
+ERLEDIGT: Hover-anzeigen zeitverzÃ¶gert?
 ERLEDIGT: ApplicationSettingsProvider verallgemeinern (DataSource)
 ERLEDIGT: CopyVishnuPluginsAssemblies.bat erweitern
-ERLEDIGT: LastExecutingTreeEvent verfügbar machen
+ERLEDIGT: LastExecutingTreeEvent verfÃ¼gbar machen
 ERLEDIGT: Logik aus App.xaml.cs in LogicalTaskTree verlagern
-ERLEDIGT: Vishnu als B2B-Programm-Interface (z.B. für UserManager das Beobachten von bereitgestellten CSVs)
+ERLEDIGT: Vishnu als B2B-Programm-Interface (z.B. fÃ¼r UserManager das Beobachten von bereitgestellten CSVs)
 					Beispielprogramm: VishnuApp
 ERLEDIGT: FlattenTreeSearchLists: Vishnu-Tab mit alternativer Darstellung als Liste
 					von Knoten nach extern konfigurierbaren Filterkriterien.
 ERLEDIGT: Ressourcen in dynamisch ladbaren Controls auf DynamicResource umstellen,
-					wo möglich.
-ERLEDIGT: Über Schalter in DynamicResource die Darstellung der Childs in dynamisch
+					wo mÃ¶glich.
+ERLEDIGT: Ãœber Schalter in DynamicResource die Darstellung der Childs in dynamisch
 				 	ladbaren NodeLists beeinflussen (Unchanged, Horizontal, Vertical, Switched).
-				 	Zusatzproblem 1: es wurde ein DataTrigger mit einem MultiBinding benötigt
+				 	Zusatzproblem 1: es wurde ein DataTrigger mit einem MultiBinding benÃ¶tigt
 				 									(nicht etwa ein MultiDataTrigger). MultiBinding wird aber von
-				 									DataTrigger nicht unterstützt.
-				 									Lösung: ein einfaches Binding, dass ein MultiBinding enthält.
+				 									DataTrigger nicht unterstÃ¼tzt.
+				 									LÃ¶sung: ein einfaches Binding, dass ein MultiBinding enthÃ¤lt.
                     <DataTrigger>
                         <DataTrigger.Binding>
                             <MultiBinding Converter="{StaticResource orientationModifier, diag:PresentationTraceSources.TraceLevel=High}">
@@ -280,11 +280,11 @@ ERLEDIGT: Über Schalter in DynamicResource die Darstellung der Childs in dynamis
                             </MultiBinding>
                         </DataTrigger.Binding>
 				 	Zusatzproblem 2: es sollte in o.g. DataTrigger an einen Schalter in einer DynamicResource
-				 	                 gebunden werden, dies wird aber von WPF nicht unterstützt, da ein Binding
+				 	                 gebunden werden, dies wird aber von WPF nicht unterstÃ¼tzt, da ein Binding
 				 	                 kein DependencyObject ist
 		 	                     (<eigene:BinaryModificationSwitch x:Key="OrientationModificationSwitch">Horizontal</eigene:BinaryModificationSwitch>).
-		 	                     Lösung: an "{RelativeSource Self}" binden und in einem entsprechenden Converter mit der eigentlichen Resource
-		 	                     				 über FrameworkElement.FindResource("OrientationModificationSwitch")
+		 	                     LÃ¶sung: an "{RelativeSource Self}" binden und in einem entsprechenden Converter mit der eigentlichen Resource
+		 	                     				 Ã¼ber FrameworkElement.FindResource("OrientationModificationSwitch")
                     <DataTrigger>
                         <DataTrigger.Binding>
                             <MultiBinding Converter="{StaticResource orientationModifier, diag:PresentationTraceSources.TraceLevel=High}">
@@ -293,72 +293,72 @@ ERLEDIGT: Über Schalter in DynamicResource die Darstellung der Childs in dynamis
                                 <Binding RelativeSource="{RelativeSource Self}" />
                             </MultiBinding>
                         </DataTrigger.Binding>
-ERLEDIGT: Füllen von Results überarbeiten (nicht bei der Abfrage füllen, sondern bei der Entstehung)
+ERLEDIGT: FÃ¼llen von Results Ã¼berarbeiten (nicht bei der Abfrage fÃ¼llen, sondern bei der Entstehung)
 ERLEDIGT: Exception beim Laden von Triggern im betroffenen Knoten sichtbar machen.
 ERLEDIGT: Hauptfenster nach Expander neu ausrichten
-		ERLEDIGT: Folgeaufgabe: nur dann zentrieren, wenn nicht mehr anders möglich oder auch nur bezogen
-							auf die letzte Bildschirmposition vergrößern
-ERLEDIGT: Datum/Uhrzeit im Knoten anzeigen,	letzter/nächster Lauf ...
+		ERLEDIGT: Folgeaufgabe: nur dann zentrieren, wenn nicht mehr anders mÃ¶glich oder auch nur bezogen
+							auf die letzte Bildschirmposition vergrÃ¶ÃŸern
+ERLEDIGT: Datum/Uhrzeit im Knoten anzeigen,	letzter/nÃ¤chster Lauf ...
 ERLEDIGT: Timer- Zusatzinfos ausgeben (Mouse-Hover/Click?)
-		ERLEDIGT: Folgeaufgabe: Nach UserRun sofort nächsten Startzeitpunkt anzeigen
+		ERLEDIGT: Folgeaufgabe: Nach UserRun sofort nÃ¤chsten Startzeitpunkt anzeigen
 ERLEDIGT: Worker werden auf JobList-Ebene nicht (mehr) angezeigt.
-		War schon seit etlichen Versionen fehlerhaft, wahrscheinlich seit der Einführung von TreeEvents.
-ERLEDIGT: Zweites Fenster 'Jobs' in Größe und Position überarbeiten.
+		War schon seit etlichen Versionen fehlerhaft, wahrscheinlich seit der EinfÃ¼hrung von TreeEvents.
+ERLEDIGT: Zweites Fenster 'Jobs' in GrÃ¶ÃŸe und Position Ã¼berarbeiten.
 ERLEDIGT: Prozessorlast bei ChangingTreeExceptions
 ERLEDIGT: Definition und LogicalTaskTreeGlobals evtl. zusammenlegen. 
-		LogicalTaskTreeGlobals war komplett überflüssig.
+		LogicalTaskTreeGlobals war komplett Ã¼berflÃ¼ssig.
 ERLEDIGT: Senkrechte Schrift bei senkrechten Elementen
-ERLEDIGT: ApplicationParameter Debug einführen
+ERLEDIGT: ApplicationParameter Debug einfÃ¼hren
 		ERLEDIGT: Anzeige von Internal-Ids bei Debug=true
 ERLEDIGT: Parameter "StartTriggeredNodesOnUserRun"
-		Ausprägungen: None, All, Direct, AllNoTreeEvents, DirectNoTreeEvents
+		AusprÃ¤gungen: None, All, Direct, AllNoTreeEvents, DirectNoTreeEvents
 		(TestJobs\CheckTreeeventTrigger)
 ERLEDIGT: Anzeige von LastRun, NextRun, Result bei JobList.
-ERLEDIGT: Beim Expandieren von Tree-Nodes wirklich komplette Höhe nutzen.
+ERLEDIGT: Beim Expandieren von Tree-Nodes wirklich komplette HÃ¶he nutzen.
 ERLEDIGT: Thread-Sicherheit im Listenkontext noch mal "akademisch" checken (einmal ist in 
 		JobController_01 aufgetreten, dass Knoten_2.1.1 und Knoten_2.1.2 nicht auf 100%	gegangen sind).
 ERLEDIGT: Run-Button differenzieren? Activate / Execute 
-		4 Qualitäten: Run Break Rerun Hold
-				Run und Break wie bisher, aber Hold un Rerun sollen keine LastNotNullLogicals verändern
-				und keine erneuten Workerstarts auslösen
-		Lösung: Run und Break immer möglich für JobList und SingleNode. Der andere Schnickschnack
+		4 QualitÃ¤ten: Run Break Rerun Hold
+				Run und Break wie bisher, aber Hold un Rerun sollen keine LastNotNullLogicals verÃ¤ndern
+				und keine erneuten Workerstarts auslÃ¶sen
+		LÃ¶sung: Run und Break immer mÃ¶glich fÃ¼r JobList und SingleNode. Der andere Schnickschnack
 		interessiert den User nicht wirklich.
-ERLEDIGT: Bei getriggerten Knoten Run und break ermöglichen
+ERLEDIGT: Bei getriggerten Knoten Run und break ermÃ¶glichen
 ERLEDIGT: Darstellung von Nodes optimieren
-ERLEDIGT: Schwarzer Schirm beim Vergrößern des Windows und nach mehrtägigem Lauf - beheben!
-		Workaround: regelmäßiger Refresh mit 1 eml Größenänderung
-		Regelmäßigen Refresh durch Refresh in Window_Activated mit DispatcherPriority "Render" ersetzt.
-ERLEDIGT: Anzeige von TreeEvents beim Hover auf Knoten übersetzen (User-Namen)
-ERLEDIGT: Reengineering der Trigger-Steuerung: läuft momentan nur mit Sleep(50) in TriggerShell.Start
-					und auch das ist wahrscheinlich bei noch mehr Knoten oder höherer Frequenz aushebelbar.
-		ERLEDIGT: Gesamte Steuerung überarbeiten, alle unnötigen Sleeps raus, alles neu testen.
-		ERLEDIGT: Steuerung bezüglich UserStart, UserBreak komplett überarbeiten insbesondere bei controlled Jobs.
-  - Hat über drei Monate in Anspruch genommen, Ergebnis: Version 2.4.0.0.
+ERLEDIGT: Schwarzer Schirm beim VergrÃ¶ÃŸern des Windows und nach mehrtÃ¤gigem Lauf - beheben!
+		Workaround: regelmÃ¤ÃŸiger Refresh mit 1 eml GrÃ¶ÃŸenÃ¤nderung
+		RegelmÃ¤ÃŸigen Refresh durch Refresh in Window_Activated mit DispatcherPriority "Render" ersetzt.
+ERLEDIGT: Anzeige von TreeEvents beim Hover auf Knoten Ã¼bersetzen (User-Namen)
+ERLEDIGT: Reengineering der Trigger-Steuerung: lÃ¤uft momentan nur mit Sleep(50) in TriggerShell.Start
+					und auch das ist wahrscheinlich bei noch mehr Knoten oder hÃ¶herer Frequenz aushebelbar.
+		ERLEDIGT: Gesamte Steuerung Ã¼berarbeiten, alle unnÃ¶tigen Sleeps raus, alles neu testen.
+		ERLEDIGT: Steuerung bezÃ¼glich UserStart, UserBreak komplett Ã¼berarbeiten insbesondere bei controlled Jobs.
+  - Hat Ã¼ber drei Monate in Anspruch genommen, Ergebnis: Version 2.4.0.0.
 ERLEDIGT: eigene UserNodeControls mit spezifischer Anzeige von Properties in komplexen ReturnObjects
 		und eigenen ViewModels
-ERLEDIGT: Snapshot - Result bei SingleNode mit übertragen (Serialisierung ist implementiert)
-ERLEDIGT: Snapshot - Result bei SingleNode mit übertragen und Darstellung von UserNodeControls (die
-		spezifischen DLLs für die UserNodeControls müssen auf beiden Seiten der De-/Serialisierung vorhanden sein).
+ERLEDIGT: Snapshot - Result bei SingleNode mit Ã¼bertragen (Serialisierung ist implementiert)
+ERLEDIGT: Snapshot - Result bei SingleNode mit Ã¼bertragen und Darstellung von UserNodeControls (die
+		spezifischen DLLs fÃ¼r die UserNodeControls mÃ¼ssen auf beiden Seiten der De-/Serialisierung vorhanden sein).
 
 Stand: 31.01.2015 Version 2.4.2.1 (RC)
 
-ERLEDIGT: Snapshot: ResultLists mit übertragen (u.U. aufwändige Serialisierung notwendig)
-ERLEDIGT: Übergabe von strukturierten Results funktioniert nicht (ObservableCollection in UserJob)
+ERLEDIGT: Snapshot: ResultLists mit Ã¼bertragen (u.U. aufwÃ¤ndige Serialisierung notwendig)
+ERLEDIGT: Ãœbergabe von strukturierten Results funktioniert nicht (ObservableCollection in UserJob)
 ERLEDIGT: Zugrunde liegende SQLs anzeigen (UserJob)
 ERLEDIGT: Es werden nicht alle Ergebnisse angezeigt, bei StartCollapsed, Run und 
-		späterem Öffnen aller Unterknoten.
+		spÃ¤terem Ã–ffnen aller Unterknoten.
 ERLEDIGT: Intelligente Zoom-Darstellung
 		Folgeaufgabe: Taste SizeToScreen
 		
 Stand: 23.03.2015 Version 2.4.3.6 (RC)
 
 ELEDIGT: NodeLists mit Vergleichen < <= = >= > != aktualisieren sich nicht nach UserRun.
-ELEDIGT: WPFDialogChecker übernehmen nicht das bisherige Ergebnis eines Knotens.
+ELEDIGT: WPFDialogChecker Ã¼bernehmen nicht das bisherige Ergebnis eines Knotens.
 
 Stand: 19.04.2015 Version 2.4.4.5 (RC)
 
-ERLEDIGT: SnapshotDirectory beim Laden berücksichtigen
-ERLEDIGT: NodeConnectoren werden bei Snapshot-Änderung nicht upgedatet,
+ERLEDIGT: SnapshotDirectory beim Laden berÃ¼cksichtigen
+ERLEDIGT: NodeConnectoren werden bei Snapshot-Ã„nderung nicht upgedatet,
     z.B.: Null geht auf True => NodeConnector bleibt Null, auch bei Refresh
     (ShowRefUserJob)
 ERLEDIGT: ConstantNodes bekommen im Snapshot das SingleNodeUserControl anstelle
@@ -368,34 +368,34 @@ ERLEDIGT: Batchfiles zur Umwandlung und zum Kopieren aller Assemblies, Plugins, 
           Harte Verdrahtung von ROOTPATH durch Environment-Variable %FRAMEWORKROOT% ersetzen;
           devenv_2013.lnk durch Environment-Variable %DEVENV% ersetzen;
           Auch alle Demo-Projekte mit in den Build.
-ERLEDIGT: Wird nicht gemacht: ValueModifier in Parameterkette? (z.B. Datum - 1 Monat übergeben)
-							ValueModifier mit Zusatzparametern? (z.B. Datum - 1 Monat übergeben)
-							ValueModifier mit embedded-Checkern (auch für Sicherheitsabfragen)
-							Erweiterung von ValueConvertern, Parameterübergaben, Datumsroutinen (Beispiel Check ABC)
+ERLEDIGT: Wird nicht gemacht: ValueModifier in Parameterkette? (z.B. Datum - 1 Monat Ã¼bergeben)
+							ValueModifier mit Zusatzparametern? (z.B. Datum - 1 Monat Ã¼bergeben)
+							ValueModifier mit embedded-Checkern (auch fÃ¼r Sicherheitsabfragen)
+							Erweiterung von ValueConvertern, ParameterÃ¼bergaben, Datumsroutinen (Beispiel Check ABC)
 					Stattdessen: Checker, die vor jedem Run eine optionale dll im Checker-Pfad aufrufen:
 							dll implementiert ICanRun
 									ICanRun: bool CanRun(ref object parameters,
 											object treeParameters, TreeEvent source)
 							Bei der Parameter-Ersetzung muss mit Caching gearbeitet werden (Performance)
 									die dll kann auch eine Startabfrage schleudern
-					Ist mit erledigt: Parameterersetzung über IParameterReader auch für Trigger, Logger,
-													 Worker ermöglichen  und vereinheitlichen.
-					Verworfen: Für Parameterersetzung die dll von ParaReplacerBase ableiten
+					Ist mit erledigt: Parameterersetzung Ã¼ber IParameterReader auch fÃ¼r Trigger, Logger,
+													 Worker ermÃ¶glichen  und vereinheitlichen.
+					Verworfen: FÃ¼r Parameterersetzung die dll von ParaReplacerBase ableiten
 										 ParaReplacerBase implementiert das Cashing
 ERLEDIGT: Externe optionale User-Dll mit globalen User-Parametern laden. Diese Dll soll von Vishnu
 					an die erste Stelle der Parameter-Auswertungskette gesetzt werden. Vishnu erweitert
-					darüber seine Parameter-Ersetzungs-Funktionalität um die globalen User-Parameter.
-					Der Pfad zu der User-Parameter-Dll kann über AppSettings gesetzt werden (UserParameterReader).
+					darÃ¼ber seine Parameter-Ersetzungs-FunktionalitÃ¤t um die globalen User-Parameter.
+					Der Pfad zu der User-Parameter-Dll kann Ã¼ber AppSettings gesetzt werden (UserParameterReader).
 					Demo: ...\PluginProjects\DemoParameterProvider
-ERLEDIGT: Nachladen von ApplicationSettings zur Laufzeit über FileWatcherTrigger auf app.config?
+ERLEDIGT: Nachladen von ApplicationSettings zur Laufzeit Ã¼ber FileWatcherTrigger auf app.config?
 ERLEDIGT: Dialog-Checker und CanRun-dlls nahe bei dem besitzenden Knoten auf dem Bildschirm darstellen;
 		Die Bildschirmposition wird jetzt nur noch auf Anfrage per Function ermittelt und nicht mehr
 		per LayoutUpdated;
 		(alt: Dialog-Checker und CanRun-dlls nahe bei dem besitzenden Knoten auf dem Bildschirm darstellen;
-							Bildschirmposition eines Knoten-Controls in die Tree-Parameter übernehmen,
-							dafür TreeParameter als Klasse einführen und in allen Projekten anpassen.
+							Bildschirmposition eines Knoten-Controls in die Tree-Parameter Ã¼bernehmen,
+							dafÃ¼r TreeParameter als Klasse einfÃ¼hren und in allen Projekten anpassen.
 				Hat sich als absoluter Performance-Killer herausgestellt!)
-ERLEDIGT: ToolTips länger offen halten - steht jetzt auf 6 Sekunden.
+ERLEDIGT: ToolTips lÃ¤nger offen halten - steht jetzt auf 6 Sekunden.
 
 Stand: 04.07.2015 Version 2.5.7.2
 
@@ -403,8 +403,8 @@ ERLEDIGT: SplashScreen mit Meldungen beim Vishnu-Start.
 ERLEDIGT: Vishnu Autostart Funktion.
 ERLEDIGT: UserNodeControls mit ListBox-Anzeige von mehreren SubResults zeigen manchmal leere ListBox,
 		obwohl Ergebnisse vorliegen (in der Jobs-Ansicht zuerst immer leer)
-		War ein falscher Refresh über Dispatcher.BeginInvoke - auf Dispatcher.Invoke geändert, ok.
-ERLEDIGT: Farbgebung des FlashScreen ändern.
+		War ein falscher Refresh Ã¼ber Dispatcher.BeginInvoke - auf Dispatcher.Invoke geÃ¤ndert, ok.
+ERLEDIGT: Farbgebung des FlashScreen Ã¤ndern.
 ERLEDIGT: Bei Exception FlashScreen beenden.
 
 Stand: 20.07.2015 Version 2.5.8.7
@@ -414,102 +414,102 @@ ERLEDIGT: Farbverlauf bei vertikalen Knoten horizontal.
 ERLEDIGT: NodeConnector auf JobList (nur als quasi SingleNode wegen des LastLogicalResult)
 ERLEDIGT: FileChecker liefert jetzt False anstelle von Exceptions.
 ERLEDIGT: Vishnu-Installer bauen/ClickOnce
-ERLEDIGT: Ausführung und Anzeige von Workern auch bei getriggerten JobLists,
-		die unter anderem Namen in übergeordneten Job eingebunden werden.
-ERLEDIGT: Result null plus Result true in Oder-Verknüpfung bleibt gelb
+ERLEDIGT: AusfÃ¼hrung und Anzeige von Workern auch bei getriggerten JobLists,
+		die unter anderem Namen in Ã¼bergeordneten Job eingebunden werden.
+ERLEDIGT: Result null plus Result true in Oder-VerknÃ¼pfung bleibt gelb
 		(TestJobs\UserControlsTest\UserNodeControls)
 		mit Vishnu 2.5.9.3 nicht mehr nachvollziehbar.
-ERLEDIGT: Result null setzt Exceptions nicht zurück. Dies ist gewollt und behebt darüber hinaus
+ERLEDIGT: Result null setzt Exceptions nicht zurÃ¼ck. Dies ist gewollt und behebt darÃ¼ber hinaus
 		das folgende Problem:
 		Fehler?: Fall: "Root = a and b", b ist false, a ist Exception, Root ist Exception (gelb), soweit ok.
 						jetzt geht a von Exception auf null (gelb), Root geht auch von Exception auf gelb anstatt auf rot.
 						(CheckTreeEventTriggerMinimal)
 ERLEDIGT: Darstellung TimerTrigger von EventTrigger unterscheiden (Stern)
-ERLEDIGT: Fehler?: Fall: zwei Zweige sind mit AND verknüpft, beide auf TRUE und Root auch auf TRUE;
+ERLEDIGT: Fehler?: Fall: zwei Zweige sind mit AND verknÃ¼pft, beide auf TRUE und Root auch auf TRUE;
 						einen Zweig abbrechen => Root bleibt auf TRUE (EqualGroups).
 					Das ist so gewollt. Root zeigt als Information auch das Breaked-Symbol.
 
 Stand: 16.08.2015 Version 2.5.9.3
 
-ERLEDIGT: Flashscreen nur kurze Zeit auf "TopMost" lassen, damit er bei längerer
-		Startphase andere Anwendungen nicht stört.
-ERLEDIGT: Fehler? Statistics liefert Zeilen mit Zähler 0.
+ERLEDIGT: Flashscreen nur kurze Zeit auf "TopMost" lassen, damit er bei lÃ¤ngerer
+		Startphase andere Anwendungen nicht stÃ¶rt.
+ERLEDIGT: Fehler? Statistics liefert Zeilen mit ZÃ¤hler 0.
 ERLEDIGT: Logging asynchron implementieren.
-ERLEDIGT: Fehler: Kombination von JobConnector und TriggerEventMirrorChecker führen dazu,
+ERLEDIGT: Fehler: Kombination von JobConnector und TriggerEventMirrorChecker fÃ¼hren dazu,
 		dass der TriggerEventMirrorChecker oft nicht getriggert wird.
 		Provozieren durch zwei bis drei mal Run in JobConnectorTest/JobDescription_multi.xml
 		oder JobConnectorTest/JobDescription_single.xml.
-		Es scheint tatsächlich der doppelte Name von Original-Job und JobConnector zu sein,
+		Es scheint tatsÃ¤chlich der doppelte Name von Original-Job und JobConnector zu sein,
 		siehe JobConnectorTest/JobDescription_multi.xml: wenn man " & SubJob1" aus der
-		Mitte der LogicalExpression entfernt, lässt sich der Fehler offensichtlich
+		Mitte der LogicalExpression entfernt, lÃ¤sst sich der Fehler offensichtlich
 		nicht mehr reproduzieren.
 		Zusatzerkenntnis: direkt vor Auftreten des Fehlers wird der WPFDialogChecker
 			von SingleNode1 relativ zu SingleNode1 positioniert und nicht relativ zum
 			Hauptfenster.
-		Gelöst: war ein Doppelfehler: da der Zustand "NodeState.Working" in
-						LogicalNode.RunAsync nicht abgeprüft wurde, entstand dort eine
+		GelÃ¶st: war ein Doppelfehler: da der Zustand "NodeState.Working" in
+						LogicalNode.RunAsync nicht abgeprÃ¼ft wurde, entstand dort eine
 						Exception, die aber nicht ausgegeben werden konnte, da in app.xaml.cs
 						der versuchte Close auf den SplashScreen im Dispatcher eine weitere
-						Exception auslöste, die aber als Dispatcher-Exception vom System
-						unterdrückt wurde.
+						Exception auslÃ¶ste, die aber als Dispatcher-Exception vom System
+						unterdrÃ¼ckt wurde.
 ERLEDIGT: NodeConnector auf JobList (automatisch, in Vishnu integriert)
 		dabei neues DefaultNodeControl "JobConnectorUserControl"
 ERLEDIGT: Vishnu auf den aktuellen Bildschirm beziehen, nicht nur auf den Haupt-Bildschirm
 		Bei zwei Bildschirmen bei der Zentrierung von Vishnu nur die Ausdehnung
-		des aktiven Bildschirms berücksichtigen.
-		Folgeaufgabe: das Verhalten auf Parameter legen, und/oder zusätzliche Icons in Decoration.
+		des aktiven Bildschirms berÃ¼cksichtigen.
+		Folgeaufgabe: das Verhalten auf Parameter legen, und/oder zusÃ¤tzliche Icons in Decoration.
 ERLEDIGT: Fehler: in der Jobs-Ansicht wird bei QuickEventsResults der Job 6 nicht richtig angezeigt.
 		DerDebugger vom Visual Studio 2015 kommt einfachmit den Events nicht mehr nach.
 		Prinzipiell ist dieses Scenario zwar auch ohne Debugger denkbar, scheint aber lange
 		noch nicht erreicht.
-ERLEDIGT: Standard einführen: ausführende Jobs heißen "Check...", SnapshotJobs heißen "Show...".
-ERLEDIGT: UserNodeControls überarbeiten: MaxWidth, MaxHeight, Expander, ToolTips, ScrollBars.
-ERLEDIGT: Vishnu.exe.config.user einführen (BasicAppSettings über XmlAccess erweitern);
-		Hierüber soll erreicht werden, dass in der Vishnu.exe.Config der Pfad zu einer User-Konfiguration
-		vorgegeben werden kann, die dann außerhalb der ClickOnce-Distribution liegt und unverändert bleibt.
-ERLEDIGT: Exceptions beim Instanziieren über GenericSingletonProvider werden durch nichts sagende
-		TargetInvocationException überlagert (z.B. bei Syntax-Fehler in Vishnu.exe.config.user).
-Absturz von Vishnu in MultiScreen.dll (Window.Left war = -25000). Lösung in WindowExtensions.cs:
+ERLEDIGT: Standard einfÃ¼hren: ausfÃ¼hrende Jobs heiÃŸen "Check...", SnapshotJobs heiÃŸen "Show...".
+ERLEDIGT: UserNodeControls Ã¼berarbeiten: MaxWidth, MaxHeight, Expander, ToolTips, ScrollBars.
+ERLEDIGT: Vishnu.exe.config.user einfÃ¼hren (BasicAppSettings Ã¼ber XmlAccess erweitern);
+		HierÃ¼ber soll erreicht werden, dass in der Vishnu.exe.Config der Pfad zu einer User-Konfiguration
+		vorgegeben werden kann, die dann auÃŸerhalb der ClickOnce-Distribution liegt und unverÃ¤ndert bleibt.
+ERLEDIGT: Exceptions beim Instanziieren Ã¼ber GenericSingletonProvider werden durch nichts sagende
+		TargetInvocationException Ã¼berlagert (z.B. bei Syntax-Fehler in Vishnu.exe.config.user).
+Absturz von Vishnu in MultiScreen.dll (Window.Left war = -25000). LÃ¶sung in WindowExtensions.cs:
 		ActualLeft() und ActualTop().
-ERLEDIGT: Schwarzer Schirm beim Vergrößern des Windows und nach mehrtägigem Lauf - beheben!
-		Workaround: regelmäßiger Refresh mit 1 eml Größenänderung
-		Regelmäßigen Refresh durch Refresh in Window_Activated mit DispatcherPriority "Render" ersetzt.
-		Regelmäßigen Refresh zusätzlich wieder eingeführt, da die obige Lösung nicht immer funktioniert.
+ERLEDIGT: Schwarzer Schirm beim VergrÃ¶ÃŸern des Windows und nach mehrtÃ¤gigem Lauf - beheben!
+		Workaround: regelmÃ¤ÃŸiger Refresh mit 1 eml GrÃ¶ÃŸenÃ¤nderung
+		RegelmÃ¤ÃŸigen Refresh durch Refresh in Window_Activated mit DispatcherPriority "Render" ersetzt.
+		RegelmÃ¤ÃŸigen Refresh zusÃ¤tzlich wieder eingefÃ¼hrt, da die obige LÃ¶sung nicht immer funktioniert.
 
 Stand: 17.10.2015 Version 2.6.1.0 R
 
-ERLEDIGT: Fehler bei TreeEventTriggern in SubJobs: TreeEvent-getriggerte Knoten lösen nicht aus,
+ERLEDIGT: Fehler bei TreeEventTriggern in SubJobs: TreeEvent-getriggerte Knoten lÃ¶sen nicht aus,
 		wenn der Trigger in einem parallelen SubJob definiert ist, also nicht in direkter
 		Linie zur Tree-Root gefunden werden kann (CheckTwoJobConnectors).
-		Lösung: alle TreeEventTrigger müssen in der TreeRootJobList gesammelt werden.
+		LÃ¶sung: alle TreeEventTrigger mÃ¼ssen in der TreeRootJobList gesammelt werden.
 
 ERLEDIGT: Fehler bei CheckDependentNodeLogic\CheckSubJobDepth: Die (senkrechte) NodeList SubJob1.2.1
 		wird nicht korrekt dargestellt.
-		Scheint ein Debugger-Phänomen zu sein.
+		Scheint ein Debugger-PhÃ¤nomen zu sein.
 
 ERLEDIGT: Zwei Probleme in UserChecker.dll: um 00:00 Uhr herum funktioniert die Logik nicht und
 		ab und zu wird statt einer korrekten "Es konnten keine Verbindungsparameter..."
-		die Exception "...ist nicht aktuell." gemeldet - dadurch wechselt für Vishnu der Exception-Typ
-		und er löst korrekterweise neu aus.
-		Alles in allem kein Vishnu-Problem sondern im UserChecker zu lösen (dort aber noch offen).
-		Ist doch ein Vishnu-Problem: durch die sich gegenseitig ausschließenden >< Beziehungen
-		entsteht eine XOR-Situation aus Sicht der übergeordneten NodeList.
-		Entsprechend auch bei einer echten XOR-Verknüpfung: dadurch, dass mindestens zwei Knoten
-		in einer NodeList direkt voneinander abhängig sind (NodeConnectoren, ValueModifier oder
-		TreeEventTrigger), diese aber naturgemäß nicht hundertprozentig zeitgleich auslösen,
-		wechselt die übergeordnete NodeList kurzzeitig ihr LogicalResult. Sind diesr NodeList, bzw.
-		der nächsten übergeordneten JobList Worker zugeordnet, lösen diese aus, obwohl aus
-		sachlogischer Sicht für die XOR Verknüpfung nichts passiert ist.
-		1. Woraround: über LogicalChangedDelay werden Änderungen von LogicalResults in Unterknoten
-		   von JobLists etwas verzögert angenommen, sodass ein kurzes, technisch bedingtes
+		die Exception "...ist nicht aktuell." gemeldet - dadurch wechselt fÃ¼r Vishnu der Exception-Typ
+		und er lÃ¶st korrekterweise neu aus.
+		Alles in allem kein Vishnu-Problem sondern im UserChecker zu lÃ¶sen (dort aber noch offen).
+		Ist doch ein Vishnu-Problem: durch die sich gegenseitig ausschlieÃŸenden >< Beziehungen
+		entsteht eine XOR-Situation aus Sicht der Ã¼bergeordneten NodeList.
+		Entsprechend auch bei einer echten XOR-VerknÃ¼pfung: dadurch, dass mindestens zwei Knoten
+		in einer NodeList direkt voneinander abhÃ¤ngig sind (NodeConnectoren, ValueModifier oder
+		TreeEventTrigger), diese aber naturgemÃ¤ÃŸ nicht hundertprozentig zeitgleich auslÃ¶sen,
+		wechselt die Ã¼bergeordnete NodeList kurzzeitig ihr LogicalResult. Sind diesr NodeList, bzw.
+		der nÃ¤chsten Ã¼bergeordneten JobList Worker zugeordnet, lÃ¶sen diese aus, obwohl aus
+		sachlogischer Sicht fÃ¼r die XOR VerknÃ¼pfung nichts passiert ist.
+		1. Woraround: Ã¼ber LogicalChangedDelay werden Ã„nderungen von LogicalResults in Unterknoten
+		   von JobLists etwas verzÃ¶gert angenommen, sodass ein kurzes, technisch bedingtes
 		   "Flackern" des LogicalResult ignoriert wird. Die Wartezeit ist aber prinzipiell
-		   systemspezifisch, so dass dies nicht die optimale Lösung sein kann
+		   systemspezifisch, so dass dies nicht die optimale LÃ¶sung sein kann
 		   (deshalb noch eine weitere Aufgabe im ToDo)
 ERLEDIGT: Fehler in TestJobs\UserTest: wenn der Job als ganzes gestartet wird, erscheint die
 		Datumseingabe nicht (ist aber in der Taskleiste vorhanden),
-		Vermutung: ungültige Bildschirmkoordinaten.
+		Vermutung: ungÃ¼ltige Bildschirmkoordinaten.
 		Bei Start eines einzelnen Tag-Knotens funktioniert es.
-		generell müssen beim Start eines DialogCheckers die berechneten Bildschirmkoordinaten
+		generell mÃ¼ssen beim Start eines DialogCheckers die berechneten Bildschirmkoordinaten
 		auf die Abmessungen des aktuellen Screens begrenzt werden.
 
 Stand: 01.12.2015 Version LastOk.2629R
@@ -521,35 +521,35 @@ ERLEDIGT: Balken bei (TreeEvent-)getriggerten Checkern gingen nicht auf 100%.
 Stand: 14.12.2015 Version LastOk.2703 (LastOk)
 
 ERLEDIGT: Fehler: Anzahl Threads und User-Objekte steigen nach unten stehenden "erledigten"
-	Aufgaben kontinuierlich an. Da die unten stehenden Lösungen aber so gewollt sind und
+	Aufgaben kontinuierlich an. Da die unten stehenden LÃ¶sungen aber so gewollt sind und
 	echten Mehrwert bieten, muss der Speicherfehler gesucht und behoben werden.
-	Lösung: neue Threads werden nur noch gestartet, wenn <thred>.IsAlive false ist.
-	ERLEDIGT: Verarbeitung von Referenzen überarbeiten: auch Referenzen auf Knoten außerhalb des
+	LÃ¶sung: neue Threads werden nur noch gestartet, wenn <thred>.IsAlive false ist.
+	ERLEDIGT: Verarbeitung von Referenzen Ã¼berarbeiten: auch Referenzen auf Knoten auÃŸerhalb des
 			aktuellen Jobs zulassen (bei TreeEventMirrorChecker geht das schon).
-	ERLEDIGT: Doppeltes Auslösen eines Checkers (DependentNodeLogic\ComplexJobs).
-		Ursache war: Checker, die später beim Parsen des Trees zu NodeConnectoren wurden,
-		blieben in TreeExternals stehen und wurden zusätzlich ausgelöst.
-	ERLEDIGT: TreeEvent-getriggerte Knoten lösten u.U. nicht aus (DependentNodeLogic\ComplexJobs).
+	ERLEDIGT: Doppeltes AuslÃ¶sen eines Checkers (DependentNodeLogic\ComplexJobs).
+		Ursache war: Checker, die spÃ¤ter beim Parsen des Trees zu NodeConnectoren wurden,
+		blieben in TreeExternals stehen und wurden zusÃ¤tzlich ausgelÃ¶st.
+	ERLEDIGT: TreeEvent-getriggerte Knoten lÃ¶sten u.U. nicht aus (DependentNodeLogic\ComplexJobs).
 		Ursache war: die TreeEventTrigger wurden nicht in TreeRootJobList gespeichert.
 
 Stand: 22.12.2015 Version LastOk.2750 (LastOk)
 
 Umfassendes Reengineering der Vishnu-Steuerungslogik.
-Auslöser: Run, Break, Run in schneller Folge führte zu Inkonsistenzen im Tree;
+AuslÃ¶ser: Run, Break, Run in schneller Folge fÃ¼hrte zu Inkonsistenzen im Tree;
 Bei CheckAll startete manchmal Datum in UserKnoten nicht mehr.
-Bei der Fehlersuche festgestellt, dass die Steuerungslogik (inzwischen) überladen
+Bei der Fehlersuche festgestellt, dass die Steuerungslogik (inzwischen) Ã¼berladen
 und verwirrend kompliziert war.
-Unter anderem wurden folgende Änderungen vorgenommen:
+Unter anderem wurden folgende Ã„nderungen vorgenommen:
 	- Break vor jedem Run rausgeschmissen;
 	- Differenzierung von Break und UserBreak rausgeschmissen;
 	- TreeExternals-Runlogik vereinfacht;
 	- Neue Logik zwischen runAsyncAsync und runAsync zur Entkopplung hochfrequenter
 	  Run-Anforderungen implementiert (tryRunAsyncWhileIsRunRequired);
-	- TreeEvent-getriggerte Knoten übernehmen jetzt beim ersten Start das letzte
-	  Result des triggernden Knoten, für den Fall, dass dieser schon vorher gefeuert
+	- TreeEvent-getriggerte Knoten Ã¼bernehmen jetzt beim ersten Start das letzte
+	  Result des triggernden Knoten, fÃ¼r den Fall, dass dieser schon vorher gefeuert
 	  haben sollte;
-	  Node-Parameter "InitNodes" und "TriggeredRunDelay" eingeführt (controlled-Jobs);
-	  App-Parameter "TryRunAsyncSleepTime" und "InitAtUserRun" eingeführt;
+	  Node-Parameter "InitNodes" und "TriggeredRunDelay" eingefÃ¼hrt (controlled-Jobs);
+	  App-Parameter "TryRunAsyncSleepTime" und "InitAtUserRun" eingefÃ¼hrt;
 	  ResultChangedEventHandler implementiert;
 	  Methode {SingleNode|NodeList}.Reset() eingebaut;
 	  diverse Code-Bereinigungen.
@@ -565,7 +565,7 @@ Restunsicherheit: einmal trat der Fehler auf, dass UserJob nicht korrekt startet
 
 ERLEDIGT: Restunsicherheit gefixt: In LogicalNode.CanTreeStart:
 	Bei NodeLists kann durch einen untergeordneten NodeConnector der State schon auf Working gehen,
-	bevor der eigentliche Run auf díe NodeList erfolgt ist.
+	bevor der eigentliche Run auf dÃ­e NodeList erfolgt ist.
 	Deswegen wird jetzt bei NodeLists der NodeState "Working" explizit auch zugelassen.
 	Hilfreich war hier der Job "JobConnector".
 
@@ -575,56 +575,56 @@ ERLEDIGT: FileChecker muss die Parameter bei jedem Run neu auswerten, da sonst e
 		inzwischen neu entstandenes Unterverzeichnis nicht erkannt wird
 		(UserChecker).
 ERLEDIGT: Ladefehler auf Assembly CheckDiskSpace.dll(CheckGiantJob).
-		Hierfür generell alle Jobs um redundante dlls bereinigt und
-		PluginProjects\copy_Vishnu_Plugins_Assemblies.bat komplett überarbeitet.
-ERLEDIGT: Jobs\CheckAll erzeugt Race-Conditions bei User (Todeskriterium für Vishnu).
+		HierfÃ¼r generell alle Jobs um redundante dlls bereinigt und
+		PluginProjects\copy_Vishnu_Plugins_Assemblies.bat komplett Ã¼berarbeitet.
+ERLEDIGT: Jobs\CheckAll erzeugt Race-Conditions bei User (Todeskriterium fÃ¼r Vishnu).
 		Nach dem ersten Shock Problem erkannt: die neue Vishnu-Version parallelisiert sauberer
-		und arbeitet performanter. Beides zusammen deckte eine schon in früheren Versionen
-		latente Fehlerquelle auf. Zur Lösung wurde dem Element "ThreadLocked" ein Attribut
-		"LockName" mitgegeben und die (nicht Thread-Save-)Jobs entsprechend übergreifend
+		und arbeitet performanter. Beides zusammen deckte eine schon in frÃ¼heren Versionen
+		latente Fehlerquelle auf. Zur LÃ¶sung wurde dem Element "ThreadLocked" ein Attribut
+		"LockName" mitgegeben und die (nicht Thread-Save-)Jobs entsprechend Ã¼bergreifend
 		gelockt.
-ERLEDIGT: Am 15.03.2016 meldete UserJob einen ungültigen Stand, obwohl
+ERLEDIGT: Am 15.03.2016 meldete UserJob einen ungÃ¼ltigen Stand, obwohl
 		der Stand eindeutig aktuell war. Ursache: beim Datumswechsel auf den 15. wurde das Result
-		von der übergeordneten NodeList nicht erneut mit der Konstanten @15 verglichen. Das
-		wurde wiederum durch ein fälschlicherweise bei NodeConnectoren unterdrücktes Event
+		von der Ã¼bergeordneten NodeList nicht erneut mit der Konstanten @15 verglichen. Das
+		wurde wiederum durch ein fÃ¤lschlicherweise bei NodeConnectoren unterdrÃ¼cktes Event
 		verursacht.
-ERLEDIGT: Vishnu-SplashScreen überarbeitet (incl. Versionsanzeige).
+ERLEDIGT: Vishnu-SplashScreen Ã¼berarbeitet (incl. Versionsanzeige).
 
-Stand: 19.03.2016 Version 3028R Dieser Stand wurde auch beim User ausführlich getestet
+Stand: 19.03.2016 Version 3028R Dieser Stand wurde auch beim User ausfÃ¼hrlich getestet
 		und als ClickOnce deployed und ist somit nach 2629R der neue "last_stable".
 
-ERLEDIGT: WorkerTimer (ohne Break) automatisch abschalten oder auf grün setzen,
+ERLEDIGT: WorkerTimer (ohne Break) automatisch abschalten oder auf grÃ¼n setzen,
 		wenn die Ursache weggefallen ist.
 ERLEDIGT: Eskalationsstufen bei Fehlern: Info, Mail, Mail an alle, SMS ...
-		über Eskalator nachdenken
+		Ã¼ber Eskalator nachdenken
 
 Stand: 13.04.2016 Version 3100 (LastOk)
 
-ERLEDIGT: Fehler: FileWatcherTrigger hängt sich auf Client irgendwann weg
-        Job-Snapshot hatte zwischendurch Länge 0
-ERLEDIGT: Jobs-Ansicht für Snapshots
+ERLEDIGT: Fehler: FileWatcherTrigger hÃ¤ngt sich auf Client irgendwann weg
+        Job-Snapshot hatte zwischendurch LÃ¤nge 0
+ERLEDIGT: Jobs-Ansicht fÃ¼r Snapshots
 ERLEDIGT: LogicalName, der mit "_" endet, wird nicht gefunden (ExpressionParser).
 ERLEDIGT: Wenn Operator irgendwo im Ausdruck fehlt, nachgenerieren (ExpressionParser).
-ERLEDIGT: Fehler: Bei InitAtUserRun = true wird der übergeordnete Job nicht aktualisiert.
-		              Ergänzung: nur jedes zweite Mal (TestJobs\RunBreakRun).
-		Lösung: Init des Teilbaums anstatt nur des Einzelknotens.
-ERLEDIGT: Der Pfad "DebugFile" kann jetzt in Vishnu.exe.config.user überschrieben werden. 
+ERLEDIGT: Fehler: Bei InitAtUserRun = true wird der Ã¼bergeordnete Job nicht aktualisiert.
+		              ErgÃ¤nzung: nur jedes zweite Mal (TestJobs\RunBreakRun).
+		LÃ¶sung: Init des Teilbaums anstatt nur des Einzelknotens.
+ERLEDIGT: Der Pfad "DebugFile" kann jetzt in Vishnu.exe.config.user Ã¼berschrieben werden. 
 ERLEDIGT: Exceptions werden jetzt auf jeden Fall geloggt.
 ERLEDIGT: Fehler bei SnapshotTest (auch schon in z.B. LastOk.2587RC):
 		1. ShowRefRefRefCheckTreeEventTriggerSnapshot
 		2. ShowRefAll
 		3. ShowRefCheckTreeEventTriggerSnapshot
 		ShowRefAll refresht #ShowRefCheckTreeEventTriggerSnapshot nicht automatisch;
-		über Button "Refresh" geht's;
+		Ã¼ber Button "Refresh" geht's;
 		4. CheckTreeEventTriggerSnapshot
 		Danach CheckTreeEventTriggerSnapshot gestartet => auch keine Reaktion in ShowRefAll.
 		5. ShowRefRefCheckTreeEventTriggerSnapshot
 		Nach Start von ShowRefRefCheckTreeEventTriggerSnapshot reagiert ShowRefAll automatisch
-		und aktualisiert die Anzeige für alle Jobs.
+		und aktualisiert die Anzeige fÃ¼r alle Jobs.
   => a) erweitertes Logging in FileWatcherTrigger implementieren (erledigt).
      b) Testergebnis: die Pfad- und Namensvergabe bei Snapshots ist ein heilloses Durcheinader;
         das alles funktioniert nur sicher, wenn ein Job genau einen Sub-Snapshot beobachtet.
-     => komplett überarbeiten:
+     => komplett Ã¼berarbeiten:
         Speicherung von Snapshots
         	a) aus Sicht des den Snapshot erzeugenden MainJobs:
         	   - bei definiertem absoluten Pfad (beginnend mit Laufwerksbuchstabe, Slash oder Backslash)
@@ -642,68 +642,68 @@ ERLEDIGT: Fehler bei SnapshotTest (auch schon in z.B. LastOk.2587RC):
         	   - bei definiertem relativen Pfad (i.d.R. nicht sinnvoll) oder keinem Pfad (empfohlen)
                relativ zum SnapshotDirectory in einem Unterverzeichnis mit dem MainJob-Namen;
                stimmt nicht ganz: zur Zeit ist es so, dass der relative
-               Pfad, wenn er ausgehend vom aktuellen Vishnu-Bin gültig ist, zuerst gezogen wird;
-               ansonsten wird vom relativen Pfad nur der Dateiname übernommen und mit den Pfaden
+               Pfad, wenn er ausgehend vom aktuellen Vishnu-Bin gÃ¼ltig ist, zuerst gezogen wird;
+               ansonsten wird vom relativen Pfad nur der Dateiname Ã¼bernommen und mit den Pfaden
                in %SnapshotDirectories% kombiniert (wird alles in FileWatcherTrigger implementiert).
 ERLEDIGT: beim Snapshot den PhysicalPath optional machen.
 ERLEDIGT: im Snapshot bei FileWatcherTrigger den Pfad auf den zu beobachteten Snapshot
-		optional machen; wenn nicht vorhanden, dann vom Snapshot übernehmen.
-ERLEDIGT: Snapshots öffnen nicht komplett bei Strg- oder Shift-Click.
+		optional machen; wenn nicht vorhanden, dann vom Snapshot Ã¼bernehmen.
+ERLEDIGT: Snapshots Ã¶ffnen nicht komplett bei Strg- oder Shift-Click.
 ERLEDIGT: Fehler: Snapshot: Exception Collection was modified; enumeration operation may not execute.
-ERLEDIGT: Kette von SubSnapshots auf korrekte Refreshes der übergeordneten Jobs testen.
+ERLEDIGT: Kette von SubSnapshots auf korrekte Refreshes der Ã¼bergeordneten Jobs testen.
 ERLEDIGT: Vishnu-Ladevorgang beschleunigen (Erreichbarkeit von Netz-Laufwerken wird jetzt gecached)
 ERLEDIGT: Vishnu-ClickOnce-Zertifikat erneuern
 
 Stand: 19.08.2016 Version 3152 "last_stable"
 
 ERLEDIGT: DefaultNodeControl-Belegung in Job.Constructor auslagern.
-ERLEDIGT: MixedTestJobProvider lauffähig machen und andere Test-JobProvider rausschmeißen.
+ERLEDIGT: MixedTestJobProvider lauffÃ¤hig machen und andere Test-JobProvider rausschmeiÃŸen.
 ERLEDIGT: Fehler: UserJob %AktuellerMonat% liefert 201606
-ERLEDIGT: Fehler: Vorbelegungen für DefaultNodeControls werden nicht in SubJobs vererbt (UserJob).
-ERLEDIGT: Parameter "NoWorkers" implementieren; bei true werden keine Worker ausgeführt.
+ERLEDIGT: Fehler: Vorbelegungen fÃ¼r DefaultNodeControls werden nicht in SubJobs vererbt (UserJob).
+ERLEDIGT: Parameter "NoWorkers" implementieren; bei true werden keine Worker ausgefÃ¼hrt.
 
 Stand: 07.02.2017 Version 3154
 
-ERLEDIGT: Fehler: JobConnectoren werden nicht korrekt im Snapshot übertragen.
-ERLEDIGT: Spezifisches Layout für JobConnectoren.
+ERLEDIGT: Fehler: JobConnectoren werden nicht korrekt im Snapshot Ã¼bertragen.
+ERLEDIGT: Spezifisches Layout fÃ¼r JobConnectoren.
 ERLEDIGT: In Snapshots beim ersten Laden, wenn der ladende Job noch nicht gestartet wurde,
   alles auf null setzen.
-ERLEDIGT: Snapshot-Knoten nutzen die gesamte zur Verfügung stehende Höhe - begrenzen;
+ERLEDIGT: Snapshot-Knoten nutzen die gesamte zur VerfÃ¼gung stehende HÃ¶he - begrenzen;
 	Zusatz: Begrenzen geht nicht so einfach, da das eine Eigenschaft aller Knoten ist.
-	Lösung: drehen, wie bei JobLists.
+	LÃ¶sung: drehen, wie bei JobLists.
 ERLEDIGT: Snapshot dreht sich nicht bei vertikaler Darstellung.
 ERLEDIGT: Fehler?: Mehrfach-RUN auf UserChecker => Checker zeigt lange Sanduhr
-  Vermutung bestätigt: liegt an anderen gerade laufenden Jobs und globalem Locking.
+  Vermutung bestÃ¤tigt: liegt an anderen gerade laufenden Jobs und globalem Locking.
 	(Vermutung: nach Exception? bessere Vermutung: liegt an anderen gerade laufenden Jobs und globalem Locking)
 ERLEDIGT: Fehler: UserJob zeigt Gelb mit rotem Rand anstatt Rot (Vermutung: nach Exception?)
   Scheint durch Korrektur beim Schreiben von Snapshots (noch mal LastNotNullLogical holen)
   mit korrigiert worden zu sein.
 ERLEDIGT: Statt Fehlermeldung bei Ersteinrichtung Demo-Job konfigurieren.
-ERLEDIGT: Parameter DemoModus einführen und im MainWindow anzeigen.
+ERLEDIGT: Parameter DemoModus einfÃ¼hren und im MainWindow anzeigen.
 ERLEDIGT: Parameter "RegistryBasePath" zur Ablage von User-Parametern in der Registry
           implementiert; Default: "HKEY_LOCAL_MACHINE\SOFTWARE\Vishnu".
 ERLEDIGT: Bei gezipptem MainJob werden SubJobs mit relativen Pfaden nicht gefunden.
   Wenn es sich beim MainJob um ein Zip handelt, wird dieses von Vishnu
-  in das WorkingDirectory entpackt. Hierbei ändert sich allerdings das
+  in das WorkingDirectory entpackt. Hierbei Ã¤ndert sich allerdings das
   Bezugsverzeichnis bei relativen Pfadangaben von SubJobs.
-  Um - zumindest in einfachen Szenarien - SubJobs noch finden zu können,
+  Um - zumindest in einfachen Szenarien - SubJobs noch finden zu kÃ¶nnen,
   wird im gleichen Verzeichnis, in dem sich das Zip-File befindet, ein
-  Unterverzeichnis angelegt und dies während der laufenden Vishnu-Session
-  zusätzlich als Ausgangs-Verzeichnis für die Suche nach SubJobs mit
+  Unterverzeichnis angelegt und dies wÃ¤hrend der laufenden Vishnu-Session
+  zusÃ¤tzlich als Ausgangs-Verzeichnis fÃ¼r die Suche nach SubJobs mit
   relativen Pfadangaben genutzt.
-  Vishnu löscht dieses Verzeichnis dann wieder, bevor es sich beendet.
+  Vishnu lÃ¶scht dieses Verzeichnis dann wieder, bevor es sich beendet.
 ERLEDIGT: Parameter SingleInstance in Vishnu implementieren.
 	Bei SingleInstance = false kann Vishnu mehrfach gleichzeitig gestartet werden;
 	bei SingleInstance = true nur einmal.
 ERLEDIGT: Fehlermeldung mit Jobname bei Fehlern auf JobDescription.xml.
 ERLEDIGT: Fehler: Parameter-Ersetzung ersetzt nicht alle %Key% - Variablen.
-  Ursache: Es werden per GetStringValue nur Parameter zurückgegeben, die von den in AppEnvReader gemeldeten
-           Accessoren zurückgeliefert werden, aber keine durch die Anwendung selbst gesetzten Properties.
-  Lösung: Neuer Accessor "PropertyAccess": holt die Property-Namen und -Werte per Reflection aus den 
+  Ursache: Es werden per GetStringValue nur Parameter zurÃ¼ckgegeben, die von den in AppEnvReader gemeldeten
+           Accessoren zurÃ¼ckgeliefert werden, aber keine durch die Anwendung selbst gesetzten Properties.
+  LÃ¶sung: Neuer Accessor "PropertyAccess": holt die Property-Namen und -Werte per Reflection aus den 
           anwendungsspezifischen AppSettings (auch geerbte).
           PropertyAccess muss in den anwendungsspezifischen AppSettings an das Ende der Accessoren-Kette
-          in AppEnvReader angefügt werden.
-ERLEDIGT: Unsauber: einige Accessoren im AppEnvReader lösen bei nicht gefundenen Parametern Exceptions aus,
+          in AppEnvReader angefÃ¼gt werden.
+ERLEDIGT: Unsauber: einige Accessoren im AppEnvReader lÃ¶sen bei nicht gefundenen Parametern Exceptions aus,
   die beim Start der Anwendung im Debug-Modus extrem hinderlich sind.
 ERLEDIGT: Einordnen eines UserParameterReaders nicht mehr ganz am Anfang der Auswertungskette,
   sondern an zweiter Stelle direkt hinter CommandLineAccess.
@@ -712,61 +712,61 @@ ERLEDIGT: Memory Leak und Zombie-Tasks bei internem Logging untersuchen und behe
 
 Stand: 15.01.2018 Version 3190
 
-ERLEDIGT: Namenszwang (führendes #) bei Snapshots eliminieren.
+ERLEDIGT: Namenszwang (fÃ¼hrendes #) bei Snapshots eliminieren.
 ERLEDIGT: Snapshot-Suche immer relativ zum Job-Verzeichnis; Default auf JobDir../Snapshots.
-ERLEDIGT: Fehler: Das kleine "W" für Worker wird nicht in alen Knoten angezeigt.
-ERLEDIGT: Erstellung und Distribution eines Starterprogramms für ClickOnce-Applikationen
-		"ClickOnceStarter.exe" zur Übergabe von Kommandozeilen-Parametern an eine ClickOnce-
+ERLEDIGT: Fehler: Das kleine "W" fÃ¼r Worker wird nicht in alen Knoten angezeigt.
+ERLEDIGT: Erstellung und Distribution eines Starterprogramms fÃ¼r ClickOnce-Applikationen
+		"ClickOnceStarter.exe" zur Ãœbergabe von Kommandozeilen-Parametern an eine ClickOnce-
 		Anwendungsreferenz.
 
 Stand: 15.01.2018 Version 3192
 
-ERLEDIGT: Fehler: Any-TreeEvents (außer Exceptions) bubblen im Tree nicht nach oben. Ist bisher nicht aufgefallen,
-    da die vorhandenen Testfälle blöder Weise alle so ausgelegt waren, dass der Knoten, an dem ein Worker
+ERLEDIGT: Fehler: Any-TreeEvents (auÃŸer Exceptions) bubblen im Tree nicht nach oben. Ist bisher nicht aufgefallen,
+    da die vorhandenen TestfÃ¤lle blÃ¶der Weise alle so ausgelegt waren, dass der Knoten, an dem ein Worker
     hing, immer auch selbst ein entsprechendes Tree-Event generierte, welches dann direkt
-    (also nicht über Any...) auslöste. Neuer, korrekter Testfall ist "CheckAnyTreeEvent".
-ERLEDIGT: Es sollen auch Haupt-Jobs mit anderem XML-Namen als "JobDescription.xml" geladen werden können.
+    (also nicht Ã¼ber Any...) auslÃ¶ste. Neuer, korrekter Testfall ist "CheckAnyTreeEvent".
+ERLEDIGT: Es sollen auch Haupt-Jobs mit anderem XML-Namen als "JobDescription.xml" geladen werden kÃ¶nnen.
 ERLEDIGT: Fehler: wenn im Snapshot ein Teilbaum mit Exception auf false (oder true?) - von Exception weg - geht,
-    werden der früheren Exception übergeordnete Strukturknoten (NodeList) nicht von gelb auf Farbe gesetzt.
+    werden der frÃ¼heren Exception Ã¼bergeordnete Strukturknoten (NodeList) nicht von gelb auf Farbe gesetzt.
 
 Stand: 26.04.2018 Version 3200
 
 ERLEDIGT: Liste aller AppSettings mit Wert und Quelle ausgeben (neuer Parameter "DumpAppSettings")
-ERLEDIGT: Fehler: Der Bildschirm springt in wahrscheinlich regelmäßigen Abständen in eine bestimmte Position,
+ERLEDIGT: Fehler: Der Bildschirm springt in wahrscheinlich regelmÃ¤ÃŸigen AbstÃ¤nden in eine bestimmte Position,
 		              so dass man immer wieder zur aktuell beobachteten Stelle scrollen muss.
 ERLEDIGT: Testprojekte gliedern und bereinigen.
-ERLEDIGT: Überarbeitung der Vishnu-Logik, Verschlanken und Klassenstruktur bereinigen.
+ERLEDIGT: Ãœberarbeitung der Vishnu-Logik, Verschlanken und Klassenstruktur bereinigen.
 ERLEDIGT: TestJobs neu organisieren: notwendige Tests mit Beschreibung und DemoJobs mit Beschreibung.
 ERLEDIGT: Kompletter Vishnu-Test mit allen Testprojekten.
 
 Stand: 22.08.2018 Version 4.0.0.0 (Zero Tolerance)
 
 ERLEDIGT: Wird nicht gemacht: Parameter "CollapseNext" implementieren.
-ERLEDIGT: bessere Lösung: aktuelle Bildschirmdarstellung speichern und beim nächsten Start reloaden.
-ERLEDIGT: Fehler: Controlled-Jobs mit verdeckten Auslösern (TreeExternals) laufen nicht an
+ERLEDIGT: bessere LÃ¶sung: aktuelle Bildschirmdarstellung speichern und beim nÃ¤chsten Start reloaden.
+ERLEDIGT: Fehler: Controlled-Jobs mit verdeckten AuslÃ¶sern (TreeExternals) laufen nicht an
           (Test: ...TestJobs\JobControllerTest\Session_verdeckt\).
 ERLEDIGT: Alle Projekte bereinigen und auf .Net 4.6 und AnyCPU umstellen.
 ERLEDIGT: Alle Projekte mit User-Projekten abgleichen.
 ERLEDIGT: Liste aller geladenen Assemblies ausgeben (neuer Parameter "DumpLoadedAssemblies").
-ERLEDIGT: Anlegen und Löschen des WorkingDirectorys von Vishnu in Framework verlagern.
+ERLEDIGT: Anlegen und LÃ¶schen des WorkingDirectorys von Vishnu in Framework verlagern.
 ERLEDIGT: DumpAppSettings-Logik und DumpLoadedAssemblies-Logik in Framework verlagern.
 
 Stand: 26.03.2019 Version 4.6.0.0 (Clean to .Net 4.6)
 
-ERLEDIGT: Differenzierung von Controlled-Jobs und "normalen" Jobs auflösen;
+ERLEDIGT: Differenzierung von Controlled-Jobs und "normalen" Jobs auflÃ¶sen;
           Der Parameter "IsControlled" wird so gegenstandslos und das Environment
-          ist im gesamten Tree immer verfügbar (Vorbereitung für Jobs mit zentral
-          verfügbaren Parametern wie z.B. SqlConnectionStrings).
+          ist im gesamten Tree immer verfÃ¼gbar (Vorbereitung fÃ¼r Jobs mit zentral
+          verfÃ¼gbaren Parametern wie z.B. SqlConnectionStrings).
           
 Stand: 26.03.2019 Version 4.6.0.2 (Treewide Environment)
 
 ERLEDIGT: TreeEventTrigger auf JobLists funktionieren bei mehrmaligem Run nicht mehr. Ursache war,
           dass immer der Zustand der Source des Events abgefragt wurde anstelle korrekterweise der Zustand
-          des referenzierten Knoten (in diesem Falle der JobList); Im Extremfall löste der abfragende
+          des referenzierten Knoten (in diesem Falle der JobList); Im Extremfall lÃ¶ste der abfragende
           Knoten selbst die Joblist neu aus und fragte dann in Folge seinen eigenen Zustand ab
           (Test-Job: CheckAnyTreeEvent).
-ERLEDIGT: Parallele SQL-Zugriffe führen zu Fehlern, z.B. "Dem Command ist schon ein geöffneter Reader 
-          zugeordnet" oder "... benötigt eine geöffnete SQL-Connection..."
+ERLEDIGT: Parallele SQL-Zugriffe fÃ¼hren zu Fehlern, z.B. "Dem Command ist schon ein geÃ¶ffneter Reader 
+          zugeordnet" oder "... benÃ¶tigt eine geÃ¶ffnete SQL-Connection..."
 ERLEDIGT: Anzeige der Sanduhr bei Neustart von noch laufenden Jobs funktioniert nicht korrekt
           (Test-Job: LongRunningNode)
 ERLEDIGT: Beim Speichern und Laden der Bildschirmdarstellung entstehen immer Scrollbars,
@@ -780,68 +780,68 @@ ERLEDIGT: Bei Wildcards im WorkingDirectory werden von BasicAppsettings ein phys
           von BasicAppSettings als Vishnu mit seinen AppSettings. Dadurch versuchte die im Knoten erzeugte
           zweite Instanz von BasicAppSettings ebenfalls, das neue WorkingDirectory anzulegen, allerdings
           ohne die Vishnu-spezifische Wildcard-Ersetzung.
-          Lösung: globales Locking über ThreadLocker.TryLockNameGlobal("ApplicationSettingsImpactLock", 100).
-          und nur, wenn dieses geglückt ist, die Verzeichnisoperationen durchführen.        
-Erledigt: Registry-Parameter checken und ggf. überarbeiten (RegistryRoot?)
+          LÃ¶sung: globales Locking Ã¼ber ThreadLocker.TryLockNameGlobal("ApplicationSettingsImpactLock", 100).
+          und nur, wenn dieses geglÃ¼ckt ist, die Verzeichnisoperationen durchfÃ¼hren.        
+Erledigt: Registry-Parameter checken und ggf. Ã¼berarbeiten (RegistryRoot?)
 
 Stand: 24.05.2019 Version 4.6.1.0 (Treewide Environment) am 27.05.2019 beim User released
 
 ERLEDIGT: Bessere Responsibility bei manuell gestarteten ThreadLocked-Checkern erreichen.
-          Lösung: Durch ein differenzierteres Handling bei UserParameterReadern und Tree-interner Weitergabe
-          von ConnectionStrings anstelle geöffneter Connections konnte die Notwendigkeit von ThreadLocks
+          LÃ¶sung: Durch ein differenzierteres Handling bei UserParameterReadern und Tree-interner Weitergabe
+          von ConnectionStrings anstelle geÃ¶ffneter Connections konnte die Notwendigkeit von ThreadLocks
           deutlich verringert werden.
 ERLEDIGT: Escalator: bestimmte Eskalationsstufen mit Timer-Trigger kombinieren
           (wahlweise auf die Nerven gehen, wie bei normalen Workern mit TimerTrigger)           
 ERLEDIGT: Zwei Probleme in UserChecker.dll: um 00:00 Uhr herum funktioniert die Logik nicht und
 					ab und zu wird statt einer korrekten "Es konnten keine Verbindungsparameter..."
-					die Exception "...ist nicht aktuell." gemeldet - dadurch wechselt für Vishnu der Exception-Typ
-					und er löst korrekterweise neu aus.
-					Alles in allem kein Vishnu-Problem sondern in UserChecker zu lösen (dort aber noch offen).
-					Ist doch ein Vishnu-Problem: durch die sich gegenseitig ausschließenden >< Beziehungen
-					entsteht eine XOR-Situation aus Sicht der übergeordneten NodeList.
-					Entsprechend auch bei einer echten XOR-Verknüpfung: dadurch, dass mindestens zwei Knoten
-					in einer NodeList direkt voneinander abhängig sind (NodeConnectoren, ValueModifier oder
-					TreeEventTrigger), diese aber naturgemäß nicht hundertprozentig zeitgleich auslösen,
-					wechselt die übergeordnete NodeList kurzzeitig ihr LogicalResult. Sind dieser NodeList, bzw.
-					der nächsten übergeordneten JobList Worker zugeordnet, lösen diese aus, obwohl aus
-					sachlogischer Sicht für die XOR Verknüpfung nichts passiert ist.
-					1. Woraround: über LogicalChangedDelay werden Änderungen von LogicalResults in Unterknoten
-					   von JobLists etwas verzögert angenommen, sodass ein kurzes, technisch bedingtes
+					die Exception "...ist nicht aktuell." gemeldet - dadurch wechselt fÃ¼r Vishnu der Exception-Typ
+					und er lÃ¶st korrekterweise neu aus.
+					Alles in allem kein Vishnu-Problem sondern in UserChecker zu lÃ¶sen (dort aber noch offen).
+					Ist doch ein Vishnu-Problem: durch die sich gegenseitig ausschlieÃŸenden >< Beziehungen
+					entsteht eine XOR-Situation aus Sicht der Ã¼bergeordneten NodeList.
+					Entsprechend auch bei einer echten XOR-VerknÃ¼pfung: dadurch, dass mindestens zwei Knoten
+					in einer NodeList direkt voneinander abhÃ¤ngig sind (NodeConnectoren, ValueModifier oder
+					TreeEventTrigger), diese aber naturgemÃ¤ÃŸ nicht hundertprozentig zeitgleich auslÃ¶sen,
+					wechselt die Ã¼bergeordnete NodeList kurzzeitig ihr LogicalResult. Sind dieser NodeList, bzw.
+					der nÃ¤chsten Ã¼bergeordneten JobList Worker zugeordnet, lÃ¶sen diese aus, obwohl aus
+					sachlogischer Sicht fÃ¼r die XOR VerknÃ¼pfung nichts passiert ist.
+					1. Woraround: Ã¼ber LogicalChangedDelay werden Ã„nderungen von LogicalResults in Unterknoten
+					   von JobLists etwas verzÃ¶gert angenommen, sodass ein kurzes, technisch bedingtes
 					   "Flackern" des LogicalResult ignoriert wird. Die Wartezeit ist aber prinzipiell
-					   systemspezifisch, so dass dies nicht die optimale Lösung sein kann.
-					FOLGEAUFGABE: korrekte Lösung ohne Sleeps finden.
-					Was ist mit Escalator? Workaround über Escalator ist gefunden, Problem wird als erledigt
+					   systemspezifisch, so dass dies nicht die optimale LÃ¶sung sein kann.
+					FOLGEAUFGABE: korrekte LÃ¶sung ohne Sleeps finden.
+					Was ist mit Escalator? Workaround Ã¼ber Escalator ist gefunden, Problem wird als erledigt
 					markiert.
 ERLEDIGT: Default-WorkingDirectory bei IsSingleInstance=true ohne ProcessId.
 
 Stand: 24.01.2020 Version 4.7.2.1 (Direct Response) am 22.01.2020 in Saas Fee released
 
-ERLEDIGT: SleepTime einführen, in der keine Checker ausgeführt werden.
+ERLEDIGT: SleepTime einfÃ¼hren, in der keine Checker ausgefÃ¼hrt werden.
 ERLEDIGT: SleepTime in Snapshots darstellen.
 ERLEDIGT: SleepTime in VishnuWeb darstellen.
-ERLEDIGT: Parameterübergabe bei UserCheckern mit letztem Result.
+ERLEDIGT: ParameterÃ¼bergabe bei UserCheckern mit letztem Result.
 ERLEDIGT: Bugfix in BasicAppSettings bei mehrfach geladenen Assemblies.
 ERLEDIGT: Bugfix in ValueModifier: Mehrfach-Durchlauf bei UserValueModifiern gefixt.
-ERLEDIGT: Darstellung in VishnuWeb überarbeitet.
+ERLEDIGT: Darstellung in VishnuWeb Ã¼berarbeitet.
 ERLEDIGT: Speichern der Bildschirmdarstellung auch in VishnuWeb (F3).
-ERLEDIGT: UserValueModifier mit eigenem UserNodeControl ermöglicht (CheckUserValueModifier).
-ERLEDIGT: Vishnu_UserChecker_VSIX.vsix und Vishnu_UserView_VSIX.vsix eingeführt.
-ERLEDIGT: Bei Strg-rechte-Maustaste werden die Trees zu klein (vorher Fenster vergrößern?).
+ERLEDIGT: UserValueModifier mit eigenem UserNodeControl ermÃ¶glicht (CheckUserValueModifier).
+ERLEDIGT: Vishnu_UserChecker_VSIX.vsix und Vishnu_UserView_VSIX.vsix eingefÃ¼hrt.
+ERLEDIGT: Bei Strg-rechte-Maustaste werden die Trees zu klein (vorher Fenster vergrÃ¶ÃŸern?).
 ERLEDIGT: Zoomen funktioniert immer noch nicht perfekt
 ERLEDIGT: Fehler: Bei FullWindow Anzeige (Strg-rechte-Maustaste) wird das Bild auf Dauer immer kleiner.
-ERLEDIGT: Framework Web-fähig (.Net Core 3.0) machen; Projekte auf Version 4.6.1. angehoben.
+ERLEDIGT: Framework Web-fÃ¤hig (.Net Core 3.0) machen; Projekte auf Version 4.6.1. angehoben.
 
 Stand: 17.05.2020 Version 4.8.0.2 (Surface)
 
 ERLEDIGT: Vishnu, Framework, PluginProjects, etc. neu strukturieren.
-ERLEDIGT: Alles in git-Repository überführen, Shellscripe zur Massenverarbeitung erstellen,
+ERLEDIGT: Alles in git-Repository Ã¼berfÃ¼hren, Shellscripe zur Massenverarbeitung erstellen,
           Remote-Repository auf eigenem Webspace einrichten.
 ERLEDIGT: ClickOnce-Publishing auf eigenem Webspace installieren.
 
 Stand: 04.07.2020 Version 4.9.0.0
 
-ERLEDIGT: Fehler: UserJob läßt sich nicht neu starten (Sanduhr)
-  TODO: nach bestimmter Zeit abschießen bzw. als ungültig markieren.
+ERLEDIGT: Fehler: UserJob lÃ¤ÃŸt sich nicht neu starten (Sanduhr)
+  TODO: nach bestimmter Zeit abschieÃŸen bzw. als ungÃ¼ltig markieren.
 ERLEDIGT: Vishnu mit Company-Integration und produktiver Distribution.
 
 ERLEDIGT: PluginProjects bereinigen
@@ -850,29 +850,29 @@ ERLEDIGT: PluginProjects bereinigen
 Stand: 05.08.2020 Version 4.9.0.1 (Repository and Install)
 
 ERLEDIGT: Beim Laden von Jobs IsControlled entfernen
-ERLEDIGT: Parameterfiles (XML-Parameter) wieder aufräumen. Werden zwar nicht aufgeräumt, aber
+ERLEDIGT: Parameterfiles (XML-Parameter) wieder aufrÃ¤umen. Werden zwar nicht aufgerÃ¤umt, aber
           es entstehen nicht mehr so viele, da der Counter aus dem Dateinamen entfernt wurde.
 ERLEDIGT: Schreiben und Laden von Snapshots optimieren und absichern (muss neu)
-ERLEDIGT: Ring Logger - Lösung über parametrisierbares Umbenennen und Löschen überzähliger Logfiles.
+ERLEDIGT: Ring Logger - LÃ¶sung Ã¼ber parametrisierbares Umbenennen und LÃ¶schen Ã¼berzÃ¤hliger Logfiles.
 ERLEDIGT: TreeParameters um Property "CheckerDllDirectory" erweitern.
 ERLEDIGT: WebDriver.dll hart in's Bin-Verzeichnis kopieren.
 ERLEDIGT: BugFix: UserControls mit ListViews mit unhandled SelectionChanged konnten im MainTabControl zum
-          Abbruch von Vishnu führen, da SelectionChanged im Tree nach oben bubbled.
-ERLEDIGT: Die maximale Öffnungszeit für ToolTips wurde auf 30 Sekunden hochgesetzt.
-ERLEDIGT: BugFix: Direkter UserRun auf getriggerte Knoten führte zum doppelten Start der Knoten, da der
-          zugeordnete Trigger auch sofort wieder auslöste.
+          Abbruch von Vishnu fÃ¼hren, da SelectionChanged im Tree nach oben bubbled.
+ERLEDIGT: Die maximale Ã–ffnungszeit fÃ¼r ToolTips wurde auf 30 Sekunden hochgesetzt.
+ERLEDIGT: BugFix: Direkter UserRun auf getriggerte Knoten fÃ¼hrte zum doppelten Start der Knoten, da der
+          zugeordnete Trigger auch sofort wieder auslÃ¶ste.
 
 Stand: 01.12.2020 Version 4.9.3.1
 
 ERLEDIGT: Environment-Parameter mit Vishnu_ Prefix versehen.
 ERLEDIGT: Vishnu-Splashscreen auf lizenzfreien Tree umstellen.
-ERLEDIGT: Kontext-Menü auf rechte Maustaste, dafür Ansicht normalisieren über Umschalt-rechte Maustaste.
-ERLEDIGT: Tree anhalten und weiterlaufen lassen (Context-Menü).
-ERLEDIGT: Tree oder Branch loggen (Context-Menü).
-ERLEDIGT: Fehler: JobSnapshots können kurzzeitige, unlogische Zwischenzustände einfrieren.
-ERLEDIGT: Dynamische Snapshots und Trees - TreeReload, HotPlug neu checken und erweitern (Context-Menü).
+ERLEDIGT: Kontext-MenÃ¼ auf rechte Maustaste, dafÃ¼r Ansicht normalisieren Ã¼ber Umschalt-rechte Maustaste.
+ERLEDIGT: Tree anhalten und weiterlaufen lassen (Context-MenÃ¼).
+ERLEDIGT: Tree oder Branch loggen (Context-MenÃ¼).
+ERLEDIGT: Fehler: JobSnapshots kÃ¶nnen kurzzeitige, unlogische ZwischenzustÃ¤nde einfrieren.
+ERLEDIGT: Dynamische Snapshots und Trees - TreeReload, HotPlug neu checken und erweitern (Context-MenÃ¼).
 ERLEDIGT: Diverse Bugfixes zum TreeReload.
-ERLEDIGT: KontextMenü: blinkender Button, solange eine Funktion läuft und Schließen des Menüs,
+ERLEDIGT: KontextMenÃ¼: blinkender Button, solange eine Funktion lÃ¤uft und SchlieÃŸen des MenÃ¼s,
 					wenn eine Funktion abgeschlossen ist.
 
 Stand: 09.02.2021 Version 5.0.1.6 (HotPlug)
@@ -883,16 +883,16 @@ ERLEDIGT: Bugfixes und Vereinfachungen bei Konstanten mit Boolschem- oder Null-W
           Farbiger Rand je nach logischem Wert einer Konstanten.
 ERLEDIGT: Fehler in Snapshots nach langer Laufzeit: 
 						System.ComponentModel.Win32Exception (0x80004005):
-							Für diesen Befehl ist nicht genügend Speicher verfügbar.
+							FÃ¼r diesen Befehl ist nicht genÃ¼gend Speicher verfÃ¼gbar.
           Ursache waren Fehler in der PieControls-UserLibrary (CheckDiskSpace/ShowDiskSpace).
 ERLEDIGT: Deutliche Erweiterung der Vishnu-Hilfe.
-ERLEDIGT: Doku: Job-Parameter ergänzen, bekannte Probleme, woher kommt der Name
+ERLEDIGT: Doku: Job-Parameter ergÃ¤nzen, bekannte Probleme, woher kommt der Name
 ERLEDIGT: Vishnu-Hilfe: Danksagung
 ERLEDIGT: Vishnu-Softwarelizenz (erster Entwurf)
 
 Stand: 05.07.2021 Version 5.0.2.6 (Documented and tested)
 
-ERLEDIGT: Bugfixes bei der Übergabe des Environments und der Results an aufgerufene Checker.
+ERLEDIGT: Bugfixes bei der Ãœbergabe des Environments und der Results an aufgerufene Checker.
           Wesentliche Verbesserung im FileWatcherTrigger: Der Sleep zum Abwarten von Doppel-Events
           wurde vor den Aufruf des Trigger-Events gezogen. 
           Dadurch ergaben sich weitreichende Verbesserungen bei Snapshots:
@@ -901,44 +901,44 @@ ERLEDIGT: Bugfixes bei der Übergabe des Environments und der Results an aufgeruf
 Stand: 15.07.2022 Version 5.0.5.0 (Peace and Sanity)
 
 ERLEDIGT: Ableitung von LogicalParser zur Schwellenwert-Analyse, Arbeitstitel "TresholdParser"
-ERLEDIGT: Umschalten in die Job-Ansicht und Maus über einzelne Checker bewegen führte zum Programmabsturz.
+ERLEDIGT: Umschalten in die Job-Ansicht und Maus Ã¼ber einzelne Checker bewegen fÃ¼hrte zum Programmabsturz.
 
 Stand: 04.08.2022 Version 5.1.0.0 (Treshold)
 
-ERLEDIGT: Prüfen: Historie für einen Knoten oder User-Aufgabe? vielleicht Teil-Historie?
-          Lösung: CheckerHistoryLogger.
-ERLEDIGT: Parameter StartWithJobs eingeführt.
+ERLEDIGT: PrÃ¼fen: Historie fÃ¼r einen Knoten oder User-Aufgabe? vielleicht Teil-Historie?
+          LÃ¶sung: CheckerHistoryLogger.
+ERLEDIGT: Parameter StartWithJobs eingefÃ¼hrt.
 ERLEDIGT: Beschleunigung der Aufbereitung und Positionierung nach Parameter StartWithJobs und
           gespeicherten Anzeigeeinstellungen.
-ERLEDIGT: Fehler: WPFDialogChecker starten immer im ersten Bildschirm, auch wenn Vishnu im zweiten Bildschirm läuft.
-ERLEDIGT: Context-Menü öffnete auch, wenn Strg oder Umschalt zusammen mit der rechten Maustaste gedrückt wurde.
-ERLEDIGT: Context-Menü schließt jetzt, wenn die Maus den Menübereich verlässt.
-ERLEDIGT: Test-Jobs mit 100, 200, 500 und 1000 Checkern erstellt und ausgeführt (...\TestJobs\Tests\HeavyDuty\).
+ERLEDIGT: Fehler: WPFDialogChecker starten immer im ersten Bildschirm, auch wenn Vishnu im zweiten Bildschirm lÃ¤uft.
+ERLEDIGT: Context-MenÃ¼ Ã¶ffnete auch, wenn Strg oder Umschalt zusammen mit der rechten Maustaste gedrÃ¼ckt wurde.
+ERLEDIGT: Context-MenÃ¼ schlieÃŸt jetzt, wenn die Maus den MenÃ¼bereich verlÃ¤sst.
+ERLEDIGT: Test-Jobs mit 100, 200, 500 und 1000 Checkern erstellt und ausgefÃ¼hrt (...\TestJobs\Tests\HeavyDuty\).
 ERLEDIGT: JobList-Ansicht: Jobs werden jetzt in dynamischen Grids mit quadratischem Zuschnitt angezeigt.
-          Dadurch wurde eine bessere Bildschirmaufteilung und ein besseres Handling bei Größenänderung erreicht.
-ERLEDIGT: ZoomBox Mouse-wheel: Scroll-Events werden jetzt nicht mehr auf e.Handled=true gesetzt. Dadurch können
+          Dadurch wurde eine bessere Bildschirmaufteilung und ein besseres Handling bei GrÃ¶ÃŸenÃ¤nderung erreicht.
+ERLEDIGT: ZoomBox Mouse-wheel: Scroll-Events werden jetzt nicht mehr auf e.Handled=true gesetzt. Dadurch kÃ¶nnen
           sie auch noch durch weitere Controls genutzt werden.
 
 Stand: 23.12.2022 Version 5.3.0.3 (Heavy Duty)
 
 ERLEDIGT: Umstellung auf .Net 7.0 (umfassende Test stehen noch aus)
 	Zusatz: siehe auch roadmap_dotnetcore_migration.txt
-ERLEDIGT: CheckDiskSpace: Sql-Zugriffe nach Company auslagern, wenn möglich
+ERLEDIGT: CheckDiskSpace: Sql-Zugriffe nach Company auslagern, wenn mÃ¶glich
 ERLEDIGT: Framework-Assemblies in NuGet-Package (was ist mit pdb?)
-	Zusatz: allgemeingültige Lösung für alle Projekte über Environment-Variable NETETI_CIB=true
+	Zusatz: allgemeingÃ¼ltige LÃ¶sung fÃ¼r alle Projekte Ã¼ber Environment-Variable NETETI_CIB=true
 	       und ...\AddOn\proj\Conditional_NuGet_Package_Properties.proj implementiert.
 ERLEDIGT: MailTo-Parameter
-ERLEDIGT: Parametertrennung mit Pipe | in Syntax führt zu Fehler in MicroMailer
+ERLEDIGT: Parametertrennung mit Pipe | in Syntax fÃ¼hrt zu Fehler in MicroMailer
 ERLEDIGT: Positionierung von UserDialogen ist noch unsauber (verschwindet rechts unten)
 		CheckCanRun, CheckDateDialog
-ERLEDIGT: Meldung mit Mindestbreite in Überschrift-Länge
+ERLEDIGT: Meldung mit Mindestbreite in Ãœberschrift-LÃ¤nge
 ERLEDIGT: Vishnu-eigene Meldungen mit korrekter Positionierung, Zoom-Funktionen und Icons
 ERLEDIGT: Vishnu-Positionierung und Resizing bei Multiscreen-Orientierung
           (-SizeOnVirtualScreen=true)
 ERLEDIGT: Fehler: UserJob: Die Objekt-Synchronisations-Methode wurde von einem nicht synchronisierten
           Codeblock aufgerufen.
 ERLEDIGT: ToolTips mit Copy-Funktion.
-ERLEDIGT: InPlug/WebScraper: eigene Lösung über Verkürzen und Herunterzählen der Chrome-Version für
+ERLEDIGT: InPlug/WebScraper: eigene LÃ¶sung Ã¼ber VerkÃ¼rzen und HerunterzÃ¤hlen der Chrome-Version fÃ¼r
 					den Download einer passenden Treiberversion implementiert. 
 
 Stand: 30.07.2023 Version 7.0.1.0 (Hard Core)
@@ -947,58 +947,58 @@ ERLEDIGT: Umfassende Test erfolgreich abgeschlossen.
 
 Stand: 04.09.2023 Version 7.0.1.4 (Hard Core tested and stable)
 
-ERLEDIGT: Vishnu_UserChecker_VSIX.vsix und Vishnu_UserView_VSIX.vsix wieder funktionstüchtig gemacht.
+ERLEDIGT: Vishnu_UserChecker_VSIX.vsix und Vishnu_UserView_VSIX.vsix wieder funktionstÃ¼chtig gemacht.
 	offen: es folgen bei der Erstellung von neuen Projekten noch Fehlermeldungen, die aber ohne weitere
 	       Auswirkungen bleiben:
-	       			Dem Projekt konnten nicht alle erforderlichen Pakete hinzugefügt werden
+	       			Dem Projekt konnten nicht alle erforderlichen Pakete hinzugefÃ¼gt werden
 							(englisch: Operation failed because details for project could not be loaded)
 
 Stand: 16.10.2023 Version 7.0.1.6 (Hard Core tested and stable)
 
-ERLEDIGT: Context-Menü schließt nicht automatisch nach dem ersten Funktionsaufruf (Reload).
-		Das Problem hat sich dadurch erledigt, dass Kontextmenüs jetzt genau dann schließen,
-		wenn die Maus den Menübereich verlässt.
-ERLEDIGT: Bugfix: Kontext-Menü funktionierte nach dem zweiten Aufruf nicht mehr - behoben.
-ERLEDIGT: Kontext-Menü: Show Log implementiert.
+ERLEDIGT: Context-MenÃ¼ schlieÃŸt nicht automatisch nach dem ersten Funktionsaufruf (Reload).
+		Das Problem hat sich dadurch erledigt, dass KontextmenÃ¼s jetzt genau dann schlieÃŸen,
+		wenn die Maus den MenÃ¼bereich verlÃ¤sst.
+ERLEDIGT: Bugfix: Kontext-MenÃ¼ funktionierte nach dem zweiten Aufruf nicht mehr - behoben.
+ERLEDIGT: Kontext-MenÃ¼: Show Log implementiert.
 	ERLEDIGT: Folgeaufgabe: auch die Vishnu-AppSettings mit einbinden (eigener Punkt: Show Settings)
-ERLEDIGT: Kontext-Menü und ToolTip auch für die Job-Ansicht realisiert.
+ERLEDIGT: Kontext-MenÃ¼ und ToolTip auch fÃ¼r die Job-Ansicht realisiert.
 ERLEDIGT: JobControllerTest\JobControllerLoop funktionierte nicht
-ERLEDIGT: Der Zusatz "(registered)" wurde im Log unter Umständen mehrfach angezeigt.
-ERLEDIGT: Positionierung bei mehreren Bildschirmen für Hauptfenster und Meldungen überarbeitet.
-ERLEDIGT: Funktion "LogMemory" beim Aufruf von "Pause Tree" hinzugefügt.
-ERLEDIGT: Parameter "AbortingAllowed" hinzugefügt.
+ERLEDIGT: Der Zusatz "(registered)" wurde im Log unter UmstÃ¤nden mehrfach angezeigt.
+ERLEDIGT: Positionierung bei mehreren Bildschirmen fÃ¼r Hauptfenster und Meldungen Ã¼berarbeitet.
+ERLEDIGT: Funktion "LogMemory" beim Aufruf von "Pause Tree" hinzugefÃ¼gt.
+ERLEDIGT: Parameter "AbortingAllowed" hinzugefÃ¼gt.
 
 Stand: 15.01.2024 Version 8.0.2 (Discovery)
 
-ERLEDIGT: Komplettüberarbeitung der Positionierung von Fenstern, WPF-Dialog-Checkern und Meldungen
+ERLEDIGT: KomplettÃ¼berarbeitung der Positionierung von Fenstern, WPF-Dialog-Checkern und Meldungen
           auf einem und mehreren Bildschirmen.
-          Dabei Berücksichtigung verschiedener Bildschirmauflösungen und Skalierungen.
+          Dabei BerÃ¼cksichtigung verschiedener BildschirmauflÃ¶sungen und Skalierungen.
 ERLEDIGT: Speichern-Meldung zentrierte noch auf dem Screen.
-ERLEDIGT: Automatisierung des Copyright Gültigkeitsendes.
-ERLEDIGT: Die Vishnu-Hilfe wurde über F1 und im Kontext-Menü integriert.
+ERLEDIGT: Automatisierung des Copyright GÃ¼ltigkeitsendes.
+ERLEDIGT: Die Vishnu-Hilfe wurde Ã¼ber F1 und im Kontext-MenÃ¼ integriert.
 ERLEDIGT: Neuer Vishnu-Parameter: HelpPreference
             online: Es wird bevorzugt die Onlinehilfe geladen. Dies ist die Voreinstellung.
           	local: Es wird bevorzugt die lokale Hilfe geladen.
 ERLEDIGT: Die "Plugin"-Verzeichnisse unterhalb von "VishnuHome/Vishnu" und "ReadyBin/Vishnu.bin" wurden abgeschafft;
           betroffene User-Assemblies wurden bei den anderen User-Assemblies integriert
-ERLEDIGT: Der Parameter UserAssemblyDirectory sollte in den allermeisten Fällen obsolet geworden sein.
+ERLEDIGT: Der Parameter UserAssemblyDirectory sollte in den allermeisten FÃ¤llen obsolet geworden sein.
           User-Assemblies werden jetzt bei Standard-Verzeichnisstrukturen
           sowohl beim Vishnu-Debugging, als auch aus ...\Ready.bin\Vishnu.Bin heraus gefunden.
-ERLEDIGT: Die Suche nach Jobs wurde verbessert. Es genügt jetzt, die dem Job direkt	übergeordneten
+ERLEDIGT: Die Suche nach Jobs wurde verbessert. Es genÃ¼gt jetzt, die dem Job direkt	Ã¼bergeordneten
           Verzeichnisse mit anzugeben; Also zum Beispiel: DemoJobs\CheckServers,
           anstelle von %VishnuSourceRoot%\VishnuHome\Documentation\DemoJobs\CheckServers.
 ERLEDIGT: Bugfix: Worker wurden bei existierenden NodeConnectoren auf SingleNodes mehrfach gestartet.
-ERLEDIGT: Bugfix: UserRun oder UserBreak auf einen Knoten bei pausiertem Tree führte zum Deadlock.
-ERLEDIGT: Tests ohne AddOn, alles leermachen (delete_binaries), ReadyBin löschen
+ERLEDIGT: Bugfix: UserRun oder UserBreak auf einen Knoten bei pausiertem Tree fÃ¼hrte zum Deadlock.
+ERLEDIGT: Tests ohne AddOn, alles leermachen (delete_binaries), ReadyBin lÃ¶schen
 
-ERLEDIGT: SizeOnVirtualScreen wieder einführen: bei false Größe und Position bei mehreren Bildschirmen
-	        trotzdem auf einen beschränken (Umschalten in die Jobs-Ansicht und zurück).
-ERLEDIGT: Icon für die Vishnu-Hilfe.
-ERLEDIGT: Icon für Vishnu-Meldungen verbessern.
+ERLEDIGT: SizeOnVirtualScreen wieder einfÃ¼hren: bei false GrÃ¶ÃŸe und Position bei mehreren Bildschirmen
+	        trotzdem auf einen beschrÃ¤nken (Umschalten in die Jobs-Ansicht und zurÃ¼ck).
+ERLEDIGT: Icon fÃ¼r die Vishnu-Hilfe.
+ERLEDIGT: Icon fÃ¼r Vishnu-Meldungen verbessern.
 
-ERLEDIGT: NetworkMappingsRefresher überarbeitet und erweitert.
-ERLEDIGT: Die Ausgaben im SplashScreen beim Vishnu Start werden jetzt asynchron und verzögert verarbeitet.
-ERLEDIGT: Der Vishnu-Start in App.cs wurde komplett überarbeitet und auf Mutex umgestellt
+ERLEDIGT: NetworkMappingsRefresher Ã¼berarbeitet und erweitert.
+ERLEDIGT: Die Ausgaben im SplashScreen beim Vishnu Start werden jetzt asynchron und verzÃ¶gert verarbeitet.
+ERLEDIGT: Der Vishnu-Start in App.cs wurde komplett Ã¼berarbeitet und auf Mutex umgestellt
 ERLEDIGT: Die Geolocation-Api im WeatherChecker wurde von http://ip-api.com/json auf
           https://get.geojs.io/v1/ip/geo.json umgestellt.
 ERLEDIGT: Das Vishnu-Ende in App.cs wird jetzt nicht mehr normal durchlaufen, sondern Vishnu wird jetzt
@@ -1007,25 +1007,60 @@ ERLEDIGT: Das Vishnu-Ende in App.cs wird jetzt nicht mehr normal durchlaufen, so
 
 Stand: 26.02.2024 Version 8.2.0 (Arrival)
 
+ERLEDIGT: Laden eines UserParameterReaders innerhalb eines root-Verzeichnisses,welches Leerzeichen im Namen hat, fÃ¼hrte zu einer Exception. 
+ERLEDIGT: Beenden aller Slave-Prozesse (Meldungen, Logfenster) mit in das KontextmenÃ¼ aufgenommen. 
+ERLEDIGT: In den Vordergrund Holen aller Slave-Prozesse (Meldungen, Logfenster) mit in das KontextmenÃ¼ aufgenommen. 
+
+Stand: 05.07.2024 Version 8.2.1 (Arrival-patch-01)
+
+ERLEDIGT: englische Hilfe (HTML und CHM)
+          Folgeaufgabe: Vishnu selbst mehrsprachig anlegen.
+ERLEDIGT: Komplette Integration des neuen KontextmenÃ¼s inklusive der Punkte 
+ERLEDIGT: Beenden aller Slave-Prozesse (Meldungen, Logfenster). 
+ERLEDIGT: In den Vordergrund Holen aller Slave-Prozesse (Meldungen, Logfenster). 
+ERLEDIGT: Weitergabe des neuen Parameters "Language" an den VishnuHelpBrowser. 
+ERLEDIGT: Bugfix: Default "" fÃ¼r RootJobPackagePath.
+ERLEDIGT: Bugfix: Default 'VishnuRoot' fÃ¼r VishnuSourceRoot hinzugefÃ¼gt.
+
+Stand: 19.12.2024 Version 8.3.0 (Babylon)
+
+ERLEDIGT: Der ProductionJobProvider ist noch Spaghetti-Code - strukturieren und dabei Json-JobDescriptions als
+          zusÃ¤tzliche Option implementieren.
+ERLEDIGT: Erweiterung des Escalators fÃ¼r Json-Parameter. 
+ERLEDIGT: Implementierung der Verarbeitung von User-Parametern in der neuen Library UserSettingsAccess. 
+          Dabei UnterstÃ¼tzung von Json-Parametern implementiert. 
+          DafÃ¼r Wegfall der Nutzung von XmlAccess. 
+
+Stand: 10.06.2025 Version 8.4.0 (Argonaut)
+
+ERLEDIGT: Bugfix: GC.WaitForPendingFinalizers() und LogMemory() konnten die Applikation (z.B., in TestJobs\CheckAnyTreeEvent);
+          Die Routinen werden jetzt nur noch aufgerufen, wenn "DebugMode" aktiv ist.
+ERLEDIGT: Bugfix: JobList Run/Stop-Buttons blieben manchmal deaktiv bei vorhandenem JobSnapshotTrigger auf "AnyLogicalResultChanged"
+          auf die JobList selbst.
+          Der Refresh auf den JobList-Run/Stop-Button wird nun schon aufgerufen, wenn die Maus in das umgebende Element eintritt.
+ERLEDIGT: Bugfix: Korrektur der Suchroutine fÃ¼r dynamisch zu ladende Assemblies (manchmal wurden existierende Assemblies Ã¼bersehen).
+
+Stand: 07.10.2025 Version 8.4.1
+
 -------------------------------------------------------------------------------------------------------------
 
 ###################
 Vishnu
-	Veröffentlichungsort: NetEti: \\localhost\Vishnu.Install\ 
+	VerÃ¶ffentlichungsort: NetEti: \\localhost\Vishnu.Install\ 
 	                               (...\ClubChaos\Setup\Vishnu.bin)
 		Url des Installationsordners: \\localhost\Vishnu.Install\
 		Optionen / Herausgebername: Erik Nagel
 		Optionen / Sammlungsname NetEti
-	Veröffentlichungsort: NetEti: \\localhost\Vishnu.Install\
+	VerÃ¶ffentlichungsort: NetEti: \\localhost\Vishnu.Install\
 		Url des Installationsordners: https://neteti.de/Vishnu.Install/
 		Anwendungsupdate/Updatepfad:  https://neteti.de/Vishnu.Install/
 WebViewer
-	Veröffentlichungsort: NetEti: \\localhost\Vishnu.Install\WebViewer\
+	VerÃ¶ffentlichungsort: NetEti: \\localhost\Vishnu.Install\WebViewer\
 	                              (...\ClubChaos\Setup\Vishnu.bin\WebViewer\)
 		Url des Installationsordners: \\localhost\Vishnu.Install\WebViewer\
 		Optionen / Herausgebername: Erik Nagel
 		Optionen / Sammlungsname NetEti
-	Veröffentlichungsort: NetEti: \\localhost\Vishnu.Install\WebViewer\
+	VerÃ¶ffentlichungsort: NetEti: \\localhost\Vishnu.Install\WebViewer\
 		Url des Installationsordners: https://neteti.de/Vishnu.Install/WebViewer/
 		Anwendungsupdate/Updatepfad:  https://neteti.de/Vishnu.Install/WebViewer/
 
@@ -1040,26 +1075,26 @@ Escalator: Text bei weggefallener Ursache nochmal checken
 SQL-Parallelisierung noch mal neu angehen
 CheckAll Break+Run: "Die DB local ist nicht aktuell"; CheckSQL:D ist grau
 Vishnu Hilfe: andere Formate checken
-Docker für Vishnu evaluieren
+Docker fÃ¼r Vishnu evaluieren
 WIX evaluieren (Beispiel: iSpy Projekt)
 Fehler nach mehrmaligem, schnell hintereinander gestarteten Run auf WPFDialogChecker im Job CheckAnyTreeEvent:
 System.Threading.ThreadAbortException: System error.
-Manchmal erscheint (im Hintergrund bei alt-Tab) ein zusätzliches leeres Start Fenster
+Manchmal erscheint (im Hintergrund bei alt-Tab) ein zusÃ¤tzliches leeres Start Fenster
 JobLogger in Logger umbenennen?
 Cooperatives Cancelling komplett implementieren (auch Checker).
-Speichern der Bildschirmdarstellung (Strg-s) mit in das Kontextmenü aufnehmen.
+Speichern der Bildschirmdarstellung (Strg-s) mit in das KontextmenÃ¼ aufnehmen.
 Uptime mit im Window-Header anzeigen.
-Aktuelle Vishnu-Version und Uptime zusätzlich in Tooltip auf Window-Header anzeigen (auch bei Dialog-Checkern).
-Aktuelle Size wird noch nicht in Messages und UserControls übernommen.
+Aktuelle Vishnu-Version und Uptime zusÃ¤tzlich in Tooltip auf Window-Header anzeigen (auch bei Dialog-Checkern).
+Aktuelle Size wird noch nicht in Messages und UserControls Ã¼bernommen.
 CheckWeatherHistory zeigt am 21.01.2024 (und auch vorerst an den Folgetagen)
 	in SaasFee bis inklusive 12:00 Uhr Mittags noch Nachtsymbole an.
 	Ist das ein Fehler oder ein Feature (Sonnenstunden/Bergabdeckung)?
 openVishnu7 mit VS2022 pre, Vishnu5 mit VS2022 pre
 free mini tetris
-Demodaten für alle Xaml
-nächster Lauf nach Datumswechsel checken
+Demodaten fÃ¼r alle Xaml
+nÃ¤chster Lauf nach Datumswechsel checken
 Rootverzeichnisse bereinigen
-diese Datei ("ToDo.txt") auf GitHub prüfen und ggf. bereinigen
+diese Datei ("ToDo.txt") auf GitHub prÃ¼fen und ggf. bereinigen
 
 Neuer Parameter: Log-Flushtime
 CheckDependentNodeLogic: SubJobs testen
@@ -1068,19 +1103,17 @@ Reload von Checker-dlls testen; UncachedCheckers testen
 Reload auf Root-JobList geht noch nicht
 In Listenansicht Shift-Expand und Ctrl-Expand einbauen
 Fehler: wenn im Snapshot ein Teilbaum mit Exception auf false (oder true?) - von Exception weg - geht,
-        werden der früheren Exception übergeordnete Strukturknoten (NodeList) nicht von gelb auf Farbe gesetzt.
-Der ProductionJobProvider ist noch Spaghetti-Code - strukturieren und dabei Json-JobDescriptions als
-    zusätzliche Option implementieren.
-Event "SnapshotRefreshed" einführen.
-Kette von SubSnapshots auf korrekte Refreshes der übergeordneten Jobs testen.
-Snapshot: vernünftige Fehlermeldung, wenn Job versehentlich sich selbst als Snapshot referenziert.		
-Liste von Snapshots mit letzter Ladezeit verfügbar und prüfbar machen
-	vielleicht besser eine allgemeinere Liste von ausgelösten Triggern
+        werden der frÃ¼heren Exception Ã¼bergeordnete Strukturknoten (NodeList) nicht von gelb auf Farbe gesetzt.
+Event "SnapshotRefreshed" einfÃ¼hren.
+Kette von SubSnapshots auf korrekte Refreshes der Ã¼bergeordneten Jobs testen.
+Snapshot: vernÃ¼nftige Fehlermeldung, wenn Job versehentlich sich selbst als Snapshot referenziert.		
+Liste von Snapshots mit letzter Ladezeit verfÃ¼gbar und prÃ¼fbar machen
+	vielleicht besser eine allgemeinere Liste von ausgelÃ¶sten Triggern
 	oder Events mit ihren Zeiten?
-	Andere Variante: SnapshotTrigger mit zusätzlichem Timer und Error-TreeEvent
-'#' bei Snapshots überdenken und ggf. abschaffen
-Dynamische multiple logger ermöglichen.
-Veröffentlichungsparameter nach Company auslagern, wenn möglich
+	Andere Variante: SnapshotTrigger mit zusÃ¤tzlichem Timer und Error-TreeEvent
+'#' bei Snapshots Ã¼berdenken und ggf. abschaffen
+Dynamische multiple logger ermÃ¶glichen.
+VerÃ¶ffentlichungsparameter nach Company auslagern, wenn mÃ¶glich
 Vishnu-Checker: Parameteraktualisierung im Hintergrund testen;
 								UserParameter-Reader Parameter-Propagation nach Aktualisierung checken
 Snapshots: Serialisierung von LastRun fehlt
@@ -1088,140 +1121,140 @@ Snapshots: Serialisierung von LastRun fehlt
 Masud
 	"Ist behoben" Link zur Dokumentation der Fehlerbehebung
 	XML laden in Excel Pivot Tabelle
-	Statistik über die Fehler in der Zeit
+	Statistik Ã¼ber die Fehler in der Zeit
 Lokale Meldungen
 TreeEventTrigger Infos vor dem ersten RUN
-Nächsten Lauf bei JobLists anzeigen.
-TrueFalseExceptionChecker Release-Zweig überprüfen
-CopyClickOnceStarter Pfad überprüfen
+NÃ¤chsten Lauf bei JobLists anzeigen.
+TrueFalseExceptionChecker Release-Zweig Ã¼berprÃ¼fen
+CopyClickOnceStarter Pfad Ã¼berprÃ¼fen
 Job.EventTriggers.Values: Key ist nur die KnotenId, nicht der Pfad
 SMS
 WhatsApp
 Dark Mode und weitere Designs.
 Telegram
 Viber
-Die dynamischen Grids mit quadratischem Zuschnitt aus der Jobs-Ansicht auch in der Tree-Ansicht für mehrere
-	mit AND verknüpfte Knoten unterhalb einer Joblist oder NodeList nutzen. Dadurch würde auch für die Tree-Ansicht
-	bei Gruppen mit vielen AND-Verknüpfungen eine deutlich bessere Bildschirmaufteilung erreicht.
+Die dynamischen Grids mit quadratischem Zuschnitt aus der Jobs-Ansicht auch in der Tree-Ansicht fÃ¼r mehrere
+	mit AND verknÃ¼pfte Knoten unterhalb einer Joblist oder NodeList nutzen. Dadurch wÃ¼rde auch fÃ¼r die Tree-Ansicht
+	bei Gruppen mit vielen AND-VerknÃ¼pfungen eine deutlich bessere Bildschirmaufteilung erreicht.
 eigene User-Events
 Vishnu-App
 Vishnu as a Service
 Vishnu Verwaltungsansicht, Uptime, Parameter, Referenzen, Tree, ProcessId, Aufrufparameter, etc.
 VishnuViewer Verzeichniszugriff optional durch WebApi ersetzen
-Fehler: Vishnu Viewer "Das Verzeichnis UserDirectory\Vishnu\Logs ist ungültig", danach komplett beendet.
+Fehler: Vishnu Viewer "Das Verzeichnis UserDirectory\Vishnu\Logs ist ungÃ¼ltig", danach komplett beendet.
 NodeList mit Tooltip-Anzeige der untergeordneten Knoten
-ToolTips bei JobLists (auch vertikal) überarbeiten.
+ToolTips bei JobLists (auch vertikal) Ã¼berarbeiten.
 Fehler? JobList zeigt im Tooltip Exceptions in Unterknoten nicht sofort an.
 False Knoten per User-Button auf true setzen und ab da in Tree ignorieren aber kennzeichnen
-  (Motto: ist zwar falsch, können wir aber ignorieren).
-Prefix-Convention für Job_Connectoren - besser: SubJobs dort aufbauen, wo sie auch definiert sind.
+  (Motto: ist zwar falsch, kÃ¶nnen wir aber ignorieren).
+Prefix-Convention fÃ¼r Job_Connectoren - besser: SubJobs dort aufbauen, wo sie auch definiert sind.
 Vishnu-Ladevorgang weiter beschleunigen
-Messaging für Vishnu und Clients
-Zusatzinfos für Checker (Monitore, Mail-Verteiler...)
-Einzelknoten mit vereinfachter Distanz-Darstellung (große Schrift, viel Farbe)
+Messaging fÃ¼r Vishnu und Clients
+Zusatzinfos fÃ¼r Checker (Monitore, Mail-Verteiler...)
+Einzelknoten mit vereinfachter Distanz-Darstellung (groÃŸe Schrift, viel Farbe)
 Break Anforderung an Checker weiterleiten.
-Erledigt-Button für Meldungen (Checker?)
-CheckEscalator: bei Run auf den gesamten Tree und grün wird zur OK-Meldung auch noch
+Erledigt-Button fÃ¼r Meldungen (Checker?)
+CheckEscalator: bei Run auf den gesamten Tree und grÃ¼n wird zur OK-Meldung auch noch
            die vorherige Fehlermeldung ausgegeben.
-CheckWorkerErrorToOk: break auf den Checker lässt Fehlermeldungen (TimerTrigger)
+CheckWorkerErrorToOk: break auf den Checker lÃ¤sst Fehlermeldungen (TimerTrigger)
            weiter laufen. Nur Break auf den Tree stoppt diese auch.
-DefaultUserControls: Demo-Projekte einführen.
-JobList(UserControl): erklärenden Text, wofür der Job ist hinzufügen (ausklappbar).
-Alle Testprojekte mit Erklärungen versehen.
+DefaultUserControls: Demo-Projekte einfÃ¼hren.
+JobList(UserControl): erklÃ¤renden Text, wofÃ¼r der Job ist hinzufÃ¼gen (ausklappbar).
+Alle Testprojekte mit ErklÃ¤rungen versehen.
 TreeExternals gar nicht erst anlegen, wenn sie nicht referenziert werden.
-geschützte Namen (auch mit Leerzeichen)
-Über Checker, die melden, wenn ein Ereignis ausbleibt, nachdenken.
-Kompletten Wiedereinstieg in einen Kontext nach Neustart von Vishnu ermöglichen (eigener Snapshot)
+geschÃ¼tzte Namen (auch mit Leerzeichen)
+Ãœber Checker, die melden, wenn ein Ereignis ausbleibt, nachdenken.
+Kompletten Wiedereinstieg in einen Kontext nach Neustart von Vishnu ermÃ¶glichen (eigener Snapshot)
 Vishnu als verteilte Anwendung - Distribution und Snapshots
 	- bei der Erstellung eines Snapshots aus einem Checker-Job heraus muss
-	  ein voreingestellter Verfallszeitraum mit übertragen werden. So
-	  können Viewer-Jobs überprüfen, ob eine Snapshot-Aktualisierung zu
-	  lange ausbleibt und Alarm schlagen. Die Verfallszeit für einen
+	  ein voreingestellter Verfallszeitraum mit Ã¼bertragen werden. So
+	  kÃ¶nnen Viewer-Jobs Ã¼berprÃ¼fen, ob eine Snapshot-Aktualisierung zu
+	  lange ausbleibt und Alarm schlagen. Die Verfallszeit fÃ¼r einen
 	  Snapshot muss in der JobDescription.xml des Checker-Jobs beim
 	  Snapshot festgelegt werden, denn dort ist der fachliche Kontext
 	  bekannt.
-Snapshot: vernünftige Fehlermeldung, wenn Job versehentlich sich selbst als Snapshot referenziert.		
-Liste von Snapshots mit letzter Ladezeit verfügbar und prüfbar machen
-	vielleicht besser eine allgemeinere Liste von ausgelösten Triggern
+Snapshot: vernÃ¼nftige Fehlermeldung, wenn Job versehentlich sich selbst als Snapshot referenziert.		
+Liste von Snapshots mit letzter Ladezeit verfÃ¼gbar und prÃ¼fbar machen
+	vielleicht besser eine allgemeinere Liste von ausgelÃ¶sten Triggern
 	oder Events mit ihren Zeiten?
-	Andere Variante: SnapshotTrigger mit zusätzlichem Timer und Error-TreeEvent
-Über Checker, die melden, wenn ein Ereignis ausbleibt, nachdenken.
+	Andere Variante: SnapshotTrigger mit zusÃ¤tzlichem Timer und Error-TreeEvent
+Ãœber Checker, die melden, wenn ein Ereignis ausbleibt, nachdenken.
 Fehler in TestJobs\CheckTrueFalseNullExceptionInput: sporadisch tritt bei erstem Run
 		ein Fehler auf (siehe Vishnu\Error_151017_[1|2].jpg)
 UserControl: Verweildauer nicht anzeigen, wenn nicht gesetzt und andere UserControls auch checken.
-Vishnu Windows-Extension einführen und registrieren
-		an JobDescription als Standard festhalten aber zusätzlich
+Vishnu Windows-Extension einfÃ¼hren und registrieren
+		an JobDescription als Standard festhalten aber zusÃ¤tzlich
 		zu JobDescription.xml auch JobDescription.vjb zulassen.
-Laden eines Jobs über Dialog ermöglichen
+Laden eines Jobs Ã¼ber Dialog ermÃ¶glichen
 		Parametrisieren, ob bei Aufruf von Vishnu ohne Job-Parameter
 		eine Fehlermeldung ("...bitte an Admin wenden...) oder ein FileDialog
 		geschleudert werden soll.
 Rechte, Staging?
-TreeEvents erweitern: Any... für alle Events?
+TreeEvents erweitern: Any... fÃ¼r alle Events?
 Ok so? CheckTrueFalseNullExceptionInput - Setzten eines Unterknoten auf
-		Test-Exception:	der Fortschrittsbalken des Knotens wird weiß mit 0% dargestellt,
+		Test-Exception:	der Fortschrittsbalken des Knotens wird weiÃŸ mit 0% dargestellt,
 		da der Endknoten selbst 0% Fortschritt hat (wegen der Test-Exception).
 		Wird der Unterknoten allerdings auf null gesetzt, geht sein Fortschritt
 		auf 100%.
-Job/SubJob/Checker in Parameter-Ersetzung (für Logging / MessageBox)
+Job/SubJob/Checker in Parameter-Ersetzung (fÃ¼r Logging / MessageBox)
 Minimize to tray
 TimerTrigger erweitern: Parameterliste mit Trigger- und Ausschlusszeiten
-Knopf für Rückkehr in die Startformation
+Knopf fÃ¼r RÃ¼ckkehr in die Startformation
 Parameter: ExpandFalseNodes
 Anzeige von Worker-Details bei Hover
-Kombinierte Anzeige für Exception+Running (ChangingTreeExceptions)
+Kombinierte Anzeige fÃ¼r Exception+Running (ChangingTreeExceptions)
 Vishnu auf HTML5 portieren
 Adaptive Trigger (feedback mit Checkern/TreeEvents)
-Schnickschnack: Countdown-Funktion für NextRun (sollte über externen Parameter geschaltet werden können)
-UserBreak setzt Exceptions nicht zurück (keine neuen Messages), ok so?
+Schnickschnack: Countdown-Funktion fÃ¼r NextRun (sollte Ã¼ber externen Parameter geschaltet werden kÃ¶nnen)
+UserBreak setzt Exceptions nicht zurÃ¼ck (keine neuen Messages), ok so?
 		Evtl. auf Parameter und Knoten-spezifisch?
-Result null setzt letzten und nächsten Lauf nicht
-VisualStudio Erweiterung für Checker, Logger, ValueModifier, Trigger, Worker
-Alle WPF Properties auf virtual setzten, falls später jemand Proxies bauen will.
+Result null setzt letzten und nÃ¤chsten Lauf nicht
+VisualStudio Erweiterung fÃ¼r Checker, Logger, ValueModifier, Trigger, Worker
+Alle WPF Properties auf virtual setzten, falls spÃ¤ter jemand Proxies bauen will.
 Sicherheitsabfrage (konfigurierbar) wenn versucht wird, einen schon erfolgreich
 		gelaufenen Teil erneut zu starten.
-Abhängigkeiten visualisieren (TreeEventTrigger)
+AbhÃ¤ngigkeiten visualisieren (TreeEventTrigger)
 Exception Meldung mit Combo-Box (readonly)
 NodeConnectoren neu testen, Controlled TestJob
-Job-Steuerung über Prozess-/Servergrenzen hinweg
-Eigene AppDomain für Plugins - bedingt Objektserialisierung, Performance?
+Job-Steuerung Ã¼ber Prozess-/Servergrenzen hinweg
+Eigene AppDomain fÃ¼r Plugins - bedingt Objektserialisierung, Performance?
 FileWatcherTrigger initialisieren sich nicht korrekt, wenn das
 		referenzierte Verzeichnis nicht existiert
 Die Hotspots beim Klick auf einen Knoten dehnen sich zu weit (Expander auf/zu)
-FXCop über alles jagen/ReSharper
-aktuelle Castle-Doku für Vishnu und Framework erstellen
+FXCop Ã¼ber alles jagen/ReSharper
+aktuelle Castle-Doku fÃ¼r Vishnu und Framework erstellen
 Umfassendes Abfangen und user-freundliches Ausgeben von Fehlern, vor allem bei Fehlern
 		in der XML-Definition von Trees
 Logging abschalten per File-Exists?
 Tastensteuerung erweiten - Enter, Escape, ..., Sicherheitsabfragen?
-MVVM.txt überarbeiten
-User Interface für die Erfassung von Jobs
+MVVM.txt Ã¼berarbeiten
+User Interface fÃ¼r die Erfassung von Jobs
 Constanten ohne Prefix
 eigene Exception
-Logischen Ergebnissen auf jeder Ebene erklärende Texte zuordnen, die hinterher
-		in einem Gesamtstatus automatisiert zusammengefasst ausgegeben werden können.
+Logischen Ergebnissen auf jeder Ebene erklÃ¤rende Texte zuordnen, die hinterher
+		in einem Gesamtstatus automatisiert zusammengefasst ausgegeben werden kÃ¶nnen.
 Counter
 Basis auf Array von LogicalTaskTrees ausweiten
 		mit externer Quelle - ADD / REMOVE ?
 Short Circuit bei logischem OR implementieren: wenn a schon true, kein b mehr
 		zweistufig, BreakWithResult greift erst, wenn die Folgeprozesse schon laufen.
 Darstellung in der Z-Ebene nutzen
-Darstellung von Meta-Verknüpfungen: !a | b 'a => b'
-Bitte warten beim Vergrößern eines (Teil-)Zweigs
-Bitte warten nach Run eines verzögerten Prozesses
-Prüfen, ob mehrere Logger pro Knoten sinnvoll sein könnten
-Prüfen, ob mehrere Trigger pro Knoten sinnvoll sein könnten
+Darstellung von Meta-VerknÃ¼pfungen: !a | b 'a => b'
+Bitte warten beim VergrÃ¶ÃŸern eines (Teil-)Zweigs
+Bitte warten nach Run eines verzÃ¶gerten Prozesses
+PrÃ¼fen, ob mehrere Logger pro Knoten sinnvoll sein kÃ¶nnten
+PrÃ¼fen, ob mehrere Trigger pro Knoten sinnvoll sein kÃ¶nnten
 Tests automatisieren
 Snapshots gegen FreeMind checken
-Bei High-Performance-Jobs dynamische Priorisierung einführen
-EventQueue Füllgrad anzeigen
-EventQueue maximalen Füllgrad konfigurierbar machen
+Bei High-Performance-Jobs dynamische Priorisierung einfÃ¼hren
+EventQueue FÃ¼llgrad anzeigen
+EventQueue maximalen FÃ¼llgrad konfigurierbar machen
 EventQueue Verwerfen von Doppel-Events konfigurierbar machen
 Zwischen keinem Ergebnis (gelb) und Exception (gelb) differenzieren
 Alle TreeEvents (auch seltener genutzte) neu testen
-Mischmasch bezüglich Reference und Parameters zwischen Loggern und TreeEventTriggern beheben
-Musikstück mit Vishnu komponieren (Sequenzer)
-Überlegen, ob ValueModifier eigenständige Knoten bleiben sollen oder nicht besser
+Mischmasch bezÃ¼glich Reference und Parameters zwischen Loggern und TreeEventTriggern beheben
+MusikstÃ¼ck mit Vishnu komponieren (Sequenzer)
+Ãœberlegen, ob ValueModifier eigenstÃ¤ndige Knoten bleiben sollen oder nicht besser
 	analog zu NodeConnectoren laufen sollen (Achtung: Tree-Problematik bei parallelen Zweigen)
 Vishnu.Interchange entschlacken
 MainWindowViewModel von den anderen ViewModels separieren
@@ -1229,14 +1262,14 @@ Namenswirrwar bei den ViewModelProperties bereinigen (Result)
 
 -------------------------------------------------------------------------------------------------------------
 --- Friedhof der unwiederholbaren Experimente ---
-Fehler: übergeordneter Knoten bleibt manchmal auf Gelb (CheckTreeEventTriggerMinimal)
+Fehler: Ã¼bergeordneter Knoten bleibt manchmal auf Gelb (CheckTreeEventTriggerMinimal)
         Nur, wenn kein Log aktiv ist und auch nicht im Debug.
-Fehler: CheckTreeEventTriggerMinimal, FalseTrueNodeListError: True, Exception, True => Balken oben gelb statt grün
+Fehler: CheckTreeEventTriggerMinimal, FalseTrueNodeListError: True, Exception, True => Balken oben gelb statt grÃ¼n
 Fehler: CheckTreeEventTwoJobConnectors: True, Exception, 
 				True => direkte JobReferenz ok, TriggerEventMirrorChecker: Exception bleibt
 ---------------------------
-Exception beim Beenden von Vishnu.CheckSpecials (nach Lauf über zwei Tage mit Abschalten über Energiesparmodus:
-	System.ComponentModel.Win32Exception (1816): Nicht genügend Quoten verfügbar, um diesen Befehl zu verarbeiten.
+Exception beim Beenden von Vishnu.CheckSpecials (nach Lauf Ã¼ber zwei Tage mit Abschalten Ã¼ber Energiesparmodus:
+	System.ComponentModel.Win32Exception (1816): Nicht genÃ¼gend Quoten verfÃ¼gbar, um diesen Befehl zu verarbeiten.
    at MS.Win32.ManagedWndProcTracker.HookUpDefWindowProc(IntPtr hwnd)
    at MS.Win32.ManagedWndProcTracker.OnAppDomainProcessExit()
 
@@ -1252,17 +1285,17 @@ System.NullReferenceException: Object reference not set to an instance of an obj
 -------------------------------------------------------------------------------------------------------------
 Allgemeinere Ideen, etc.
 -------------------------------------------------------------------------------------------------------------
-MultiScreen Überabeitung
-1. SizeOnVirtualScreen ist erforderlich, da sonst Vishnu beim Umschalten zur Jobs-Ansicht und zurück
+MultiScreen Ãœberabeitung
+1. SizeOnVirtualScreen ist erforderlich, da sonst Vishnu beim Umschalten zur Jobs-Ansicht und zurÃ¼ck
    teilweise auf dem anderen Bildschirm dargestellt wird, obwohl das nicht gewollt ist.
 [falsch: 1. Es wird nur moch mit SizeOnVirtualScreen = true gearbeitet; der Parameter wird stillgelegt.]
 [falsch: 2. Der Rest sollte eigentlich schon egal sein.]
-2. Ob die einzelnen Bildschirme unterschiedliche Maße und Auflösungen haben, liegt in der Verantwortung des
-   Anwenders. Ebenso, ob sie über Windows-Systemeinstellung logisch richtig angeordnet wurden
+2. Ob die einzelnen Bildschirme unterschiedliche MaÃŸe und AuflÃ¶sungen haben, liegt in der Verantwortung des
+   Anwenders. Ebenso, ob sie Ã¼ber Windows-Systemeinstellung logisch richtig angeordnet wurden
    (links=links, oben=oben, ...).
 -------------------------------------------------------------------------------------------------------------
 Vishnu als Signal/Interrupt-gesteuertes System
-	Motivation: die klassische Checker-Ansteuerung erfolgt über Polling durch TimerTrigger.
+	Motivation: die klassische Checker-Ansteuerung erfolgt Ã¼ber Polling durch TimerTrigger.
 		Dies ist in einer Vielzahl von Aufgabenstellung ein praktikables Vorgehen.
 		Allerdings verursacht es eine vergleichsweise hohe Systemlast und ist in letzter Konsequenz auch ungenau.
 		Besser sind oft Trigger, die auf bestimmte Signale hin feuern, wie FileWatcherTrigger
@@ -1270,27 +1303,27 @@ Vishnu als Signal/Interrupt-gesteuertes System
 	Idee zur Realisierung: analog zum FileWatcherTrigger einen neuen Trigger entwickeln,
 		Arbeitstitel: SignalApiTrigger. Dieser Trigger exportiert ein Interface, welches
 		von einem externen Signalgeber implementiert werden muss, Arbeitstitel: ISignalApi.
-		Dieses Interface muss zumindest einEvent veröffentlichen, in das sich der Trigger
-		einhängen kann.	Zusätzlich muss dieser Trigger einen externen Signalgeber als Slave
-		übergeben	bekommen.
+		Dieses Interface muss zumindest einEvent verÃ¶ffentlichen, in das sich der Trigger
+		einhÃ¤ngen kann.	ZusÃ¤tzlich muss dieser Trigger einen externen Signalgeber als Slave
+		Ã¼bergeben	bekommen.
 Knoten, der immer neu gestartet wird, wenn er greade zuende gelaufen ist.
 	Idee zur Realisierung: Der betroffene Knoten toucht immer, wenn er zuende gelaufen
 		ist, eine Steuerdatei. Der Knoten wird dabei durch einen FileWatcherTrigger gestartet,
 		der seinerseits eben diese Steuerdatei beobachtet.
 	
 -------------------------------------------------------------------------------------------------------------
-Integration Tests über asynchrones Logging und KI-Logauswertung
-	Grad der Ähnlichkeiten ermitteln (grün, gelb, rot)
+Integration Tests Ã¼ber asynchrones Logging und KI-Logauswertung
+	Grad der Ã„hnlichkeiten ermitteln (grÃ¼n, gelb, rot)
 	Vishnu:
 		Liste von Testjobs
 			Job, Dauer, [Log-Spezifika]
-			Vishnu muss ferngesteuert gestoppt werden können
+			Vishnu muss ferngesteuert gestoppt werden kÃ¶nnen
 -------------------------------------------------------------------------------------------------------------
-ThreadLocked = true ist nur nötig, wenn
+ThreadLocked = true ist nur nÃ¶tig, wenn
 	1. verschiedene Checker dieselbe Dll aufrufen und diese nicht selbst threadsafe ist,
 	2. verschiedene Dlls gemeinsame, nicht threadsafe Ressourcen verwenden.
-Unabhängige Dlls kommen sich nicht ins Gehege - ggf. reicht es auch, eine Dll mit
-identischer Funktionalität unter verschiedenen Namen (Entry-Point und Projekt) umzuwandeln.
+UnabhÃ¤ngige Dlls kommen sich nicht ins Gehege - ggf. reicht es auch, eine Dll mit
+identischer FunktionalitÃ¤t unter verschiedenen Namen (Entry-Point und Projekt) umzuwandeln.
 
 Wann User control, custom control, Anpassen des control template, Anpassen des data template,
 header template, Attached properties?
@@ -1388,7 +1421,7 @@ Suchreihenfolge:
 	1. Job + xyz\bla.dll
 	2. WorkingDirectory + xyz\bla.dll
 
-Timer:	H:10|S:20 [Verzögerung] Intervall
+Timer:	H:10|S:20 [VerzÃ¶gerung] Intervall
 				+[YYYYMMDDHHmmSSMS-YYYYMMDDHHmmSSMS] positiver, absoluter Zeitraum
 				-[YYYYMMDDHHmmSSMS-YYYYMMDDHHmmSSMS] negativer, absoluter Zeitraum
 				+[D:1-31] oder +[D:1,10,23] positive Monatstage
@@ -1399,11 +1432,11 @@ Timer:	H:10|S:20 [Verzögerung] Intervall
 SingleNode FindSingleNodeByName(string singleNodeName) rekursiv
 SingleNode findJobSingleNode(string name) nicht rekursiv
 JobList findJobSubJob(string name) nicht rekursiv
-LogicalNode FindNodeById(string nodeId) rekursiv (für Controlled Jobs Environment)
+LogicalNode FindNodeById(string nodeId) rekursiv (fÃ¼r Controlled Jobs Environment)
 
-Nur ValueModifier können vor ihren referenzierten Knoten auftreten,
+Nur ValueModifier kÃ¶nnen vor ihren referenzierten Knoten auftreten,
 NodeConnectoren und JobConnectoren nicht
-NodeConnectoren und JobConnectoren können nicht referenziert werden
+NodeConnectoren und JobConnectoren kÃ¶nnen nicht referenziert werden
 
 =====================================================================================
 
@@ -1413,40 +1446,40 @@ LogicalNode
 		this.Break(true, false);
 
 31.12.2015  (wurde mit Version 3028R vom 19.03.2016 wie unten angedacht umgesetzt).
-Denkansatz: Vishnu ist nicht für das ordnungsgemäße (und schnelle) Starten oder Beenden von
+Denkansatz: Vishnu ist nicht fÃ¼r das ordnungsgemÃ¤ÃŸe (und schnelle) Starten oder Beenden von
 (User-)Checkern verantwortlich. Vishnu sollte Run und Break sofort und ohne Wartezeiten
 durch den gesamten Tree routen (ist aktuell nicht so).
 Probleme dieses Ansatzes:
-	TreeEvents, die u.U. nur einmal auftreten, werden möglicherweise für immer von
-	TreeEvent-getriggerten Knoten verpasst, wenn diese später starten als der auslösende Knoten.
-	Mögliche Lösung: beim Start wird das letzte passende TreeEvent nachträglich abgefragt.
+	TreeEvents, die u.U. nur einmal auftreten, werden mÃ¶glicherweise fÃ¼r immer von
+	TreeEvent-getriggerten Knoten verpasst, wenn diese spÃ¤ter starten als der auslÃ¶sende Knoten.
+	MÃ¶gliche LÃ¶sung: beim Start wird das letzte passende TreeEvent nachtrÃ¤glich abgefragt.
 	Wenn mehrere NodeConnectoren auf einen Knoten mit Checker zeigen, darf dieser pro
 	Run (User oder nicht User) nur einmal gestartet werden.
-	Mögliche Lösung: normalen Run über NodeConnector nicht weiterleiten,
+	MÃ¶gliche LÃ¶sung: normalen Run Ã¼ber NodeConnector nicht weiterleiten,
 	UserRun innerhalb des gestarteten Teilbaums nur genau dann genau einmal weiterleiten,
 	wenn der Knoten mit Checker sich nicht im gestarteten Teilbaum befindet.
 These: ein Run setzt keinen Break voraus (ist bisher so).
 Konsequenzen:
 	Es gibt nur noch UserBreak (bisher gibt es auch noch den internen Break).
-	Ein Thread/Knoten/Checker, der schon läuft, darf nicht erneut gestartet werden (ist
+	Ein Thread/Knoten/Checker, der schon lÃ¤uft, darf nicht erneut gestartet werden (ist
 	auch jetzt schon so).
 	Unregister auf Trigger findet nur bei UserBreak statt (ist auch schon so).
 	Register auf Trigger findet entsprechend nur bei UserRun Statt (ist auch schon so).
 	Bei einem UserBreak erfolgt eine Aufforderung an jeden Knoten, sich zu beenden.
 	Der Vishnu-Knoten setzt sich sofort auf UserBreak.
-	Gleichzeitig wird der Thread des laufenden Knoten als ungültiger Thread in eine interne
-	(concurrent) Tabelle aufgenommen. Beendet sich dann der Thread, kann der Eintrag gelöscht
+	Gleichzeitig wird der Thread des laufenden Knoten als ungÃ¼ltiger Thread in eine interne
+	(concurrent) Tabelle aufgenommen. Beendet sich dann der Thread, kann der Eintrag gelÃ¶scht
 	werden. Solange der Eintrag in der Tabelle aber noch vorhanden ist, werden alle noch
 	folgenden Events des Knotens des Threads verworfen.
 	Ist der Knoten ein Einzelknoten mit einem Checker, wird die Break-Aufforderung an den
-	Checker weitergereicht. Threads, die eine gewisse Zeit in der Tabelle der ungültigen
-	Threads hängengeblieben sind, könnten dann noch einen harten Abort mit ThreadException
+	Checker weitergereicht. Threads, die eine gewisse Zeit in der Tabelle der ungÃ¼ltigen
+	Threads hÃ¤ngengeblieben sind, kÃ¶nnten dann noch einen harten Abort mit ThreadException
 	bekommen.
 	Trifft ein getriggerter Run (kein UserRun) auf einen noch laufenden Knoten, so wird
-	dieser einfach verworfen. Der Anwender ist dafür verantwortlich, dass seine Checker
-	im Verhältnis zum Trigger-Intervall schnell genug terminieren.
+	dieser einfach verworfen. Der Anwender ist dafÃ¼r verantwortlich, dass seine Checker
+	im VerhÃ¤ltnis zum Trigger-Intervall schnell genug terminieren.
 	Ein UserRun erzeugt einen User Break, wenn der betroffene Teilbaum aktiv ist.
-	UserRun und UserBreak sollten nicht zur gleichen Zeit laufen können. Das bedingt,
+	UserRun und UserBreak sollten nicht zur gleichen Zeit laufen kÃ¶nnen. Das bedingt,
 	dass ein UserBreak erst dann erfolgen kann, wenn der User Run durch den gesamten Tree
 	propagiert wurde und umgekehrt. Da Vishnu aber nicht mehr auf User-Knoten wartet,
 	sollte das unkritisch sein.
@@ -1460,50 +1493,50 @@ Ziel: Realisierung einer Reaktion auf Ereignisse, deren Ursache weggefallen ist.
                 b) Knoten x geht auf true => (anderer?) Worker beendet Message und schleudert wieder-ok-Message?;
                 Variante a sollte verworfen werden, da sonst der zwischenzeitliche Fehlerzustand des Systems
                 unbemerkt bliebe.
-  Grundvoraussetzung: Vishnu darf keine Verantwortlichkeiten übernehmen, die in externe Worker gehören.
-  Arbeitshypothese: Vishnu bekommt ein zusätzliches Event "FaultToTrue". Dieses Event enthält auch Informationen
-                    über den ursprünglichen Fehlerzustand, damit eventuelle Worker darauf Bezug nehmen können.
-                    Das etwaige Beenden noch aktiver Worker zum ursprünglichen Fehlerzustand wird vorläufig
-                    zurückgestellt.
-  Wie können Eskalatoren realisiert werden?
-  					"Eskalator" = Modul, dass z.B. zuerst eine Meldung generiert, später eine Mail verschickt und noch
-  					              später, wenn immer noch keine Fehlerbehebung stattgefunden hat, eine SMS.
-  					Probleme: Eskalatoren müssen gestoppt werden, wenn Vishnu beendet wird oder der Fehler behoben wird.
-  					Chancen: Eskalatoren würden, wenn sie realisiert werden könnten, auch die Funktionen normaler Worker
-  					abdecken können, und auch behobene Probleme melden können, sodass es wieder nur Worker gäbe, die aber
-  					implizit Eskalatoren sein könnten.
-  					Hierfür müsste aber das oben zurückgestellte Problem der Information von externen Workern über
-  					den Wegfall (oder weiteren Bestand) des ursprünglichen Fehlerzustandes gelöst werden.
-  Arbeitshypothese 2: Eskalatoren möglicherweise doch komplett in Vishnu implementieren?
+  Grundvoraussetzung: Vishnu darf keine Verantwortlichkeiten Ã¼bernehmen, die in externe Worker gehÃ¶ren.
+  Arbeitshypothese: Vishnu bekommt ein zusÃ¤tzliches Event "FaultToTrue". Dieses Event enthÃ¤lt auch Informationen
+                    Ã¼ber den ursprÃ¼nglichen Fehlerzustand, damit eventuelle Worker darauf Bezug nehmen kÃ¶nnen.
+                    Das etwaige Beenden noch aktiver Worker zum ursprÃ¼nglichen Fehlerzustand wird vorlÃ¤ufig
+                    zurÃ¼ckgestellt.
+  Wie kÃ¶nnen Eskalatoren realisiert werden?
+  					"Eskalator" = Modul, dass z.B. zuerst eine Meldung generiert, spÃ¤ter eine Mail verschickt und noch
+  					              spÃ¤ter, wenn immer noch keine Fehlerbehebung stattgefunden hat, eine SMS.
+  					Probleme: Eskalatoren mÃ¼ssen gestoppt werden, wenn Vishnu beendet wird oder der Fehler behoben wird.
+  					Chancen: Eskalatoren wÃ¼rden, wenn sie realisiert werden kÃ¶nnten, auch die Funktionen normaler Worker
+  					abdecken kÃ¶nnen, und auch behobene Probleme melden kÃ¶nnen, sodass es wieder nur Worker gÃ¤be, die aber
+  					implizit Eskalatoren sein kÃ¶nnten.
+  					HierfÃ¼r mÃ¼sste aber das oben zurÃ¼ckgestellte Problem der Information von externen Workern Ã¼ber
+  					den Wegfall (oder weiteren Bestand) des ursprÃ¼nglichen Fehlerzustandes gelÃ¶st werden.
+  Arbeitshypothese 2: Eskalatoren mÃ¶glicherweise doch komplett in Vishnu implementieren?
             Vorteil: Vishnu hat jederzeit die volle Kontrolle.
-            Nachteil: Das Ganze wird in Vishnu aufwändig und Vishnu übernimmt Teilverantwortung für User-Aktionen.
-  Arbeitshypothese 3: Timer-getriggerte Worker wie bisher erhalten, aber zusätzlich in das Worker-Verzeichnis ein
+            Nachteil: Das Ganze wird in Vishnu aufwÃ¤ndig und Vishnu Ã¼bernimmt Teilverantwortung fÃ¼r User-Aktionen.
+  Arbeitshypothese 3: Timer-getriggerte Worker wie bisher erhalten, aber zusÃ¤tzlich in das Worker-Verzeichnis ein
                       einfaches Textfile mit Eskalationsinformationen stellen (kann auch "alles ok" enthalten).
-                      Es könnten spezielle Basis-Worker zur Verfügung gestellt werden, die die Grundfunktionen
+                      Es kÃ¶nnten spezielle Basis-Worker zur VerfÃ¼gung gestellt werden, die die Grundfunktionen
                       von Eskalatoren schon implementieren.
 ---------------------------------------------------------------------------------------------------
-23.06.2017 Erste Überlegungen zu Sicherheitsfragen,
+23.06.2017 Erste Ãœberlegungen zu Sicherheitsfragen,
 	mit im Kontext: 
-	- Viewer, über die Checker-Startanforderungen an den zentralen Vishnu gestellt werden können
+	- Viewer, Ã¼ber die Checker-Startanforderungen an den zentralen Vishnu gestellt werden kÃ¶nnen
 	- eigene Dispatcher Task (Exe), die Snapshots auf verschiedene Client-Pfade pusht und
-	  Startanfragen der Clients an Vishnu zurück leitet
-	- Vishnu as a service, Hintergrund: keine Rechte für Logins
-	  Gedanke: möglicherweise keine direkte Vishnu-Nutzung mehr, sondern nur noch per Viewer
+	  Startanfragen der Clients an Vishnu zurÃ¼ck leitet
+	- Vishnu as a service, Hintergrund: keine Rechte fÃ¼r Logins
+	  Gedanke: mÃ¶glicherweise keine direkte Vishnu-Nutzung mehr, sondern nur noch per Viewer
 	- Distribution von Jobs (best practise): wie bekommt ein bestimmter Client seine Jobs?
-	  denkbar: zentraler Vishnu verwaltet eine Liste von erlaubten Jobs für jeden eingetragenen
-	  User; der User wählt beim Erststart oder über Menü einen dieser Jobs aus einer Liste aus.
+	  denkbar: zentraler Vishnu verwaltet eine Liste von erlaubten Jobs fÃ¼r jeden eingetragenen
+	  User; der User wÃ¤hlt beim Erststart oder Ã¼ber MenÃ¼ einen dieser Jobs aus einer Liste aus.
 	  
-	Verwaltung von Gruppen und Usern über Dateien
+	Verwaltung von Gruppen und Usern Ã¼ber Dateien
 	beim ersten Start eines Client-Viewers Passwort-Abfrage und persistieren auf Server
 	zusammen mit den DefaultCredentials (Domain\User, Passwort) um sicherzustellen, dass die
-	vom Client gesendete User-Identität nicht von einem unberechtigten User kopiert wurde.
+	vom Client gesendete User-IdentitÃ¤t nicht von einem unberechtigten User kopiert wurde.
   
-  Es scheint, als folgt aus den Vorüberlegungen die Notwendigkeit für ein gesondertes
+  Es scheint, als folgt aus den VorÃ¼berlegungen die Notwendigkeit fÃ¼r ein gesondertes
   Vishnu-Admin-Tool.
   
-  Wie wird verhindert, dass ein beliebiger User Vishnu Jobs mit echten Checkern ausführen
+  Wie wird verhindert, dass ein beliebiger User Vishnu Jobs mit echten Checkern ausfÃ¼hren
   darf? Job-spezifisch? Knoten-spezifisch?
-  Wie wird geregelt, welche Knoten ein User über Snapshot/Viewer starten darf?
+  Wie wird geregelt, welche Knoten ein User Ã¼ber Snapshot/Viewer starten darf?
   Wie wird geregelt, welche Snapshots ein Benutzer sehen darf? Job-spezifisch, Knoten-spezifisch,
   anonyme Platzhalter-Knoten?
   
@@ -1527,7 +1560,7 @@ Vishnu.exe -job="%Vishnu_Root%\VishnuHome\Tests\TestJobs\Tests\TwoDialogNodes" -
 
 falsch wegen Pipe-Symbol in der Kommandozeile:
 	Vishnu.exe --FlatNodeListFilter=JobConnector|NodeConnector|NodeList -job="%Vishnu_Root%\VishnuHome\Tests\TestJobs\Tests\TwoDialogNodes" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --NoWorkers=false --AbortingAllowed=false
-korrekt mit Anführungszeichen:
+korrekt mit AnfÃ¼hrungszeichen:
 	Vishnu.exe --FlatNodeListFilter="JobConnector|NodeConnector|NodeList" -job="%Vishnu_Root%\VishnuHome\Tests\TestJobs\Tests\TwoDialogNodes" --Vishnu_Root=../../../../../.. --NoWorkers=true --DebugMode=true --UserAssemblyDirectory=%Vishnu_Root%/ReadyBin/UserAssemblies --SizeOnVirtualScreen=false -Autostart=true -StartWithJobs=false --NoWorkers=false --AbortingAllowed=false
 -------------------------------------------------------------------------------------------------
 
@@ -1692,7 +1725,7 @@ Job
         = new Dictionary<string, int>() { { "LT", 10 }, { "LE", 10 }, { "GE", 10 }, { "GT", 10 }, { "NE", 11 }, { "EQ", 11 } };
 
 
-NodeList bei Break ProgressBar nicht weiß (CheckTriggeredSubJob)
+NodeList bei Break ProgressBar nicht weiÃŸ (CheckTriggeredSubJob)
 NodeConnector bei Exception nicht gelb
 
 %JOBDIRECTORIES%
@@ -1706,10 +1739,10 @@ NodeConnector bei Exception nicht gelb
 %Result%
 %Exception%
 
-        /// Der Parameter-String kann neben beliebigen, durch die Programm-Session auflösbaren Platzhaltern
+        /// Der Parameter-String kann neben beliebigen, durch die Programm-Session auflÃ¶sbaren Platzhaltern
         /// folgende Platzhalter enthalten, die beim Aufruf der SubWorker-Exe durch aktuelle Laufzeit-Werte
         /// ersetzt werden:
-        ///   "%Event%" = Name des Ereignisses, das zum Aufruf des Workers geführt hat,
+        ///   "%Event%" = Name des Ereignisses, das zum Aufruf des Workers gefÃ¼hrt hat,
         ///   "%Source%" = Quelle des Ereignisses (Knoten, in dem das Ereignis zuerst aufgetreten ist),
         ///   "%Sender%" = Knoten, der aufgrund des Ereigniss aktuell den Worker aufruft,
         ///   "%TreePath%" = kompletter Pfad im Tree zur Ereignis-Quelle,
@@ -1718,7 +1751,7 @@ NodeConnector bei Exception nicht gelb
         ///   "%Exception%" = Exception.Message, falls %Event% gleich "Exception" ist, ansonsten "".
 
 App.cs
-	// Der Produktions-JobProvider mit extern über XML definierten Jobs:
+	// Der Produktions-JobProvider mit extern Ã¼ber XML definierten Jobs:
   SingleInstanceApplication._businessLogic = new LogicalTaskTree.LogicalTaskTree(new TreeParameters("Tree 1", null), new ProductionJobProvider());
 
   	public LogicalTaskTree(TreeParameters treeParams, IJobProvider jobProvider)
@@ -1737,7 +1770,7 @@ App.cs
   	      		{
     	        		if (name == null || !this.LoadedJobPackages.ContainsKey(name))
       	      		{
-        	        		this.TryLoadJobPackage(ref name); // lädt ggf. auch alle SubJobs
+        	        		this.TryLoadJobPackage(ref name); // lÃ¤dt ggf. auch alle SubJobs
 
 											protected override void TryLoadJobPackage(ref string logicalJobName)
 											{
@@ -1745,7 +1778,7 @@ App.cs
           	  						logicalJobName = loadJob(null, jobXml, logicalJobName,
                       				null, false, null, null, true, false, out depth);
 
-										      		// Lädt einen Job oder SubJob; SubJobs können intern oder extern (eigenes XML-File) angelegt sein.
+										      		// LÃ¤dt einen Job oder SubJob; SubJobs kÃ¶nnen intern oder extern (eigenes XML-File) angelegt sein.
         											private string loadJob(Job mother, string jobXML, string logicalJobName, XElement xSubJob, bool startCollapsed,
                                TriggerShell snapshotTrigger, string snapshotTriggerName, bool isRootJob, bool isSnapshot, out int subJobDepth)
         											{
@@ -1762,12 +1795,12 @@ App.cs
 ----------------------------------------------------------------------------------------------------------------------
 HotPlug
 
-    ///   - Merging von für JobLists und Tree globalen Arrays und Dictionaries:
+    ///   - Merging von fÃ¼r JobLists und Tree globalen Arrays und Dictionaries:
 		///				Job
 		///		        #region tree globals
 		///		
 		///		        /// <summary>
-		///		        /// Liste von internen Triggern für einen jobPackage.Job.
+		///		        /// Liste von internen Triggern fÃ¼r einen jobPackage.Job.
 		///		        /// </summary>
 		///		        internal Dictionary<string, Dictionary<string, TriggerShell>> EventTriggers { get; set; }
 		///		        										|										|
@@ -1777,11 +1810,11 @@ HotPlug
 		///		
 		///		        	EventTriggers werden nach oben in die TopRootJobList propagiert.
 		///		
-		///		        // Hilfsproperty für das Hinzufügen von Workern zum
+		///		        // Hilfsproperty fÃ¼r das HinzufÃ¼gen von Workern zum
 		///		        // privaten Dictionary _workers.
-		///		        // Wird von auße wie ein Dictionary wahrgenommen.
+		///		        // Wird von auÃŸe wie ein Dictionary wahrgenommen.
 		///		        /// <summary>
-		///		        /// Liste von externen Arbeitsroutinen für einen jobPackage.Job.
+		///		        /// Liste von externen Arbeitsroutinen fÃ¼r einen jobPackage.Job.
 		///		        /// Ist ein Dictionary mit WorkerShell-Arrays zu aus
 		///		        /// Knoten-Id + ":" + TreeEvents-String gebildeten Keys.
 		///		        /// </summary>
@@ -1793,7 +1826,7 @@ HotPlug
 		///		        											+-> einzelnes Event, z.B. "AnyException" oder "LastNotNullLogicalChanged"
 		///		        	
 		///		        	Workers werden nicht nach oben in die TopRootJobList propagiert,
-		///		        	sondern sind für jede JobList spezifisch.
+		///		        	sondern sind fÃ¼r jede JobList spezifisch.
 		///		
 		///		        #endregion tree globals
 		///		
@@ -1804,8 +1837,8 @@ HotPlug
 		///		        internal Job Job { get; set; }
 		///		
 		///		        /// <summary>
-		///		        /// Dictionary von externen Prüfroutinen für einen jobPackage.Job mit Namen als Key.
-		///		        /// Wird als Lookup für unaufgelöste JobConnector-Referenzen genutzt.
+		///		        /// Dictionary von externen PrÃ¼froutinen fÃ¼r einen jobPackage.Job mit Namen als Key.
+		///		        /// Wird als Lookup fÃ¼r unaufgelÃ¶ste JobConnector-Referenzen genutzt.
 		///		        /// </summary>
 		///		        internal Dictionary<string, NodeCheckerBase> AllCheckers { get; set; }
 		///		        										|
@@ -1813,35 +1846,35 @@ HotPlug
 		///		
 		///		        	AllCheckers werden nach oben in die TopRootJobList propagiert.
 		///		
-		///						nur temporär	/// <summary>
-		///								        	/// Liste von NodeConnectoren, die beim Parsen der Jobs noch nicht aufgelöst
+		///						nur temporÃ¤r	/// <summary>
+		///								        	/// Liste von NodeConnectoren, die beim Parsen der Jobs noch nicht aufgelÃ¶st
 		///								        	/// werden konnten.
 		///								        	/// </summary>
 		///								        	internal List<NodeConnector> UnsatisfiedNodeConnectors;
 		///		
 		///		        /// <summary>
-		///		        /// Dictionary von externen Prüfroutinen für eine JobList, die nicht in
-		///		        /// der LogicalExpression referenziert werden; Checker, die ausschließlich
-		///		        /// über ValueModifier angesprochen werden.
+		///		        /// Dictionary von externen PrÃ¼froutinen fÃ¼r eine JobList, die nicht in
+		///		        /// der LogicalExpression referenziert werden; Checker, die ausschlieÃŸlich
+		///		        /// Ã¼ber ValueModifier angesprochen werden.
 		///		        /// </summary>
 		///		        internal Dictionary<string, NodeCheckerBase> TreeExternalCheckers { get; set; }
 		///		        										|
 		///		        										+-> Checker-Id, z.B. "Datum" (NodeName wird zur Id)
 		///		
 		///		        	TreeExternalCheckers werden nicht nach oben in die TopRootJobList propagiert,
-		///		        	sondern sind für jede JobList spezifisch.
+		///		        	sondern sind fÃ¼r jede JobList spezifisch.
 		///		
 		///		        /// <summary>
-		///		        /// Liste von externen SingleNodes für die TopRootJobList, die in keiner
-		///		        /// der LogicalExpressions referenziert werden; Nodes, die ausschließlich
-		///		        /// über NodeConnectoren angesprochen werden.
+		///		        /// Liste von externen SingleNodes fÃ¼r die TopRootJobList, die in keiner
+		///		        /// der LogicalExpressions referenziert werden; Nodes, die ausschlieÃŸlich
+		///		        /// Ã¼ber NodeConnectoren angesprochen werden.
 		///		        /// </summary>
 		///		        internal List<SingleNode> TreeExternalSingleNodes { get; set; }
 		///		        										|
 		///		        										+-> SingleNode-Id, z.B. "Datum" (NodeName wird zur Id)
 		///		
 		///		        	TreeExternalSingleNodes werden nicht nach oben in die TopRootJobList propagiert,
-		///		        	sondern sind für jede JobList spezifisch.
+		///		        	sondern sind fÃ¼r jede JobList spezifisch.
 		///		
 		///		        /// <summary>
 		///		        /// Cache zur Beschleunigung der Verarbeitung von TreeEvents
@@ -1890,7 +1923,7 @@ HotPlug
 		///		   														+-> einzelne Knoten-Id, z.B. "Datum" oder "Check_D"
 		///		
 		///		        	NodesByName werden nicht nach oben in die TopRootJobList propagiert,
-		///		        	sondern sind für jede JobList spezifisch.
+		///		        	sondern sind fÃ¼r jede JobList spezifisch.
 		///		
 		///		        /// <summary>
 		///		        /// Dictionary von LogicalNodes mit ihren Namen als Keys.
@@ -1937,8 +1970,8 @@ Xamarin
 
 Alle Checker und Locking
 	Checker, der gestartet wird, wird in eine Wartetabelle eingetragen.
-	Checker, die schon gelaufen sind und wieder gestartet werden sollen, werden hinten an die Wartetabelle angefügt.
-	Wie läuft das mit wiederholten Starts?
+	Checker, die schon gelaufen sind und wieder gestartet werden sollen, werden hinten an die Wartetabelle angefÃ¼gt.
+	Wie lÃ¤uft das mit wiederholten Starts?
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
 Windows PowerShell
@@ -1962,47 +1995,47 @@ PS > (gci -include *.cs,*.cpp,*.xaml -recurse | select-string .).Count
 
 
             //   1. Zuerst wird die Property VishnuRoot vorbelegt.
-            //      1.1 Wurde VishnuRoot in irgendeiner Weise als Parameter übergeben, wird dieser
-            //          Parameter in die Property übernommen und das Hilfsfeld vishnuRootUserSet auf true
+            //      1.1 Wurde VishnuRoot in irgendeiner Weise als Parameter Ã¼bergeben, wird dieser
+            //          Parameter in die Property Ã¼bernommen und das Hilfsfeld vishnuRootUserSet auf true
             //          gesetzt.
-            //      1.2 Anderenfalls wird VishnuRoot mit  eine mögliche Environment-Vorbelegung Vishnu_Root oder, wenn
+            //      1.2 Anderenfalls wird VishnuRoot mit  eine mÃ¶gliche Environment-Vorbelegung Vishnu_Root oder, wenn
             //          diese leer ist oder nicht existiert relativeVishnuRoot in die Property VishnuRoot
-            //          übernommen und das Hilfsfeld vishnuRootUserSet verbleibt auf false.
+            //          Ã¼bernommen und das Hilfsfeld vishnuRootUserSet verbleibt auf false.
             //      1.1 Dazu wird eine Hilfsvariable relativeVishnuRoot relativ zum aktuellen
             //          ApplicationRootPath (Verzeichnis mit der Vishnu.exe) gesetzt.
             //          1.1.1 Hierbei wird noch differenziert, ob es sich um eine .Net Framework-Variante
-            //                oder eine .Net (Core, 5-8, ...) Anwendung handelt (ein Rückschritt mehr).
+            //                oder eine .Net (Core, 5-8, ...) Anwendung handelt (ein RÃ¼ckschritt mehr).
             //   2. Nun wird eine Hilfsvariable "vishnuRootTemp" vorerst auf "ApplicationRootPath" gesetzt.
-            //   3. Dann wird eine Vorbelegung für das Verzeichnis mit den User-Assemblies 
+            //   3. Dann wird eine Vorbelegung fÃ¼r das Verzeichnis mit den User-Assemblies 
             //      ("userAssemblyDirectoryCandidate") gesetzt.
-            //      2.1 Dafür wird versucht, ein Verzeichnis "UserAssemblies" auf der gleichen Ebene
+            //      2.1 DafÃ¼r wird versucht, ein Verzeichnis "UserAssemblies" auf der gleichen Ebene
             //          wie "vishnuRootTemp" (momentan ApplicationRootPath) zu finden
-            //          (oberste Priorität hat immer ein mögliches Verzeichnis relativ zur Vishnu.exe).
+            //          (oberste PrioritÃ¤t hat immer ein mÃ¶gliches Verzeichnis relativ zur Vishnu.exe).
             //          2.1.1 Existiert dieses Verzeichnis, wird es als "userAssemblyDirectoryCandidate"
-            //                übernommen.
+            //                Ã¼bernommen.
             //          2.1.2 Existiert es nicht, wird die Hilfsvariable "vishnuRootTemp" auf "VishnuRoot"
-            //                (das Rootverzeichnis für die Vishnu-Entwicklung) gesetzt.
+            //                (das Rootverzeichnis fÃ¼r die Vishnu-Entwicklung) gesetzt.
             //                Dann wird entsprechend der Vishnu Standard-Verzeichnisstruktur 
             //                "<vishnuRootTemp>/ReadyBin/UserAssemblies" als "userAssemblyDirectoryCandidate"
-            //                übernommen.
-            //   4. Zuletzt wird über den Schlüssel "UserAssemblyDirectory" nach einer Parametrisierung
-            //      für das Verzeichnis mit den User-Assemblies gesucht.
-            //      3.1 Existiert zu diesem Schlüssel ein Wert ungleich null, wird dieser der Property
+            //                Ã¼bernommen.
+            //   4. Zuletzt wird Ã¼ber den SchlÃ¼ssel "UserAssemblyDirectory" nach einer Parametrisierung
+            //      fÃ¼r das Verzeichnis mit den User-Assemblies gesucht.
+            //      3.1 Existiert zu diesem SchlÃ¼ssel ein Wert ungleich null, wird dieser der Property
             //          "UserAssemblyDirectory" final zugewiesen.
-            //      3.2 Existiert zu diesem Schlüssel kein Wert ungleich null, wird mit dem Schlüssel
-            //          "Vishnu_UserAssemblies" im Programm-Environment nach einer möglichen
+            //      3.2 Existiert zu diesem SchlÃ¼ssel kein Wert ungleich null, wird mit dem SchlÃ¼ssel
+            //          "Vishnu_UserAssemblies" im Programm-Environment nach einer mÃ¶glichen
             //          Vorbelegung gesucht.
-            //          3.2.1 Existiert zu diesem Schlüssel ein Wert ungleich null, wird dieser der
+            //          3.2.1 Existiert zu diesem SchlÃ¼ssel ein Wert ungleich null, wird dieser der
             //                Property "UserAssemblyDirectory" final zugewiesen.
-            //          3.2.2 Existiert zu diesem Schlüssel kein Wert ungleich null, wird die
-            //                ursprünglich ermittelte Vorbelegung "userAssemblyDirectoryCandidate"
+            //          3.2.2 Existiert zu diesem SchlÃ¼ssel kein Wert ungleich null, wird die
+            //                ursprÃ¼nglich ermittelte Vorbelegung "userAssemblyDirectoryCandidate"
             //                der Property "UserAssemblyDirectory" final zugewiesen.
 
             // Ermittlung der Properties VishnuRoot und UserAssemblyDirectory zur Laufzeit.
-            // 1. Vorbelegung der Hilfsvariable "userAssemblyDirectoryCandidate" mit einem möglichen
+            // 1. Vorbelegung der Hilfsvariable "userAssemblyDirectoryCandidate" mit einem mÃ¶glichen
             //    Verzeichnis "UserAssemblies" auf derselben Hierarchiestufe des Verzeichnisses
-            //    mit der Vishnu.exe. Ein solches Verzeichnis soll vor allen anderen Möglichkeiten
-            //    Priorität haben.
+            //    mit der Vishnu.exe. Ein solches Verzeichnis soll vor allen anderen MÃ¶glichkeiten
+            //    PrioritÃ¤t haben.
             //    
 
 C:\Users\micro\Documents\Tools\openVishnu8\Vishnu.bin
