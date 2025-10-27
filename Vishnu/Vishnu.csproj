@@ -13,8 +13,8 @@
     <Company>NetEti</Company>
     <Description>Monitoring- und Prozesssteuerungssoftware mit integrierter Verarbeitung erweiterter logischer Ausdrücke.</Description>
     <Copyright>Copyright © $(Authors) 2012-$([System.DateTime]::Now.Year)</Copyright>
-    <AssemblyVersion>8.4.1.0</AssemblyVersion>
-    <FileVersion>8.4.1.0</FileVersion>
+    <AssemblyVersion>8.4.1.1</AssemblyVersion>
+    <FileVersion>8.4.1.1</FileVersion>
     <PackageTags>NetEti Vishnu Node Control View</PackageTags>
   </PropertyGroup>
 
@@ -120,6 +120,9 @@
 
 	<ItemGroup>
 	  <None Update="appsettings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="LoadExceptionJob.xml">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	  <None Update="Microsoft.Data.SqlClient.SNI.dll">

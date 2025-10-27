@@ -264,9 +264,14 @@ namespace LogicalTaskTree.Provider
                 else
                 {
                     isDefaultSnapshot = true;
-                    jobContainer =
-                        this.LoadJobDescriptionFile(this._appSettings.PrepareAndLocatePath(
-                            @"LoadExceptionJob.xml"), isSnapshot);
+                    SnapshotJobContainer? snapshotJobContainer
+                        = SerializationUtility.LoadFromXmlFile<SnapshotJobContainer>("LoadExceptionJob.xml");
+                    jobContainer = snapshotJobContainer?.JobDescription;
+                    if (jobContainer != null)
+                    {
+                        jobContainer.Path = snapshotJobContainer?.Path;
+                        jobContainer.TimeStamp = snapshotJobContainer?.TimeStamp;
+                    }
                 }
             }
             string logicalName = jobContainer?.LogicalName ?? "_unknown_";

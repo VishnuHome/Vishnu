@@ -1042,6 +1042,10 @@ ERLEDIGT: Bugfix: Korrektur der Suchroutine für dynamisch zu ladende Assemblies
 
 Stand: 07.10.2025 Version 8.4.1
 
+ERLEDIGT: Bugfix: Ein Re-Run auf einen SubJob, der einen JobConnector auf einen außerhalb des SubJobs liegenden Job enthält
+          führte zum Beenden des referenzierten Jobs. Wurde durch Implementierung eines neuen
+          Interfaces "IUntraversableElement" und Zuweisung zu NodeConnector behoben.
+
 -------------------------------------------------------------------------------------------------------------
 
 ###################
