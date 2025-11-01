@@ -21,6 +21,19 @@ namespace LogicalTaskTree
     {
         #region public members
 
+        /// <summary> Default Pfad zur JobListUserControl Dll. </summary>
+        public const string DEFAULTJOBLISTUSERCONTROLPATH = @"DefaultNodeControls\JobListUserControl.dll";
+        /// <summary> Default Pfad zur JobConnectorUserControl Dll. </summary>
+        public const string DEFAULTJOBCONNECTORUSERCONTROLPATH = @"DefaultNodeControls\JobConnectorUserControl.dll";
+        /// <summary> Default Pfad zur NodeListUserControl Dll. </summary>
+        public const string DEFAULTNODELISTUSERCONTROLPATH = @"DefaultNodeControls\NodeListUserControl.dll";
+        /// <summary> Default Pfad zur SingleNodeUserControl Dll. </summary>
+        public const string DEFAULTSINGLENODEUSERCONTROLPATH = @"DefaultNodeControls\SingleNodeUserControl.dll";
+        /// <summary> Default Pfad zur ConstantNodeUserControl Dll. </summary>
+        public const string DEFAULTCONSTANTNODEUSERCONTROLPATH = @"DefaultNodeControls\ConstantNodeUserControl.dll";
+        /// <summary> Default Pfad zur SnapshotUserControl Dll. </summary>
+        public const string DEFAULTSNAPSHOTUSERCONTROLPATH = @"DefaultNodeControls\SnapshotUserControl.dll";
+
         #region UndefinedJobProvider
 
         /// <summary>

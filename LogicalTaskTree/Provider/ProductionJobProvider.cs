@@ -404,51 +404,30 @@ namespace LogicalTaskTree.Provider
         //===================================================================================================
         private void LoadUserControlPathes(Job? mother, JobContainer jobContainer, JobPackage jobPackage)
         {
-            // Die UserControl-Pfade sind alle mit Default ungleich null vor-initialisiert
-            // (JobPackage.Job-Konstruktor), deshalb kann hier keine vereinfachende
-            // null-propagation kodiert werden, da sonst die Vorbelegungen ggf. mit null
-            // überschrieben würden.
-            // Die Variante: "jobPackage.Job.JobListUserControlPath
-            //                = tmpVar ??= jobPackage.Job.JobListUserControlPath;"
-            // würde zwar funktionieren, hätte aber im Fall "tmpVar == null" eine unnötige
-            // Zuweisung "jobPackage.Job.JobListUserControlPath = jobPackage.Job.JobListUserControlPath;"
-            // zur Folge.
-
-            string? tmpString = jobContainer.JobListUserControlPath ?? mother?.JobListUserControlPath;
-            if (tmpString != null)
-            {
-                jobPackage.Job.JobListUserControlPath = tmpString;
-            }
-            tmpString = jobContainer.JobListUserControlPath;
-            if (tmpString != null)
-            {
-                jobPackage.Job.JobListUserControlPath = tmpString;
-            }
-            tmpString = jobContainer.JobListUserControlPath ?? mother?.JobConnectorUserControlPath;
-            if (tmpString != null)
-            {
-                jobPackage.Job.JobConnectorUserControlPath = tmpString;
-            }
-            tmpString = jobContainer.JobListUserControlPath ?? mother?.NodeListUserControlPath;
-            if (tmpString != null)
-            {
-                jobPackage.Job.NodeListUserControlPath = tmpString;
-            }
-            tmpString = jobContainer.JobListUserControlPath ?? mother?.SingleNodeUserControlPath;
-            if (tmpString != null)
-            {
-                jobPackage.Job.SingleNodeUserControlPath = tmpString;
-            }
-            tmpString = jobContainer.JobListUserControlPath ?? mother?.ConstantNodeUserControlPath;
-            if (tmpString != null)
-            {
-                jobPackage.Job.ConstantNodeUserControlPath = tmpString;
-            }
-            tmpString = jobContainer.JobListUserControlPath ?? mother?.SnapshotUserControlPath;
-            if (tmpString != null)
-            {
-                jobPackage.Job.SnapshotUserControlPath = tmpString;
-            }
+            // Die UserControl-Pfade im Job sind alle mit Default ungleich null vor-initialisiert.
+            jobPackage.Job.JobListUserControlPath =
+                jobContainer.JobListUserControlPath ??
+                mother?.JobListUserControlPath ??
+                DEFAULTJOBLISTUSERCONTROLPATH; // @"DefaultNodeControls\JobListUserControl.dll";
+            jobPackage.Job.JobConnectorUserControlPath =
+                jobContainer.JobConnectorUserControlPath ??
+                mother?.JobConnectorUserControlPath ??
+                DEFAULTJOBCONNECTORUSERCONTROLPATH; // @"DefaultNodeControls\JobConnectorUserControl.dll";
+            jobPackage.Job.SnapshotUserControlPath =
+                jobContainer.SnapshotUserControlPath ??
+                mother?.SnapshotUserControlPath ??
+                DEFAULTSNAPSHOTUSERCONTROLPATH; // @"DefaultNodeControls\SnapshotUserControl.dll";
+            jobPackage.Job.NodeListUserControlPath =
+                jobContainer.NodeListUserControlPath ??
+                mother?.NodeListUserControlPath ??
+                DEFAULTNODELISTUSERCONTROLPATH; // @"DefaultNodeControls\NodeListUserControl.dll";
+            jobPackage.Job.SingleNodeUserControlPath = jobContainer.SingleNodeUserControlPath ??
+                mother?.SingleNodeUserControlPath ??
+                DEFAULTSINGLENODEUSERCONTROLPATH; // @"DefaultNodeControls\SingleNodeUserControl.dll";
+            jobPackage.Job.ConstantNodeUserControlPath =
+                jobContainer.ConstantNodeUserControlPath ??
+                mother?.ConstantNodeUserControlPath ??
+                DEFAULTCONSTANTNODEUSERCONTROLPATH; // @"DefaultNodeControls\ConstantNodeUserControl.dll";
         }
 
         #endregion LoadUserControlPathes

@@ -34,12 +34,12 @@ namespace LogicalTaskTree
     {
         #region public members
 
-        const string DEFAULTJOBLISTUSERCONTROLPATH = @"DefaultNodeControls\JobListUserControl.dll";
-        const string DEFAULTJOBCONNECTORUSERCONTROLPATH = @"DefaultNodeControls\JobConnectorUserControl.dll";
-        const string DEFAULTNODELISTUSERCONTROLPATH = @"DefaultNodeControls\NodeListUserControl.dll";
-        const string DEFAULTSINGLENODEUSERCONTROLPATH = @"DefaultNodeControls\SingleNodeUserControl.dll";
-        const string DEFAULTCONSTANTNODEUSERCONTROLPATH = @"DefaultNodeControls\ConstantNodeUserControl.dll";
-        const string DEFAULTSNAPSHOTUSERCONTROLPATH = @"DefaultNodeControls\SnapshotUserControl.dll";
+        //const string DEFAULTJOBLISTUSERCONTROLPATH = @"DefaultNodeControls\JobListUserControl.dll";
+        //const string DEFAULTJOBCONNECTORUSERCONTROLPATH = @"DefaultNodeControls\JobConnectorUserControl.dll";
+        //const string DEFAULTNODELISTUSERCONTROLPATH = @"DefaultNodeControls\NodeListUserControl.dll";
+        //const string DEFAULTSINGLENODEUSERCONTROLPATH = @"DefaultNodeControls\SingleNodeUserControl.dll";
+        //const string DEFAULTCONSTANTNODEUSERCONTROLPATH = @"DefaultNodeControls\ConstantNodeUserControl.dll";
+        //const string DEFAULTSNAPSHOTUSERCONTROLPATH = @"DefaultNodeControls\SnapshotUserControl.dll";
 
         /// <summary>
         /// Das Format, in dem dieser Job gespeichert wurde (Json oder Xml).
@@ -311,12 +311,12 @@ namespace LogicalTaskTree
             this.JobTrigger = null;
             this.ThreadLocked = false;
             this.IsVolatile = false;
-            this._jobListUserControlPath = Job.DEFAULTJOBLISTUSERCONTROLPATH; // @"DefaultNodeControls\JobListUserControl.dll";
-            this._jobConnectorUserControlPath = Job.DEFAULTJOBCONNECTORUSERCONTROLPATH; // @"DefaultNodeControls\JobConnectorUserControl.dll";
-            this._nodeListUserControlPath = Job.DEFAULTNODELISTUSERCONTROLPATH; // @"DefaultNodeControls\NodeListUserControl.dll";
-            this._singleNodeUserControlPath = Job.DEFAULTSINGLENODEUSERCONTROLPATH; // @"DefaultNodeControls\SingleNodeUserControl.dll";
-            this._constantNodeUserControlPath = Job.DEFAULTCONSTANTNODEUSERCONTROLPATH; // @"DefaultNodeControls\ConstantNodeUserControl.dll";
-            this._snapshotUserControlPath = Job.DEFAULTSNAPSHOTUSERCONTROLPATH; // @"DefaultNodeControls\SnapshotUserControl.dll";
+            this._jobListUserControlPath = JobProviderBase.DEFAULTJOBLISTUSERCONTROLPATH; // @"DefaultNodeControls\JobListUserControl.dll";
+            this._jobConnectorUserControlPath = JobProviderBase.DEFAULTJOBCONNECTORUSERCONTROLPATH; // @"DefaultNodeControls\JobConnectorUserControl.dll";
+            this._nodeListUserControlPath = JobProviderBase.DEFAULTNODELISTUSERCONTROLPATH; // @"DefaultNodeControls\NodeListUserControl.dll";
+            this._singleNodeUserControlPath = JobProviderBase.DEFAULTSINGLENODEUSERCONTROLPATH; // @"DefaultNodeControls\SingleNodeUserControl.dll";
+            this._constantNodeUserControlPath = JobProviderBase.DEFAULTCONSTANTNODEUSERCONTROLPATH; // @"DefaultNodeControls\ConstantNodeUserControl.dll";
+            this._snapshotUserControlPath = JobProviderBase.DEFAULTSNAPSHOTUSERCONTROLPATH; // @"DefaultNodeControls\SnapshotUserControl.dll";
         }
 
         #region tree globals
