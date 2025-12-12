@@ -227,7 +227,7 @@ namespace LogicalTaskTree.Provider
             else
             {
                 string tmpPath = this._appSettings.PrepareAndLocatePath(
-                    physicalJobPath, new string[] { }, false);
+                    physicalJobPath, new Stack<string>() { }, false);
                 string tmpDir = Path.GetDirectoryName(tmpPath) ?? "";
                 if (!File.Exists(tmpPath) && !Directory.Exists(tmpDir))
                 {

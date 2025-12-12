@@ -1,14 +1,16 @@
 ﻿using NetEti.ApplicationEnvironment;
-using System.Collections.Generic;
-using System.IO;
-using System;
-using NetEti.Globals;
-using System.Security;
-using System.Windows;
 using NetEti.FileTools;
 using NetEti.FileTools.Zip;
+using NetEti.Globals;
 using NetEti.ObjectSerializer;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection.Metadata;
+using System.Security;
+using System.Windows;
+using System.Windows.Navigation;
 
 namespace Vishnu.Interchange
 {
@@ -565,7 +567,7 @@ namespace Vishnu.Interchange
                 defaultDemo = true;
             }
             this.DemoModus = this.GetValue<bool>("DemoModus", defaultDemo);
-            this.RootJobPackagePath = this.PrepareAndLocatePath(rootJobPackagePath, this.JobDirPathes.ToArray());
+            this.RootJobPackagePath = this.PrepareAndLocatePath(rootJobPackagePath, this.JobDirPathes);
             this.MainJobName = Path.GetFileNameWithoutExtension(this.RootJobPackagePath);
             if (this.MainJobName.ToLower() == "jobdescription")
             {
@@ -752,7 +754,7 @@ namespace Vishnu.Interchange
         /// <returns>Modifizierter und verifizierter Pfad zu einer Datei oder leerer String.</returns>
         /// <exception cref="ArgumentException">Exception, wenn kein Pfad übergeben wurde.</exception>
         /// <exception cref="FileNotFoundException">Exception, wenn kein möglicher Pfad existiert.</exception>
-        public string PrepareAndLocatePath(string? rawPath, string[]? pathCandidates = null, bool throwIfFail = true)
+        public string PrepareAndLocatePath(string? rawPath, Stack<string>? pathCandidates = null, bool throwIfFail = true)
         {
             if (rawPath == null)
             {
@@ -760,10 +762,11 @@ namespace Vishnu.Interchange
             }
             if (pathCandidates == null)
             {
-                pathCandidates = this.JobDirPathes.ToArray();
+                pathCandidates = this.JobDirPathes;
             }
-            string tmpPath = ReplaceWildcardsAndPathes(rawPath, pathCandidates);
-            tmpPath = UnpackIfPacked(tmpPath);
+            string tmpPath = ReplaceWildcardsAndPathes(rawPath, pathCandidates.ToArray());
+            tmpPath = tmpPath.Replace(@"Plugin\Plugin", "Plugin");
+            tmpPath = UnpackIfPacked(tmpPath, pathCandidates);
             if (!Directory.Exists(tmpPath) && !File.Exists(tmpPath))
             {
                 foreach (string extension in this.ValidJobDescriptionExtensions)
@@ -778,7 +781,7 @@ namespace Vishnu.Interchange
             }
             if (Directory.Exists(tmpPath))
             {
-                tmpPath = Path.Combine(tmpPath, "JobDescription");
+                tmpPath = System.IO.Path.Combine(tmpPath, "JobDescription");
                 foreach (string extension in this.ValidJobDescriptionExtensions)
                 {
                     string tmpPath2 = tmpPath + extension;
@@ -813,9 +816,8 @@ namespace Vishnu.Interchange
                 string modifiedParaPart = paraPart;
                 if (modifiedParaPart.Trim() != String.Empty)
                 {
-                    string path = NetworkMappingsRefresher.GetNextReachablePath(
+                    modifiedParaPart = NetworkMappingsRefresher.GetNextReachablePath(
                         modifiedParaPart, searchDirectories) ?? modifiedParaPart;
-                    modifiedParaPart = path.Replace(@"Plugin\Plugin", "Plugin");
                 }
                 paraString += delimiter + modifiedParaPart;
                 delimiter = "|";
@@ -935,65 +937,75 @@ namespace Vishnu.Interchange
 
         // Wenn der Job ein ZIP-Archiv ist, wird der Job ins WorkingDirectory
         // entpackt und ein angepasster Pfad zum Job zurückgeliefert.
-        private string UnpackIfPacked(string physicalJobPath)
+        private string UnpackIfPacked(string physicalJobPath, Stack<string> searchDirectories)
         {
-            string tmpPath = physicalJobPath;
-            if (!File.Exists(tmpPath))
+            if (String.IsNullOrEmpty(physicalJobPath) || Directory.Exists(physicalJobPath))
             {
-                tmpPath = tmpPath.TrimEnd('\\').TrimEnd('/') + ".zip";
+                return physicalJobPath;
             }
-            if (File.Exists(tmpPath))
+            using (ZipAccess zipAccess = new ZipAccess())
             {
-                ZipAccess zipAccess = new ZipAccess();
-                try
+                string? tmpPath = physicalJobPath;
+                string lastNamePart = Path.GetFileNameWithoutExtension(physicalJobPath);
+                if (File.Exists(physicalJobPath))
                 {
-                    if (zipAccess.IsZip(tmpPath))
+                    if (!zipAccess.IsZip(tmpPath))
                     {
-                        if (String.IsNullOrEmpty(this.ZipRelativeDummyDirectory)
-                            || !Directory.Exists(this.ZipRelativeDummyDirectory))
-                        {
-                            this.CreateAndRememberZipRelativeDummyDirectory(tmpPath);
-                        }
-                        physicalJobPath = this.Unpack(tmpPath, zipAccess);
+                        return physicalJobPath;
                     }
                 }
-                finally
+                else
                 {
-                    zipAccess.Dispose();
+                    tmpPath = NetworkMappingsRefresher.GetNextReachablePath(tmpPath.TrimEnd('\\').TrimEnd('/') + ".zip", searchDirectories.ToArray());
+                }
+                if (File.Exists(tmpPath))
+                {
+                    physicalJobPath = tmpPath;
+                    if (zipAccess.IsZip(tmpPath))
+                    {
+                        if (!Directory.Exists(this.ZipRelativeDummyDirectory))
+                        {
+                            physicalJobPath = this.CreateAndRememberZipRelativeDummyDirectory(tmpPath);
+                            searchDirectories.Push(physicalJobPath);
+                        }
+                        else
+                        {
+                            physicalJobPath = this.ZipRelativeDummyDirectory;
+                        }
+                        try
+                        {
+                            zipAccess.UnZipArchive(tmpPath, physicalJobPath, null, false);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new ApplicationException(String.Format(
+                                "Das Zip-Archiv {0} konnte nicht entpackt werden nach {1}.", tmpPath, physicalJobPath), ex);
+                        }
+                        string pathCandidate = Path.Combine(physicalJobPath, lastNamePart);
+                        if (Directory.GetDirectories(physicalJobPath).Contains(pathCandidate))
+                        {
+                            physicalJobPath = pathCandidate;
+                        }
+                    }
                 }
             }
             return physicalJobPath;
         }
 
-        // Entpackt einen Job aus einem ZIP-Archiv.
-        private string Unpack(string archive, ZipAccess zipAccess)
+        private string CreateAndRememberZipRelativeDummyDirectory(string zipPath)
         {
-            string rtn = Directory.GetCurrentDirectory();
-            zipAccess.UnZipArchive(archive, this.WorkingDirectory, null, false);
-            string archivePath = Path.Combine(Path.GetDirectoryName(archive) ?? "", Path.GetFileNameWithoutExtension(archive));
-            if (!this.AssemblyDirectories.Contains(archivePath))
-            {
-                this.AssemblyDirectories.Add(archivePath);
-            }
-            if (!this.JobDirPathes.Contains(archivePath))
-            {
-                this.JobDirPathes.Push(archivePath);
-            }
-            rtn = Path.Combine(this.WorkingDirectory, Path.GetFileNameWithoutExtension(archive));
-            return rtn;
-        }
-
-        private void CreateAndRememberZipRelativeDummyDirectory(string zipPath)
-        {
-            string fallbackDirectory = Directory.GetCurrentDirectory();
-            string randomDirectoryName = Path.Combine(Path.GetDirectoryName(zipPath) ?? fallbackDirectory,
-                Path.GetRandomFileName() + ".v");
+            string randomDirectoryName = Path.Combine(this.TempDirectory, Path.GetRandomFileName() + ".vnu");
             Directory.CreateDirectory(randomDirectoryName);
             this.ZipRelativeDummyDirectory = randomDirectoryName;
             if (!this.JobDirPathes.Contains(randomDirectoryName))
             {
                 this.JobDirPathes.Push(randomDirectoryName);
             }
+            if (!this.AssemblyDirectories.Contains(randomDirectoryName))
+            {
+                this.AssemblyDirectories.Add(randomDirectoryName);
+            }
+            return randomDirectoryName;
         }
 
         private void SetSnapshotSustain(string snapshotSustainString)

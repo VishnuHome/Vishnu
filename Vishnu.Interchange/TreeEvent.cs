@@ -236,7 +236,7 @@ namespace Vishnu.Interchange
         /// <returns>Modifizierter und verifizierter Pfad zu einer Datei oder leerer String.</returns>
         /// <exception cref="ArgumentException">Exception, wenn kein Pfad übergeben wurde.</exception>
         /// <exception cref="FileNotFoundException">Exception, wenn kein möglicher Pfad existiert.</exception>
-        public string PrepareAndLocatePath(string? rawPath, string[]? pathCandidates = null, bool throwIfFail = true)
+        public string PrepareAndLocatePath(string? rawPath, Stack<string>? pathCandidates = null, bool throwIfFail = true)
         {
             return GenericSingletonProvider.GetInstance<AppSettings>().PrepareAndLocatePath(rawPath, pathCandidates, throwIfFail);
         }

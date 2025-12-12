@@ -1546,6 +1546,42 @@ Ziel: Realisierung einer Reaktion auf Ereignisse, deren Ursache weggefallen ist.
   
   der Administrator startet einen Vishnu (Service|Master)
   
+-------------------------------------------------------------------------------------------------
+Mögliche Job-Konstellationen:
+
+<path>/<name>
+	1.	<name> ist ein Zip-Archiv
+			Es wird ein temporäres Verzeichnis unterhalb von c:\Users\<user>\AppData\Local\Temp\
+			mit randomisiertem Namen <randomPath> erstellt und das Archiv dorthin entpackt.
+		1.1	Das Archiv entpackt einen Ordner, der wiederum eine Job-Description (xml|json)
+				enthält
+				=> Der Ordnername wäre der Jobname. Dies wird by Design anders gelöst:
+				1.1.1	der Archivname wurde ohne ".zip" angegeben oder
+				1.1.2	der Archivname wurde mit ".zip" angegeben:
+				=>	Der Archivname ohne Extension ist der Jobname,
+						und es wird eine "JobDescription".(xml|json) mit genau diesem Namen
+						im Verzeichnis vorausgesetzt.
+						Der Pfad des temporären Verzeichnisses <randomPath> wird inklusive des
+						entpackten Ordners und "JobDescription".(xml|json) gemerkt.
+		1.2	das Archiv entpackt direkt eine Job-Description (xml|json)
+				=>	der Archivname ohne Extension ist der Jobname,
+						und es wird eine "JobDescription".(xml|json) im Verzeichnis vorausgesetzt.
+						Der Pfad des temporären Verzeichnisses <randomPath> wird inklusive
+						der entpackten "JobDescription".(xml|json) gemerkt.
+		Andere Namen für Job-Descriptions als "JobDescription".(xml|json)
+		werden hier nicht unterstützt.
+	2.	<name> ist ein Verzeichnis
+				=>	<name> ist der Jobname,
+						und es wird eine "JobDescription".(xml|json) im Verzeichnis vorausgesetzt.
+						<path>/<name> wird inklusive der enthaltenen "JobDescription".(xml|json)
+						gemerkt.
+	3.	<name> ist eine Job-Description-Datei
+		3.1	<name> wurde ohne "(xml|json)" angegeben oder
+		3.2	<name> wurde mit "(xml|json)" angegeben:
+				=>	<name> ohne Extension ist der Jobname.
+						<path>/<name> wird inklusive der genannten Job-Description und
+						inklusive der Extension ".(xml|json)" gemerkt.
+						
   
 -------------------------------------------------------------------------------------------------
 Vishnu.exe -job="...\DemoJobs\Simple\ShowRefCheckTreeEventTriggerSnapshot" -UserAssemblyDirectory="...\UserAssemblies" -SingleInstance=false
