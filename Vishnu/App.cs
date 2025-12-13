@@ -535,14 +535,17 @@ namespace Vishnu
             catch { }
             if (App._appSettings != null)
             {
-                if (!String.IsNullOrEmpty(App._appSettings.ZipRelativeDummyDirectory)
-                    && Directory.Exists(App._appSettings.ZipRelativeDummyDirectory))
+                while (App._appSettings?.SelfCreatedDummyDirectories.Count > 0)
                 {
-                    try
+                    string? tempDir = App._appSettings?.SelfCreatedDummyDirectories.Pop();
+                    if (!string.IsNullOrEmpty(tempDir))
                     {
-                        Directory.Delete(App._appSettings.ZipRelativeDummyDirectory, true);
+                        try
+                        {
+                            Directory.Delete(tempDir, true);
+                        }
+                        catch { }
                     }
-                    catch { }
                 }
                 try
                 {

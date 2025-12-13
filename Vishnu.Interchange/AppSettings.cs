@@ -445,16 +445,19 @@ namespace Vishnu.Interchange
 
         /// <summary>
         /// Wenn es sich beim MainJob um ein Zip handelt, wird dieses von Vishnu
-        /// in das WorkingDirectory entpackt. Hierbei ändert sich allerdings das
-        /// Bezugsverzeichnis bei relativen Pfadangaben von SubJobs.
+        /// in ein neues Unterverzeichnis mit zufälligem Namen im Temp-Directory entpackt.
+        /// Hierbei ändert sich allerdings das Bezugsverzeichnis bei relativen
+        /// Pfadangaben von SubJobs.
         /// Um - zumindest in einfachen Szenarien - SubJobs noch finden zu können,
         /// wird im gleichen Verzeichnis, in dem sich das Zip-File befindet, ein
         /// Unterverzeichnis angelegt und dies während der laufenden Vishnu-Session
         /// zusätzlich als Ausgangs-Verzeichnis für die Suche nach SubJobs mit
         /// relativen Pfadangaben genutzt.
-        /// Vishnu löscht dieses Verzeichnis dann wieder, bevor es sich beendet.
+        /// Vishnu löscht alle selbst angelegten Verzeichnisse dann wieder,
+        /// bevor es sich beendet.
         /// </summary>
-        public string? ZipRelativeDummyDirectory { get; set; }
+        public Stack<string> SelfCreatedDummyDirectories { get; set; } = new Stack<string>();
+
 
         #endregion Properties (alphabetic)
 
@@ -963,14 +966,20 @@ namespace Vishnu.Interchange
                     physicalJobPath = tmpPath;
                     if (zipAccess.IsZip(tmpPath))
                     {
-                        if (!Directory.Exists(this.ZipRelativeDummyDirectory))
+                        if (this.SelfCreatedDummyDirectories?.Count == 0)
                         {
-                            physicalJobPath = this.CreateAndRememberZipRelativeDummyDirectory(tmpPath);
-                            searchDirectories.Push(physicalJobPath);
+                            string relativeJobSearchDirectory = this.CreateAndRememberRelativeDummyDirectory(Path.GetDirectoryName(physicalJobPath) ?? "");
+                            // searchDirectories.Push(relativeJobSearchDirectory);
+                            physicalJobPath = this.CreateAndRememberRelativeDummyDirectory(this.TempDirectory);
+                            // searchDirectories.Push(physicalJobPath);
                         }
                         else
                         {
-                            physicalJobPath = this.ZipRelativeDummyDirectory;
+                            string? physicalJobPathCandidate;
+                            if (this.SelfCreatedDummyDirectories?.TryPeek(out physicalJobPathCandidate) == true)
+                            {
+                                physicalJobPath = physicalJobPathCandidate;
+                            }
                         }
                         try
                         {
@@ -992,19 +1001,13 @@ namespace Vishnu.Interchange
             return physicalJobPath;
         }
 
-        private string CreateAndRememberZipRelativeDummyDirectory(string zipPath)
+        private string CreateAndRememberRelativeDummyDirectory(string rootPath)
         {
-            string randomDirectoryName = Path.Combine(this.TempDirectory, Path.GetRandomFileName() + ".vnu");
+            string randomDirectoryName = Path.Combine(rootPath, Path.GetRandomFileName() + ".vnu");
             Directory.CreateDirectory(randomDirectoryName);
-            this.ZipRelativeDummyDirectory = randomDirectoryName;
-            if (!this.JobDirPathes.Contains(randomDirectoryName))
-            {
-                this.JobDirPathes.Push(randomDirectoryName);
-            }
-            if (!this.AssemblyDirectories.Contains(randomDirectoryName))
-            {
-                this.AssemblyDirectories.Add(randomDirectoryName);
-            }
+            this.SelfCreatedDummyDirectories.Push(randomDirectoryName);
+            this.JobDirPathes.Push(randomDirectoryName);
+            this.AssemblyDirectories.Add(randomDirectoryName);
             return randomDirectoryName;
         }
 
