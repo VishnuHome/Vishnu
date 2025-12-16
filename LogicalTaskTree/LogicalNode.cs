@@ -2376,6 +2376,10 @@ namespace LogicalTaskTree
             lock (this._threadStartLocker)
             {
                 this.LastExecutingTreeEvent = source;
+                if (this.LastExecutingTreeEvent != null && String.IsNullOrEmpty(this.LastExecutingTreeEvent.NodeName)) // 16.12.2025 Nagel+
+                {
+                    this.LastExecutingTreeEvent.NodeName = this.NameId;
+                } // 16.12.2025 Nagel-
                 if ((this.CancellationToken.IsCancellationRequested)
                   || (this.LastLogicalState == NodeLogicalState.UserAbort))
                 {
@@ -2422,7 +2426,8 @@ namespace LogicalTaskTree
                     {
                         // new NetEti.ProcessTools.Threader(_starterThread, this.CancellationToken).Start(source);
                         LogThis("#Multithreading# starting Thread"); // 29.11.2023 Nagel+- TEST
-                        _starterThread.Start(source);
+                        // 16.12.2025 Nagel+ _starterThread.Start(source);
+                        _starterThread.Start(this.LastExecutingTreeEvent); // 16.12.2025 Nagel-
                     }
                     catch (InvalidOperationException) { }
                 }

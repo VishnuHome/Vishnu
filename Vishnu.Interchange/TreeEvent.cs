@@ -161,10 +161,10 @@ namespace Vishnu.Interchange
         public string SenderId { get; set; }
         
         /// <summary>Name des Knotens, der das Ereignis meldet.</summary>
-        public string NodeName { get; internal set; }
+        public string NodeName { get; set; }
         
         /// <summary>Pfad zum Knoten, der das Ereignis meldet.</summary>
-        public string NodePath { get; internal set; }
+        public string NodePath { get; set; }
         
         /// <summary>Logischer Wert des Knotens, der das Ereignis meldet (true, false oder null).</summary>
         public bool? Logical { get; internal set; }
